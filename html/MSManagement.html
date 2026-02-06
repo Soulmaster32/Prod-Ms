@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MS 5S Management System - Paglambo 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            /* --- PAGLAMBO 5S THEME COLORS (Based on Image) --- */
+            --bg-dark: #2b2b2b; /* Dark grey backing */
+            --primary-red: #8B0000; /* Deep Red from Header */
+            --primary-red-light: #a52a2a;
+            --accent-yellow: #FFD700; /* Bright Yellow from Post-its */
+            --accent-blue: #0047AB; /* Blue from "Programs" headers */
+            --paper: #f4f4f4;
+            --text-main: #333;
+            
+            /* Shadows & Effects */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+            
+            /* Status Colors */
+            --danger: #d32f2f; --danger-bg: #ffebee;
+            --success: #2e7d32; --success-bg: #e8f5e9;
+            --warning: #f57f17; --warning-bg: #fffde7;
+        }
+
+        * { box-sizing: border-box; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #e0e0e0; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-yellow); }
+
+        body {
+            margin: 0; font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-dark);
+            /* Subtle texture to mimic the board backing */
+            background-image: radial-gradient(#383838 15%, transparent 16%), radial-gradient(#383838 15%, transparent 16%);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            color: var(--text-main); padding: 15px;
+        }
+
+        .dashboard-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; max-width: 1800px; margin: 0 auto; }
+
+        /* --- HEADER (Matches the Red Top Board) --- */
+        .header-area {
+            grid-column: 1 / -1; 
+            background: linear-gradient(90deg, var(--primary-red) 0%, #5c0000 100%);
+            padding: 15px 20px; border-radius: 6px; border: 2px solid var(--accent-yellow);
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: var(--shadow-lg); flex-wrap: wrap; gap: 15px;
+        }
+        
+        .header-title h1 {
+            font-family: 'Oswald', sans-serif; font-size: clamp(1.8rem, 3vw, 2.5rem); margin: 0; 
+            color: #fff; text-transform: uppercase; letter-spacing: 1px;
+            text-shadow: 2px 2px 0px #000;
+        }
+        .header-subtitle {
+            font-family: 'Oswald', sans-serif; color: var(--accent-yellow); font-size: 1.1rem; letter-spacing: 2px; margin-top: 5px;
+        }
+
+        .search-box { position: relative; flex-grow: 1; max-width: 400px; }
+        .search-box input {
+            width: 100%; padding: 10px 15px 10px 35px; border-radius: 20px; border: 2px solid var(--accent-yellow);
+            background: rgba(255,255,255,0.9); color: #333; font-weight: bold;
+        }
+        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--primary-red); }
+
+        /* --- NAVIGATION --- */
+        .nav-bar {
+            grid-column: 1 / -1; 
+            background: #fff; border-bottom: 4px solid var(--primary-red);
+            display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 0 10px; 
+            border-radius: 4px; margin-bottom: 10px; box-shadow: var(--shadow);
+        }
+
+        .nav-link, .dropbtn {
+            color: #444; text-decoration: none; font-family: 'Oswald', sans-serif; text-transform: uppercase;
+            padding: 12px 20px; font-size: 1rem; transition: 0.3s; display: inline-flex;
+            background: transparent; border: none; cursor: pointer; font-weight: bold;
+        }
+        .nav-link:hover, .dropdown:hover .dropbtn { background: var(--primary-red); color: var(--accent-yellow); }
+        
+        .dropdown { position: relative; display: inline-flex; }
+        .dropdown-content {
+            display: none; position: absolute; background-color: #fff; min-width: 240px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3); z-index: 1000; top: 100%; left: 0;
+            border-top: 4px solid var(--accent-yellow);
+        }
+        .dropdown-content a {
+            color: #333; padding: 12px 16px; text-decoration: none; display: block;
+            font-family: 'Roboto', sans-serif; font-size: 0.9rem; border-bottom: 1px solid #eee;
+        }
+        .dropdown-content a:hover { background-color: var(--accent-yellow); color: var(--primary-red); }
+        .dropdown:hover .dropdown-content { display: block; }
+
+        /* --- CARDS & UTILS --- */
+        .paper { background: var(--paper); padding: 20px; box-shadow: var(--shadow); border-radius: 4px; height: 100%; border-top: 4px solid var(--primary-red); }
+        
+        .section-badge { 
+            background: var(--accent-blue); /* Blue from "Programs" header */
+            color: #fff; padding: 10px 15px; 
+            font-family: 'Oswald', sans-serif; text-transform: uppercase; 
+            border-radius: 4px; margin-bottom: 12px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            box-shadow: var(--shadow-sm); border-left: 5px solid var(--accent-yellow);
+        }
+        
+        /* Buttons */
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-family: 'Oswald', sans-serif; text-transform: uppercase; font-weight: bold; font-size: 0.8rem; }
+        .btn-gold { background: var(--accent-yellow); color: var(--primary-red); border: 1px solid #d4af37; }
+        .btn-navy { background: var(--primary-red); color: white; border: 1px solid #5c0000; }
+        .btn-danger { background: #333; color: white; }
+        .btn-sm { padding: 4px 8px; font-size: 0.7rem; margin-left: 5px; }
+        .btn:hover { filter: brightness(110%); transform: translateY(-1px); }
+
+        /* --- PAGLAMBO ABOUT CARD --- */
+        .vm-card {
+            background: white; border-radius: 4px; padding: 15px; margin-bottom: 15px;
+            border: 2px solid var(--primary-red); box-shadow: var(--shadow); position: relative;
+        }
+        .vm-card::before { content: "PAGLAMBO"; position: absolute; right: 10px; top: 10px; font-family:'Oswald'; color:rgba(139,0,0,0.1); font-size: 3rem; pointer-events: none;}
+        .vm-title { font-family: 'Oswald'; color: var(--primary-red); font-size: 1.1rem; margin-bottom: 5px; border-bottom: 2px solid var(--accent-yellow); padding-bottom: 5px; }
+        .vm-text { font-size: 0.85rem; color: #444; line-height: 1.4; text-align: justify; }
+
+        /* --- KPI BOARD (Simulating the 1-8 Objective Grid) --- */
+        .obj-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; }
+        .obj-row { 
+            display: flex; align-items: center; padding: 10px; background: #fff; 
+            border: 1px solid #ccc; border-radius: 4px; border-left: 6px solid var(--primary-red);
+        }
+        .obj-number {
+            font-family: 'Oswald'; font-size: 1.5rem; color: var(--accent-blue); margin-right: 10px;
+            text-shadow: 1px 1px 0 #ddd; width: 30px; text-align: center;
+        }
+
+        /* --- TABLE --- */
+        table.data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; background: white; }
+        table.data-table th { background: var(--primary-red); color: var(--accent-yellow); padding: 10px; text-align: left; }
+        table.data-table td { border-bottom: 1px solid #ddd; padding: 8px; }
+        table.data-table tr:hover td { background-color: #ffebee; }
+        
+        /* --- SCRUM BOARD (Simulating the "Programs" section) --- */
+        .scrum-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; height: 500px; overflow-x: auto; }
+        .scrum-col { background: #e0e0e0; border-radius: 4px; padding: 10px; display: flex; flex-direction: column; min-width: 220px; border: 1px solid #ccc; }
+        .scrum-header { font-family: 'Oswald'; color: var(--primary-red); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary-red); padding-bottom: 5px;}
+        .scrum-cards { flex-grow: 1; overflow-y: auto; padding-right: 4px; min-height: 50px; }
+        
+        .scrum-card { 
+            background: #fff; padding: 10px; border-radius: 2px; margin-bottom: 8px; 
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.1); border-top: 4px solid var(--accent-blue); /* Blue Tape look */
+            cursor: grab; display: flex; flex-direction: column; gap: 5px;
+            transition: 0.2s; position: relative;
+        }
+        .scrum-card:hover { transform: rotate(-1deg); box-shadow: 3px 3px 6px rgba(0,0,0,0.2); z-index: 10;}
+        .scrum-card.dragging { opacity: 0.5; border: 2px dashed var(--primary-red); }
+        .scrum-col.drag-over { background: #d0d0d0; border: 2px dashed var(--primary-red); }
+        
+        .card-obj-num {
+            position: absolute; top: 5px; right: 5px; background: var(--accent-yellow); 
+            color: var(--primary-red); font-weight: bold; padding: 2px 6px; border-radius: 50%; font-size: 0.7rem;
+            border: 1px solid var(--primary-red);
+        }
+
+        .card-badges { display: flex; gap: 5px; flex-wrap: wrap; }
+        .badge { padding: 2px 6px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; border: 1px solid #ccc; }
+        .bg-pass { background: var(--success-bg); color: var(--success); border-color: var(--success); }
+        .bg-fail { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
+
+        /* --- MODAL --- */
+        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:none; justify-content:center; align-items:center; z-index:1000; }
+        .modal-box { background: white; width: 100%; max-width: 600px; border-radius: 4px; border-top: 6px solid var(--primary-red); padding: 0; }
+        .modal-header { background: #f4f4f4; padding: 15px; display: flex; justify-content: space-between; border-bottom: 1px solid #ddd; font-family: 'Oswald'; color: var(--primary-red); }
+        .modal-body { padding: 20px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-group { display: flex; flex-direction: column; margin-bottom: 10px; }
+        .form-group label { font-size: 0.75rem; font-weight: 700; color: #666; text-transform: uppercase; }
+        .form-group input, .form-group select { padding: 8px; border: 1px solid #ccc; background: #fff; }
+        .col-span-2 { grid-column: span 2; }
+
+        /* --- TEAM FOOTER --- */
+        .team-container { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        .team-member { width: 80px; text-align: center; }
+        .team-img { width: 60px; height: 60px; background: #ddd; border-radius: 50%; margin: 0 auto; border: 2px solid var(--primary-red); overflow: hidden; display: flex; align-items: center; justify-content: center; color: #888; font-size: 0.7rem;}
+        .team-name { font-size: 0.7rem; font-weight: bold; margin-top: 5px; color: var(--primary-red); }
+
+        /* --- TOAST --- */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: white; border-left: 5px solid var(--accent-yellow); padding: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s; font-weight: bold; color: var(--primary-red); }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        @media (max-width: 1024px) { 
+            .dashboard-grid { display: block; } 
+            .header-area { flex-direction: column; text-align: center; }
+            .form-grid { grid-template-columns: 1fr; }
+            .scrum-container { overflow-x: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<div class="dashboard-grid">
+    <!-- HEADER -->
+    <header class="header-area">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <!-- Simulated Logo -->
+            <div style="width: 60px; height: 60px; background: white; border-radius: 50%; border: 3px solid var(--accent-yellow); display: flex; justify-content: center; align-items: center; color: var(--primary-red); font-weight: bold; font-family: 'Oswald'; font-size: 1.5rem;">5S</div>
+            <div class="header-title">
+                <h1>MS 5S MANAGEMENT SYSTEM</h1>
+                <div class="header-subtitle">PAGLAMBO 2026 - MIXED SULPHIDE SECTION</div>
+            </div>
+        </div>
+        
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Search Programs, 5S Audits, or Personnel..." oninput="App.handleSearch(this.value)">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-gold" onclick="App.exportData()">📤 Export JSON</button>
+            <button class="btn btn-gold" onclick="document.getElementById('importFile').click()">📥 Import</button>
+            <input type="file" id="importFile" hidden onchange="App.importData(event)">
+            <button class="btn btn-navy" onclick="App.resetAll()">🔄 Reset</button>
+        </div>
+    </header>
+
+    <!-- NAVIGATION -->
+    <nav class="nav-bar">
+        <a href="Qualitymanagement.html" class="nav-link">Home</a>
+        <div class="dropdown">
+            <button class="dropbtn">Management Systems ▼</button>
+            <div class="dropdown-content">
+                <a href="Qualitymanagement.html">Quality Management</a>
+                <a href="#" class="active" style="background:var(--accent-yellow); color:var(--primary-red); font-weight:bold;">MS 5S System</a>
+                <a href="#">Safety Management</a>
+            </div>
+        </div>
+        <a href="#" class="nav-link">Programs</a>
+        <a href="#" class="nav-link">Calendar</a>
+    </nav>
+
+    <!-- LEFT COLUMN: Intro & KPI -->
+    <div style="grid-column: 1 / 4; margin-bottom: 20px;">
+        <!-- PAGLAMBO DESCRIPTION -->
+        <div class="vm-card">
+            <div class="vm-title">ABOUT OUR PROJECT</div>
+            <div class="vm-text">
+                hdhsbsbskskshshshdhdjdjdbdhdhdhdhd
+                jdjdjdjdjdjdjjdjd
+                jdjdjdjd
+                <br><br>
+                <strong>Goal:</strong> To achieve a higher level of advancement that requires serious attention and discipline through the 5S Methodology.
+            </div>
+        </div>
+
+        <div class="section-badge">
+            <span>Functional Objectives</span>
+            <button class="btn btn-gold" style="font-size: 0.7rem; padding: 2px 6px;" onclick="App.openKPIModal('add')">+</button>
+        </div>
+        <!-- 1-8 Numbered Objectives like the board -->
+        <div class="obj-grid" id="kpiContainer"></div>
+        
+        <div class="section-badge" style="margin-top: 15px;"><span>Substandard Trends</span></div>
+        <div class="paper" style="height: 200px; padding:10px;">
+            <canvas id="trendChart"></canvas>
+        </div>
+    </div>
+
+    <!-- CENTER/RIGHT COLUMN: 5S Programs (Scrum) -->
+    <div style="grid-column: 4 / -1; margin-bottom: 20px;">
+        <div class="section-badge">
+            <span>MS Section 5S Programs & Activities</span>
+            <button class="btn btn-gold" style="font-size: 0.7rem; padding: 4px 10px;" onclick="App.openScrumModal('add')">+ New Program</button>
+        </div>
+        
+        <div class="paper" style="background: #f9f9f9; border-left: 10px solid var(--primary-red);">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px; color:#666; font-size:0.8rem;">
+                <span id="scrumTotal">Total Programs: 0</span>
+                <span>Target: Zero Missing Tools</span>
+            </div>
+
+            <div class="scrum-container" id="scrumBoard">
+                <!-- Columns: Plan, Do, Check, Act -->
+            </div>
+        </div>
+    </div>
+
+    <!-- FULL WIDTH: Substandard Report (Audit) -->
+    <div style="grid-column: 1 / -1; margin-bottom: 20px;">
+         <div class="section-badge">
+            <span>Daily Substandard & Rectification Monitoring</span>
+            <button class="btn btn-gold" style="font-size: 0.7rem; padding: 4px 10px;" onclick="App.openAuditModal('add')">+ Add Finding</button>
+        </div>
+        <div class="paper" style="max-height: 400px; overflow-y: auto;">
+            <table class="data-table" id="auditTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Objective #</th>
+                        <th>Condition / Finding</th>
+                        <th>PIC</th>
+                        <th>Rectification Status</th>
+                        <th>Evidence</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="auditBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- FOOTER: TEAM & STRUCTURE -->
+    <div style="grid-column: 1 / -1;">
+        <div class="section-badge"><span>5S Core Team & Structure</span></div>
+        <div class="paper">
+            <div class="team-container">
+                <!-- Placeholders based on images in the board -->
+                <div class="team-member"><div class="team-img">MGR</div><div class="team-name">Manager</div></div>
+                <div class="team-member"><div class="team-img">SUPER</div><div class="team-name">Supervisor</div></div>
+                <div class="team-member"><div class="team-img">COORD</div><div class="team-name">5S Coord</div></div>
+                <div class="team-member"><div class="team-img">SEC</div><div class="team-name">Secretary</div></div>
+                <div class="team-member"><div class="team-img">AUD</div><div class="team-name">Auditor 1</div></div>
+                <div class="team-member"><div class="team-img">AUD</div><div class="team-name">Auditor 2</div></div>
+            </div>
+            <div style="text-align:center; margin-top:15px; font-size:0.8rem; color:#666;">
+                <em>"The continuous search for improvements and innovative ideas is crucial."</em>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- MODALS (Similar Structure, Adapted Styling) -->
+
+<!-- AUDIT MODAL -->
+<div class="modal-overlay" id="auditModal">
+    <div class="modal-box">
+        <div class="modal-header"><h3>Daily Substandard Record</h3><button onclick="App.closeModal('auditModal')" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button></div>
+        <div class="modal-body">
+            <form id="auditForm" class="form-grid">
+                <input type="hidden" id="auditId">
+                <div class="form-group"><label>Objective # (1-8)</label><input type="number" id="auditObjNum" min="1" max="8"></div>
+                <div class="form-group"><label>Date</label><input type="date" id="auditDate"></div>
+                <div class="form-group col-span-2"><label>Substandard Condition</label><input type="text" id="auditDesc"></div>
+                <div class="form-group"><label>PIC</label><input type="text" id="auditPic"></div>
+                <div class="form-group"><label>Status</label>
+                    <select id="auditStatus">
+                        <option value="Pending">Pending</option>
+                        <option value="Rectified">Rectified (Passed)</option>
+                        <option value="Failed">Failed</option>
+                    </select>
+                </div>
+                <div class="form-group col-span-2"><label>Evidence Link</label><input type="text" id="auditImg" placeholder="Link to photo..."></div>
+            </form>
+            <div style="text-align:right; margin-top:10px;">
+                <button class="btn btn-navy" onclick="App.saveAudit()">Save Record</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SCRUM TASK MODAL -->
+<div class="modal-overlay" id="scrumModal">
+    <div class="modal-box">
+        <div class="modal-header"><h3>5S Program / Activity</h3><button onclick="App.closeModal('scrumModal')" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button></div>
+        <div class="modal-body">
+            <form id="scrumForm" class="form-grid">
+                <input type="hidden" id="scrumId">
+                <div class="form-group col-span-2"><label>Program Name</label><input type="text" id="scrumText" placeholder="e.g. Weekly Tool Inventory"></div>
+                <div class="form-group"><label>Related Objective #</label><input type="number" id="scrumObj" min="1" max="8"></div>
+                <div class="form-group"><label>PIC / Team</label><input type="text" id="scrumUser"></div>
+                <div class="form-group"><label>Frequency</label><input type="text" id="scrumTag" placeholder="Daily, Weekly, Monthly"></div>
+                <div class="form-group"><label>Current Status</label>
+                    <select id="scrumStatus">
+                        <option value="plan">Plan / Program</option>
+                        <option value="doing">Ongoing / Doing</option>
+                        <option value="check">Monitoring (Check)</option>
+                        <option value="act">Standardized (Act)</option>
+                    </select>
+                </div>
+            </form>
+            <div style="display:flex; justify-content:space-between; margin-top:15px;">
+                <button class="btn btn-danger" id="btnDeleteScrum" onclick="App.deleteScrum()" style="display:none;">Delete</button>
+                <button class="btn btn-navy" onclick="App.saveScrum()">Save Program</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const App = (() => {
+    // Unique Key for this page to not conflict with Quality Management
+    const STORE_KEY = 'MS_5S_SYSTEM_V1';
+    let filterTerm = ""; 
+    
+    // Initial State - Pre-populated based on the Board Image
+    let state = {
+        audits: [
+            { id: 1, objNum: 1, date: '2026-02-01', desc: 'Unlabeled chemical bottle in Area 2', pic: 'J. Doe', status: 'Pending', img: '' },
+            { id: 2, objNum: 4, date: '2026-02-02', desc: 'Workplace condition dirty after shift', pic: 'Shift A', status: 'Rectified', img: '' }
+        ],
+        kpis: [ // The 8 Objectives from the board
+            { id: 1, text: 'Safety Audits', val: '100%', target: '100%', num: 1 },
+            { id: 2, text: 'Rectification', val: '95%', target: '100%', num: 2 },
+            { id: 3, text: 'Missing Tools', val: '0', target: '0', num: 3 },
+            { id: 4, text: 'Workplace Cond.', val: 'Good', target: 'Exc', num: 4 },
+            { id: 5, text: '5S Model Area', val: 'Select', target: 'Done', num: 5 },
+            { id: 6, text: 'Trainings Direct', val: '100%', target: '100%', num: 6 },
+            { id: 7, text: 'Trainings CTS', val: '80%', target: '100%', num: 7 },
+            { id: 8, text: 'Bulletin Report', val: 'Done', target: 'Done', num: 8 }
+        ],
+        scrumTasks: [
+            { id: 1, text: 'Daily Substandard Report', user: 'Admin', obj: 1, tag: 'Daily', status: 'doing' },
+            { id: 2, text: 'Weekly Tool Inventory', user: 'Storeman', obj: 3, tag: 'Weekly', status: 'check' },
+            { id: 3, text: 'Monthly Safety Audit', user: 'Safety Officer', obj: 2, tag: 'Monthly', status: 'plan' },
+            { id: 4, text: '5S Education to Direct', user: 'HR', obj: 6, tag: 'Quarterly', status: 'act' }
+        ]
+    };
+
+    const scrumCols = [
+        { id: 'plan', title: 'PROGRAMS (PLAN)' },
+        { id: 'doing', title: 'ONGOING (DO)' },
+        { id: 'check', title: 'MONITORING (CHECK)' },
+        { id: 'act', title: 'STANDARD (ACT)' }
+    ];
+
+    const init = () => {
+        const saved = localStorage.getItem(STORE_KEY);
+        if (saved) state = JSON.parse(saved);
+        render();
+        renderChart();
+    };
+
+    const saveState = () => {
+        localStorage.setItem(STORE_KEY, JSON.stringify(state));
+        render();
+    };
+
+    const handleSearch = (val) => {
+        filterTerm = val.toLowerCase();
+        render();
+    };
+
+    const render = () => {
+        // Render 5S Findings Table
+        const auditBody = document.getElementById('auditBody');
+        const filteredAudits = state.audits.filter(a => 
+            a.desc.toLowerCase().includes(filterTerm) || 
+            a.pic.toLowerCase().includes(filterTerm)
+        );
+
+        auditBody.innerHTML = filteredAudits.map(a => `
+            <tr>
+                <td>${a.date}</td>
+                <td><span style="background:var(--accent-blue); color:white; padding:2px 6px; border-radius:50%; font-size:0.7rem;">${a.objNum}</span></td>
+                <td>${a.desc}</td>
+                <td>${a.pic}</td>
+                <td><span class="badge ${a.status==='Rectified'?'bg-pass':'bg-fail'}">${a.status}</span></td>
+                <td>${a.img ? `<a href="${a.img}" target="_blank">📷 View</a>` : '-'}</td>
+                <td><button class="btn-sm btn-gold" onclick="App.deleteAudit(${a.id})">Del</button></td>
+            </tr>
+        `).join('');
+
+        // Render KPI Grid (Functional Objectives 1-8)
+        document.getElementById('kpiContainer').innerHTML = state.kpis.map(k => `
+            <div class="obj-row">
+                <div class="obj-number">${k.num}</div>
+                <div style="flex-grow:1;">
+                    <div style="font-weight:bold; font-size:0.8rem; color:var(--primary-red);">${k.text}</div>
+                    <div style="font-size:0.7rem; color:#666;">Target: ${k.target}</div>
+                </div>
+                <div style="font-weight:bold; font-size:1rem; color:var(--accent-blue);">${k.val}</div>
+            </div>
+        `).join('');
+
+        // Render Scrum Board
+        const board = document.getElementById('scrumBoard');
+        const totalTasks = state.scrumTasks.length;
+        document.getElementById('scrumTotal').innerText = `Total Programs: ${totalTasks}`;
+
+        board.innerHTML = scrumCols.map(col => {
+            const tasks = state.scrumTasks.filter(t => t.status === col.id && t.text.toLowerCase().includes(filterTerm));
+            return `
+            <div class="scrum-col" ondragover="App.handleDragOver(event)" ondrop="App.handleDrop(event, '${col.id}')">
+                <div class="scrum-header">
+                    <span>${col.title}</span>
+                    <span style="background:var(--primary-red); color:white; padding:1px 6px; border-radius:10px; font-size:0.7rem;">${tasks.length}</span>
+                </div>
+                <div class="scrum-cards">
+                    ${tasks.map(t => `
+                        <div class="scrum-card" draggable="true" ondragstart="App.handleDragStart(event, ${t.id})">
+                            <span class="card-obj-num" title="Objective #${t.obj}">${t.obj}</span>
+                            <strong onclick="App.openScrumModal('edit', ${t.id})" style="font-size:0.85rem; padding-right:20px;">${t.text}</strong>
+                            <div class="card-badges" style="margin-top:5px;">
+                                <span class="badge" style="background:#eee;">${t.tag}</span>
+                                <span class="badge" style="background:var(--paper); color:#666;">${t.user}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            `;
+        }).join('');
+    };
+
+    // --- LOGIC ---
+    const handleDragStart = (e, id) => { e.dataTransfer.setData("text/plain", id); e.target.classList.add('dragging'); };
+    const handleDragOver = (e) => { e.preventDefault(); e.currentTarget.classList.add('drag-over'); };
+    const handleDrop = (e, newStatus) => {
+        e.preventDefault();
+        document.querySelectorAll('.scrum-col').forEach(col => col.classList.remove('drag-over'));
+        const id = parseInt(e.dataTransfer.getData("text/plain"));
+        const task = state.scrumTasks.find(t => t.id === id);
+        if(task && task.status !== newStatus) {
+            task.status = newStatus;
+            saveState();
+            showToast(`Moved to ${newStatus.toUpperCase()}`);
+        }
+    };
+
+    // Modal & CRUD
+    const openAuditModal = (mode) => { 
+        document.getElementById('auditForm').reset();
+        document.getElementById('auditId').value = 'new';
+        document.getElementById('auditDate').valueAsDate = new Date();
+        document.getElementById('auditModal').style.display = 'flex'; 
+    };
+    const saveAudit = () => {
+        const data = {
+            id: Date.now(),
+            objNum: document.getElementById('auditObjNum').value,
+            date: document.getElementById('auditDate').value,
+            desc: document.getElementById('auditDesc').value,
+            pic: document.getElementById('auditPic').value,
+            status: document.getElementById('auditStatus').value,
+            img: document.getElementById('auditImg').value
+        };
+        state.audits.unshift(data);
+        saveState();
+        closeModal('auditModal');
+        showToast('Audit Recorded');
+    };
+    const deleteAudit = (id) => { if(confirm('Delete?')) { state.audits = state.audits.filter(a=>a.id!==id); saveState(); }};
+
+    const openScrumModal = (mode, id) => {
+        const form = document.getElementById('scrumForm');
+        form.reset();
+        document.getElementById('scrumId').value = mode === 'edit' ? id : 'new';
+        document.getElementById('btnDeleteScrum').style.display = mode === 'edit' ? 'block' : 'none';
+        
+        if(mode === 'edit') {
+            const t = state.scrumTasks.find(x => x.id === id);
+            document.getElementById('scrumText').value = t.text;
+            document.getElementById('scrumObj').value = t.obj;
+            document.getElementById('scrumUser').value = t.user;
+            document.getElementById('scrumTag').value = t.tag;
+            document.getElementById('scrumStatus').value = t.status;
+        }
+        document.getElementById('scrumModal').style.display = 'flex';
+    };
+    const saveScrum = () => {
+        const idVal = document.getElementById('scrumId').value;
+        const data = {
+            id: idVal === 'new' ? Date.now() : parseInt(idVal),
+            text: document.getElementById('scrumText').value,
+            obj: document.getElementById('scrumObj').value,
+            user: document.getElementById('scrumUser').value,
+            tag: document.getElementById('scrumTag').value,
+            status: document.getElementById('scrumStatus').value
+        };
+        if(idVal === 'new') state.scrumTasks.push(data);
+        else { const idx = state.scrumTasks.findIndex(x=>x.id===data.id); state.scrumTasks[idx] = data; }
+        saveState();
+        closeModal('scrumModal');
+        showToast('Program Updated');
+    };
+    const deleteScrum = () => {
+        const id = parseInt(document.getElementById('scrumId').value);
+        if(confirm('Delete?')) { state.scrumTasks = state.scrumTasks.filter(x=>x.id!==id); saveState(); closeModal('scrumModal'); }
+    };
+
+    // Utils
+    const closeModal = (id) => document.getElementById(id).style.display = 'none';
+    const showToast = (msg) => {
+        const c = document.getElementById('toast-container');
+        const t = document.createElement('div');
+        t.className = 'toast'; t.innerText = "✅ " + msg;
+        c.appendChild(t); setTimeout(()=>t.remove(), 3000);
+    };
+    const resetAll = () => { if(confirm('Reset all 5S Data?')) { localStorage.removeItem(STORE_KEY); location.reload(); }};
+    const exportData = () => {
+        const a = document.createElement('a');
+        a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+        a.download = "MS_5S_Backup.json"; a.click();
+    };
+    const importData = (e) => {
+        const r = new FileReader();
+        r.onload = (ev) => { try { state = JSON.parse(ev.target.result); saveState(); location.reload(); } catch(err){ alert('Invalid File'); } };
+        r.readAsText(e.target.files[0]);
+    };
+
+    let chartObj = null;
+    const renderChart = () => {
+        const ctx = document.getElementById('trendChart').getContext('2d');
+        if(chartObj) chartObj.destroy();
+        chartObj = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Obj 1', 'Obj 2', 'Obj 3', 'Obj 4', 'Obj 5', 'Obj 6'],
+                datasets: [{
+                    label: 'Compliance %',
+                    data: [100, 95, 100, 85, 60, 100],
+                    backgroundColor: ['#0047AB', '#0047AB', '#0047AB', '#FFD700', '#8B0000', '#0047AB']
+                }]
+            },
+            options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 120 } } }
+        });
+    };
+
+    return { init, handleSearch, openAuditModal, saveAudit, deleteAudit, openScrumModal, saveScrum, deleteScrum, handleDragStart, handleDragOver, handleDrop, closeModal, resetAll, exportData, importData };
+})();
+
+document.addEventListener('DOMContentLoaded', App.init);
+</script>
+</body>
+</html>
