@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quality Management Dashboard T202603 - Pro</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    
+    <style>
+        :root {
+            /* --- THEME COLORS --- */
+            --bg-dark: #1e2a3a;
+            --primary-navy: #0e2444;
+            --primary-blue-light: #3c78d8;
+            --gold-light: #fcd34d;
+            --gold-dark: #b88a30;
+            --paper: #f9f9f9;
+            --text-main: #374151;
+            
+            /* Shadows & Effects */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            /* Status Colors */
+            --danger: #dc2626; --danger-bg: #fef2f2;
+            --success: #059669; --success-bg: #d1fae5;
+            --warning: #d97706; --warning-bg: #fffbeb;
+            --info: #2563eb; --info-bg: #dbeafe;
+        }
+
+        * { box-sizing: border-box; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-navy); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold-dark); }
+
+        body {
+            margin: 0; font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: linear-gradient(rgba(14, 36, 68, 0.95), rgba(14, 36, 68, 0.98)); 
+            color: var(--text-main); 
+            overflow-x: hidden;
+        }
+
+        /* --- WRAPPER & SIDEBAR LAYOUT --- */
+        .wrapper {
+            display: flex;
+            width: 100%;
+            align-items: stretch;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        #sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            background: rgba(14, 36, 68, 0.9);
+            border-right: 1px solid var(--gold-dark);
+            color: #fff;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            z-index: 999;
+        }
+
+        #sidebar.active { margin-left: -250px; }
+
+        #sidebar .sidebar-header {
+            padding: 20px;
+            background: var(--primary-navy);
+            border-bottom: 2px solid var(--gold-dark);
+        }
+
+        #sidebar .sidebar-header h3 {
+            margin: 0;
+            font-family: 'Oswald', sans-serif;
+            color: var(--gold-light);
+            letter-spacing: 1px;
+        }
+
+        #sidebar ul.components { padding: 20px 0; }
+
+        #sidebar ul li { padding: 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        #sidebar ul li a {
+            padding: 15px 20px;
+            font-size: 1rem;
+            display: block;
+            color: #ccc;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        #sidebar ul li a:hover {
+            color: var(--primary-navy);
+            background: var(--gold-light);
+            padding-left: 30px;
+        }
+        
+        #sidebar ul li a i { width: 25px; text-align: center; margin-right: 10px; }
+
+        #sidebar ul li.active > a {
+            color: #fff;
+            background: var(--primary-navy);
+            border-left: 4px solid var(--gold-dark);
+        }
+
+        /* Content Area */
+        #content {
+            width: 100%;
+            padding: 20px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        /* Toggle Button */
+        #sidebarCollapse {
+            background: var(--gold-light);
+            border: none;
+            color: var(--primary-navy);
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 15px;
+            box-shadow: 0 0 5px var(--gold-dark);
+            transition: 0.2s;
+        }
+        #sidebarCollapse:hover { background: var(--gold-dark); color: white; }
+
+        /* --- DASHBOARD GRID --- */
+        .dashboard-grid { 
+            display: grid; 
+            grid-template-columns: repeat(12, 1fr); 
+            gap: 20px; 
+            max-width: 1800px; 
+            margin: 0 auto; 
+        }
+
+        /* --- HEADER & SEARCH --- */
+        .header-area {
+            grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; border-bottom: 1px solid rgba(230, 200, 120, 0.3); padding-bottom: 15px; flex-wrap: wrap; gap: 15px;
+        }
+        
+        .header-title-group { display: flex; align-items: center; }
+        
+        h1 {
+            font-family: 'Oswald', sans-serif; font-size: clamp(1.5rem, 3vw, 2.5rem); margin: 0; line-height: 0.9;
+            text-transform: uppercase; background: linear-gradient(to bottom, #fff 0%, #a8a8a8 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(2px 2px 0px var(--gold-dark));
+        }
+
+        .search-box {
+            position: relative; flex-grow: 1; max-width: 400px; margin: 0 20px;
+        }
+        .search-box input {
+            width: 100%; padding: 10px 15px; padding-left: 35px; border-radius: 20px; border: none;
+            background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--gold-dark);
+            transition: 0.3s;
+        }
+        .search-box input:focus { background: rgba(255,255,255,0.2); outline: none; box-shadow: 0 0 10px rgba(230, 200, 120, 0.3); }
+        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--gold-light); }
+
+        /* --- CARDS & UTILS --- */
+        .paper { background: var(--paper); padding: 20px; box-shadow: var(--shadow); border-radius: 8px; margin-bottom: 0; height: 100%; border: 1px solid #ddd; }
+        .section-badge { 
+            background: linear-gradient(90deg, var(--primary-navy), #2c4c7c); 
+            color: var(--gold-light); padding: 10px 20px; 
+            font-family: 'Oswald', sans-serif; text-transform: uppercase; 
+            border-radius: 6px; margin-bottom: 12px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            box-shadow: var(--shadow-sm); border-left: 4px solid var(--gold-dark);
+        }
+        
+        /* Buttons */
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-family: 'Oswald', sans-serif; text-transform: uppercase; font-weight: bold; transition: 0.2s; font-size: 0.8rem; letter-spacing: 0.5px; }
+        .btn-gold { background: linear-gradient(135deg, var(--gold-light), var(--gold-dark)); color: var(--primary-navy); }
+        .btn-navy { background: var(--primary-navy); color: var(--gold-light); border: 1px solid var(--gold-dark); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-sm { padding: 4px 8px; font-size: 0.7rem; margin-left: 5px; border-radius: 4px; }
+        .btn:hover { transform: translateY(-1px); filter: brightness(110%); }
+
+        /* --- VISION MISSION CARD --- */
+        .vm-card {
+            background: white; border-radius: 8px; padding: 15px; margin-bottom: 15px;
+            border-left: 4px solid var(--primary-navy); box-shadow: var(--shadow);
+            border-right: 4px solid var(--primary-navy);
+        }
+        .vm-title { 
+            font-family: 'Oswald'; color: var(--primary-navy); font-size: 1.1rem; margin-bottom: 5px; 
+            background: var(--gold-light); padding: 2px 8px; display: inline-block; border-radius: 4px;
+        }
+        .vm-text { font-size: 0.9rem; color: #333; line-height: 1.4; font-weight: 500; margin-bottom: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 10px;}
+        .vm-text:last-child { border-bottom: none; margin-bottom: 0; }
+
+        /* --- AUDIT TABLE (Updated Layout) --- */
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table.data-table { width: 100%; border-collapse: collapse; min-width: 1400px; font-size: 0.75rem; background: white; }
+        table.data-table th { background: var(--primary-navy); color: white; padding: 10px 5px; text-align: center; border: 1px solid #555; vertical-align: middle; white-space: nowrap; }
+        table.data-table td { border: 1px solid #ccc; padding: 8px 5px; vertical-align: middle; color: #374151; }
+        table.data-table tr:hover td { background-color: #f1f5f9; }
+        table.data-table td.center { text-align: center; }
+        
+        .img-thumb { width: 50px; height: 50px; object-fit: cover; border: 1px solid #ccc; cursor: pointer; transition: 0.2s; }
+        .img-thumb:hover { transform: scale(1.5); border-color: var(--gold-dark); z-index: 10; position:relative; }
+        
+        /* --- NEW SECTION: SCHEDULE & IMPROVEMENTS --- */
+        .schedule-grid { display: grid; grid-template-columns: 100px repeat(12, 1fr) 150px; border: 1px solid #ccc; font-size: 0.7rem; text-align: center; background: white; overflow-x: auto; }
+        .sch-head { background: #333; color: white; padding: 5px; font-weight: bold; border: 1px solid #555; }
+        .sch-cell { border: 1px solid #eee; padding: 5px; display: flex; align-items: center; justify-content: center; min-height: 40px; }
+        .bg-sched-blue { background-color: #3b82f6; color: white; }
+        .bg-sched-yellow { background-color: #fbbf24; color: black; }
+        .bg-sched-green { background-color: #10b981; color: white; }
+        .bg-sched-red { background-color: #ef4444; color: white; }
+
+        /* --- PROCESS GUIDELINES --- */
+        .flow-container { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; }
+        .flow-step { 
+            width: 120px; text-align: center; position: relative; 
+            background: white; padding: 10px; border-radius: 8px; border: 2px solid var(--primary-navy);
+            box-shadow: var(--shadow); transition: 0.3s;
+        }
+        .flow-step:hover { transform: translateY(-5px); background: var(--gold-light); }
+        .flow-num { 
+            background: var(--danger); color: white; width: 25px; height: 25px; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-weight: bold; margin: 0 auto 5px auto; font-family: 'Oswald';
+        }
+        .flow-text { font-size: 0.7rem; font-weight: bold; color: var(--primary-navy); }
+        .arrow-next { color: var(--gold-dark); font-size: 1.2rem; align-self: center; }
+
+        /* --- PRODUCT QUALITY KPI GRID --- */
+        .pq-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .pq-box { background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .pq-label { font-size: 0.75rem; font-weight: bold; color: #555; }
+        .pq-val { font-family: 'Oswald'; font-size: 1.2rem; color: var(--primary-navy); }
+
+        /* --- ROBUST SCRUM BOARD --- */
+        .scrum-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.8rem; color: #666; }
+        .progress-track { flex-grow: 1; height: 8px; background: #e5e7eb; margin: 0 10px; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--success); transition: width 0.5s; }
+
+        .scrum-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; height: 400px; overflow-x: auto; padding-bottom: 5px; }
+        .scrum-col { background: #f1f5f9; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; min-width: 220px; border: 1px solid #e2e8f0; }
+        .scrum-header { font-family: 'Oswald'; color: var(--primary-navy); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .scrum-count { background: white; padding: 1px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; box-shadow: var(--shadow-sm); }
+        .scrum-cards { flex-grow: 1; overflow-y: auto; padding-right: 4px; min-height: 50px; }
+        
+        .scrum-card { 
+            background: white; padding: 12px; border-radius: 6px; margin-bottom: 10px; 
+            box-shadow: var(--shadow-sm); border-left: 4px solid var(--primary-navy); 
+            transition: all 0.2s ease; cursor: grab; display: flex; flex-direction: column; gap: 6px;
+        }
+        .scrum-card:active { cursor: grabbing; transform: scale(0.98); }
+        .scrum-card.dragging { opacity: 0.5; border: 2px dashed var(--primary-navy); }
+        .scrum-col.drag-over { background: #e2e8f0; border: 2px dashed var(--gold-dark); }
+
+        .scrum-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+        .card-high { border-left-color: var(--danger); }
+        .card-med { border-left-color: var(--warning); }
+        .card-low { border-left-color: var(--success); }
+        
+        .card-badges { display: flex; gap: 5px; flex-wrap: wrap; }
+        .badge { padding: 2px 8px; border-radius: 12px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .bg-gray { background: #e5e7eb; color: #4b5563; }
+        .bg-red { background: var(--danger-bg); color: var(--danger); }
+        .bg-orange { background: var(--warning-bg); color: var(--warning); }
+        .bg-green { background: var(--success-bg); color: var(--success); }
+
+        /* --- MODAL --- */
+        .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:none; justify-content:center; align-items:center; z-index:2000; backdrop-filter: blur(2px); }
+        .modal-box { background: white; width: 100%; max-width: 900px; border-radius: 8px; border: 1px solid var(--gold-dark); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; max-height: 90vh; }
+        .modal-header { background: var(--primary-navy); color: white; padding: 15px 20px; display: flex; justify-content: space-between; border-radius: 7px 7px 0 0; }
+        .modal-body { padding: 20px; overflow-y: auto; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        .form-group { display: flex; flex-direction: column; margin-bottom: 10px; }
+        .form-group label { font-size: 0.75rem; font-weight: 700; margin-bottom: 5px; color: #4b5563; text-transform: uppercase; }
+        .form-group input, .form-group select, .form-group textarea { padding: 9px; border: 1px solid #d1d5db; border-radius: 4px; background: #f9fafb; font-family: 'Roboto'; transition: 0.2s; font-size: 0.85rem; }
+        .form-group input:focus, .form-group textarea:focus { border-color: var(--gold-dark); outline: none; box-shadow: 0 0 5px rgba(184, 138, 48, 0.3); }
+        .col-span-3 { grid-column: span 3; }
+        .modal-footer { padding: 15px; background: #f3f4f6; display: flex; justify-content: flex-end; border-radius: 0 0 7px 7px; gap: 10px; }
+
+        /* --- TOAST NOTIFICATION --- */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 3000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: white; border-left: 4px solid var(--primary-navy); padding: 15px 20px; border-radius: 4px; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 10px; max-width: 300px; }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+
+        /* Responsive */
+        @media (max-width: 1024px) { 
+            .dashboard-grid { display: block; } 
+            .header-area { flex-direction: column; align-items: stretch; }
+            .search-box { max-width: 100%; margin: 10px 0; }
+            .form-grid { grid-template-columns: 1fr; }
+            .scrum-container { overflow-x: scroll; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <h3>QM SYSTEM</h3>
+        </div>
+        
+        <ul class="list-unstyled components">
+            <li class="active"><a href="#"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+            <li><a href="#"><i class="fas fa-folder-open"></i> Audits</a></li>
+            
+            <li>
+                <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                    <i class="fas fa-sitemap"></i> Management
+                </a>
+                <ul class="collapse list-unstyled" id="pageSubmenu" style="padding-left:10px; background:rgba(0,0,0,0.1);">
+                    <li><a href="Qualitymanagement.html">Quality Management</a></li>
+                    <li><a href="#">Environmental</a></li>
+                    <li><a href="MSManagement.html">MS 5s Management System</a></li>
+                    <li><a href="#">Safety Management</a></li>
+                </ul>
+            </li>
+            
+            <li><a href="#"><i class="fas fa-calendar-alt"></i> Calendar</a></li>
+            <li><a href="#"><i class="fas fa-users"></i> Team</a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+        </ul>
+        
+        <div style="margin-top:auto; padding:20px; text-align:center; font-size:0.7rem; opacity:0.6;">
+            &copy; 2026 Quality Dept
+        </div>
+    </nav>
+
+    <!-- PAGE CONTENT -->
+    <div id="content">
+        <div id="toast-container"></div>
+
+        <div class="dashboard-grid">
+            <!-- HEADER -->
+            <header class="header-area">
+                <div class="header-title-group">
+                    <button type="button" id="sidebarCollapse">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div style="margin-left:10px;">
+                        <h1><span style="color:var(--gold-light)">Q</span>UALITY MANAGEMENT</h1>
+                        <div style="font-family:'Oswald'; color:var(--gold-light); font-size:1.2rem; letter-spacing: 2px;">DASHBOARD T202603</div>
+                    </div>
+                </div>
+                
+                <!-- SEARCH FUNCTION -->
+                <div class="search-box">
+                    <span class="search-icon"><i class="fas fa-search"></i></span>
+                    <input type="text" id="searchInput" placeholder="Search Findings, Work Req, PIC..." oninput="App.handleSearch(this.value)">
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-navy" onclick="App.exportData()"><i class="fas fa-file-export"></i> Export</button>
+                    <button class="btn btn-navy" onclick="document.getElementById('importFile').click()"><i class="fas fa-file-import"></i> Import</button>
+                    <input type="file" id="importFile" hidden onchange="App.importData(event)">
+                    <button class="btn btn-danger" onclick="App.resetAll()"><i class="fas fa-trash-alt"></i> Reset</button>
+                </div>
+            </header>
+
+            <!-- LEFT COLUMN: Identity & Product Quality -->
+            <div style="grid-column: 1 / 4; margin-bottom: 20px;">
+                <!-- VISION & MISSION -->
+                <div class="vm-card">
+                    <div class="vm-title"><i class="fas fa-eye"></i> VISION STATEMENT</div>
+                    <div class="vm-text">Achieving annual MS production with zero internal and external quality claim through establishing excellent quality in work, process and product.</div>
+                    
+                    <div class="vm-title"><i class="fas fa-rocket"></i> MISSION STATEMENT</div>
+                    <div class="vm-text">To achieve production target and continually improve product, process, and work quality through sustainability, standardization, continuous equipment monitoring, commitment and discipline.</div>
+                </div>
+
+                <!-- PRODUCT QUALITY -->
+                <div class="section-badge"><span><i class="fas fa-boxes"></i> Product Quality</span></div>
+                <div class="paper" style="padding:15px; margin-bottom: 15px;">
+                    <div style="margin-bottom:10px; font-weight:bold; color:var(--primary-navy); border-bottom:1px solid #ddd;">Year to Date (2026)</div>
+                    <div class="pq-grid">
+                        <div class="pq-box"><div class="pq-label">Near Miss</div><div class="pq-val">6</div></div>
+                        <div class="pq-box"><div class="pq-label">Int. Claims</div><div class="pq-val">10</div></div>
+                        <div class="pq-box"><div class="pq-label">Ext. Claims</div><div class="pq-val">0</div></div>
+                        <div class="pq-box"><div class="pq-label">Batch Credit</div><div class="pq-val">98%</div></div>
+                    </div>
+                    <div style="margin-top:15px; font-weight:bold; color:var(--primary-navy); border-bottom:1px solid #ddd;">Reprocess Bags</div>
+                    <div class="pq-grid" style="margin-top:5px;">
+                        <div class="pq-box"><div class="pq-label">High Moisture</div><div class="pq-val">173</div></div>
+                        <div class="pq-box"><div class="pq-label">High Cr</div><div class="pq-val">96</div></div>
+                        <div class="pq-box"><div class="pq-label">High Mg</div><div class="pq-val">231</div></div>
+                        <div class="pq-box"><div class="pq-label">Damaged</div><div class="pq-val">5</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CENTER/RIGHT COLUMN: Internal Audit Findings -->
+            <div style="grid-column: 4 / -1; margin-bottom: 20px;">
+                <div class="section-badge">
+                    <span><i class="fas fa-clipboard-check"></i> Internal Quality Audit Findings</span>
+                    <button class="btn btn-gold" style="font-size: 0.7rem; padding: 4px 10px;" onclick="App.openAuditModal('add')"><i class="fas fa-plus"></i> Record Finding</button>
+                </div>
+                <div class="paper" style="height: 580px; padding:0; overflow:hidden;">
+                    <div class="table-responsive" style="height:100%;">
+                        <table class="data-table" id="auditTable">
+                            <thead style="position: sticky; top: 0; z-index: 20;">
+                                <tr>
+                                    <th width="40">Item<br>No.</th>
+                                    <th>Pictures<br>(Before)</th>
+                                    <th>Plan of Action</th>
+                                    <th>Corrective Action<br>Pictures (After)</th>
+                                    <th>Corrective Action<br>Taken</th>
+                                    <th width="60">Work<br>Req No.</th>
+                                    <th>Type of<br>Counter Measure</th>
+                                    <th>Progress<br>Status</th>
+                                    <th>Overall<br>Status</th>
+                                    <th>Primary<br>PIC</th>
+                                    <th>Secondary<br>PIC</th>
+                                    <th>Target<br>Date</th>
+                                    <th>Actual<br>Date</th>
+                                    <th style="text-align:center">Act</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANNUAL SCHEDULE -->
+            <div style="grid-column: 1 / -1; margin-bottom: 20px;">
+                <div class="section-badge">
+                    <span><i class="fas fa-calendar-week"></i> Annual MS Internal Quality Audit Schedule & Ext. Claim Discussion</span>
+                </div>
+                <div class="paper" style="padding:10px; overflow-x:auto;">
+                    <div style="min-width: 1000px; display: grid; grid-template-columns: 150px repeat(12, 1fr) 150px; font-size: 0.7rem; border:1px solid #ccc; text-align:center;">
+                        <!-- Header -->
+                        <div class="sch-head">Group/Topic</div>
+                        <div class="sch-head">Jan</div><div class="sch-head">Feb</div><div class="sch-head">Mar</div><div class="sch-head">Apr</div>
+                        <div class="sch-head">May</div><div class="sch-head">Jun</div><div class="sch-head">Jul</div><div class="sch-head">Aug</div>
+                        <div class="sch-head">Sep</div><div class="sch-head">Oct</div><div class="sch-head">Nov</div><div class="sch-head">Dec</div>
+                        <div class="sch-head">Remarks</div>
+
+                        <!-- Row 1: Internal Audit -->
+                        <div class="sch-cell" style="font-weight:bold;">Int. Quality Audit</div>
+                        <div class="sch-cell bg-sched-blue">Group 1 CLC</div>
+                        <div class="sch-cell"></div><div class="sch-cell" style="background:#eee;">Minor SD</div>
+                        <div class="sch-cell bg-sched-green">Group 4 NIL</div>
+                        <div class="sch-cell"></div><div class="sch-cell bg-sched-red">Group 2 JED</div>
+                        <div class="sch-cell"></div><div class="sch-cell"></div><div class="sch-cell" style="background:#ddd;">Major SD</div>
+                        <div class="sch-cell bg-sched-yellow">Group 3 JNY</div>
+                        <div class="sch-cell bg-sched-blue">Group 1 CLC</div><div class="sch-cell bg-sched-green">Group 4 NIL</div>
+                        <div class="sch-cell">100% Compliance</div>
+
+                        <!-- Row 2: Cross Audit -->
+                        <div class="sch-cell" style="font-weight:bold;">Quality Cross Audit</div>
+                        <div class="sch-cell"></div>
+                        <div class="sch-cell bg-sched-yellow">Auditor: JNY</div>
+                        <div class="sch-cell"></div><div class="sch-cell"></div>
+                        <div class="sch-cell bg-sched-blue">Auditor: CLC</div>
+                        <div class="sch-cell"></div>
+                        <div class="sch-cell bg-sched-green">Auditor: Rare</div>
+                        <div class="sch-cell bg-sched-red">Auditor: Log</div>
+                        <div class="sch-cell"></div><div class="sch-cell"></div><div class="sch-cell"></div><div class="sch-cell"></div>
+                        <div class="sch-cell">Compliance >90%</div>
+
+                         <!-- Row 3: Claim Discussion -->
+                        <div class="sch-cell" style="font-weight:bold;">Ext. Claim Disc.</div>
+                        <div class="sch-cell" style="grid-column: span 12; background: #e0ac88; color:black;">All Groups (Group 1, 2, 3 & 4)</div>
+                        <div class="sch-cell">>85% Attendance</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROCESS IMPROVEMENTS / GUIDELINES -->
+            <div style="grid-column: 1 / 7; margin-bottom: 20px;">
+                <div class="section-badge">
+                    <span><i class="fas fa-project-diagram"></i> Process Improvements: 9-Stage MS Bag Checking</span>
+                </div>
+                <div class="paper" style="display:flex; flex-direction:column; gap:15px;">
+                    <div style="font-weight:bold; color:var(--primary-navy); text-align:center;">Guidelines: MS Bag Quality Checking Rev.2</div>
+                    <div class="flow-container">
+                        <div class="flow-step"><div class="flow-num">1</div><div class="flow-text">MS Bagger Check</div></div>
+                        <div class="arrow-next"><i class="fas fa-arrow-right"></i></div>
+                        <div class="flow-step"><div class="flow-num">2</div><div class="flow-text">CTS Quality Check</div></div>
+                        <div class="arrow-next"><i class="fas fa-arrow-right"></i></div>
+                        <div class="flow-step"><div class="flow-num">3</div><div class="flow-text">Logistics Warehouse</div></div>
+                        <div class="arrow-next"><i class="fas fa-turn-down"></i></div>
+                    </div>
+                    <div class="flow-container">
+                         <div class="flow-step"><div class="flow-num">6</div><div class="flow-text">Logistics Daily</div></div>
+                         <div class="arrow-next"><i class="fas fa-arrow-left"></i></div>
+                         <div class="flow-step"><div class="flow-num">5</div><div class="flow-text">End of Day (H2S Sup)</div></div>
+                         <div class="arrow-next"><i class="fas fa-arrow-left"></i></div>
+                         <div class="flow-step"><div class="flow-num">4</div><div class="flow-text">End of Shift (Log)</div></div>
+                    </div>
+                    <div class="flow-container">
+                        <div class="arrow-next"><i class="fas fa-turn-down"></i></div>
+                    </div>
+                    <div class="flow-container">
+                        <div class="flow-step"><div class="flow-num">7</div><div class="flow-text">MS Foreman / PLD</div></div>
+                        <div class="arrow-next"><i class="fas fa-arrow-right"></i></div>
+                        <div class="flow-step"><div class="flow-num">8</div><div class="flow-text">Warehouse to Pier</div></div>
+                        <div class="arrow-next"><i class="fas fa-arrow-right"></i></div>
+                        <div class="flow-step"><div class="flow-num">9</div><div class="flow-text">Ship Loading</div></div>
+                    </div>
+                </div>
+            </div>
+
+             <!-- CLAIMS REPORT -->
+             <div style="grid-column: 7 / -1; margin-bottom: 20px;">
+                <div class="section-badge">
+                    <span><i class="fas fa-file-invoice"></i> MS Quality Claim Report</span>
+                    <button class="btn btn-gold" style="font-size: 0.7rem; padding: 4px 10px;" onclick="App.addClaim()"><i class="fas fa-plus"></i> New Report</button>
+                </div>
+                <div class="paper">
+                    <ul id="claimsList" style="font-size: 0.9rem; padding:0; display: flex; flex-direction:column; gap: 10px; list-style:none;">
+                        <!-- Dynamic Claims -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- SCRUM BOARD -->
+            <div style="grid-column: 1 / -1; margin-bottom: 20px;">
+                <div class="section-badge">
+                    <span><i class="fas fa-th-large"></i> Quality Kaizen / Scrum Board</span>
+                    <button class="btn btn-gold" style="font-size: 0.7rem; padding: 4px 10px;" onclick="App.openScrumModal('add')"><i class="fas fa-plus"></i> New Task</button>
+                </div>
+                
+                <div class="paper" style="background: #fff;">
+                    <div class="scrum-meta">
+                        <span id="scrumTotal">Total Tasks: 0</span>
+                        <div class="progress-track"><div class="progress-fill" id="scrumProgress" style="width: 0%"></div></div>
+                        <span id="scrumPercent">0% Complete</span>
+                    </div>
+
+                    <div class="scrum-container" id="scrumBoard">
+                        <!-- Scrum Columns Rendered Here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AUDIT MODAL -->
+<div class="modal-overlay" id="auditModal">
+    <div class="modal-box">
+        <div class="modal-header"><h3>Audit Finding Record</h3><button onclick="App.closeModal('auditModal')" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button></div>
+        <div class="modal-body">
+            <form id="auditForm" class="form-grid">
+                <input type="hidden" id="auditId">
+                <div class="form-group col-span-3"><label>Finding Description / Item</label><textarea id="auditDesc" rows="2" required></textarea></div>
+                
+                <div class="form-group"><label>Picture URL (Before)</label><input type="text" id="auditImgBefore" placeholder="Image URL"></div>
+                <div class="form-group"><label>Plan of Action</label><input type="text" id="auditPlan"></div>
+                <div class="form-group"><label>Work Req. No.</label><input type="text" id="auditWorkReq"></div>
+
+                <div class="form-group"><label>Picture URL (Corrective)</label><input type="text" id="auditImgAfter" placeholder="Image URL"></div>
+                <div class="form-group"><label>Corrective Action Taken</label><input type="text" id="auditCATaken"></div>
+                <div class="form-group"><label>Type of Counter Measure</label>
+                    <select id="auditCMType">
+                        <option value="Engineering">Engineering</option>
+                        <option value="Administrative">Administrative</option>
+                        <option value="PPE">PPE</option>
+                    </select>
+                </div>
+
+                <div class="form-group"><label>Primary PIC</label><input type="text" id="auditPicPri"></div>
+                <div class="form-group"><label>Secondary PIC</label><input type="text" id="auditPicSec"></div>
+                
+                <div class="form-group"><label>Target Date</label><input type="date" id="auditTargetDate"></div>
+                <div class="form-group"><label>Actual Date</label><input type="date" id="auditActualDate"></div>
+                
+                <div class="form-group">
+                    <label>Overall Status</label>
+                    <select id="auditStatus">
+                        <option value="Open">Open</option>
+                        <option value="In-Progress">In-Progress</option>
+                        <option value="Closed">Closed</option>
+                        <option value="Delayed">Delayed</option>
+                    </select>
+                </div>
+
+                <div class="form-group col-span-3">
+                    <label>Progress (%)</label>
+                    <input type="range" id="auditProgress" min="0" max="100" oninput="this.nextElementSibling.value = this.value + '%'">
+                    <output style="font-weight:bold; color:var(--primary-navy)">0%</output>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer"><button class="btn btn-navy" onclick="App.saveAudit()">Save Finding</button></div>
+    </div>
+</div>
+
+<!-- SCRUM TASK MODAL -->
+<div class="modal-overlay" id="scrumModal">
+    <div class="modal-box" style="max-width:600px;">
+        <div class="modal-header"><h3>Scrum Task</h3><button onclick="App.closeModal('scrumModal')" style="color:white; background:none; border:none; font-size:1.5rem;">&times;</button></div>
+        <div class="modal-body">
+            <form id="scrumForm" class="form-grid" style="grid-template-columns: 1fr 1fr;">
+                <input type="hidden" id="scrumId">
+                <div class="form-group" style="grid-column: span 2;"><label>Task Description</label><input type="text" id="scrumText" required></div>
+                <div class="form-group"><label>Assignee</label><input type="text" id="scrumUser"></div>
+                <div class="form-group"><label>Priority</label>
+                    <select id="scrumPriority">
+                        <option value="High">High</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Tag</label><input type="text" id="scrumTag"></div>
+                <div class="form-group"><label>Column</label>
+                    <select id="scrumStatus">
+                        <option value="backlog">Backlog</option>
+                        <option value="analysis">Doing</option>
+                        <option value="verify">Verify</option>
+                        <option value="done">Done</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-danger" id="btnDeleteScrum" style="margin-right:auto; display:none;" onclick="App.deleteScrum()">Delete</button>
+            <button class="btn btn-navy" onclick="App.saveScrum()">Save Task</button>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function () {
+    // Sidebar Toggle
+    $('#sidebarCollapse').on('click', function () { $('#sidebar').toggleClass('active'); });
+    // Close modals
+    $('.modal-overlay').on('click', function(e) { if($(e.target).is('.modal-overlay')) $(this).fadeOut(200); });
+});
+
+const App = (() => {
+    const STORE_KEY = 'QM_PRO_SYSTEM_V7';
+    let filterTerm = ""; 
+    
+    // Initial State
+    let state = {
+        audits: [
+            {
+                id: 1, itemNo: 1, desc: "Bag label misalignment on Line 2 Conveyor", 
+                imgBefore: "https://via.placeholder.com/150/FF0000?text=Error", 
+                plan: "Re-align sensor", 
+                imgAfter: "", caTaken: "", 
+                workReq: "WR-2026-001", cmType: "Engineering", 
+                progress: 50, status: "In-Progress", 
+                picPri: "John Doe", picSec: "M. Smith", 
+                targetDate: "2026-03-15", actualDate: ""
+            }
+        ],
+        claims: [ { id: 101, text: "Report #001: Bag tear detected at Ship Loading (Stage 9). 5 bags affected." } ],
+        scrumTasks: [
+            { id: 1, text: 'Review SOP-001 Guidelines', user: 'John', priority: 'High', tag: 'ISO', status: 'analysis' },
+            { id: 2, text: 'Calibrate Micrometers', user: 'Team', priority: 'Medium', tag: 'Equip', status: 'backlog' }
+        ]
+    };
+
+    const scrumCols = [
+        { id: 'backlog', title: 'BACKLOG' },
+        { id: 'analysis', title: 'DOING' },
+        { id: 'verify', title: 'VERIFY' },
+        { id: 'done', title: 'DONE' }
+    ];
+
+    const init = () => {
+        const saved = localStorage.getItem(STORE_KEY);
+        if (saved) {
+            try { state = JSON.parse(saved); } catch(e) { console.error("Data load error", e); }
+        }
+        if (!state.scrumTasks) state.scrumTasks = [];
+        if (!state.audits) state.audits = [];
+        render();
+    };
+
+    const saveState = () => {
+        localStorage.setItem(STORE_KEY, JSON.stringify(state));
+        render();
+    };
+
+    const handleSearch = (val) => {
+        filterTerm = val.toLowerCase();
+        render();
+    };
+
+    // --- RENDER FUNCTIONS ---
+    const render = () => {
+        // Render Audits with 13 Columns
+        const auditBody = document.getElementById('auditBody');
+        let filteredAudits = state.audits.filter(a => 
+            (a.desc && a.desc.toLowerCase().includes(filterTerm)) || 
+            (a.picPri && a.picPri.toLowerCase().includes(filterTerm)) ||
+            (a.workReq && a.workReq.toLowerCase().includes(filterTerm))
+        );
+
+        if(filteredAudits.length === 0) {
+             auditBody.innerHTML = `<tr><td colspan="14" style="text-align:center; padding:20px; color:#999;">No records found.</td></tr>`;
+        } else {
+            auditBody.innerHTML = filteredAudits.map((a, idx) => {
+                const imgBeforeHtml = a.imgBefore ? `<img src="${a.imgBefore}" class="img-thumb" onclick="window.open('${a.imgBefore}')">` : '-';
+                const imgAfterHtml = a.imgAfter ? `<img src="${a.imgAfter}" class="img-thumb" onclick="window.open('${a.imgAfter}')">` : '-';
+                
+                return `
+                <tr>
+                    <td class="center">${idx + 1}</td>
+                    <td class="center">${imgBeforeHtml}</td>
+                    <td>${a.plan || ''}</td>
+                    <td class="center">${imgAfterHtml}</td>
+                    <td>${a.caTaken || ''}</td>
+                    <td class="center"><small>${a.workReq || ''}</small></td>
+                    <td><small>${a.cmType || ''}</small></td>
+                    <td class="center">
+                         <div style="width:100%; background:#e5e7eb; height:6px; border-radius:3px;">
+                            <div style="width:${a.progress}%; background:var(--primary-navy); height:100%;"></div>
+                        </div>
+                        <span style="font-size:0.65rem">${a.progress}%</span>
+                    </td>
+                    <td class="center"><span class="badge ${a.status === 'Closed' ? 'bg-green' : 'bg-orange'}">${a.status}</span></td>
+                    <td>${a.picPri}</td>
+                    <td>${a.picSec || '-'}</td>
+                    <td>${a.targetDate}</td>
+                    <td>${a.actualDate || '-'}</td>
+                    <td class="center">
+                        <button class="btn-sm btn-navy" onclick="App.openAuditModal('edit', ${a.id})"><i class="fas fa-edit"></i></button>
+                        <button class="btn-sm btn-danger" onclick="App.deleteAudit(${a.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        // Render Claims
+        document.getElementById('claimsList').innerHTML = state.claims.map(c => `
+            <li style="display:flex; justify-content:space-between; align-items:center; background:#fff; padding:10px; border-radius:4px; border-left:4px solid var(--danger); box-shadow:var(--shadow-sm);">
+                <span><strong style="color:var(--danger)">REPORT:</strong> ${c.text}</span>
+                <button onclick="App.deleteClaim(${c.id})" style="border:none; background:none; color:#999; cursor:pointer;"><i class="fas fa-times"></i></button>
+            </li>
+        `).join('');
+
+        // Render Scrum Board
+        const board = document.getElementById('scrumBoard');
+        const totalTasks = state.scrumTasks.length;
+        const doneTasks = state.scrumTasks.filter(t => t.status === 'done').length;
+        const percent = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+        document.getElementById('scrumTotal').innerText = `Total: ${totalTasks}`;
+        document.getElementById('scrumPercent').innerText = `${percent}%`;
+        document.getElementById('scrumProgress').style.width = `${percent}%`;
+
+        board.innerHTML = scrumCols.map(col => {
+            const tasks = state.scrumTasks.filter(t => t.status === col.id);
+            return `
+            <div class="scrum-col" ondragover="App.handleDragOver(event)" ondrop="App.handleDrop(event, '${col.id}')">
+                <div class="scrum-header">
+                    <span>${col.title}</span>
+                    <span class="scrum-count">${tasks.length}</span>
+                </div>
+                <div class="scrum-cards">
+                    ${tasks.map(t => {
+                        const initials = t.user ? t.user.substring(0,2).toUpperCase() : '??';
+                        let colorClass = t.priority === 'High' ? 'card-high' : (t.priority === 'Medium' ? 'card-med' : 'card-low');
+                        return `
+                        <div class="scrum-card ${colorClass}" draggable="true" ondragstart="App.handleDragStart(event, ${t.id})">
+                            <div style="display:flex; justify-content:space-between;">
+                                <strong onclick="App.openScrumModal('edit', ${t.id})" style="font-size:0.85rem;">${t.text}</strong>
+                            </div>
+                            <div class="card-badges">
+                                <span class="badge bg-gray">${t.priority}</span>
+                                ${t.tag ? `<span class="badge bg-gray">${t.tag}</span>` : ''}
+                            </div>
+                            <div style="display:flex; justify-content:space-between; margin-top:5px; border-top:1px dashed #eee; padding-top:4px;">
+                                <div style="font-size:0.7rem; background:var(--primary-navy); color:white; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center;">${initials}</div>
+                            </div>
+                        </div>
+                    `}).join('')}
+                </div>
+            </div>
+            `;
+        }).join('');
+    };
+
+    // --- CRUD AUDIT ---
+    const openAuditModal = (mode, id = null) => {
+        const form = document.getElementById('auditForm');
+        form.reset();
+        document.getElementById('auditId').value = mode === 'add' ? 'new' : id;
+
+        if (mode === 'edit') {
+            const a = state.audits.find(x => x.id === id);
+            if(a) {
+                document.getElementById('auditDesc').value = a.desc || '';
+                document.getElementById('auditImgBefore').value = a.imgBefore || '';
+                document.getElementById('auditPlan').value = a.plan || '';
+                document.getElementById('auditImgAfter').value = a.imgAfter || '';
+                document.getElementById('auditCATaken').value = a.caTaken || '';
+                document.getElementById('auditWorkReq').value = a.workReq || '';
+                document.getElementById('auditCMType').value = a.cmType || 'Engineering';
+                document.getElementById('auditStatus').value = a.status || 'Open';
+                document.getElementById('auditProgress').value = a.progress || 0;
+                document.getElementById('auditProgress').nextElementSibling.value = (a.progress || 0) + '%';
+                document.getElementById('auditPicPri').value = a.picPri || '';
+                document.getElementById('auditPicSec').value = a.picSec || '';
+                document.getElementById('auditTargetDate').value = a.targetDate || '';
+                document.getElementById('auditActualDate').value = a.actualDate || '';
+            }
+        }
+        $('#auditModal').fadeIn(200).css('display', 'flex');
+    };
+
+    const saveAudit = () => {
+        const id = document.getElementById('auditId').value;
+        const data = {
+            id: id === 'new' ? Date.now() : parseInt(id),
+            desc: document.getElementById('auditDesc').value,
+            imgBefore: document.getElementById('auditImgBefore').value,
+            plan: document.getElementById('auditPlan').value,
+            imgAfter: document.getElementById('auditImgAfter').value,
+            caTaken: document.getElementById('auditCATaken').value,
+            workReq: document.getElementById('auditWorkReq').value,
+            cmType: document.getElementById('auditCMType').value,
+            progress: document.getElementById('auditProgress').value,
+            status: document.getElementById('auditStatus').value,
+            picPri: document.getElementById('auditPicPri').value,
+            picSec: document.getElementById('auditPicSec').value,
+            targetDate: document.getElementById('auditTargetDate').value,
+            actualDate: document.getElementById('auditActualDate').value
+        };
+
+        if (id === 'new') state.audits.push(data);
+        else {
+            const idx = state.audits.findIndex(x => x.id === data.id);
+            if(idx !== -1) state.audits[idx] = data;
+        }
+        saveState();
+        $('#auditModal').fadeOut(200);
+        showToast('Audit Finding Saved', 'success');
+    };
+
+    const deleteAudit = (id) => {
+        if(confirm('Delete this finding?')) {
+            state.audits = state.audits.filter(x => x.id !== id);
+            saveState();
+            showToast('Audit Deleted', 'error');
+        }
+    };
+
+    // --- CRUD CLAIMS ---
+    const addClaim = () => {
+        const text = prompt("Enter Claim / Report Description:");
+        if(text) { 
+            state.claims.push({ id: Date.now(), text: text }); 
+            saveState(); 
+            showToast('Report Added', 'success');
+        }
+    };
+
+    const deleteClaim = (id) => {
+        if(confirm("Remove this report?")) { 
+            state.claims = state.claims.filter(c => c.id !== id); 
+            saveState(); 
+        }
+    };
+
+    // --- SCRUM LOGIC ---
+    const openScrumModal = (mode, id) => {
+        const btnDel = document.getElementById('btnDeleteScrum');
+        document.getElementById('scrumForm').reset();
+        document.getElementById('scrumId').value = mode === 'add' ? 'new' : id;
+        
+        if (mode === 'edit') {
+            const t = state.scrumTasks.find(x => x.id === id);
+            if(t) {
+                document.getElementById('scrumText').value = t.text;
+                document.getElementById('scrumUser').value = t.user;
+                document.getElementById('scrumPriority').value = t.priority;
+                document.getElementById('scrumTag').value = t.tag;
+                document.getElementById('scrumStatus').value = t.status;
+                btnDel.style.display = 'block';
+            }
+        } else {
+            btnDel.style.display = 'none';
+        }
+        $('#scrumModal').fadeIn(200).css('display', 'flex');
+    };
+
+    const saveScrum = () => {
+        const id = document.getElementById('scrumId').value;
+        const data = {
+            id: id === 'new' ? Date.now() : parseInt(id),
+            text: document.getElementById('scrumText').value,
+            user: document.getElementById('scrumUser').value,
+            priority: document.getElementById('scrumPriority').value,
+            tag: document.getElementById('scrumTag').value,
+            status: document.getElementById('scrumStatus').value
+        };
+
+        if (id === 'new') state.scrumTasks.push(data);
+        else {
+            const idx = state.scrumTasks.findIndex(x => x.id === data.id);
+            if(idx !== -1) state.scrumTasks[idx] = data;
+        }
+        saveState();
+        $('#scrumModal').fadeOut(200);
+        showToast('Task Saved', 'success');
+    };
+
+    const deleteScrum = () => {
+        const id = parseInt(document.getElementById('scrumId').value);
+        if(confirm("Delete this task?")) {
+            state.scrumTasks = state.scrumTasks.filter(t => t.id !== id);
+            saveState();
+            $('#scrumModal').fadeOut(200);
+        }
+    }
+
+    const handleDragStart = (e, id) => {
+        e.dataTransfer.setData("text/plain", id);
+        e.target.classList.add('dragging');
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        $(e.currentTarget).addClass('drag-over');
+    };
+
+    const handleDrop = (e, newStatus) => {
+        e.preventDefault();
+        $('.scrum-col').removeClass('drag-over');
+        const id = parseInt(e.dataTransfer.getData("text/plain"));
+        const task = state.scrumTasks.find(t => t.id === id);
+        if(task && task.status !== newStatus) {
+            task.status = newStatus;
+            saveState();
+            showToast(`Moved to ${newStatus.toUpperCase()}`, 'success');
+        }
+    };
+
+    // --- UTILS ---
+    const showToast = (msg, type='info') => {
+        const c = $('#toast-container');
+        const t = $(`<div class="toast ${type}"><span>${type==='success'?'✅':'⚠️'}</span> ${msg}</div>`);
+        c.append(t);
+        t.animate({right: '0', opacity: 1}, 300);
+        setTimeout(() => {
+            t.fadeOut(500, function(){ $(this).remove(); });
+        }, 3000);
+    };
+
+    const closeModal = (id) => $('#'+id).fadeOut(200);
+    
+    const exportData = () => {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+        const a = document.createElement('a');
+        a.href = dataStr; a.download = "QM_System_Backup.json";
+        a.click();
+    };
+    
+    const importData = (event) => {
+        const file = event.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try { 
+                state = JSON.parse(e.target.result); 
+                saveState(); 
+                location.reload(); 
+            } catch(err) { alert("Invalid JSON"); }
+        };
+        reader.readAsText(file);
+    };
+    
+    const resetAll = () => { 
+        if(confirm('Clear ALL data?')) { 
+            localStorage.removeItem(STORE_KEY); 
+            location.reload(); 
+        }
+    };
+
+    return { 
+        init, handleSearch,
+        openAuditModal, saveAudit, deleteAudit, 
+        openScrumModal, saveScrum, deleteScrum, handleDragStart, handleDragOver, handleDrop,
+        addClaim, deleteClaim, 
+        closeModal, exportData, importData, resetAll 
+    };
+})();
+
+document.addEventListener('DOMContentLoaded', App.init);
+</script>
+
+<script src="js/imp-1.js"></script>
+</body>
+</html>
