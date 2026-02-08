@@ -1,9 +1,9 @@
 /**
  * extension.js
- * Version: 2.0 (Robust & Feature Rich)
+ * Version: 3.0 (Material Design Edition)
  * Purpose: Extends the Quality Management Dashboard with:
- * 1. Advanced Audit Details & Collaboration (Comments/Replies)
- * 2. Editable Product Quality KPIs
+ * 1. Advanced Audit Details & Collaboration (Material Threaded Comments)
+ * 2. Editable Product Quality KPIs (Overlay Edit)
  * 3. Interactive Annual Schedule Builder
  * 4. Process Flow SOP Manager
  */
@@ -15,238 +15,365 @@ $(document).ready(function () {
 const QMExtension = (() => {
     // --- CONFIGURATION & KEYS ---
     const KEYS = {
-        COMMENTS: 'QM_EXT_COMMENTS_V2',
+        COMMENTS: 'QM_EXT_COMMENTS_V3',
         KPI: 'QM_EXT_KPI_V1',
         SCHEDULE: 'QM_EXT_SCHEDULE_V1',
         PROCESS: 'QM_EXT_PROCESS_V1'
     };
 
-    // --- 1. INJECTED STYLES ---
-    const injectStyles = () => {
+    // --- 1. INJECTED RESOURCES & STYLES ---
+    const injectResources = () => {
+        // Inject Material Icons and Roboto Font
+        $('head').append(`
+            <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+            <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+        `);
+
         const styles = `
             <style>
-                /* --- GENERAL EXTENSION STYLES --- */
-                .ext-cursor-pointer { cursor: pointer !important; transition: all 0.2s; }
-                .ext-hover-effect:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); filter: brightness(105%); }
-                
-                /* Highlight Editable Areas */
-                .pq-box, .flow-step, .sch-cell:not(.sch-head) { position: relative; }
-                .pq-box:hover::after, .flow-step:hover::after, .sch-cell:not(.sch-head):hover::after {
-                    content: '✎'; position: absolute; top: 0; right: 0; 
-                    background: var(--gold-light, #fcd34d); color: #000; 
-                    font-size: 0.6rem; padding: 2px 5px; border-radius: 0 0 0 4px;
+                /* --- MATERIAL DESIGN VARIABLES --- */
+                :root {
+                    --md-primary: #3f51b5; /* Indigo 500 */
+                    --md-primary-dark: #303f9f;
+                    --md-accent: #ffca28; /* Amber 400 */
+                    --md-bg: #f5f5f5;
+                    --md-surface: #ffffff;
+                    --md-text-primary: #212121;
+                    --md-text-secondary: #757575;
+                    --md-divider: #e0e0e0;
+                    --shadow-2: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+                    --shadow-4: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+                    --radius: 8px;
                 }
 
-                /* --- MODAL STYLES --- */
-                .ext-modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(14, 36, 68, 0.85); display:none; z-index:5000; backdrop-filter: blur(4px); align-items:center; justify-content:center; }
-                .ext-modal { background: #f3f4f6; width: 90%; max-width: 1000px; max-height: 90vh; border-radius: 8px; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid #b88a30; overflow:hidden; }
-                .ext-modal.small { max-width: 500px; height: auto; }
+                /* --- GLOBAL OVERRIDES --- */
+                .ext-scope { font-family: 'Roboto', sans-serif; color: var(--md-text-primary); }
                 
-                .ext-header { background: #0e2444; color: #fff; padding: 15px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom: 3px solid #b88a30; }
-                .ext-header h2 { margin:0; font-family: 'Oswald', sans-serif; font-size: 1.2rem; letter-spacing: 1px; color: #fcd34d; }
-                
-                .ext-body { padding: 0; overflow-y: auto; flex: 1; display:flex; }
-                .ext-content-full { padding: 20px; width: 100%; }
+                /* --- EDITABLE ZONES --- */
+                .pq-box, .flow-step, .sch-cell:not(.sch-head) { position: relative; overflow: hidden; }
+                .pq-box:hover .ext-edit-overlay, .flow-step:hover .ext-edit-overlay, .sch-cell:not(.sch-head):hover .ext-edit-overlay {
+                    opacity: 1; transform: translateY(0);
+                }
+                .ext-edit-overlay {
+                    position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+                    background: rgba(63, 81, 181, 0.1);
+                    display: flex; align-items: center; justify-content: center;
+                    opacity: 0; transition: all 0.2s ease; cursor: pointer;
+                    border: 2px solid var(--md-primary);
+                }
 
-                /* --- AUDIT VIEW STYLES --- */
-                .ext-details-panel { flex: 1.2; padding: 25px; background: white; border-right: 1px solid #ddd; overflow-y:auto; }
-                .ext-discuss-panel { flex: 0.8; display: flex; flex-direction: column; background: #f9fafb; min-height: 400px; }
+                /* --- MATERIAL MODAL --- */
+                .md-overlay {
+                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                    background: rgba(0, 0, 0, 0.6); z-index: 9999;
+                    display: none; align-items: center; justify-content: center;
+                    backdrop-filter: blur(3px); opacity: 0; transition: opacity 0.3s;
+                }
+                .md-dialog {
+                    background: var(--md-surface); width: 90%; max-width: 900px;
+                    border-radius: var(--radius); box-shadow: var(--shadow-4);
+                    display: flex; flex-direction: column; max-height: 90vh;
+                    transform: translateY(20px); transition: transform 0.3s;
+                    overflow: hidden;
+                }
+                .md-dialog.small { max-width: 450px; }
                 
-                .detail-group { margin-bottom: 15px; }
-                .detail-label { font-size: 0.7rem; color: #6b7280; text-transform: uppercase; font-weight: bold; margin-bottom: 4px; }
-                .detail-value { font-size: 0.95rem; color: #1f2937; border-bottom: 1px dashed #e5e7eb; padding-bottom: 5px; }
+                .md-header {
+                    background: var(--md-primary); color: white; padding: 16px 24px;
+                    display: flex; justify-content: space-between; align-items: center;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 10;
+                }
+                .md-header h2 { margin: 0; font-weight: 500; font-size: 1.25rem; display: flex; align-items: center; gap: 10px; }
                 
-                .comment-item { background: white; border-radius: 6px; padding: 10px; margin-bottom: 10px; border-left: 3px solid #3c78d8; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-                .comment-meta { display: flex; justify-content: space-between; font-size: 0.7rem; color: #888; margin-bottom: 5px; }
-                .reply-list { margin-left: 15px; border-left: 2px solid #ddd; padding-left: 10px; margin-top: 5px; display:none; }
-                .reply-item { background: #f1f5f9; padding: 8px; border-radius: 4px; margin-bottom: 5px; font-size: 0.85rem; }
+                .md-body { flex: 1; overflow-y: auto; display: flex; flex-direction: column; background: #fafafa; }
+                .md-body.row { flex-direction: row; }
+                
+                .md-footer {
+                    padding: 12px 24px; border-top: 1px solid var(--md-divider);
+                    background: var(--md-surface); display: flex; justify-content: flex-end; gap: 10px;
+                }
 
-                /* --- FORM ELEMENTS --- */
-                .ext-input { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 4px; margin-bottom: 15px; }
-                .ext-select { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 4px; margin-bottom: 15px; background: white; }
-                .ext-btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; }
-                .ext-btn-primary { background: #0e2444; color: #fcd34d; border: 1px solid #b88a30; }
-                .ext-btn-primary:hover { background: #b88a30; color: #0e2444; }
+                /* --- MATERIAL INPUTS --- */
+                .md-input-group { position: relative; margin-bottom: 20px; width: 100%; }
+                .md-input, .md-textarea, .md-select {
+                    width: 100%; padding: 12px 12px 12px 12px; display: block;
+                    border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
+                    font-size: 1rem; transition: 0.2s; background: white;
+                }
+                .md-input:focus, .md-textarea:focus {
+                    border-color: var(--md-primary); outline: none; box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+                }
+                .md-label {
+                    position: absolute; top: -8px; left: 10px; background: white;
+                    padding: 0 5px; font-size: 0.75rem; color: var(--md-primary); font-weight: 500;
+                }
 
-                /* --- SEARCH HIGHLIGHT --- */
-                .highlight-text { background-color: #fcd34d; color: #0e2444; font-weight: bold; padding: 0 2px; }
+                /* --- MATERIAL BUTTONS --- */
+                .md-btn {
+                    border: none; border-radius: 4px; padding: 8px 16px;
+                    text-transform: uppercase; font-weight: 500; letter-spacing: 0.5px;
+                    cursor: pointer; transition: background 0.2s; font-size: 0.875rem;
+                }
+                .md-btn-text { background: transparent; color: var(--md-primary); }
+                .md-btn-text:hover { background: rgba(63, 81, 181, 0.08); }
+                .md-btn-contained { background: var(--md-primary); color: white; box-shadow: 0 2px 2px rgba(0,0,0,0.24); }
+                .md-btn-contained:hover { background: var(--md-primary-dark); box-shadow: 0 3px 6px rgba(0,0,0,0.26); }
+                .md-icon-btn { background: none; border: none; color: white; cursor: pointer; border-radius: 50%; padding: 8px; }
+                .md-icon-btn:hover { background: rgba(255,255,255,0.2); }
+
+                /* --- AUDIT & COMMENTS --- */
+                .details-pane { padding: 24px; flex: 1; border-right: 1px solid var(--md-divider); background: white; }
+                .discuss-pane { padding: 0; flex: 0.8; display: flex; flex-direction: column; background: #f0f2f5; }
+                
+                .chat-list { flex: 1; padding: 16px; overflow-y: auto; }
+                .chat-input-area { padding: 16px; background: white; border-top: 1px solid var(--md-divider); display: flex; gap: 10px; align-items: flex-end; }
+                
+                .msg-card { display: flex; gap: 12px; margin-bottom: 16px; }
+                .msg-avatar { 
+                    width: 36px; height: 36px; border-radius: 50%; color: white; 
+                    display: flex; align-items: center; justify-content: center; 
+                    font-weight: bold; font-size: 0.9rem; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                }
+                .msg-bubble { background: white; padding: 10px 14px; border-radius: 0 12px 12px 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); max-width: 90%; }
+                .msg-meta { font-size: 0.7rem; color: var(--md-text-secondary); margin-bottom: 4px; display: flex; justify-content: space-between; gap: 10px;}
+                .msg-text { font-size: 0.9rem; color: #333; line-height: 1.4; }
+                .msg-actions { margin-top: 5px; font-size: 0.75rem; }
+                .msg-actions a { text-decoration: none; color: var(--md-primary); margin-right: 10px; font-weight: 500; }
+
+                /* --- SNACKBAR --- */
+                #md-snackbar {
+                    visibility: hidden; min-width: 250px; background-color: #333; color: #fff;
+                    text-align: center; border-radius: 4px; padding: 14px; position: fixed;
+                    z-index: 10000; left: 50%; bottom: 30px; transform: translateX(-50%);
+                    box-shadow: 0 3px 5px -1px rgba(0,0,0,.2), 0 6px 10px 0 rgba(0,0,0,.14), 0 1px 18px 0 rgba(0,0,0,.12);
+                    font-size: 0.9rem;
+                }
+                #md-snackbar.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+                @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+                @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+                
+                /* HELPERS */
+                .badge-status { padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
+                .st-closed { background: #e8f5e9; color: #2e7d32; }
+                .st-open { background: #fff3e0; color: #ef6c00; }
+                .hidden { display: none; }
             </style>
         `;
         $('head').append(styles);
     };
 
-    // --- 2. INJECTED HTML (Modals) ---
+    // --- 2. INJECTED HTML (Dialogs) ---
     const injectHTML = () => {
-        const modals = `
-            <!-- AUDIT VIEW MODAL -->
-            <div class="ext-modal-overlay" id="extAuditModal">
-                <div class="ext-modal">
-                    <div class="ext-header">
-                        <h2><i class="fas fa-clipboard-check"></i> Finding Details & Discussion</h2>
-                        <button onclick="QMExtension.UI.closeModal('extAuditModal')" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
+        const html = `
+            <!-- AUDIT & DISCUSSION MODAL -->
+            <div class="md-overlay ext-scope" id="extAuditModal">
+                <div class="md-dialog">
+                    <div class="md-header">
+                        <h2><span class="material-icons">fact_check</span> Finding Details</h2>
+                        <button class="md-icon-btn" onclick="QMExtension.UI.closeModal('extAuditModal')"><span class="material-icons">close</span></button>
                     </div>
-                    <div class="ext-body">
-                        <div class="ext-details-panel" id="extAuditDetails"></div>
-                        <div class="ext-discuss-panel">
-                            <div style="padding:15px; border-bottom:1px solid #eee; font-weight:bold; color:#0e2444; display:flex; justify-content:space-between;">
-                                <span>Discussion Board</span><span class="badge bg-gray" id="extCommentCount">0</span>
+                    <div class="md-body row">
+                        <div class="details-pane" id="extAuditDetails">
+                            <!-- Details Injected Here -->
+                        </div>
+                        <div class="discuss-pane">
+                            <div style="padding:12px 16px; background:white; border-bottom:1px solid #eee; font-weight:500; color:var(--md-primary);">
+                                Team Discussion (<span id="extCommentCount">0</span>)
                             </div>
-                            <div id="extCommentList" style="flex:1; padding:15px; overflow-y:auto;"></div>
-                            <div style="padding:15px; background:white; border-top:1px solid #eee;">
-                                <textarea id="extNewComment" class="ext-input" rows="2" placeholder="Type a comment..."></textarea>
-                                <button class="ext-btn ext-btn-primary" style="width:100%;" onclick="QMExtension.Logic.Audits.postComment()">Post</button>
+                            <div id="extCommentList" class="chat-list"></div>
+                            <div class="chat-input-area">
+                                <textarea id="extNewComment" class="md-textarea" rows="1" placeholder="Add a comment..." style="resize:none; padding:10px;"></textarea>
+                                <button class="md-btn md-btn-contained" style="min-width:auto; padding:8px 12px;" onclick="QMExtension.Logic.Audits.postComment()">
+                                    <span class="material-icons" style="font-size:1.2rem;">send</span>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- GENERIC EDITOR MODAL (For KPI, Schedule, Process) -->
-            <div class="ext-modal-overlay" id="extEditorModal">
-                <div class="ext-modal small">
-                    <div class="ext-header">
-                        <h2 id="extEditorTitle">Edit Item</h2>
-                        <button onclick="QMExtension.UI.closeModal('extEditorModal')" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
+            <!-- UNIVERSAL EDITOR MODAL -->
+            <div class="md-overlay ext-scope" id="extEditorModal">
+                <div class="md-dialog small">
+                    <div class="md-header">
+                        <h2 id="extEditorTitle"><span class="material-icons">edit</span> Edit Item</h2>
+                        <button class="md-icon-btn" onclick="QMExtension.UI.closeModal('extEditorModal')"><span class="material-icons">close</span></button>
                     </div>
-                    <div class="ext-body">
-                        <div class="ext-content-full" id="extEditorContent">
-                            <!-- Dynamic Form -->
+                    <div class="md-body" style="padding:24px;">
+                        <div id="extEditorContent">
+                            <!-- Form Injected Here -->
                         </div>
                     </div>
-                    <div style="padding:15px; background:#e5e7eb; display:flex; justify-content:flex-end; gap:10px;">
-                        <button class="ext-btn" onclick="QMExtension.UI.closeModal('extEditorModal')">Cancel</button>
-                        <button class="ext-btn ext-btn-primary" id="extEditorSaveBtn">Save Changes</button>
+                    <div class="md-footer">
+                        <button class="md-btn md-btn-text" onclick="QMExtension.UI.closeModal('extEditorModal')">Cancel</button>
+                        <button class="md-btn md-btn-contained" id="extEditorSaveBtn">Save Changes</button>
                     </div>
                 </div>
             </div>
+
+            <!-- SNACKBAR TOAST -->
+            <div id="md-snackbar" class="ext-scope">Notification</div>
         `;
-        $('body').append(modals);
+        $('body').append(html);
     };
 
-    // --- 3. STORAGE MANAGER ---
-    const Storage = {
-        get: (key) => {
-            try { return JSON.parse(localStorage.getItem(key)) || null; } 
-            catch (e) { console.error("Data Load Error", e); return null; }
+    // --- 3. UTILITIES & STORAGE ---
+    const Utils = {
+        getInitials: (name) => {
+            let initials = name.match(/\b\w/g) || [];
+            return ((initials.shift() || '') + (initials.pop() || '')).toUpperCase();
         },
-        set: (key, data) => {
-            localStorage.setItem(key, JSON.stringify(data));
+        getColorFromName: (name) => {
+            const colors = ['#e57373', '#ba68c8', '#7986cb', '#4db6ac', '#ffb74d', '#a1887f'];
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            return colors[Math.abs(hash) % colors.length];
+        },
+        storage: {
+            get: (key) => JSON.parse(localStorage.getItem(key)) || null,
+            set: (key, data) => localStorage.setItem(key, JSON.stringify(data))
         }
     };
 
     // --- 4. LOGIC MODULES ---
     const Logic = {
-        // --- AUDIT & COMMENTS LOGIC ---
         Audits: {
             currentId: null,
-            data: [], // Comments cache
+            data: [], 
 
             open: (id) => {
                 Logic.Audits.currentId = id;
-                Logic.Audits.data = Storage.get(KEYS.COMMENTS) || [];
+                Logic.Audits.data = Utils.storage.get(KEYS.COMMENTS) || [];
                 
-                // Get Audit Data from Main App's LocalStorage
-                const appState = JSON.parse(localStorage.getItem('QM_PRO_SYSTEM_V7'));
+                // Simulate getting data (Replace with real App Data Fetch)
+                const appState = JSON.parse(localStorage.getItem('QM_PRO_SYSTEM_V7')) || { audits: [] };
                 const audit = appState.audits.find(a => a.id === id);
 
-                if(!audit) return alert("Record not found.");
+                if(!audit) return QMExtension.UI.snack("Audit Record not found.");
 
                 // Render Details
+                const statusClass = audit.status === 'Closed' ? 'st-closed' : 'st-open';
+                
                 $('#extAuditDetails').html(`
-                    <div class="detail-group"><div class="detail-label">Description</div><div class="detail-value">${audit.desc}</div></div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                        <div class="detail-group"><div class="detail-label">PIC</div><div class="detail-value">${audit.picPri}</div></div>
-                        <div class="detail-group"><div class="detail-label">Target</div><div class="detail-value">${audit.targetDate}</div></div>
+                    <div class="md-input-group">
+                        <label class="md-label">Problem Description</label>
+                        <div style="font-size:1.1rem; line-height:1.5; color:#333;">${audit.desc}</div>
                     </div>
-                    <div class="detail-group"><div class="detail-label">Status</div><div class="detail-value"><span class="badge ${audit.status==='Closed'?'bg-green':'bg-orange'}">${audit.status}</span></div></div>
-                    <div class="detail-group"><div class="detail-label">Images</div>
-                        <div style="display:flex; gap:10px;">
-                            ${audit.imgBefore ? `<img src="${audit.imgBefore}" style="width:80px; height:80px; object-fit:cover; border:1px solid #ccc; cursor:pointer;" onclick="window.open(this.src)">` : ''}
-                            ${audit.imgAfter ? `<img src="${audit.imgAfter}" style="width:80px; height:80px; object-fit:cover; border:1px solid #ccc; cursor:pointer;" onclick="window.open(this.src)">` : ''}
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:20px;">
+                         <div class="md-input-group">
+                            <label class="md-label">Person In Charge</label>
+                            <div>${audit.picPri}</div>
+                        </div>
+                        <div class="md-input-group">
+                            <label class="md-label">Target Date</label>
+                            <div>${audit.targetDate}</div>
+                        </div>
+                    </div>
+
+                    <div class="md-input-group">
+                        <label class="md-label">Current Status</label>
+                        <span class="badge-status ${statusClass}">${audit.status}</span>
+                    </div>
+
+                    <div class="md-input-group">
+                        <label class="md-label">Evidence</label>
+                        <div style="display:flex; gap:10px; margin-top:10px;">
+                            ${audit.imgBefore ? `<img src="${audit.imgBefore}" style="width:100px; height:100px; border-radius:4px; object-fit:cover; box-shadow:var(--shadow-2); cursor:pointer;" onclick="window.open(this.src)">` : '<span style="color:#999; font-style:italic;">No Before Image</span>'}
+                            ${audit.imgAfter ? `<img src="${audit.imgAfter}" style="width:100px; height:100px; border-radius:4px; object-fit:cover; box-shadow:var(--shadow-2); cursor:pointer;" onclick="window.open(this.src)">` : ''}
                         </div>
                     </div>
                 `);
 
                 Logic.Audits.renderComments();
-                $('#extAuditModal').css('display', 'flex').hide().fadeIn(200);
+                QMExtension.UI.openModal('extAuditModal');
             },
 
             renderComments: () => {
-                const comments = Logic.Audits.data.filter(c => c.refId === Logic.Audits.currentId).sort((a,b) => b.id - a.id);
+                const comments = Logic.Audits.data.filter(c => c.refId === Logic.Audits.currentId).sort((a,b) => a.id - b.id);
                 $('#extCommentCount').text(comments.length);
                 
-                $('#extCommentList').html(comments.length ? comments.map(c => `
-                    <div class="comment-item">
-                        <div class="comment-meta">
-                            <span style="font-weight:bold; color:#0e2444;"><i class="fas fa-user"></i> ${c.user}</span>
-                            <span>${new Date(c.time).toLocaleString()}</span>
-                        </div>
-                        <div style="font-size:0.9rem; margin-bottom:5px;">${c.text}</div>
-                        <div style="font-size:0.75rem;">
-                            <a href="#" onclick="QMExtension.Logic.Audits.toggleReply(${c.id}); return false;">Reply</a>
-                            ${c.replies && c.replies.length ? `| <a href="#" onclick="$('#replies-${c.id}').slideToggle(); return false;">View Replies (${c.replies.length})</a>` : ''}
-                        </div>
-                        
-                        <div id="reply-box-${c.id}" style="display:none; margin-top:5px;">
-                            <input type="text" id="reply-input-${c.id}" class="ext-input" style="margin-bottom:5px; padding:5px;" placeholder="Write reply...">
-                            <button class="ext-btn ext-btn-primary" style="padding:4px 8px; font-size:0.7rem;" onclick="QMExtension.Logic.Audits.postReply(${c.id})">Send</button>
-                        </div>
-
-                        <div id="replies-${c.id}" class="reply-list">
-                            ${(c.replies || []).map(r => `
-                                <div class="reply-item">
-                                    <strong>${r.user}</strong>: ${r.text}
+                const html = comments.length ? comments.map(c => {
+                    const initials = Utils.getInitials(c.user);
+                    const bg = Utils.getColorFromName(c.user);
+                    return `
+                    <div class="msg-card">
+                        <div class="msg-avatar" style="background:${bg}">${initials}</div>
+                        <div style="flex:1;">
+                            <div class="msg-meta">
+                                <strong>${c.user}</strong>
+                                <span>${new Date(c.time).toLocaleDateString()} ${new Date(c.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                            </div>
+                            <div class="msg-bubble">
+                                <div class="msg-text">${c.text}</div>
+                            </div>
+                            <!-- Simple Reply Logic -->
+                            ${c.replies ? c.replies.map(r => `
+                                <div style="margin-top:8px; display:flex; gap:8px;">
+                                    <div class="msg-avatar" style="width:24px; height:24px; font-size:0.7rem; background:#999;">${Utils.getInitials(r.user)}</div>
+                                    <div class="msg-bubble" style="background:#f5f5f5; padding:8px;">
+                                        <div class="msg-text" style="font-size:0.85rem;"><strong>${r.user}:</strong> ${r.text}</div>
+                                    </div>
                                 </div>
-                            `).join('')}
+                            `).join('') : ''}
+                            <div class="msg-actions">
+                                <a href="#" onclick="QMExtension.Logic.Audits.replyTo(${c.id}); return false;">Reply</a>
+                            </div>
                         </div>
                     </div>
-                `).join('') : '<div style="text-align:center; color:#ccc; margin-top:20px;">No comments yet.</div>');
+                    `;
+                }).join('') : '<div style="text-align:center; padding:20px; color:#aaa;">No comments yet. Start the discussion!</div>';
+                
+                const list = $('#extCommentList');
+                list.html(html);
+                list.scrollTop(list[0].scrollHeight); // Auto scroll to bottom
             },
 
             postComment: () => {
                 const txt = $('#extNewComment').val().trim();
                 if(!txt) return;
-                Logic.Audits.data.push({ id: Date.now(), refId: Logic.Audits.currentId, user: 'Manager', time: Date.now(), text: txt, replies: [] });
-                Storage.set(KEYS.COMMENTS, Logic.Audits.data);
+                
+                const newC = { id: Date.now(), refId: Logic.Audits.currentId, user: 'Current User', time: Date.now(), text: txt, replies: [] };
+                Logic.Audits.data.push(newC);
+                Utils.storage.set(KEYS.COMMENTS, Logic.Audits.data);
                 $('#extNewComment').val('');
                 Logic.Audits.renderComments();
             },
 
-            toggleReply: (id) => { $(`#reply-box-${id}`).slideToggle().find('input').focus(); },
-
-            postReply: (cId) => {
-                const txt = $(`#reply-input-${cId}`).val().trim();
-                if(!txt) return;
-                const comment = Logic.Audits.data.find(c => c.id === cId);
-                if(comment) {
-                    if(!comment.replies) comment.replies = [];
-                    comment.replies.push({ user: 'User', text: txt, time: Date.now() });
-                    Storage.set(KEYS.COMMENTS, Logic.Audits.data);
-                    Logic.Audits.renderComments();
+            replyTo: (commentId) => {
+                const reply = prompt("Enter your reply:"); // Simple prompt for reply to keep UI clean, or could use modal
+                if(reply) {
+                    const comment = Logic.Audits.data.find(c => c.id === commentId);
+                    if(comment) {
+                        if(!comment.replies) comment.replies = [];
+                        comment.replies.push({ user: 'Current User', text: reply, time: Date.now() });
+                        Utils.storage.set(KEYS.COMMENTS, Logic.Audits.data);
+                        Logic.Audits.renderComments();
+                    }
                 }
             }
         },
 
-        // --- KPI / PRODUCT QUALITY LOGIC ---
         KPI: {
             init: () => {
-                // Initialize IDs for KPI boxes to track them
-                $('.pq-box').each(function(index) {
-                    $(this).attr('data-kpi-id', index).addClass('ext-cursor-pointer ext-hover-effect');
+                $('.pq-box').each(function(i) {
+                    $(this).attr('data-kpi-id', i);
+                    if($(this).find('.ext-edit-overlay').length === 0) {
+                        $(this).append('<div class="ext-edit-overlay"><span class="material-icons" style="color:var(--md-primary);">edit</span></div>');
+                    }
                 });
-                Logic.KPI.load();
                 
-                // Bind Click
-                $(document).on('click', '.pq-box', function() {
-                    const id = $(this).data('kpi-id');
-                    const label = $(this).find('.pq-label').text();
-                    const val = $(this).find('.pq-val').text();
-                    Logic.KPI.openEditor(id, label, val);
+                Logic.KPI.load();
+
+                $(document).on('click', '.pq-box .ext-edit-overlay', function(e) {
+                    e.stopPropagation();
+                    const box = $(this).parent();
+                    Logic.KPI.openEditor(box.data('kpi-id'), box.find('.pq-label').text(), box.find('.pq-val').text());
                 });
             },
 
             load: () => {
-                const data = Storage.get(KEYS.KPI) || {};
+                const data = Utils.storage.get(KEYS.KPI) || {};
                 $('.pq-box').each(function() {
                     const id = $(this).data('kpi-id');
                     if(data[id]) {
@@ -257,206 +384,208 @@ const QMExtension = (() => {
             },
 
             openEditor: (id, label, val) => {
-                $('#extEditorTitle').text('Edit KPI Metric');
+                $('#extEditorTitle').html('<span class="material-icons">analytics</span> Edit Metric');
                 $('#extEditorContent').html(`
-                    <label class="detail-label">Metric Name</label>
-                    <input type="text" id="kpiLabel" class="ext-input" value="${label}">
-                    <label class="detail-label">Current Value</label>
-                    <input type="text" id="kpiVal" class="ext-input" value="${val}">
+                    <div class="md-input-group">
+                        <label class="md-label">Metric Name</label>
+                        <input type="text" id="kpiLabel" class="md-input" value="${label}">
+                    </div>
+                    <div class="md-input-group">
+                        <label class="md-label">Value</label>
+                        <input type="text" id="kpiVal" class="md-input" value="${val}">
+                    </div>
                 `);
-                
+
                 $('#extEditorSaveBtn').off('click').on('click', () => {
-                    const data = Storage.get(KEYS.KPI) || {};
+                    const data = Utils.storage.get(KEYS.KPI) || {};
                     data[id] = { label: $('#kpiLabel').val(), val: $('#kpiVal').val() };
-                    Storage.set(KEYS.KPI, data);
+                    Utils.storage.set(KEYS.KPI, data);
                     Logic.KPI.load();
                     QMExtension.UI.closeModal('extEditorModal');
-                    QMExtension.UI.showToast("KPI Updated");
+                    QMExtension.UI.snack("KPI Updated Successfully");
                 });
-                
-                $('#extEditorModal').css('display', 'flex').hide().fadeIn(200);
+                QMExtension.UI.openModal('extEditorModal');
             }
         },
 
-        // --- ANNUAL SCHEDULE LOGIC ---
         Schedule: {
             init: () => {
-                // Ignore headers, target content cells
-                $('.sch-cell').not('.sch-head').not('[style*="font-weight:bold"]').each(function(index) {
-                    $(this).attr('data-sch-id', index).addClass('ext-cursor-pointer');
+                $('.sch-cell').not('.sch-head').each(function(i) {
+                    $(this).attr('data-sch-id', i);
+                    $(this).append('<div class="ext-edit-overlay"><span class="material-icons" style="font-size:1rem;">edit</span></div>');
                 });
                 Logic.Schedule.load();
 
-                $(document).on('click', '.sch-cell[data-sch-id]', function() {
-                    const id = $(this).data('sch-id');
-                    const currentText = $(this).text();
-                    Logic.Schedule.openEditor(id, currentText);
+                $(document).on('click', '.sch-cell .ext-edit-overlay', function(e) {
+                    e.stopPropagation();
+                    const cell = $(this).parent();
+                    Logic.Schedule.openEditor(cell.data('sch-id'), cell.text().trim());
                 });
             },
 
             load: () => {
-                const data = Storage.get(KEYS.SCHEDULE) || {};
+                const data = Utils.storage.get(KEYS.SCHEDULE) || {};
                 $('.sch-cell[data-sch-id]').each(function() {
                     const id = $(this).data('sch-id');
                     if(data[id]) {
-                        $(this).text(data[id].text);
-                        // Reset classes then add specific one
-                        $(this).removeClass('bg-sched-blue bg-sched-yellow bg-sched-green bg-sched-red')
-                               .addClass(data[id].colorClass);
+                        // Preserve the overlay
+                        const overlay = $(this).find('.ext-edit-overlay').detach();
+                        $(this).text(data[id].text).append(overlay);
+                        $(this).removeClass('bg-sched-blue bg-sched-yellow bg-sched-green bg-sched-red').addClass(data[id].color);
                     }
                 });
             },
 
             openEditor: (id, text) => {
-                $('#extEditorTitle').text('Update Schedule');
+                $('#extEditorTitle').html('<span class="material-icons">event</span> Update Schedule');
                 $('#extEditorContent').html(`
-                    <label class="detail-label">Cell Text</label>
-                    <input type="text" id="schText" class="ext-input" value="${text}">
-                    <label class="detail-label">Status Color</label>
-                    <select id="schColor" class="ext-select">
-                        <option value="">None (White)</option>
-                        <option value="bg-sched-blue">Blue (Planned)</option>
-                        <option value="bg-sched-yellow">Yellow (In-Progress)</option>
-                        <option value="bg-sched-green">Green (Completed)</option>
-                        <option value="bg-sched-red">Red (Issue)</option>
-                    </select>
+                    <div class="md-input-group">
+                        <label class="md-label">Plan / Activity</label>
+                        <input type="text" id="schText" class="md-input" value="${text}">
+                    </div>
+                    <div class="md-input-group">
+                        <label class="md-label">Status Color</label>
+                        <select id="schColor" class="md-select">
+                            <option value="">None</option>
+                            <option value="bg-sched-blue">Blue (Planned)</option>
+                            <option value="bg-sched-yellow">Yellow (In Progress)</option>
+                            <option value="bg-sched-green">Green (Done)</option>
+                            <option value="bg-sched-red">Red (Delayed)</option>
+                        </select>
+                    </div>
                 `);
 
                 $('#extEditorSaveBtn').off('click').on('click', () => {
-                    const data = Storage.get(KEYS.SCHEDULE) || {};
-                    data[id] = { 
-                        text: $('#schText').val(), 
-                        colorClass: $('#schColor').val() 
-                    };
-                    Storage.set(KEYS.SCHEDULE, data);
+                    const data = Utils.storage.get(KEYS.SCHEDULE) || {};
+                    data[id] = { text: $('#schText').val(), color: $('#schColor').val() };
+                    Utils.storage.set(KEYS.SCHEDULE, data);
                     Logic.Schedule.load();
                     QMExtension.UI.closeModal('extEditorModal');
+                    QMExtension.UI.snack("Schedule Saved");
                 });
-                
-                $('#extEditorModal').css('display', 'flex').hide().fadeIn(200);
+                QMExtension.UI.openModal('extEditorModal');
             }
         },
 
-        // --- PROCESS FLOW LOGIC ---
         Process: {
             init: () => {
-                $('.flow-step').each(function(index) {
-                    $(this).attr('data-proc-id', index).addClass('ext-cursor-pointer ext-hover-effect');
+                $('.flow-step').each(function(i) {
+                    $(this).attr('data-proc-id', i);
+                    $(this).append('<div class="ext-edit-overlay"><span class="material-icons" style="color:var(--md-primary);">description</span></div>');
                 });
-                Logic.Process.load(); // Load any custom tooltips?
+                Logic.Process.load();
 
-                $(document).on('click', '.flow-step', function() {
-                    const id = $(this).data('proc-id');
-                    const title = $(this).find('.flow-text').text();
-                    const num = $(this).find('.flow-num').text();
-                    Logic.Process.openDetails(id, num, title);
+                $(document).on('click', '.flow-step .ext-edit-overlay', function(e) {
+                    e.stopPropagation();
+                    const step = $(this).parent();
+                    Logic.Process.openEditor(step.data('proc-id'), step.find('.flow-text').text());
                 });
             },
-
+            
             load: () => {
-                // Optional: Visually indicate steps that have SOPs attached
-                const data = Storage.get(KEYS.PROCESS) || {};
+                // Add indicator for existing SOPs
+                const data = Utils.storage.get(KEYS.PROCESS) || {};
                 $('.flow-step').each(function() {
                     const id = $(this).data('proc-id');
                     if(data[id] && data[id].sop) {
-                        $(this).css('border-color', '#b88a30');
+                         $(this).css('border-bottom', '3px solid var(--md-accent)');
                     }
                 });
             },
 
-            openDetails: (id, num, title) => {
-                const data = Storage.get(KEYS.PROCESS) || {};
-                const currentData = data[id] || { sop: '', notes: '' };
+            openEditor: (id, title) => {
+                const data = Utils.storage.get(KEYS.PROCESS) || {};
+                const current = data[id] || { sop: '', notes: '' };
 
-                $('#extEditorTitle').text(`Stage ${num}: ${title}`);
+                $('#extEditorTitle').html(`<span class="material-icons">schema</span> ${title}`);
                 $('#extEditorContent').html(`
-                    <div style="background:#eef2ff; padding:10px; border-radius:4px; margin-bottom:15px; font-size:0.8rem; border-left:4px solid #3c78d8;">
-                        Edit the Standard Operating Procedure (SOP) or Notes for this stage.
+                    <div class="md-input-group">
+                        <label class="md-label">Standard Operating Procedure (SOP)</label>
+                        <textarea id="procSop" class="md-textarea" rows="6">${current.sop}</textarea>
                     </div>
-                    <label class="detail-label">SOP / Guidelines</label>
-                    <textarea id="procSop" class="ext-input" rows="4">${currentData.sop}</textarea>
-                    <label class="detail-label">Internal Notes</label>
-                    <textarea id="procNotes" class="ext-input" rows="2">${currentData.notes}</textarea>
+                    <div class="md-input-group">
+                        <label class="md-label">Internal Notes</label>
+                        <textarea id="procNotes" class="md-textarea" rows="2">${current.notes}</textarea>
+                    </div>
                 `);
 
                 $('#extEditorSaveBtn').off('click').on('click', () => {
-                    const newData = Storage.get(KEYS.PROCESS) || {};
-                    newData[id] = { 
-                        sop: $('#procSop').val(), 
-                        notes: $('#procNotes').val() 
-                    };
-                    Storage.set(KEYS.PROCESS, newData);
+                    const newData = Utils.storage.get(KEYS.PROCESS) || {};
+                    newData[id] = { sop: $('#procSop').val(), notes: $('#procNotes').val() };
+                    Utils.storage.set(KEYS.PROCESS, newData);
                     Logic.Process.load();
                     QMExtension.UI.closeModal('extEditorModal');
-                    QMExtension.UI.showToast("Process Info Saved");
+                    QMExtension.UI.snack("Process Details Saved");
                 });
-
-                $('#extEditorModal').css('display', 'flex').hide().fadeIn(200);
+                QMExtension.UI.openModal('extEditorModal');
             }
         }
     };
 
-    // --- 5. UI UTILITIES ---
+    // --- 5. UI CONTROLLERS ---
     const UI = {
-        closeModal: (id) => { $(`#${id}`).fadeOut(200); },
-        
-        showToast: (msg) => {
-            // Re-use the main app's toast container if available
-            if($('#toast-container').length) {
-                const t = $(`<div class="toast info" style="border-left-color:#b88a30;"><span><i class="fas fa-wrench"></i></span> ${msg}</div>`);
-                $('#toast-container').append(t);
-                t.animate({right: '0', opacity: 1}, 300);
-                setTimeout(() => t.fadeOut(500, () => t.remove()), 3000);
-            } else {
-                alert(msg);
-            }
+        openModal: (id) => {
+            const el = $(`#${id}`);
+            el.css('display', 'flex').animate({ opacity: 1 }, 150);
+            el.find('.md-dialog').css('transform', 'translateY(20px)');
+            setTimeout(() => el.find('.md-dialog').css('transform', 'translateY(0)'), 10);
         },
 
-        // Enhanced Search Highlighting
+        closeModal: (id) => {
+            const el = $(`#${id}`);
+            el.animate({ opacity: 0 }, 150, () => {
+                el.hide();
+            });
+        },
+
+        snack: (msg) => {
+            const x = $("#md-snackbar");
+            x.text(msg).addClass("show");
+            setTimeout(() => { x.removeClass("show"); }, 3000);
+        },
+
+        // Material Search Highlighting
         setupSearch: () => {
             $('#searchInput').on('keyup', function() {
-                const term = $(this).val().toLowerCase();
-                if(!term) { 
-                    $('.highlight-text').contents().unwrap(); 
-                    return; 
-                }
-                
-                // Wait for Main App Filter to finish
+                const val = $(this).val().toLowerCase();
                 setTimeout(() => {
                     $('#auditTable tbody tr:visible td').each(function() {
-                        const text = $(this).text();
-                        if(text.toLowerCase().includes(term) && $(this).children().length === 0) {
-                            const regex = new RegExp(`(${term})`, 'gi');
-                            $(this).html(text.replace(regex, '<span class="highlight-text">$1</span>'));
+                        const cell = $(this);
+                        if(cell.children().length === 0 && val) {
+                            const txt = cell.text();
+                            if(txt.toLowerCase().includes(val)) {
+                                cell.html(txt.replace(new RegExp(`(${val})`, 'gi'), 
+                                    '<span style="background:var(--md-accent); color:black; padding:0 2px;">$1</span>'));
+                            }
+                        } else if (!val) {
+                             // Reset highlight logic would go here if needed, 
+                             // but simple table redraws usually handle this in main app
                         }
                     });
-                }, 100);
+                }, 200);
             });
         }
     };
 
-    // --- 6. INITIALIZATION ---
+    // --- 6. INIT ---
     const init = () => {
-        console.log("QM Extension v2.0: Loaded");
-        injectStyles();
+        console.log("QM Extension 3.0 (Material Design) Loaded");
+        injectResources();
         injectHTML();
         
-        // Init Sub-Modules
         Logic.KPI.init();
         Logic.Schedule.init();
         Logic.Process.init();
         UI.setupSearch();
 
-        // Inject "View" buttons into existing Audit Table dynamically
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((m) => {
-                if(m.type === 'childList') injectAuditButtons();
-            });
+        // Dynamically Inject View Buttons into Audit Table
+        const obs = new MutationObserver((mutations) => {
+            mutations.forEach((m) => { if(m.type === 'childList') injectAuditButtons(); });
         });
         const target = document.getElementById('auditBody');
         if(target) {
-            observer.observe(target, { childList: true });
-            injectAuditButtons(); // Initial run
+            obs.observe(target, { childList: true });
+            injectAuditButtons();
         }
     };
 
@@ -464,22 +593,25 @@ const QMExtension = (() => {
         $('#auditTable tbody tr').each(function() {
             const row = $(this);
             const actionCell = row.find('td:last-child');
-            // Extract ID from the delete function string (Fragile but necessary without changing main code)
-            const onclick = actionCell.find('.btn-danger').attr('onclick');
-            if(onclick && actionCell.find('.ext-view-btn').length === 0) {
-                const idMatch = onclick.match(/(\d+)/);
+            if(actionCell.find('.ext-view-btn').length === 0) {
+                const onclick = actionCell.find('.btn-danger').attr('onclick');
+                const idMatch = onclick ? onclick.match(/(\d+)/) : null;
+                
                 if(idMatch) {
-                    const btn = $(`<button class="btn-sm ext-view-btn" style="background:#3b82f6; color:white; border:1px solid #2563eb; margin-right:5px; border-radius:4px;"><i class="fas fa-eye"></i></button>`);
-                    btn.click(() => Logic.Audits.open(parseInt(idMatch[1])));
+                    const btn = $(`
+                        <button class="md-btn md-btn-text ext-view-btn" style="min-width:auto; padding:4px 8px; margin-right:4px;" title="View Details">
+                            <span class="material-icons" style="font-size:1.2rem;">visibility</span>
+                        </button>
+                    `);
+                    btn.click((e) => {
+                        e.preventDefault();
+                        Logic.Audits.open(parseInt(idMatch[1]));
+                    });
                     actionCell.prepend(btn);
                 }
             }
         });
     };
 
-    return { 
-        init, 
-        UI, 
-        Logic 
-    };
+    return { init, UI, Logic };
 })();
