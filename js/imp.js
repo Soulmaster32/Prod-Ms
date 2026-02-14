@@ -122,7 +122,7 @@ window.handleLogin = async function(event) {
 
         setTimeout(() => {
             // Redirect to your Dashboard file (check the filename carefully)
-            window.location.href = 'Qualitymanagement.html'; 
+            window.location.href = 'html/Qualitymanagement.html'; 
         }, 1500);
 
     } catch (error) {
