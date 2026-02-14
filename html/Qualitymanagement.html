@@ -1,792 +1,805 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QM Dashboard 2026 - Material Pro</title>
+    <title>QM Dashboard T202603 - Enterprise Pro</title>
     
-    <!-- Fonts: Roboto (Standard Material) & Material Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- FontAwesome (Legacy Support) -->
+    <!-- Fonts: Inter for UI, Oswald for Headers -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Libraries -->
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <!-- Chart.js (Optional) -->
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        header: ['Oswald', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: { 850: '#1e293b', 900: '#0f172a', 950: '#020617' },
+                        gold: { 400: '#facc15', 500: '#eab308', 600: '#ca8a04' },
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.3)',
+                        'neon': '0 0 10px rgba(250, 204, 21, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
-        :root {
-            /* --- MATERIAL THEME PALETTE --- */
-            --md-primary: #3f51b5;       /* Indigo 500 */
-            --md-primary-dark: #303f9f;  /* Indigo 700 */
-            --md-primary-light: #c5cae9; /* Indigo 100 */
-            --md-accent: #ffca28;        /* Amber 400 */
-            --md-danger: #f44336;
-            --md-success: #4caf50;
-            --md-warning: #ff9800;
-            
-            /* Backgrounds */
-            --bg-app: #f0f2f5;
-            --bg-surface: #ffffff;
-            --bg-sidebar: #263238;       /* Blue Grey 900 */
-            
-            /* Text */
-            --text-primary: #212121;
-            --text-secondary: #757575;
-            --text-light: #ffffff;
-            
-            /* Elevation / Shadows */
-            --shadow-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-            --shadow-2: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-            --shadow-3: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
-            
-            --radius: 8px;
-        }
+@keyframes float-gentle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+.animate-bounce-slow {
+    animation: float-gentle 3s ease-in-out infinite;
+}
 
-        * { box-sizing: border-box; outline: none; }
-        
+
+
+        /* --- CORE STYLES --- */
         body {
-            margin: 0; font-family: 'Roboto', sans-serif;
-            background-color: var(--bg-app);
-            color: var(--text-primary);
-            overflow-x: hidden;
+            background-color: #0f172a; /* Fallback */
+            background-image: radial-gradient(circle at 10% 20%, #1e293b 0%, #020617 90%);
+            color: #f1f5f9;
+            overflow: hidden; /* Prevent body scroll, handle inside containers */
         }
 
-        /* --- LAYOUT STRUCTURE --- */
-        .wrapper { display: flex; width: 100%; min-height: 100vh; }
-
-        /* Sidebar */
-        #sidebar {
-            width: 260px; flex-shrink: 0;
-            background: var(--bg-sidebar); color: var(--text-light);
-            transition: margin 0.3s; display: flex; flex-direction: column;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.2); z-index: 100;
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
-        #sidebar.active { margin-left: -260px; }
+
+        /* Custom Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #eab308; }
+
+        /* Sidebar Animation */
+        #sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease; }
         
-        .sidebar-header {
-            padding: 24px 20px; background: rgba(0,0,0,0.2);
-            border-left: 4px solid var(--md-accent);
-        }
-        .sidebar-header h3 { margin: 0; font-weight: 300; letter-spacing: 1px; }
-        .sidebar-header strong { font-weight: 700; color: var(--md-accent); }
-
-        .menu-list { list-style: none; padding: 0; margin: 20px 0; }
-        .menu-list li a {
-            padding: 16px 24px; display: flex; align-items: center; color: #b0bec5;
-            text-decoration: none; transition: 0.2s; font-size: 0.95rem; border-left: 4px solid transparent;
-        }
-        .menu-list li a:hover, .menu-list li.active a {
-            background: rgba(255,255,255,0.05); color: white;
-        }
-        .menu-list li.active a { border-left-color: var(--md-accent); background: rgba(63, 81, 181, 0.2); }
-        .menu-list li a i, .menu-list li a .material-icons { margin-right: 15px; width: 24px; text-align: center; }
-
-        /* Main Content */
-        #content { flex-grow: 1; padding: 24px; overflow-y: auto; height: 100vh; }
+        /* Sidebar Collapsed State (Desktop) */
+        #sidebar.collapsed { width: 70px; }
+        #sidebar.collapsed .sidebar-text, 
+        #sidebar.collapsed .menu-category, 
+        #sidebar.collapsed .badge-pill { display: none; opacity: 0; }
+        #sidebar.collapsed .nav-item { justify-content: center; padding-left: 0; padding-right: 0; }
+        #sidebar.collapsed .nav-icon { margin-right: 0; font-size: 1.2rem; }
         
-        /* Grid System */
-        .dashboard-grid {
-            display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px;
-            max-width: 1600px; margin: 0 auto;
+        /* Tooltip Logic for Collapsed Sidebar */
+        #sidebar.collapsed .nav-item:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-left: 10px;
+            background: #eab308;
+            color: #020617;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            white-space: nowrap;
+            z-index: 50;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
-        .col-full { grid-column: 1 / -1; }
-        .col-left { grid-column: 1 / 4; }
-        .col-right { grid-column: 4 / -1; }
-        .col-half { grid-column: span 6; }
 
-        /* --- COMPONENT: CARDS (Surfaces) --- */
-        .md-card {
-            background: var(--bg-surface); border-radius: var(--radius);
-            box-shadow: var(--shadow-1); padding: 24px;
-            height: 100%; display: flex; flex-direction: column;
-            transition: box-shadow 0.3s;
-        }
-        .md-card:hover { box-shadow: var(--shadow-2); }
-        
-        .section-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #eee;
-        }
-        .section-title {
-            font-size: 1.1rem; font-weight: 500; color: var(--md-primary);
-            display: flex; align-items: center; gap: 10px;
-        }
-        
-        /* --- COMPONENT: BUTTONS --- */
-        .btn {
-            border: none; border-radius: 4px; padding: 8px 16px;
-            font-family: 'Roboto', sans-serif; font-weight: 500; text-transform: uppercase;
-            font-size: 0.85rem; letter-spacing: 0.5px; cursor: pointer;
-            transition: background 0.2s, box-shadow 0.2s; display: inline-flex; align-items: center; gap: 8px;
-        }
-        .btn-primary { background: var(--md-primary); color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .btn-primary:hover { background: var(--md-primary-dark); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
-        
-        .btn-accent { background: var(--md-accent); color: #333; }
-        .btn-accent:hover { filter: brightness(95%); }
-        
-        .btn-text { background: transparent; color: var(--md-primary); }
-        .btn-text:hover { background: rgba(63, 81, 181, 0.08); }
-        
-        .btn-icon { padding: 8px; border-radius: 50%; min-width: auto; }
+        /* Table Styles */
+        .glass-table th { background: rgba(15, 23, 42, 0.8); color: #facc15; font-family: 'Oswald'; letter-spacing: 0.05em; text-transform: uppercase; font-size: 0.75rem; }
+        .glass-table td { border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; }
+        .glass-table tr:hover td { background: rgba(255,255,255,0.05); }
 
-        /* --- COMPONENT: INPUTS & SEARCH --- */
-        .top-bar {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--bg-surface); padding: 12px 24px; border-radius: var(--radius);
-            box-shadow: var(--shadow-1); margin-bottom: 24px; flex-wrap: wrap; gap: 15px;
-        }
-        .search-wrapper { position: relative; flex: 1; max-width: 500px; }
-        .search-wrapper input {
-            width: 100%; padding: 10px 15px 10px 45px; border-radius: 4px;
-            border: 1px solid #ddd; background: #f9f9f9; font-size: 1rem;
-            transition: 0.3s;
-        }
-        .search-wrapper input:focus { background: white; border-color: var(--md-primary); box-shadow: 0 0 0 2px rgba(63,81,181,0.1); }
-        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
+        /* Drag & Drop Visuals */
+        .scrum-card { cursor: grab; transition: transform 0.2s, box-shadow 0.2s; }
+        .scrum-card:active { cursor: grabbing; transform: scale(1.02); }
+        .scrum-card.dragging { opacity: 0.4; border: 1px dashed #facc15; }
+        .scrum-col.drag-over { background: rgba(255,255,255,0.1); border: 2px dashed #facc15; }
 
-        /* --- COMPONENT: DATA TABLE --- */
-        .table-container { overflow-x: auto; border: 1px solid #eee; border-radius: 4px; }
-        table.md-table { width: 100%; border-collapse: collapse; min-width: 1200px; font-size: 0.85rem; }
-        table.md-table th {
-            background: #fafafa; color: var(--text-secondary); font-weight: 500; text-transform: uppercase;
-            padding: 12px 16px; text-align: left; border-bottom: 2px solid #eee; position: sticky; top: 0;
-        }
-        table.md-table td { padding: 12px 16px; border-bottom: 1px solid #eee; color: var(--text-primary); vertical-align: middle; }
-        table.md-table tr:hover { background: #f5f5f5; }
-        
-        /* Images */
-        .thumb-img { width: 48px; height: 48px; object-fit: cover; border-radius: 4px; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .thumb-img:hover { transform: scale(1.5); z-index: 10; }
-
-        /* Status Chips */
-        .chip { padding: 4px 10px; border-radius: 16px; font-size: 0.75rem; font-weight: 500; }
-        .chip.green { background: #e8f5e9; color: #2e7d32; }
-        .chip.orange { background: #fff3e0; color: #ef6c00; }
-        .chip.red { background: #ffebee; color: #c62828; }
-        .chip.blue { background: #e3f2fd; color: #1565c0; }
-
-        /* --- SPECIFIC: KPI BOXES --- */
-        .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .pq-box {
-            background: #fff; border: 1px solid #eee; padding: 12px; border-radius: 6px;
-            display: flex; flex-direction: column; align-items: center; text-align: center;
-            transition: 0.2s; position: relative;
-        }
-        .pq-box:hover { border-color: var(--md-primary); transform: translateY(-2px); }
-        .pq-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
-        .pq-val { font-size: 1.5rem; font-weight: 300; color: var(--md-primary); margin-top: 4px; }
-
-        /* --- SPECIFIC: SCRUM BOARD --- */
-        .scrum-board { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 10px; height: 450px; }
-        .scrum-col {
-            flex: 0 0 280px; background: #f5f5f5; border-radius: var(--radius);
-            display: flex; flex-direction: column; padding: 12px;
-            border-top: 4px solid var(--md-primary-light);
-        }
-        .scrum-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-weight: 500; color: var(--text-secondary); }
-        .scrum-list { flex: 1; overflow-y: auto; padding-right: 4px; }
-        .task-card {
-            background: white; padding: 12px; border-radius: 6px; margin-bottom: 10px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 3px solid transparent;
-            cursor: grab; transition: 0.2s;
-        }
-        .task-card:hover { box-shadow: 0 3px 6px rgba(0,0,0,0.15); transform: translateY(-2px); }
-        .task-card.high { border-left-color: var(--md-danger); }
-        .task-card.med { border-left-color: var(--md-warning); }
-        .task-card.low { border-left-color: var(--md-success); }
-        
-        .task-meta { margin-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-secondary); }
-        .user-avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--md-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; }
-
-        /* --- SPECIFIC: SCHEDULE --- */
-        .sched-grid {
-            display: grid; grid-template-columns: 140px repeat(12, 1fr) 140px;
-            font-size: 0.75rem; border: 1px solid #e0e0e0; border-radius: 4px; overflow: hidden;
-        }
-        .sch-head { background: #424242; color: white; padding: 8px; text-align: center; border-right: 1px solid #555; }
-        .sch-cell { border-bottom: 1px solid #eee; border-right: 1px solid #eee; padding: 6px; display: flex; align-items: center; justify-content: center; text-align: center; }
-        .bg-sched-blue { background: #42a5f5; color: white; }
-        .bg-sched-green { background: #66bb6a; color: white; }
-        .bg-sched-yellow { background: #ffee58; color: #333; }
-        .bg-sched-red { background: #ef5350; color: white; }
-
-        /* --- PROCESS FLOW --- */
-        .flow-wrapper { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; padding: 20px 0; }
-        .flow-step {
-            width: 130px; background: white; border: 1px solid #e0e0e0; border-radius: 8px;
-            padding: 16px 10px; text-align: center; position: relative; box-shadow: var(--shadow-1);
-        }
-        .flow-step:hover { border-color: var(--md-primary); box-shadow: var(--shadow-2); }
-        .flow-num {
-            width: 28px; height: 28px; background: var(--md-accent); color: #333;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: bold; margin: 0 auto 8px; font-size: 0.9rem;
-        }
-        .flow-arrow { display: flex; align-items: center; color: var(--text-secondary); }
-
-        /* --- MODAL (Overlay) --- */
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 2000; display: none;
-            align-items: center; justify-content: center; backdrop-filter: blur(2px);
-        }
-        .dialog {
-            background: white; width: 100%; max-width: 800px; max-height: 90vh;
-            border-radius: var(--radius); box-shadow: var(--shadow-3);
-            display: flex; flex-direction: column; overflow: hidden;
-        }
-        .dialog-header { padding: 16px 24px; background: var(--md-primary); color: white; display: flex; justify-content: space-between; align-items: center; }
-        .dialog-body { padding: 24px; overflow-y: auto; }
-        .dialog-footer { padding: 16px 24px; background: #f5f5f5; display: flex; justify-content: flex-end; gap: 10px; }
-        
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-        .input-group { display: flex; flex-direction: column; gap: 6px; }
-        .input-group label { font-size: 0.8rem; font-weight: 500; color: var(--md-primary); }
-        .input-control { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: 'Roboto'; }
-        .input-control:focus { border-color: var(--md-primary); box-shadow: 0 0 0 2px rgba(63,81,181,0.2); }
-
-        /* Responsive */
+        /* Mobile Adjustments */
         @media (max-width: 1024px) {
-            .dashboard-grid { display: flex; flex-direction: column; }
-            .col-left, .col-right, .col-half { width: 100%; }
-            #sidebar { position: fixed; height: 100%; }
-            #sidebar.active { margin-left: 0; }
-            #sidebar { margin-left: -260px; } /* Hidden by default on mobile if logic reversed, but kept standard here */
+            #sidebar { position: fixed; height: 100%; z-index: 50; transform: translateX(-100%); width: 260px; }
+            #sidebar.mobile-open { transform: translateX(0); }
+            .desktop-search { display: none; }
         }
     </style>
 </head>
-<body>
+<body class="antialiased font-sans text-slate-200">
 
-<div class="wrapper">
+<!-- Mobile Backdrop -->
+<div id="mobileBackdrop" onclick="App.toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+
+<div class="flex h-screen w-full">
+
     <!-- SIDEBAR -->
-    <nav id="sidebar">
-        <div class="sidebar-header">
-            <h3>QUALITY <strong>PRO</strong></h3>
-            <span style="font-size:0.75rem; opacity:0.7;">System V7.0</span>
+    <aside id="sidebar" class="glass-panel h-full flex flex-col flex-shrink-0 z-50">
+        <!-- Brand -->
+        <div class="h-16 flex items-center justify-center border-b border-white/10 relative">
+            <div class="flex items-center gap-3 sidebar-text transition-opacity duration-200">
+                <i class="fas fa-shield-alt text-gold-400 text-2xl drop-shadow-lg"></i>
+                <h2 class="font-header text-xl tracking-wider font-bold text-white">Quality<span class="text-gold-400">Group</span></h2>
+            </div>
+            <!-- Icon only when collapsed -->
+            <i class="fas fa-shield-alt text-gold-400 text-2xl absolute left-1/2 -translate-x-1/2 opacity-0 transition-opacity duration-200" id="brandIconCollapsed"></i>
         </div>
-        
-        <ul class="menu-list">
-            <li class="active"><a href="#"><i class="material-icons">dashboard</i> Dashboard</a></li>
-            <li><a href="#"><i class="material-icons">fact_check</i> Audits</a></li>
-            <li><a href="#"><i class="material-icons">assignment</i> Claims</a></li>
-            <li><a href="#"><i class="material-icons">folder_shared</i> Documents</a></li>
-            <li><a href="#"><i class="material-icons">calendar_today</i> Schedule</a></li>
-            <li><a href="#"><i class="material-icons">people</i> Team</a></li>
-            <li><a href="#"><i class="material-icons">settings</i> Settings</a></li>
-        </ul>
-        
-        <div style="margin-top:auto; padding: 20px; font-size: 0.75rem; text-align: center; color: #78909c;">
-            &copy; 2026 Quality Dept
-        </div>
-    </nav>
 
-    <!-- CONTENT -->
-    <div id="content">
-        <!-- TOP BAR -->
-        <div class="top-bar">
-            <div style="display:flex; align-items:center; gap:15px;">
-                <button class="btn btn-icon btn-text" id="toggleSidebar">
-                    <i class="material-icons">menu</i>
+        <!-- User Profile -->
+        <div class="p-6 text-center border-b border-white/10 sidebar-text">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 border-2 border-gold-500 mx-auto flex items-center justify-center shadow-neon mb-3">
+                <span class="font-header text-xl text-gold-400">AD</span>
+            </div>
+            <h4 class="font-bold text-white text-sm">Admin User</h4>
+            <span class="text-xs text-slate-400 uppercase tracking-wider">Quality Lead</span>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto custom-scroll py-4 px-2 space-y-1">
+            <a href="#dashboard" class="nav-item relative flex items-center px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg transition-all group" data-tooltip="Dashboard">
+                <i class="fas fa-chart-line nav-icon w-5 text-center text-slate-400 group-hover:text-gold-400 transition-colors mr-3"></i>
+                <span class="sidebar-text font-medium text-sm">Dashboard</span>
+            </a>
+
+            <div class="menu-category mt-6 mb-2 px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Quality Modules</div>
+
+            <a href="#section-product" class="nav-item relative flex items-center px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg transition-all group" data-tooltip="Product Quality">
+                <i class="fas fa-boxes nav-icon w-5 text-center text-slate-400 group-hover:text-gold-400 transition-colors mr-3"></i>
+                <span class="sidebar-text font-medium text-sm">Product Quality</span>
+            </a>
+            
+            <a href="#section-audit" class="nav-item relative flex items-center px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg transition-all group" data-tooltip="Audit Findings">
+                <i class="fas fa-clipboard-check nav-icon w-5 text-center text-slate-400 group-hover:text-gold-400 transition-colors mr-3"></i>
+                <span class="sidebar-text font-medium text-sm">Audit Findings</span>
+                <span class="badge-pill ml-auto bg-red-500/80 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">3</span>
+            </a>
+
+            <a href="#section-scrum" class="nav-item relative flex items-center px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg transition-all group" data-tooltip="Scrum Board">
+                <i class="fas fa-th-large nav-icon w-5 text-center text-slate-400 group-hover:text-gold-400 transition-colors mr-3"></i>
+                <span class="sidebar-text font-medium text-sm">Scrum Board</span>
+            </a>
+
+            <a href="#section-claims" class="nav-item relative flex items-center px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg transition-all group" data-tooltip="Claims">
+                <i class="fas fa-exclamation-triangle nav-icon w-5 text-center text-slate-400 group-hover:text-gold-400 transition-colors mr-3"></i>
+                <span class="sidebar-text font-medium text-sm">Claims Report</span>
+            </a>
+        </nav>
+        
+        <!-- Footer -->
+        <div class="p-4 border-t border-white/10 sidebar-text text-center">
+            <p class="text-[10px] text-slate-500">&copy; 2026 QM System v4.1</p>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative bg-slate-900/50">
+        
+        <!-- Top Header -->
+        <header class="h-16 glass-panel border-b border-white/5 flex items-center justify-between px-6 z-30">
+            <div class="flex items-center gap-4">
+                <button onclick="App.toggleSidebar()" class="text-slate-400 hover:text-gold-400 transition-colors p-2 rounded-lg hover:bg-white/5">
+                    <i class="fas fa-bars text-lg"></i>
                 </button>
-                <h2 style="margin:0; font-weight:400; color:var(--md-primary-dark);">Dashboard Overview</h2>
+                <h1 class="font-header text-xl text-white tracking-wide hidden sm:block">QUALITY MANAGEMENT DASHBOARD</h1>
             </div>
-            
-            <div class="search-wrapper">
-                <i class="material-icons search-icon">search</i>
-                <input type="text" id="searchInput" placeholder="Search findings, PIC, tags..." onkeyup="App.handleSearch(this.value)">
-            </div>
-            
-            <div style="display:flex; gap:10px;">
-                <button class="btn btn-text" onclick="App.exportData()"><i class="material-icons">download</i> Export</button>
-                <button class="btn btn-text" onclick="$('#importFile').click()"><i class="material-icons">upload</i> Import</button>
-                <input type="file" id="importFile" hidden onchange="App.importData(event)">
-                <div style="width:36px; height:36px; background:var(--md-primary); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold;">QA</div>
-            </div>
-        </div>
 
-        <div class="dashboard-grid">
+            <div class="flex items-center gap-3">
+                <!-- Search -->
+                <div class="relative hidden md:block">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                    <input type="text" oninput="App.handleSearch(this.value)" placeholder="Search audits, tasks..." 
+                        class="bg-slate-950/50 border border-white/10 rounded-full py-1.5 pl-9 pr-4 text-sm focus:outline-none focus:border-gold-500 w-64 transition-all">
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-2">
+                    <button onclick="App.exportData()" title="Export JSON" class="bg-slate-800 hover:bg-slate-700 text-slate-200 p-2 rounded-lg border border-white/10 transition-colors">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <label title="Import JSON" class="bg-slate-800 hover:bg-slate-700 text-slate-200 p-2 rounded-lg border border-white/10 transition-colors cursor-pointer">
+                        <i class="fas fa-upload"></i>
+                        <input type="file" id="importFile" hidden onchange="App.importData(event)">
+                    </label>
+                    <button onclick="App.resetAll()" title="Reset Data" class="bg-red-900/30 hover:bg-red-900/50 text-red-400 p-2 rounded-lg border border-red-500/30 transition-colors">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto custom-scroll p-4 md:p-6" id="dashboard">
             
-            <!-- LEFT COLUMN: KPIs & Vision -->
-            <div class="col-left">
-                <!-- Vision Card -->
-                <div class="md-card" style="margin-bottom: 24px; background: linear-gradient(135deg, var(--md-primary) 0%, var(--md-primary-dark) 100%); color: white;">
-                    <div style="margin-bottom:15px;">
-                        <div style="font-size:0.8rem; opacity:0.8; text-transform:uppercase; letter-spacing:1px;">Vision Statement</div>
-                        <div style="font-size:1rem; margin-top:5px; font-weight:300; line-height:1.4;">Achieving zero quality claims through excellent process standards and continuous monitoring.</div>
-                    </div>
+            <!-- KPI CARDS ROW -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="glass-panel p-4 rounded-xl flex items-center justify-between border-l-4 border-gold-500">
                     <div>
-                        <div style="font-size:0.8rem; opacity:0.8; text-transform:uppercase; letter-spacing:1px;">Mission Statement</div>
-                        <div style="font-size:0.9rem; margin-top:5px; font-weight:300; line-height:1.4;">Sustainable improvement via standardization, discipline, and equipment maintenance.</div>
+                        <p class="text-xs text-slate-400 uppercase font-bold">Total Audits</p>
+                        <h3 class="text-2xl font-header text-white mt-1">124</h3>
                     </div>
+                    <div class="w-10 h-10 rounded-full bg-gold-500/10 flex items-center justify-center text-gold-400"><i class="fas fa-clipboard-list"></i></div>
                 </div>
-
-                <!-- Product Quality KPIs -->
-                <div class="md-card">
-                    <div class="section-header">
-                        <span class="section-title"><i class="material-icons">analytics</i> Product Quality (YTD)</span>
+                <div class="glass-panel p-4 rounded-xl flex items-center justify-between border-l-4 border-blue-500">
+                    <div>
+                        <p class="text-xs text-slate-400 uppercase font-bold">Compliance Rate</p>
+                        <h3 class="text-2xl font-header text-white mt-1">98.5%</h3>
                     </div>
-                    <div class="kpi-grid">
-                        <div class="pq-box"><span class="pq-label">Near Miss</span><span class="pq-val">6</span></div>
-                        <div class="pq-box"><span class="pq-label">Int. Claims</span><span class="pq-val" style="color:var(--md-warning)">10</span></div>
-                        <div class="pq-box"><span class="pq-label">Ext. Claims</span><span class="pq-val" style="color:var(--md-success)">0</span></div>
-                        <div class="pq-box"><span class="pq-label">Batch Credit</span><span class="pq-val">98%</span></div>
+                    <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400"><i class="fas fa-check-circle"></i></div>
+                </div>
+                <div class="glass-panel p-4 rounded-xl flex items-center justify-between border-l-4 border-red-500">
+                    <div>
+                        <p class="text-xs text-slate-400 uppercase font-bold">Open Claims</p>
+                        <h3 class="text-2xl font-header text-white mt-1" id="kpiClaims">0</h3>
                     </div>
-                    
-                    <div style="margin: 20px 0 10px; font-size:0.85rem; font-weight:bold; color:var(--text-secondary);">REPROCESS BAGS ANALYSIS</div>
-                    <div class="kpi-grid">
-                        <div class="pq-box"><span class="pq-label">Moisture</span><span class="pq-val" style="font-size:1.2rem">173</span></div>
-                        <div class="pq-box"><span class="pq-label">High Cr</span><span class="pq-val" style="font-size:1.2rem">96</span></div>
-                        <div class="pq-box"><span class="pq-label">High Mg</span><span class="pq-val" style="font-size:1.2rem">231</span></div>
-                        <div class="pq-box"><span class="pq-label">Damaged</span><span class="pq-val" style="font-size:1.2rem">5</span></div>
+                    <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center text-red-400"><i class="fas fa-exclamation-triangle"></i></div>
+                </div>
+                <div class="glass-panel p-4 rounded-xl flex items-center justify-between border-l-4 border-green-500">
+                    <div>
+                        <p class="text-xs text-slate-400 uppercase font-bold">Scrum Done</p>
+                        <h3 class="text-2xl font-header text-white mt-1" id="kpiScrum">0%</h3>
                     </div>
+                    <div class="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-400"><i class="fas fa-tasks"></i></div>
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN: Audits Table -->
-            <div class="col-right">
-                <div class="md-card" style="padding:0; overflow:hidden;">
-                    <div style="padding:16px 24px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
-                        <span class="section-title"><i class="material-icons">table_view</i> Internal Audit Findings</span>
-                        <button class="btn btn-primary" onclick="App.openModal('add')"><i class="material-icons" style="font-size:1rem;">add</i> Record Finding</button>
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                
+                <!-- PRODUCT QUALITY CHART -->
+                <div class="glass-panel rounded-xl p-6 xl:col-span-2 flex flex-col" id="section-product">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-header text-lg text-gold-400 uppercase tracking-wide">Product Quality Trends (2026)</h3>
+                        <span class="text-xs bg-white/5 px-2 py-1 rounded border border-white/10">YTD Analysis</span>
+                    </div>
+                    <div class="flex-1 min-h-[300px] relative w-full">
+                        <canvas id="qualityChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- OBJECTIVES -->
+                <div class="glass-panel rounded-xl p-6 xl:col-span-1 flex flex-col justify-center relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 text-9xl text-white opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h3 class="font-header text-lg text-white mb-6 border-b border-white/10 pb-2">Vission & Mission</h3>
+                    
+                    <div class="mb-6">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fas fa-eye text-gold-400"></i>
+                            <span class="text-sm font-bold text-slate-300">VISION</span>
+                        </div>
+                        <p class="text-sm text-slate-400 leading-relaxed pl-6 border-l-2 border-gold-500/30">
+                            Achieve zero internal & external claims through excellence in process and product quality.
+                        </p>
                     </div>
                     
-                    <div class="table-container" style="border:none; height:600px; overflow-y:auto;">
-                        <table class="md-table" id="auditTable">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="fas fa-rocket text-gold-400"></i>
+                            <span class="text-sm font-bold text-slate-300">MISSION</span>
+                        </div>
+                        <p class="text-sm text-slate-400 leading-relaxed pl-6 border-l-2 border-gold-500/30">
+                            Sustainability, standardization, continuous equipment monitoring, commitment, and discipline.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- AUDIT FINDINGS TABLE -->
+                <div class="glass-panel rounded-xl xl:col-span-3 flex flex-col min-h-[500px]" id="section-audit">
+                    <div class="p-4 border-b border-white/10 flex flex-wrap justify-between items-center gap-4">
+                        <h3 class="font-header text-lg text-white"><i class="fas fa-search text-gold-400 mr-2"></i>INTERNAL AUDIT FINDINGS</h3>
+                        <button onclick="App.openAuditModal('add')" class="bg-gold-500 hover:bg-gold-400 text-slate-900 font-bold py-1.5 px-4 rounded shadow-lg transition-transform hover:-translate-y-0.5 text-sm">
+                            <i class="fas fa-plus mr-1"></i> New Finding
+                        </button>
+                    </div>
+                    <div class="flex-1 overflow-x-auto custom-scroll">
+                        <table class="w-full text-left border-collapse glass-table min-w-[1000px]">
                             <thead>
                                 <tr>
-                                    <th>#</th>
-                                    <th>Images</th>
-                                    <th>Description & Plan</th>
-                                    <th>Action Taken</th>
-                                    <th>Work Req</th>
-                                    <th>Status</th>
-                                    <th>PIC</th>
-                                    <th>Target</th>
-                                    <th style="text-align:right;">Actions</th>
+                                    <th class="p-3 text-center w-12">#</th>
+                                    <th class="p-3 text-center w-20">Before</th>
+                                    <th class="p-3 w-1/4">Issue & Plan</th>
+                                    <th class="p-3 text-center w-20">After</th>
+                                    <th class="p-3 w-1/4">Corrective Action</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3">PIC</th>
+                                    <th class="p-3">Target</th>
+                                    <th class="p-3 text-center w-24">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="auditBody">
-                                <!-- Dynamic Content -->
+                                <!-- JS Rendered -->
                             </tbody>
                         </table>
                     </div>
                 </div>
-            </div>
 
-            <!-- FULL WIDTH: Schedule -->
-            <div class="col-full">
-                <div class="md-card">
-                    <div class="section-header">
-                        <span class="section-title"><i class="material-icons">event_note</i> Annual Schedule Matrix</span>
-                    </div>
-                    <div style="overflow-x:auto;">
-                        <div class="sched-grid">
-                            <!-- Header -->
-                            <div class="sch-head">Activity / Month</div>
-                            <div class="sch-head">Jan</div><div class="sch-head">Feb</div><div class="sch-head">Mar</div><div class="sch-head">Apr</div>
-                            <div class="sch-head">May</div><div class="sch-head">Jun</div><div class="sch-head">Jul</div><div class="sch-head">Aug</div>
-                            <div class="sch-head">Sep</div><div class="sch-head">Oct</div><div class="sch-head">Nov</div><div class="sch-head">Dec</div>
-                            <div class="sch-head">Remarks</div>
-
-                            <!-- Content Rows -->
-                            <div class="sch-cell" style="font-weight:500; justify-content:flex-start; padding-left:10px;">Internal Audit</div>
-                            <div class="sch-cell bg-sched-blue">Grp 1</div>
-                            <div class="sch-cell"></div>
-                            <div class="sch-cell" style="background:#eee;">Minor</div>
-                            <div class="sch-cell bg-sched-green">Grp 4</div>
-                            <div class="sch-cell"></div>
-                            <div class="sch-cell bg-sched-red">Grp 2</div>
-                            <div class="sch-cell"></div><div class="sch-cell"></div>
-                            <div class="sch-cell" style="background:#eee;">Major</div>
-                            <div class="sch-cell bg-sched-yellow">Grp 3</div>
-                            <div class="sch-cell bg-sched-blue">Grp 1</div>
-                            <div class="sch-cell">98% Done</div>
-
-                            <div class="sch-cell" style="font-weight:500; justify-content:flex-start; padding-left:10px;">Cross Audit</div>
-                            <div class="sch-cell"></div><div class="sch-cell bg-sched-yellow">Aud: JNY</div>
-                            <div class="sch-cell"></div><div class="sch-cell"></div>
-                            <div class="sch-cell bg-sched-blue">Aud: CLC</div>
-                            <div class="sch-cell"></div><div class="sch-cell bg-sched-green">Aud: Team</div>
-                            <div class="sch-cell bg-sched-red">Aud: Log</div>
-                            <div class="sch-cell"></div><div class="sch-cell"></div><div class="sch-cell"></div><div class="sch-cell"></div>
-                            <div class="sch-cell">>90% Comp</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ROW: Process & Claims -->
-            <div class="col-half">
-                <div class="md-card">
-                    <div class="section-header">
-                        <span class="section-title"><i class="material-icons">linear_scale</i> Process Flow: MS Bag Checking</span>
-                    </div>
-                    <div class="flow-wrapper">
-                        <div class="flow-step">
-                            <div class="flow-num">1</div>
-                            <div style="font-size:0.8rem; font-weight:500;">Bagger Check</div>
-                        </div>
-                        <div class="flow-arrow"><i class="material-icons">arrow_forward</i></div>
-                        <div class="flow-step">
-                            <div class="flow-num">2</div>
-                            <div style="font-size:0.8rem; font-weight:500;">CTS Quality</div>
-                        </div>
-                        <div class="flow-arrow"><i class="material-icons">arrow_forward</i></div>
-                        <div class="flow-step">
-                            <div class="flow-num">3</div>
-                            <div style="font-size:0.8rem; font-weight:500;">Warehouse</div>
-                        </div>
-                    </div>
-                    <div style="text-align:center; font-size:0.8rem; color:var(--text-secondary);">
-                        <i class="material-icons" style="vertical-align:middle; font-size:1rem;">info</i> Click steps to edit SOP details (requires Extension).
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-half">
-                <div class="md-card">
-                    <div class="section-header">
-                        <span class="section-title"><i class="material-icons">report_problem</i> Claim Reports</span>
-                        <button class="btn btn-text" onclick="App.addClaim()"><i class="material-icons">add</i> New</button>
-                    </div>
-                    <ul id="claimsList" style="list-style:none; padding:0; margin:0; flex:1; overflow-y:auto;">
-                        <!-- Dynamic Claims -->
-                    </ul>
-                </div>
-            </div>
-
-            <!-- FULL: Scrum Board -->
-            <div class="col-full">
-                <div class="md-card">
-                    <div class="section-header">
-                        <span class="section-title"><i class="material-icons">view_kanban</i> Kaizen / Task Board</span>
-                        <div>
-                            <span id="taskProgress" style="font-size:0.85rem; color:var(--text-secondary); margin-right:15px;">0% Complete</span>
-                            <button class="btn btn-accent" onclick="App.openScrumModal('add')"><i class="material-icons" style="font-size:1rem;">add</i> Add Task</button>
-                        </div>
+                <!-- SCRUM BOARD -->
+                <div class="glass-panel rounded-xl xl:col-span-3 p-6" id="section-scrum">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-header text-lg text-white"><i class="fas fa-th-large text-gold-400 mr-2"></i>KAIZEN SCRUM BOARD</h3>
+                        <button onclick="App.openScrumModal('add')" class="text-sm text-gold-400 hover:text-white border border-gold-500/30 hover:bg-gold-500/10 px-3 py-1 rounded transition-colors">
+                            <i class="fas fa-plus mr-1"></i> Add Task
+                        </button>
                     </div>
                     
-                    <div class="scrum-board" id="scrumBoard">
-                        <!-- Scrum Columns -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto" id="scrumBoard">
+                        <!-- JS Rendered -->
                     </div>
                 </div>
-            </div>
 
-        </div> <!-- End Grid -->
-    </div>
+                <!-- CLAIMS & PROCESS FLOW -->
+                <div class="glass-panel rounded-xl xl:col-span-2 p-6" id="section-claims">
+                    <h3 class="font-header text-lg text-white mb-4"><i class="fas fa-file-invoice text-gold-400 mr-2"></i>CLAIMS & NEARMISS</h3>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs text-slate-400 uppercase">Recent Reports</span>
+                        <button onclick="App.addClaim()" class="text-xs text-gold-400 hover:underline">Add New</button>
+                    </div>
+                    <ul id="claimsList" class="space-y-2 max-h-64 overflow-y-auto custom-scroll pr-2">
+                        <!-- JS Rendered -->
+                    </ul>
+                </div>
+                
+                <div class="glass-panel rounded-xl xl:col-span-1 p-6" id="section-improvement">
+                     <h3 class="font-header text-lg text-white mb-4"><i class="fas fa-project-diagram text-gold-400 mr-2"></i>IMPROVEMENT FLOW</h3>
+                     <div class="space-y-4">
+                         <div class="flex items-center gap-3 p-3 bg-slate-800/50 rounded border border-white/5">
+                             <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center font-bold text-white">1</div>
+                             <div class="text-sm text-slate-300">Bagger Check</div>
+                             <i class="fas fa-arrow-right ml-auto text-slate-600"></i>
+                         </div>
+                         <div class="flex items-center gap-3 p-3 bg-slate-800/50 rounded border border-white/5">
+                             <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center font-bold text-white">2</div>
+                             <div class="text-sm text-slate-300">Warehouse QA</div>
+                             <i class="fas fa-arrow-right ml-auto text-slate-600"></i>
+                         </div>
+                         <div class="flex items-center gap-3 p-3 bg-slate-800/50 rounded border border-white/5">
+                             <div class="w-8 h-8 rounded-full bg-gold-600 flex items-center justify-center font-bold text-white">3</div>
+                             <div class="text-sm text-white font-bold">Ship Loading</div>
+                             <i class="fas fa-check ml-auto text-gold-400"></i>
+                         </div>
+                     </div>
+                </div>
+
+            </div> <!-- End Grid -->
+            
+            <div class="mt-8 text-center text-slate-600 text-xs">
+                Quality Management System &copy; 2026 | Built for Performance
+            </div>
+        </div>
+    </main>
 </div>
 
 <!-- AUDIT MODAL -->
-<div class="overlay" id="auditModal">
-    <div class="dialog">
-        <div class="dialog-header">
-            <h3 style="margin:0;">Audit Finding Record</h3>
-            <button onclick="App.closeModal('auditModal')" style="background:none; border:none; color:white; cursor:pointer;"><i class="material-icons">close</i></button>
+<div id="auditModal" class="fixed inset-0 z-[100] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onclick="App.closeModal('auditModal')"></div>
+    <div class="relative bg-slate-900 border border-gold-500/30 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col transform transition-all">
+        <div class="bg-slate-950 p-4 border-b border-white/10 flex justify-between items-center rounded-t-xl">
+            <h3 class="font-header text-xl text-gold-400">AUDIT FINDING RECORD</h3>
+            <button onclick="App.closeModal('auditModal')" class="text-slate-400 hover:text-white text-2xl">&times;</button>
         </div>
-        <div class="dialog-body">
-            <form id="auditForm">
+        <div class="p-6 overflow-y-auto custom-scroll">
+            <form id="auditForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <input type="hidden" id="auditId">
-                <div class="input-group" style="margin-bottom:15px;">
-                    <label>Finding Description</label>
-                    <textarea id="auditDesc" rows="2" class="input-control" required></textarea>
+                <div class="lg:col-span-3">
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Finding Description</label>
+                    <textarea id="auditDesc" rows="2" class="w-full bg-slate-800 border border-white/10 rounded p-3 text-sm focus:border-gold-500 focus:outline-none"></textarea>
                 </div>
-                
-                <div class="form-row">
-                    <div class="input-group"><label>Before Image URL</label><input type="text" id="auditImgBefore" class="input-control"></div>
-                    <div class="input-group"><label>After Image URL</label><input type="text" id="auditImgAfter" class="input-control"></div>
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Img URL (Before)</label><input type="text" id="auditImgBefore" class="w-full bg-slate-800 border border-white/10 rounded p-2 text-sm"></div>
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Plan of Action</label><input type="text" id="auditPlan" class="w-full bg-slate-800 border border-white/10 rounded p-2 text-sm"></div>
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Img URL (After)</label><input type="text" id="auditImgAfter" class="w-full bg-slate-800 border border-white/10 rounded p-2 text-sm"></div>
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Corrective Action</label><input type="text" id="auditCATaken" class="w-full bg-slate-800 border border-white/10 rounded p-2 text-sm"></div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Status</label>
+                    <select id="auditStatus" class="w-full bg-slate-800 border border-white/10 rounded p-2 text-sm text-slate-200">
+                        <option value="Open">Open</option>
+                        <option value="In-Progress">In-Progress</option>
+                        <option value="Closed">Closed</option>
+                    </select>
                 </div>
-
-                <div class="form-row">
-                    <div class="input-group"><label>Plan of Action</label><input type="text" id="auditPlan" class="input-control"></div>
-                    <div class="input-group"><label>Work Request No.</label><input type="text" id="auditWorkReq" class="input-control"></div>
-                </div>
-
-                <div class="form-row">
-                    <div class="input-group"><label>Primary PIC</label><input type="text" id="auditPicPri" class="input-control"></div>
-                    <div class="input-group"><label>Secondary PIC</label><input type="text" id="auditPicSec" class="input-control"></div>
-                </div>
-
-                <div class="form-row">
-                    <div class="input-group"><label>Status</label>
-                        <select id="auditStatus" class="input-control">
-                            <option value="Open">Open</option>
-                            <option value="In-Progress">In-Progress</option>
-                            <option value="Closed">Closed</option>
-                            <option value="Delayed">Delayed</option>
-                        </select>
-                    </div>
-                    <div class="input-group"><label>Progress (%)</label>
-                        <input type="number" id="auditProgress" class="input-control" min="0" max="100">
-                    </div>
-                </div>
-                 <div class="form-row">
-                    <div class="input-group"><label>Target Date</label><input type="date" id="auditTargetDate" class="input-control"></div>
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">PIC</label><input type="text" id="auditPicPri" class="w-full bg-slate-800 border border-white/10 rounded p-2 text-sm"></div>
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-2">Target Date</label><input type="date" id="auditTargetDate" class="w-full bg-slate-800 border border-white/10 rounded p-2 text-sm text-slate-200"></div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Progress: <span id="auditProgressVal" class="text-gold-400">0%</span></label>
+                    <input type="range" id="auditProgress" min="0" max="100" class="w-full accent-gold-500">
                 </div>
             </form>
         </div>
-        <div class="dialog-footer">
-            <button class="btn btn-text" onclick="App.closeModal('auditModal')">Cancel</button>
-            <button class="btn btn-primary" onclick="App.saveAudit()">Save Record</button>
+        <div class="bg-slate-950 p-4 border-t border-white/10 text-right rounded-b-xl">
+            <button onclick="App.saveAudit()" class="bg-gold-500 hover:bg-gold-400 text-slate-900 font-bold py-2 px-6 rounded shadow-lg">Save Record</button>
         </div>
     </div>
 </div>
 
 <!-- SCRUM MODAL -->
-<div class="overlay" id="scrumModal">
-    <div class="dialog" style="max-width:500px;">
-        <div class="dialog-header">
-            <h3 style="margin:0;">Task Details</h3>
-            <button onclick="App.closeModal('scrumModal')" style="background:none; border:none; color:white; cursor:pointer;"><i class="material-icons">close</i></button>
-        </div>
-        <div class="dialog-body">
-            <form id="scrumForm">
-                <input type="hidden" id="scrumId">
-                <div class="input-group" style="margin-bottom:15px;">
-                    <label>Task Description</label>
-                    <input type="text" id="scrumText" class="input-control" required>
+<div id="scrumModal" class="fixed inset-0 z-[100] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="App.closeModal('scrumModal')"></div>
+    <div class="relative bg-slate-900 border border-white/10 rounded-xl shadow-2xl w-full max-w-md p-6">
+        <h3 class="font-header text-xl text-white mb-4">Scrum Task</h3>
+        <form id="scrumForm" class="space-y-4">
+            <input type="hidden" id="scrumId">
+            <div><label class="text-xs text-slate-400 uppercase">Task</label><input type="text" id="scrumText" class="w-full bg-slate-800 border border-white/10 rounded p-2 text-white"></div>
+            <div><label class="text-xs text-slate-400 uppercase">User</label><input type="text" id="scrumUser" class="w-full bg-slate-800 border border-white/10 rounded p-2 text-white"></div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-xs text-slate-400 uppercase">Priority</label>
+                    <select id="scrumPriority" class="w-full bg-slate-800 border border-white/10 rounded p-2 text-white">
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
                 </div>
-                <div class="form-row">
-                    <div class="input-group"><label>Assignee</label><input type="text" id="scrumUser" class="input-control"></div>
-                    <div class="input-group"><label>Priority</label>
-                        <select id="scrumPriority" class="input-control">
-                            <option value="High">High</option>
-                            <option value="Medium" selected>Medium</option>
-                            <option value="Low">Low</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="input-group"><label>Status Column</label>
-                    <select id="scrumStatus" class="input-control">
+                <div>
+                    <label class="text-xs text-slate-400 uppercase">Status</label>
+                    <select id="scrumStatus" class="w-full bg-slate-800 border border-white/10 rounded p-2 text-white">
                         <option value="backlog">Backlog</option>
                         <option value="analysis">Doing</option>
                         <option value="verify">Verify</option>
                         <option value="done">Done</option>
                     </select>
                 </div>
-            </form>
-        </div>
-        <div class="dialog-footer">
-            <button class="btn btn-text" style="color:var(--md-danger); margin-right:auto;" onclick="App.deleteScrum()">Delete</button>
-            <button class="btn btn-primary" onclick="App.saveScrum()">Save Task</button>
+            </div>
+        </form>
+        <div class="mt-6 flex justify-between">
+            <button id="btnDeleteScrum" onclick="App.deleteScrum()" class="text-red-400 text-sm hover:text-red-300">Delete</button>
+            <button onclick="App.saveScrum()" class="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded">Save Task</button>
         </div>
     </div>
 </div>
 
-<!-- CORE APP LOGIC -->
+<!-- TOASTS -->
+<div id="toast-container" class="fixed bottom-5 right-5 z-[200] flex flex-col gap-2"></div>
+
 <script>
-    // --- UI INTERACTIONS ---
-    $('#toggleSidebar').click(function() { $('#sidebar').toggleClass('active'); });
-    $('.overlay').click(function(e) { if($(e.target).is('.overlay')) $(this).fadeOut(200); });
+const App = (() => {
+    const STORE_KEY = 'QM_ENT_V4';
+    let filterTerm = "";
+    let chartInstance = null;
+    
+    // Default State
+    let state = {
+        audits: [
+            { id: 1, desc: "Bag label misalignment on Line 2", imgBefore: "", plan: "Re-align sensor", imgAfter: "", status: "In-Progress", progress: 60, picPri: "John D.", targetDate: "2026-03-15", caTaken: "Adj sensor" }
+        ],
+        claims: [ { id: 101, text: "Report #001: Bag tear detected at Ship Loading." } ],
+        scrumTasks: [
+            { id: 1, text: 'Review SOP-001', user: 'Mike', priority: 'High', status: 'analysis' },
+            { id: 2, text: 'Calibrate Scales', user: 'Team', priority: 'Medium', status: 'backlog' }
+        ],
+        sidebarCollapsed: false
+    };
 
-    const App = (() => {
-        const STORE_KEY = 'QM_PRO_SYSTEM_V7';
-        let filterTerm = "";
+    // --- INITIALIZATION ---
+    const init = () => {
+        const saved = localStorage.getItem(STORE_KEY);
+        if(saved) try { state = { ...state, ...JSON.parse(saved) }; } catch(e) { console.error("Load Error"); }
         
-        let state = {
-            audits: [
-                {
-                    id: 1, desc: "Sensor misalignment on Line 2", imgBefore: "https://via.placeholder.com/150", 
-                    plan: "Re-align sensor", workReq: "WR-001", status: "In-Progress", progress: 50,
-                    picPri: "John Doe", targetDate: "2026-03-15"
-                }
-            ],
-            claims: [{id: 101, text: "Bag tear at Ship Loading (Stage 9). 5 bags affected."}],
-            scrumTasks: [
-                {id: 1, text: "Update ISO Guidelines", user: "Jane", priority: "High", status: "analysis"},
-                {id: 2, text: "Check Equipment Calibration", user: "Mike", priority: "Medium", status: "backlog"}
-            ]
-        };
-
-        const scrumCols = [
-            { id: 'backlog', title: 'BACKLOG' },
-            { id: 'analysis', title: 'DOING' },
-            { id: 'verify', title: 'VERIFY' },
-            { id: 'done', title: 'DONE' }
-        ];
-
-        const init = () => {
-            const loaded = localStorage.getItem(STORE_KEY);
-            if(loaded) { try { state = JSON.parse(loaded); } catch(e){ console.error(e); } }
-            render();
-        };
-
-        const save = () => { localStorage.setItem(STORE_KEY, JSON.stringify(state)); render(); };
-
-        const render = () => {
-            // RENDER AUDITS
-            const tbody = document.getElementById('auditBody');
-            const filtered = state.audits.filter(a => 
-                (a.desc && a.desc.toLowerCase().includes(filterTerm)) ||
-                (a.picPri && a.picPri.toLowerCase().includes(filterTerm))
-            );
-            
-            tbody.innerHTML = filtered.length ? filtered.map((a, i) => {
-                let statusColor = a.status === 'Closed' ? 'green' : (a.status === 'Delayed' ? 'red' : 'blue');
-                return `
-                <tr>
-                    <td>${i+1}</td>
-                    <td>${a.imgBefore ? `<img src="${a.imgBefore}" class="thumb-img" onclick="window.open(this.src)">` : '-'}</td>
-                    <td>
-                        <div style="font-weight:500;">${a.desc}</div>
-                        <div style="font-size:0.75rem; color:#888;">Plan: ${a.plan || 'Pending'}</div>
-                    </td>
-                    <td>${a.caTaken || '-'}</td>
-                    <td><span style="font-family:monospace; background:#eee; padding:2px 4px; border-radius:3px;">${a.workReq || 'N/A'}</span></td>
-                    <td>
-                        <span class="chip ${statusColor}">${a.status}</span>
-                        <div style="width:60px; height:4px; background:#eee; margin-top:5px; border-radius:2px;">
-                            <div style="width:${a.progress}%; background:var(--md-primary); height:100%;"></div>
-                        </div>
-                    </td>
-                    <td>${a.picPri}</td>
-                    <td>${a.targetDate}</td>
-                    <td style="text-align:right;">
-                        <button class="btn btn-icon btn-text" onclick="App.openModal('edit', ${a.id})"><i class="material-icons">edit</i></button>
-                        <button class="btn btn-icon btn-text" style="color:var(--md-danger);" onclick="App.deleteAudit(${a.id})"><i class="material-icons">delete</i></button>
-                    </td>
-                </tr>
-            `}).join('') : `<tr><td colspan="9" style="text-align:center; padding:20px; color:#999;">No records found.</td></tr>`;
-
-            // RENDER CLAIMS
-            document.getElementById('claimsList').innerHTML = state.claims.map(c => `
-                <li style="padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
-                    <div style="font-size:0.9rem; color:var(--md-danger);"><i class="material-icons" style="font-size:1rem; vertical-align:text-bottom;">warning</i> ${c.text}</div>
-                    <button class="btn btn-icon btn-text" onclick="App.deleteClaim(${c.id})"><i class="material-icons">close</i></button>
-                </li>
-            `).join('');
-
-            // RENDER SCRUM
-            const board = document.getElementById('scrumBoard');
-            const total = state.scrumTasks.length;
-            const done = state.scrumTasks.filter(t => t.status === 'done').length;
-            document.getElementById('taskProgress').innerText = total ? `${Math.round((done/total)*100)}% Complete` : 'No Tasks';
-
-            board.innerHTML = scrumCols.map(col => {
-                const tasks = state.scrumTasks.filter(t => t.status === col.id);
-                return `
-                <div class="scrum-col" ondragover="App.dragOver(event)" ondrop="App.drop(event, '${col.id}')">
-                    <div class="scrum-header"><span>${col.title}</span> <span>${tasks.length}</span></div>
-                    <div class="scrum-list">
-                        ${tasks.map(t => {
-                            let priorityClass = t.priority === 'High' ? 'high' : (t.priority === 'Medium' ? 'med' : 'low');
-                            return `
-                            <div class="task-card ${priorityClass}" draggable="true" ondragstart="App.dragStart(event, ${t.id})" onclick="App.openScrumModal('edit', ${t.id})">
-                                <div style="font-weight:500; font-size:0.9rem;">${t.text}</div>
-                                <div class="task-meta">
-                                    <div class="user-avatar">${t.user ? t.user.substring(0,2).toUpperCase() : '?'}</div>
-                                    <span>${t.priority}</span>
-                                </div>
-                            </div>
-                        `}).join('')}
-                    </div>
-                </div>
-            `}).join('');
-        };
-
-        // --- ACTIONS ---
-        const handleSearch = (val) => { filterTerm = val.toLowerCase(); render(); };
-        
-        // Audit CRUD
-        const openModal = (mode, id) => {
-            document.getElementById('auditForm').reset();
-            document.getElementById('auditId').value = mode === 'add' ? 'new' : id;
-            if(mode === 'edit') {
-                const a = state.audits.find(x => x.id === id);
-                if(a) {
-                    $('#auditDesc').val(a.desc); $('#auditImgBefore').val(a.imgBefore);
-                    $('#auditPlan').val(a.plan); $('#auditWorkReq').val(a.workReq);
-                    $('#auditStatus').val(a.status); $('#auditProgress').val(a.progress);
-                    $('#auditPicPri').val(a.picPri); $('#auditTargetDate').val(a.targetDate);
-                }
-            }
-            $('#auditModal').css('display','flex').hide().fadeIn(200);
-        };
-
-        const saveAudit = () => {
-            const id = $('#auditId').val();
-            const data = {
-                id: id === 'new' ? Date.now() : parseInt(id),
-                desc: $('#auditDesc').val(), imgBefore: $('#auditImgBefore').val(),
-                plan: $('#auditPlan').val(), workReq: $('#auditWorkReq').val(),
-                status: $('#auditStatus').val(), progress: $('#auditProgress').val(),
-                picPri: $('#auditPicPri').val(), targetDate: $('#auditTargetDate').val()
-            };
-            if(id === 'new') state.audits.push(data);
-            else { const idx = state.audits.findIndex(x => x.id == id); if(idx > -1) state.audits[idx] = data; }
-            save(); closeModal('auditModal');
-        };
-
-        const deleteAudit = (id) => { if(confirm("Delete record?")) { state.audits = state.audits.filter(x => x.id !== id); save(); } };
-
-        // Scrum CRUD
-        const openScrumModal = (mode, id) => {
-            $('#scrumForm')[0].reset();
-            $('#scrumId').val(mode === 'add' ? 'new' : id);
-            if(mode === 'edit') {
-                const t = state.scrumTasks.find(x => x.id === id);
-                if(t) {
-                    $('#scrumText').val(t.text); $('#scrumUser').val(t.user);
-                    $('#scrumPriority').val(t.priority); $('#scrumStatus').val(t.status);
-                }
-            }
-            $('#scrumModal').css('display','flex').hide().fadeIn(200);
-        };
-        
-        const saveScrum = () => {
-            const id = $('#scrumId').val();
-            const data = {
-                id: id === 'new' ? Date.now() : parseInt(id),
-                text: $('#scrumText').val(), user: $('#scrumUser').val(),
-                priority: $('#scrumPriority').val(), status: $('#scrumStatus').val()
-            };
-            if(id === 'new') state.scrumTasks.push(data);
-            else { const idx = state.scrumTasks.findIndex(x => x.id == id); if(idx > -1) state.scrumTasks[idx] = data; }
-            save(); closeModal('scrumModal');
-        };
-
-        const deleteScrum = () => {
-            const id = parseInt($('#scrumId').val());
-            if(id && confirm("Delete task?")) { state.scrumTasks = state.scrumTasks.filter(x => x.id !== id); save(); closeModal('scrumModal'); }
+        // Restore Sidebar State (Desktop only)
+        if(window.innerWidth > 1024 && state.sidebarCollapsed) {
+            $('#sidebar').addClass('collapsed');
+            $('#brandIconCollapsed').removeClass('opacity-0');
         }
 
-        // Claims
-        const addClaim = () => { const t = prompt("Report Description:"); if(t) { state.claims.push({id:Date.now(), text:t}); save(); } };
-        const deleteClaim = (id) => { if(confirm("Resolve/Remove report?")) { state.claims = state.claims.filter(x => x.id !== id); save(); } };
+        initChart();
+        render();
+        
+        // Listeners
+        $('#auditProgress').on('input', function() { $('#auditProgressVal').text(this.value + '%'); });
+    };
 
-        // Drag & Drop
-        const dragStart = (e, id) => e.dataTransfer.setData("text", id);
-        const dragOver = (e) => e.preventDefault();
-        const drop = (e, status) => {
-            e.preventDefault();
-            const id = parseInt(e.dataTransfer.getData("text"));
-            const task = state.scrumTasks.find(t => t.id === id);
-            if(task) { task.status = status; save(); }
+    const saveState = () => {
+        localStorage.setItem(STORE_KEY, JSON.stringify(state));
+        render();
+    };
+
+    // --- UI LOGIC ---
+    const toggleSidebar = () => {
+        const sb = $('#sidebar');
+        const overlay = $('#mobileBackdrop');
+        const brandIcon = $('#brandIconCollapsed');
+
+        if(window.innerWidth <= 1024) {
+            // Mobile
+            if(sb.hasClass('mobile-open')) {
+                sb.removeClass('mobile-open');
+                overlay.addClass('hidden');
+            } else {
+                sb.addClass('mobile-open');
+                overlay.removeClass('hidden');
+            }
+        } else {
+            // Desktop
+            sb.toggleClass('collapsed');
+            state.sidebarCollapsed = sb.hasClass('collapsed');
+            
+            if(state.sidebarCollapsed) {
+                setTimeout(() => brandIcon.removeClass('opacity-0'), 150);
+            } else {
+                brandIcon.addClass('opacity-0');
+            }
+            
+            localStorage.setItem(STORE_KEY, JSON.stringify(state));
+            // Trigger resize for chart
+            setTimeout(() => { if(chartInstance) chartInstance.resize(); }, 350);
+        }
+    };
+
+    // --- CHART.JS ---
+    const initChart = () => {
+        const ctx = document.getElementById('qualityChart').getContext('2d');
+        
+        // Gradient
+        let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(234, 179, 8, 0.4)'); // Gold
+        gradient.addColorStop(1, 'rgba(234, 179, 8, 0.0)');
+
+        chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Moisture Compliance %',
+                    data: [92, 94, 89, 96, 95, 98],
+                    borderColor: '#facc15',
+                    backgroundColor: gradient,
+                    borderWidth: 2,
+                    pointBackgroundColor: '#fff',
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Defect Rate',
+                    data: [5, 4, 8, 2, 3, 1],
+                    borderColor: '#f87171', // Red
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { labels: { color: '#94a3b8' } },
+                    tooltip: { backgroundColor: '#1e293b', titleColor: '#fff', bodyColor: '#ccc', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1 }
+                },
+                scales: {
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } },
+                    x: { grid: { display: false }, ticks: { color: '#64748b' } }
+                }
+            }
+        });
+    };
+
+    // --- RENDER ---
+    const render = () => {
+        const term = filterTerm.toLowerCase();
+
+        // 1. Audit Table
+        const filteredAudits = state.audits.filter(a => (a.desc || '').toLowerCase().includes(term));
+        const tbody = document.getElementById('auditBody');
+        
+        if(filteredAudits.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-slate-500">No records found.</td></tr>`;
+        } else {
+            tbody.innerHTML = filteredAudits.map((a, i) => {
+                const imgB = a.imgBefore ? `<img src="${a.imgBefore}" class="w-8 h-8 rounded border border-white/20 object-cover cursor-pointer hover:scale-150 transition-transform">` : '<span class="text-xs text-slate-600">-</span>';
+                const imgA = a.imgAfter ? `<img src="${a.imgAfter}" class="w-8 h-8 rounded border border-white/20 object-cover cursor-pointer hover:scale-150 transition-transform">` : '<span class="text-xs text-slate-600">-</span>';
+                
+                let statusColor = 'bg-blue-500/20 text-blue-400';
+                if(a.status === 'Closed') statusColor = 'bg-green-500/20 text-green-400';
+                if(a.status === 'Open') statusColor = 'bg-red-500/20 text-red-400';
+
+                return `
+                <tr class="transition-colors group">
+                    <td class="p-3 text-center text-slate-500 text-xs">${i+1}</td>
+                    <td class="p-3 text-center">${imgB}</td>
+                    <td class="p-3 align-top">
+                        <div class="font-bold text-slate-300 truncate max-w-[150px]" title="${a.desc}">${a.desc}</div>
+                        <div class="text-xs text-gold-500/80 mt-1">${a.plan || 'No Plan'}</div>
+                    </td>
+                    <td class="p-3 text-center">${imgA}</td>
+                    <td class="p-3 text-xs text-slate-400">${a.caTaken || '-'}</td>
+                    <td class="p-3"><span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${statusColor}">${a.status}</span></td>
+                    <td class="p-3 text-xs text-slate-300">${a.picPri}</td>
+                    <td class="p-3 text-xs text-slate-500">${a.targetDate}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="App.openAuditModal('edit', ${a.id})" class="text-blue-400 hover:text-white mx-1 transition-colors"><i class="fas fa-edit"></i></button>
+                        <button onclick="App.deleteAudit(${a.id})" class="text-red-400 hover:text-white mx-1 transition-colors"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        // 2. Scrum Board
+        const scrumCols = [
+            { id: 'backlog', title: 'BACKLOG', color: 'border-slate-500' },
+            { id: 'analysis', title: 'DOING', color: 'border-blue-500' },
+            { id: 'verify', title: 'VERIFY', color: 'border-orange-500' },
+            { id: 'done', title: 'DONE', color: 'border-green-500' }
+        ];
+
+        document.getElementById('scrumBoard').innerHTML = scrumCols.map(col => {
+            const tasks = state.scrumTasks.filter(t => t.status === col.id);
+            return `
+            <div class="scrum-col bg-slate-800/50 rounded-lg p-3 border-t-2 ${col.color} min-w-[260px] flex flex-col h-full" 
+                 ondragover="App.dragOver(event)" ondrop="App.drop(event, '${col.id}')">
+                <div class="flex justify-between items-center mb-3 text-xs font-bold text-slate-400 tracking-wider">
+                    <span>${col.title}</span>
+                    <span class="bg-white/5 px-2 py-0.5 rounded text-slate-300">${tasks.length}</span>
+                </div>
+                <div class="space-y-2 flex-1 min-h-[50px]">
+                    ${tasks.map(t => {
+                        let priorityColor = t.priority === 'High' ? 'text-red-400 bg-red-500/10' : (t.priority === 'Medium' ? 'text-orange-400 bg-orange-500/10' : 'text-green-400 bg-green-500/10');
+                        return `
+                        <div class="scrum-card bg-slate-700/50 p-3 rounded border border-white/5 hover:border-gold-500/30 shadow-sm"
+                             draggable="true" ondragstart="App.dragStart(event, ${t.id})" onclick="App.openScrumModal('edit', ${t.id})">
+                            <div class="text-sm text-slate-200 mb-2">${t.text}</div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${priorityColor}">${t.priority}</span>
+                                <div class="w-6 h-6 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center text-[10px] text-slate-400">${t.user.substring(0,2).toUpperCase()}</div>
+                            </div>
+                        </div>
+                    `}).join('')}
+                </div>
+            </div>`;
+        }).join('');
+
+        // 3. Update KPI Numbers
+        document.getElementById('kpiClaims').innerText = state.claims.length;
+        const doneTasks = state.scrumTasks.filter(t=>t.status==='done').length;
+        const totalTasks = state.scrumTasks.length;
+        document.getElementById('kpiScrum').innerText = totalTasks ? Math.round((doneTasks/totalTasks)*100)+'%' : '0%';
+
+        // 4. Claims List
+        document.getElementById('claimsList').innerHTML = state.claims.map(c => `
+            <li class="bg-slate-800/50 p-3 rounded border-l-2 border-red-500 flex justify-between items-center text-sm group hover:bg-slate-800 transition-colors">
+                <span class="text-slate-300">${c.text}</span>
+                <button onclick="App.deleteClaim(${c.id})" class="text-slate-600 hover:text-red-400 transition-colors"><i class="fas fa-times"></i></button>
+            </li>
+        `).join('');
+    };
+
+    // --- ACTIONS ---
+    const handleSearch = (val) => { filterTerm = val; render(); };
+    
+    // Audit Modal
+    const openAuditModal = (mode, id) => {
+        document.getElementById('auditForm').reset();
+        $('#auditId').val(mode==='add'?'new':id);
+        $('#auditProgressVal').text('0%');
+        if(mode === 'edit') {
+            const a = state.audits.find(x => x.id === id);
+            if(a) {
+                $('#auditDesc').val(a.desc); $('#auditImgBefore').val(a.imgBefore); $('#auditPlan').val(a.plan);
+                $('#auditImgAfter').val(a.imgAfter); $('#auditCATaken').val(a.caTaken); $('#auditStatus').val(a.status);
+                $('#auditPicPri').val(a.picPri); $('#auditTargetDate').val(a.targetDate); $('#auditProgress').val(a.progress);
+                $('#auditProgressVal').text(a.progress+'%');
+            }
+        }
+        $('#auditModal').removeClass('hidden').addClass('flex');
+    };
+
+    const saveAudit = () => {
+        const id = $('#auditId').val();
+        const data = {
+            id: id==='new' ? Date.now() : parseInt(id),
+            desc: $('#auditDesc').val(), imgBefore: $('#auditImgBefore').val(), plan: $('#auditPlan').val(),
+            imgAfter: $('#auditImgAfter').val(), caTaken: $('#auditCATaken').val(), status: $('#auditStatus').val(),
+            picPri: $('#auditPicPri').val(), targetDate: $('#auditTargetDate').val(), progress: $('#auditProgress').val()
         };
+        if(id==='new') state.audits.push(data);
+        else { const idx = state.audits.findIndex(x=>x.id===data.id); if(idx!==-1) state.audits[idx] = data; }
+        saveState(); closeModal('auditModal'); showToast('Finding Saved', 'success');
+    };
 
-        // Helpers
-        const closeModal = (id) => $(`#${id}`).fadeOut(200);
-        const exportData = () => {
-            const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
-            const a = document.createElement('a'); a.href = data; a.download = "QM_Backup.json"; a.click();
+    const deleteAudit = (id) => { if(confirm("Delete finding?")) { state.audits = state.audits.filter(x=>x.id!==id); saveState(); showToast('Deleted', 'error'); } };
+
+    // Scrum Modal
+    const openScrumModal = (mode, id) => {
+        $('#scrumForm')[0].reset();
+        $('#scrumId').val(mode==='add'?'new':id);
+        $('#btnDeleteScrum').toggle(mode==='edit');
+        if(mode==='edit') {
+            const t = state.scrumTasks.find(x=>x.id===id);
+            if(t) { $('#scrumText').val(t.text); $('#scrumUser').val(t.user); $('#scrumPriority').val(t.priority); $('#scrumStatus').val(t.status); }
+        }
+        $('#scrumModal').removeClass('hidden').addClass('flex');
+    };
+
+    const saveScrum = () => {
+        const id = $('#scrumId').val();
+        const data = {
+            id: id==='new'?Date.now():parseInt(id),
+            text: $('#scrumText').val(), user: $('#scrumUser').val(), priority: $('#scrumPriority').val(), status: $('#scrumStatus').val()
         };
-        const importData = (e) => {
-            const fr = new FileReader();
-            fr.onload = (ev) => { try { state = JSON.parse(ev.target.result); save(); location.reload(); } catch(err){alert("Invalid File");} };
-            if(e.target.files[0]) fr.readAsText(e.target.files[0]);
+        if(id==='new') state.scrumTasks.push(data);
+        else { const idx = state.scrumTasks.findIndex(x=>x.id===data.id); if(idx!==-1) state.scrumTasks[idx]=data; }
+        saveState(); closeModal('scrumModal'); showToast('Task Saved', 'success');
+    };
+
+    const deleteScrum = () => { state.scrumTasks = state.scrumTasks.filter(x=>x.id!==parseInt($('#scrumId').val())); saveState(); closeModal('scrumModal'); };
+
+    // Drag & Drop
+    const dragStart = (e, id) => { e.dataTransfer.setData('text/plain', id); e.target.classList.add('dragging'); };
+    const dragOver = (e) => { e.preventDefault(); $(e.currentTarget).addClass('drag-over'); };
+    const drop = (e, status) => {
+        e.preventDefault(); $('.scrum-col').removeClass('drag-over'); $('.scrum-card').removeClass('dragging');
+        const id = parseInt(e.dataTransfer.getData('text/plain'));
+        const t = state.scrumTasks.find(x=>x.id===id);
+        if(t && t.status !== status) { t.status = status; saveState(); showToast(`Moved to ${status.toUpperCase()}`, 'success'); }
+    };
+
+    // Claims
+    const addClaim = () => { const t = prompt("Claim Description:"); if(t){ state.claims.push({id:Date.now(), text:t}); saveState(); }};
+    const deleteClaim = (id) => { if(confirm("Delete?")){ state.claims = state.claims.filter(x=>x.id!==id); saveState(); }};
+
+    // Global Utils
+    const closeModal = (id) => $(`#${id}`).addClass('hidden').removeClass('flex');
+    const resetAll = () => { if(confirm("Reset ALL data?")) { localStorage.removeItem(STORE_KEY); location.reload(); }};
+    
+    // Export/Import
+    const exportData = () => {
+        const blob = new Blob([JSON.stringify(state)], {type: "application/json"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = "QM_Data_Backup.json";
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    };
+
+    const importData = (e) => {
+        const file = e.target.files[0];
+        if(!file) return;
+        const r = new FileReader();
+        r.onload = (e) => {
+            try { state = JSON.parse(e.target.result); saveState(); location.reload(); } 
+            catch(err) { alert("Invalid File"); }
         };
+        r.readAsText(file);
+    };
 
-        return { init, handleSearch, openModal, saveAudit, deleteAudit, openScrumModal, saveScrum, deleteScrum, addClaim, deleteClaim, dragStart, dragOver, drop, closeModal, exportData, importData };
-    })();
+    const showToast = (msg, type) => {
+        const color = type === 'success' ? 'border-green-500 text-green-400' : 'border-red-500 text-red-400';
+        const icon = type === 'success' ? 'fa-check' : 'fa-info-circle';
+        const t = $(`<div class="bg-slate-800 border-l-4 ${color} px-4 py-3 shadow-lg rounded flex items-center gap-3 transform translate-x-10 opacity-0 transition-all duration-300"><i class="fas ${icon}"></i><span class="text-sm font-bold text-slate-200">${msg}</span></div>`);
+        $('#toast-container').append(t);
+        setTimeout(() => t.removeClass('translate-x-10 opacity-0'), 50);
+        setTimeout(() => t.addClass('translate-x-10 opacity-0').one('transitionend', () => t.remove()), 3000);
+    };
 
-    $(document).ready(App.init);
+    return { 
+        init, toggleSidebar, handleSearch, 
+        openAuditModal, saveAudit, deleteAudit, 
+        openScrumModal, saveScrum, deleteScrum, dragStart, dragOver, drop,
+        addClaim, deleteClaim, closeModal, resetAll, exportData, importData
+    };
+})();
+
+document.addEventListener('DOMContentLoaded', App.init);
 </script>
 
-<!-- Load Extension if available -->
-<script src="extension.js"></script>
+<script src="js/productqy.js" defer></script>
+<script src="js/bubble.js" defer></script>
+
 
 </body>
 </html>
