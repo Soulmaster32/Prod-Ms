@@ -9,35 +9,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- SweetAlert2 -->
+    <!-- Supabase & SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-<!-- 1. Load Supabase FIRST -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- 2. Load other libraries -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Tailwind Config -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        header: ['Oswald', 'sans-serif'],
-                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], header: ['Oswald', 'sans-serif'] },
                     colors: {
-                        slate: { 850: '#1e293b', 900: '#0f172a', 950: '#020617' },
-                        gold: { 400: '#facc15', 500: '#eab308', 600: '#ca8a04' },
+                        slate: { 50:'#eff6ff', 800:'#002855', 900:'#001845', 950:'#001233' },
+                        gold: { 400:'#facc15', 500:'#eab308' },
                     },
                     backgroundImage: {
-                        'hero-pattern': "linear-gradient(to left bottom, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.85)), url('img/IMG_20251215_081420.jpg')",
+                        'hero-pattern': "linear-gradient(to right bottom, rgba(0, 24, 69, 0.9), rgba(0, 24, 69, 0.7)), url('img/IMG_20251215_081420.jpg')",
                         'tech-grid': "linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)"
                     }
                 }
@@ -46,23 +35,24 @@
     </script>
 
     <style>
-        body { background-color: #0f172a; color: #f1f5f9; }
+        body { background-color: #001233; color: #eff6ff; }
         .glass-card {
-            background: rgba(30, 41, 59, 0.6);
+            background: rgba(0, 40, 85, 0.5);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
         .qg-input {
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(0, 24, 69, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: white;
             transition: all 0.3s;
         }
-        .qg-input:focus {
-            outline: none;
-            border-color: #eab308;
-            box-shadow: 0 0 15px rgba(234, 179, 8, 0.1);
+        .qg-input:focus { outline: none; border-color: #eab308; background: rgba(0, 24, 69, 0.8); }
+        /* Custom File Input */
+        input[type="file"]::file-selector-button {
+            background-color: #002855; color: #facc15; border: 1px solid #facc15;
+            padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 10px;
         }
     </style>
 </head>
@@ -73,75 +63,59 @@
     <div class="relative z-10 w-full max-w-md px-6">
         <div class="text-center mb-8">
             <h2 class="font-header text-3xl tracking-widest font-bold text-white leading-none">QUALITY<span class="text-gold-400">GROUP</span></h2>
-            <span class="text-[10px] text-slate-400 uppercase tracking-[0.3em]">Create Access Profile</span>
+            <span class="text-[10px] text-slate-300 uppercase tracking-[0.3em]">Create Access Profile</span>
         </div>
 
         <div class="glass-card rounded-xl p-8 border-b-4 border-b-gold-500 relative">
-            
             <h3 class="font-header text-2xl text-white mb-6 flex items-center gap-2">
                 <i class="fas fa-user-plus text-gold-500"></i> New Registration
             </h3>
+<form id="register-form" onsubmit="handleRegister(event)">
+    <div class="space-y-4">
+        <div>
+            <label class="block text-xs uppercase tracking-wider text-slate-300 mb-2">Full Name</label>
+            <input type="text" id="reg-fullname" required placeholder="e.g. John Doe" class="qg-input w-full rounded px-4 py-2 text-sm">
+        </div>
 
-            <form id="register-form" onsubmit="handleRegister(event)">
-                <div class="space-y-4">
-                    
-                    <!-- Full Name -->
-                    <div>
-                        <label class="block text-xs uppercase tracking-wider text-slate-400 mb-2">Full Name / Position</label>
-                        <div class="relative">
-                            <i class="fas fa-id-card absolute left-4 top-3.5 text-slate-500"></i>
-                            <input type="text" id="reg-fullname" required placeholder="e.g. John Doe - QAS" 
-                                class="qg-input w-full rounded pl-10 pr-4 py-3 text-sm placeholder-slate-600">
-                        </div>
-                    </div>
-
-                    <!-- Email -->
-                    <div>
-                        <label class="block text-xs uppercase tracking-wider text-slate-400 mb-2">Work Email</label>
-                        <div class="relative">
-                            <i class="fas fa-envelope absolute left-4 top-3.5 text-slate-500"></i>
-                            <input type="email" id="reg-email" required placeholder="name@qualitygroup.com" 
-                                class="qg-input w-full rounded pl-10 pr-4 py-3 text-sm placeholder-slate-600">
-                        </div>
-                    </div>
-
-                    <!-- Password -->
-                    <div>
-                        <label class="block text-xs uppercase tracking-wider text-slate-400 mb-2">Password</label>
-                        <div class="relative">
-                            <i class="fas fa-lock absolute left-4 top-3.5 text-slate-500"></i>
-                            <input type="password" id="reg-password" required placeholder="Min 6 characters" minlength="6"
-                                class="qg-input w-full rounded pl-10 pr-4 py-3 text-sm placeholder-slate-600">
-                        </div>
-                    </div>
-
-                    <!-- Confirm Password -->
-                    <div>
-                        <label class="block text-xs uppercase tracking-wider text-slate-400 mb-2">Confirm Password</label>
-                        <div class="relative">
-                            <i class="fas fa-check-circle absolute left-4 top-3.5 text-slate-500"></i>
-                            <input type="password" id="reg-confirm" required placeholder="Re-enter password" 
-                                class="qg-input w-full rounded pl-10 pr-4 py-3 text-sm placeholder-slate-600">
-                        </div>
-                    </div>
-
-                    <!-- Action -->
-                    <button type="submit" id="btn-register" class="w-full bg-slate-800 hover:bg-gold-500 border border-gold-500/50 text-gold-400 hover:text-slate-900 font-header text-lg font-bold py-3 rounded transition-all mt-4 uppercase tracking-wide">
-                        Create Account
-                    </button>
-                </div>
-            </form>
-
-            <div class="mt-8 pt-6 border-t border-white/5 text-center">
-                <p class="text-slate-400 text-sm">Already authorized?</p>
-                <a href="login.html" class="text-white hover:text-gold-400 font-bold text-sm uppercase tracking-wide mt-2 inline-block transition-colors">
-                    <i class="fas fa-arrow-left mr-2"></i> Back to Login
-                </a>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs uppercase tracking-wider text-slate-300 mb-2">Role / Title</label>
+                <input type="text" id="reg-role" required placeholder="e.g. Foreman" class="qg-input w-full rounded px-4 py-2 text-sm">
+            </div>
+            <div>
+                <label class="block text-xs uppercase tracking-wider text-slate-300 mb-2">Department</label>
+                <select id="reg-category" required class="qg-input w-full rounded px-4 py-2 text-sm appearance-none">
+                    <option value="ms-design">MS-Design</option>
+                    <option value="fntrl">FNTRL</option>
+                    <option value="h2s">H2S Area</option>
+                    <option value="limestone">Limestone</option>
+                    <option value="dcs">DCS Control</option>
+                </select>
             </div>
         </div>
-    </div>
 
-    <!-- Logic Script -->
-    <script src="js/imp.js"></script>
+        <div>
+            <label class="block text-xs uppercase tracking-wider text-slate-300 mb-2">Profile Photo</label>
+            <input type="file" id="reg-photo" accept="image/*" required class="qg-input w-full rounded px-2 py-2 text-sm">
+        </div>
+
+        <div>
+            <label class="block text-xs uppercase tracking-wider text-slate-300 mb-2">Work Email</label>
+            <input type="email" id="reg-email" required placeholder="name@qualitygroup.com" class="qg-input w-full rounded px-4 py-2 text-sm">
+        </div>
+
+        <div>
+            <label class="block text-xs uppercase tracking-wider text-slate-300 mb-2">Password</label>
+            <input type="password" id="reg-password" required placeholder="Min 6 chars" minlength="6" class="qg-input w-full rounded px-4 py-2 text-sm">
+        </div>
+
+        <button type="submit" id="btn-register" class="w-full bg-slate-800 hover:bg-gold-500 text-gold-400 hover:text-slate-900 font-header text-lg font-bold py-3 rounded transition-all mt-4 uppercase border border-gold-500">
+            Create & Join Team
+        </button>
+    </div>
+</form>
+
+<script src="js/imp.js"></script>
+
 </body>
 </html>
