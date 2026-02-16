@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISO 9001:2015 | QualityGroup Certification</title>
+    
+    <!-- Fonts: Inter & Oswald -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Supabase & SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        header: ['Oswald', 'sans-serif'],
+                    },
+                    colors: {
+                        // Royal Blue Palette Override
+                        slate: { 
+                            50: '#eff6ff', 
+                            100: '#dbeafe', 
+                            200: '#bfdbfe', 
+                            300: '#93c5fd', 
+                            400: '#60a5fa', 
+                            500: '#3b82f6', 
+                            600: '#2563eb', 
+                            700: '#1d4ed8', 
+                            800: '#002855', // Card Background (Royal)
+                            850: '#001d3d', // Custom Dark Royal
+                            900: '#001845', // Main Background (Deep Royal)
+                            950: '#001233'  // Darkest Background (Navy)
+                        },
+                        gold: { 400: '#facc15', 500: '#eab308', 600: '#ca8a04', 700: '#a16207' },
+                    },
+                    backgroundImage: {
+                        'tech-grid': "linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)",
+                        'cert-pattern': "url('data:image/svg+xml,%3Csvg width=\\'60\\' height=\\'60\\' viewBox=\\'0 0 60 60\\' xmlns=\\'http://www.w3.org/2000/svg\\'%3E%3Cg fill=\\'none\\' fill-rule=\\'evenodd\\'%3E%3Cg fill=\\'%23eab308\\' fill-opacity=\\'0.05\\'%3E%3Cpath d=\\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 12s linear infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #001233; /* Deep Royal Navy */
+            color: #eff6ff;
+            overflow-x: hidden;
+        }
+        
+        /* Glassmorphism - Blue Tint */
+        .glass {
+            background: rgba(0, 24, 69, 0.75);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-panel {
+            background: rgba(0, 40, 85, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Certificate Specific Styles */
+        .cert-container {
+            perspective: 1000px;
+        }
+
+        .cert-paper {
+            /* Updated to Royal Blue Gradient */
+            background: linear-gradient(135deg, #002855 0%, #001233 100%);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            box-shadow: 0 0 50px rgba(234, 179, 8, 0.1), inset 0 0 0 4px rgba(234, 179, 8, 0.1);
+            transition: transform 0.5s ease;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .cert-paper:hover {
+            transform: rotateX(2deg) rotateY(2deg);
+            box-shadow: 0 20px 60px rgba(234, 179, 8, 0.2), inset 0 0 0 4px rgba(234, 179, 8, 0.3);
+        }
+
+        .gold-text-gradient {
+            background: linear-gradient(to right, #facc15, #eab308, #facc15);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shine 3s linear infinite;
+        }
+
+        .seal-glow {
+            box-shadow: 0 0 30px rgba(234, 179, 8, 0.4);
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        /* Tech Card (Reused from Index) */
+        .tech-card {
+            background: linear-gradient(145deg, rgba(0, 40, 85, 0.7), rgba(0, 24, 69, 0.9));
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.3s ease;
+        }
+        .tech-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(234, 179, 8, 0.4);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <!-- NAVIGATION -->
+    <nav class="fixed w-full z-50 glass transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <!-- Back to Home -->
+                <a href="../index.html" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 rounded bg-slate-800 flex items-center justify-center border border-white/10 group-hover:border-gold-500 transition-colors">
+                        <i class="fas fa-chevron-left text-gold-400"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <h2 class="font-header text-xl tracking-widest font-bold text-white leading-none">QUALITY<span class="text-gold-400">GROUP</span></h2>
+                        <span class="text-[9px] text-slate-300 uppercase tracking-[0.2em]">Return to Dashboard</span>
+                    </div>
+                </a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <span class="hidden md:block text-xs font-bold text-green-400 bg-green-500/10 border border-green-500/20 px-3 py-1 rounded uppercase tracking-wider">
+                    <i class="fas fa-circle text-[8px] mr-2 animate-pulse"></i> System Active
+                </span>
+                <a href="#" onclick="printCert()" class="px-6 py-2 bg-gold-500 hover:bg-white text-slate-900 font-bold text-xs uppercase tracking-wider rounded transition-all shadow-[0_0_15px_rgba(234,179,8,0.3)]">
+                    <i class="fas fa-print mr-2"></i> Print Cert
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="pt-32 pb-20 relative min-h-screen">
+        <!-- Background Elements -->
+        <div class="fixed inset-0 bg-tech-grid opacity-20 pointer-events-none"></div>
+        <div class="absolute top-20 left-0 w-96 h-96 bg-gold-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-12 gap-12 items-start">
+            
+            <!-- LEFT COLUMN: CERTIFICATE DISPLAY (7 cols) -->
+            <div class="lg:col-span-7 cert-container fade-in-section">
+                
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h1 class="font-header text-4xl text-white">ISO <span class="text-gold-400">9001:2015</span></h1>
+                        <p class="text-slate-300 text-sm mt-1 uppercase tracking-widest">Global Quality Management System</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs text-slate-400 uppercase">Status</p>
+                        <p class="text-green-400 font-bold uppercase tracking-wider text-lg drop-shadow-[0_0_8px_rgba(74,222,128,0.5)]">Certified</p>
+                    </div>
+                </div>
+
+                <!-- DIGITAL CERTIFICATE -->
+                <div class="cert-paper rounded-lg p-10 lg:p-14 relative overflow-hidden bg-cert-pattern">
+                    <!-- Decorative Corner Accents -->
+                    <div class="absolute top-0 left-0 w-20 h-20 border-t-4 border-l-4 border-gold-500/40 rounded-tl-lg"></div>
+                    <div class="absolute top-0 right-0 w-20 h-20 border-t-4 border-r-4 border-gold-500/40 rounded-tr-lg"></div>
+                    <div class="absolute bottom-0 left-0 w-20 h-20 border-b-4 border-l-4 border-gold-500/40 rounded-bl-lg"></div>
+                    <div class="absolute bottom-0 right-0 w-20 h-20 border-b-4 border-r-4 border-gold-500/40 rounded-br-lg"></div>
+
+                    <!-- Watermark -->
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03]">
+                        <i class="fas fa-award text-[300px] text-white"></i>
+                    </div>
+
+                    <!-- Header -->
+                    <div class="text-center relative z-10 mb-10">
+                        <div class="inline-block mb-4">
+                            <i class="fas fa-globe-americas text-4xl text-gold-400 mb-2"></i>
+                        </div>
+                        <h2 class="font-header text-5xl text-white mb-2 tracking-wide uppercase">Certificate</h2>
+                        <p class="text-gold-500 text-sm font-bold uppercase tracking-[0.4em]">of Registration</p>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="text-center relative z-10 space-y-6">
+                        <p class="text-slate-300 text-sm italic">This is to certify that the Quality Management System of</p>
+                        
+                        <h3 class="font-header text-3xl text-white gold-text-gradient uppercase tracking-wider py-2 border-b border-white/10 inline-block px-8">
+                            Quality Group Enterprise
+                        </h3>
+
+                        <p class="text-slate-300 text-sm italic">has been assessed and found to comply with the requirements of</p>
+
+                        <div class="py-4">
+                            <h4 class="font-header text-6xl text-white font-bold drop-shadow-xl">ISO 9001:2015</h4>
+                        </div>
+
+                        <p class="text-slate-300 text-sm max-w-lg mx-auto leading-relaxed">
+                            For the following scope of activities: <br>
+                            <span class="text-slate-100 font-medium">Provision of Enterprise Assurance, Industrial Bagging Operations, Warehousing Management, and Pier Logistics Coordination.</span>
+                        </p>
+                    </div>
+
+                    <!-- Footer / Signatures -->
+                    <div class="mt-12 flex justify-between items-end relative z-10 border-t border-white/10 pt-8">
+                        <div class="text-center">
+                            <div class="h-12 flex items-end justify-center pb-2">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Signature_sample.svg" class="h-8 opacity-70 filter invert" alt="Signature">
+                            </div>
+                            <div class="h-px w-32 bg-slate-500 mb-2 mx-auto"></div>
+                            <p class="text-[10px] text-slate-400 uppercase tracking-wider">Director of Certification</p>
+                        </div>
+
+                        <!-- Gold Seal -->
+                        <div class="absolute left-1/2 bottom-2 transform -translate-x-1/2">
+                            <div class="w-24 h-24 bg-gradient-to-br from-gold-400 to-gold-700 rounded-full flex items-center justify-center seal-glow relative">
+                                <div class="absolute inset-1 border border-white/30 rounded-full border-dashed animate-spin-slow"></div>
+                                <div class="text-slate-900 font-header font-bold text-center leading-none text-[10px]">
+                                    <i class="fas fa-check text-2xl mb-1"></i><br>
+                                    OFFICIAL<br>SEAL
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <p class="font-mono text-lg text-gold-400">QG-2026-9001</p>
+                            <div class="h-px w-32 bg-slate-500 mb-2 mt-1 mx-auto"></div>
+                            <p class="text-[10px] text-slate-400 uppercase tracking-wider">Certificate Number</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-between items-center text-xs text-slate-400 font-mono">
+                    <span>Hash: 8f9a...3b2c</span>
+                    <span class="flex items-center text-blue-400"><i class="fas fa-shield-alt mr-2"></i> Blockchain Verified</span>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: DETAILS & COMPLIANCE (5 cols) -->
+            <div class="lg:col-span-5 space-y-6 fade-in-section" style="transition-delay: 100ms;">
+                
+                <!-- Validity Card -->
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-gold-500">
+                    <h3 class="font-header text-xl text-white mb-4"><i class="fas fa-calendar-check text-gold-500 mr-2"></i> Validity Status</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-900/50 p-3 rounded">
+                            <p class="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Issue Date</p>
+                            <p class="text-white font-mono">Jan 01, 2026</p>
+                        </div>
+                        <div class="bg-slate-900/50 p-3 rounded">
+                            <p class="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Expiry Date</p>
+                            <p class="text-white font-mono">Jan 01, 2029</p>
+                        </div>
+                        <div class="bg-slate-900/50 p-3 rounded col-span-2 flex justify-between items-center">
+                            <div>
+                                <p class="text-[10px] text-slate-400 uppercase tracking-wider mb-1">Next Surveillance Audit</p>
+                                <p class="text-gold-400 font-bold">Dec 15, 2026</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="block w-2 h-2 bg-green-500 rounded-full mb-1 ml-auto animate-pulse"></span>
+                                <span class="text-[9px] text-green-400">On Track</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Principles Grid -->
+                <div class="space-y-4">
+                    <h3 class="font-header text-lg text-white">Core Principles Applied</h3>
+                    
+                    <div class="grid grid-cols-1 gap-3">
+                        <!-- Principle 1 -->
+                        <div class="tech-card p-4 rounded flex items-start gap-4">
+                            <div class="text-gold-400 text-xl mt-1"><i class="fas fa-users"></i></div>
+                            <div>
+                                <h4 class="text-white font-bold text-sm uppercase">Customer Focus</h4>
+                                <p class="text-slate-300 text-xs mt-1">Zero external claims target achieved through rigorous checking stages (1-9).</p>
+                            </div>
+                        </div>
+
+                        <!-- Principle 2 -->
+                        <div class="tech-card p-4 rounded flex items-start gap-4">
+                            <div class="text-blue-400 text-xl mt-1"><i class="fas fa-sitemap"></i></div>
+                            <div>
+                                <h4 class="text-white font-bold text-sm uppercase">Process Approach</h4>
+                                <p class="text-slate-300 text-xs mt-1">Interrelated processes (Bagging -> Warehouse -> Logistics) managed as a coherent system.</p>
+                            </div>
+                        </div>
+
+                        <!-- Principle 3 -->
+                        <div class="tech-card p-4 rounded flex items-start gap-4">
+                            <div class="text-green-400 text-xl mt-1"><i class="fas fa-chart-line"></i></div>
+                            <div>
+                                <h4 class="text-white font-bold text-sm uppercase">Improvement</h4>
+                                <p class="text-slate-300 text-xs mt-1">Continual improvement driven by Yield Reports and Daily Checklist data analysis.</p>
+                            </div>
+                        </div>
+
+                        <!-- Principle 4 -->
+                        <div class="tech-card p-4 rounded flex items-start gap-4">
+                            <div class="text-red-400 text-xl mt-1"><i class="fas fa-clipboard-check"></i></div>
+                            <div>
+                                <h4 class="text-white font-bold text-sm uppercase">Evidence-based Decision</h4>
+                                <p class="text-slate-300 text-xs mt-1">Decisions based on real-time data from the T202603 System Update.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Download Actions -->
+                <div class="pt-4 border-t border-white/10">
+                    <a href="#" class="group flex items-center justify-between w-full bg-slate-800 hover:bg-slate-700 border border-white/10 p-4 rounded transition-all">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-red-500/10 text-red-400 p-2 rounded">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-white text-sm font-bold">Download Full Report</p>
+                                <p class="text-slate-400 text-[10px]">PDF, 4.2 MB • Audit T202603</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-download text-slate-400 group-hover:text-white transition-colors"></i>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER (Simplified) -->
+    <footer class="bg-slate-950 border-t border-white/5 py-8">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-slate-400 text-xs">&copy; 2026 QualityGroup Management. ISO 9001:2015 Certified Entity.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Simple 3D Tilt Effect for Certificate
+        const card = document.querySelector('.cert-paper');
+        const container = document.querySelector('.cert-container');
+
+        if(container && card) {
+            container.addEventListener('mousemove', (e) => {
+                const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+                const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+                card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            });
+
+            container.addEventListener('mouseenter', (e) => {
+                card.style.transition = 'none';
+            });
+
+            container.addEventListener('mouseleave', (e) => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.transform = `rotateY(0deg) rotateX(0deg)`;
+            });
+        }
+
+        // Print Function
+        function printCert() {
+            Swal.fire({
+                title: 'Preparing Document',
+                text: 'Generating High-Res PDF...',
+                icon: 'info',
+                timer: 1500,
+                showConfirmButton: false,
+                background: '#002855', /* Updated to Royal Blue */
+                color: '#fff'
+            }).then(() => {
+                window.print();
+            });
+        }
+
+        // Fade In Animation
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+
+            document.querySelectorAll('.fade-in-section').forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(20px)';
+                section.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>

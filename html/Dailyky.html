@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily K.Y Report | Safety Assurance</title>
+    
+    <!-- Fonts: Inter & Oswald -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tailwind Config (Royal Blue Theme) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        header: ['Oswald', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: { 850: '#1e293b', 900: '#0f172a', 950: '#020617' },
+                        // Royal Blue Palette
+                        royal: { 
+                            400: '#60a5fa', // Light Blue
+                            500: '#3b82f6', // Standard Blue
+                            600: '#2563eb', // Royal Blue
+                            700: '#1d4ed8', // Darker Blue
+                            glow: 'rgba(59, 130, 246, 0.5)'
+                        },
+                    },
+                    backgroundImage: {
+                        'tech-grid': "linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)"
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f1f5f9;
+            overflow-x: hidden;
+        }
+        
+        /* Glassmorphism */
+        .glass {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(59, 130, 246, 0.1); /* Blue tint border */
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.2);
+            transform: translateY(-3px);
+        }
+
+        /* Progress Bar Animation */
+        .progress-fill {
+            transition: width 1.5s ease-in-out;
+        }
+
+        /* Table Styles */
+        .ky-table th {
+            font-family: 'Oswald', sans-serif;
+            letter-spacing: 1px;
+            color: #60a5fa;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .ky-table td {
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .ky-table tr:hover td {
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased font-sans bg-slate-950">
+
+    <!-- NAVIGATION -->
+    <nav class="fixed w-full z-50 glass">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-royal-600 rounded flex items-center justify-center text-white font-bold text-lg shadow-[0_0_15px_rgba(37,99,235,0.5)]">
+                    KY
+                </div>
+                <div class="flex flex-col">
+                    <h2 class="font-header text-xl tracking-widest font-bold text-white leading-none">SAFETY<span class="text-royal-400">FIRST</span></h2>
+                    <span class="text-[9px] text-slate-400 uppercase tracking-[0.2em]">Hazard Prediction</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="group relative px-6 py-2 border border-royal-500/50 text-royal-400 font-bold text-xs uppercase tracking-wider rounded overflow-hidden transition-all hover:bg-royal-600 hover:text-white hover:border-royal-600">
+                    <span class="relative z-10"><i class="fas fa-arrow-left mr-2"></i> Back to Main</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HEADER / STATS OVERVIEW -->
+    <header class="pt-32 pb-12 relative overflow-hidden">
+        <div class="absolute inset-0 bg-tech-grid opacity-20 pointer-events-none"></div>
+        <!-- Blue Glow -->
+        <div class="absolute top-0 right-0 w-96 h-96 bg-royal-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-8 fade-in">
+                <div>
+                    <span class="text-royal-400 font-bold tracking-[0.2em] text-xs uppercase mb-2 block"><i class="fas fa-hard-hat mr-2"></i> Kiken Yochi Training</span>
+                    <h1 class="font-header text-4xl md:text-6xl text-white font-bold leading-tight">
+                        DAILY K.Y <span class="text-transparent bg-clip-text bg-gradient-to-r from-royal-400 to-royal-700">REPORT</span>
+                    </h1>
+                </div>
+                <div class="mt-6 md:mt-0 flex gap-6 text-right">
+                    <div>
+                        <p class="text-slate-400 text-xs uppercase tracking-wider">Date</p>
+                        <p class="text-xl font-bold text-white" id="current-date">--/--/----</p>
+                    </div>
+                    <div>
+                        <p class="text-slate-400 text-xs uppercase tracking-wider">Shift</p>
+                        <p class="text-xl font-bold text-white text-royal-400">Day Shift</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 fade-in" style="animation-delay: 0.1s;">
+                <!-- Total Target -->
+                <div class="glass-card p-6 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-xs uppercase tracking-wider mb-1">Daily Target</p>
+                        <h3 class="text-3xl font-header font-bold text-white">50 <span class="text-sm text-slate-500 font-sans">Cards</span></h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center text-royal-400 text-xl">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                </div>
+
+                <!-- Actual Submitted -->
+                <div class="glass-card p-6 rounded-xl flex items-center justify-between border-royal-500/30 shadow-[0_0_20px_rgba(37,99,235,0.1)]">
+                    <div>
+                        <p class="text-royal-400 text-xs uppercase tracking-wider mb-1">Actual Submitted</p>
+                        <h3 class="text-3xl font-header font-bold text-white">42 <span class="text-sm text-royal-400 font-sans">(84%)</span></h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-royal-600/20 border border-royal-500 flex items-center justify-center text-royal-400 text-xl animate-pulse-slow">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+
+                <!-- Action Required -->
+                <div class="glass-card p-6 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-red-400 text-xs uppercase tracking-wider mb-1">Critical Hazards</p>
+                        <h3 class="text-3xl font-header font-bold text-white">0 <span class="text-sm text-slate-500 font-sans">Pending</span></h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-slate-800 border border-red-500/30 flex items-center justify-center text-red-400 text-xl">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- TEAM PROGRESS SECTION -->
+    <section class="py-12 bg-slate-900 border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="font-header text-2xl text-white mb-8 border-l-4 border-royal-500 pl-4">Team Performance <span class="text-slate-500 font-sans text-sm font-normal ml-2">(Target: 10/Person)</span></h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 fade-in" style="animation-delay: 0.2s;">
+                
+                <!-- Team Member 1 -->
+                <div class="glass-card p-6 rounded-xl">
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-royal-600 to-royal-800 flex items-center justify-center font-bold text-sm">JD</div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">John Doe</h4>
+                                <p class="text-xs text-slate-400">Shift Supervisor</p>
+                            </div>
+                        </div>
+                        <span class="text-royal-400 font-bold text-lg">10<span class="text-slate-500 text-sm">/10</span></span>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden border border-white/5">
+                        <div class="progress-fill h-full bg-gradient-to-r from-royal-600 to-royal-400 shadow-[0_0_10px_#3b82f6]" style="width: 0%" data-width="100%"></div>
+                    </div>
+                    <p class="text-right text-[10px] text-green-400 mt-2 uppercase tracking-wide">Target Achieved</p>
+                </div>
+
+                <!-- Team Member 2 -->
+                <div class="glass-card p-6 rounded-xl">
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-sm">AS</div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">Alex Smith</h4>
+                                <p class="text-xs text-slate-400">MS Bagger</p>
+                            </div>
+                        </div>
+                        <span class="text-yellow-400 font-bold text-lg">8<span class="text-slate-500 text-sm">/10</span></span>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden border border-white/5">
+                        <div class="progress-fill h-full bg-gradient-to-r from-yellow-600 to-yellow-400" style="width: 0%" data-width="80%"></div>
+                    </div>
+                    <p class="text-right text-[10px] text-yellow-500 mt-2 uppercase tracking-wide">2 Cards Remaining</p>
+                </div>
+
+                <!-- Team Member 3 -->
+                <div class="glass-card p-6 rounded-xl">
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-sm">RM</div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">Robert Miller</h4>
+                                <p class="text-xs text-slate-400">Logistics</p>
+                            </div>
+                        </div>
+                        <span class="text-royal-400 font-bold text-lg">12<span class="text-slate-500 text-sm">/10</span></span>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden border border-white/5">
+                        <div class="progress-fill h-full bg-gradient-to-r from-green-600 to-green-400" style="width: 0%" data-width="100%"></div>
+                    </div>
+                    <p class="text-right text-[10px] text-royal-400 mt-2 uppercase tracking-wide">Exceeded Target (+2)</p>
+                </div>
+
+                <!-- Team Member 4 -->
+                <div class="glass-card p-6 rounded-xl">
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-sm">KW</div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">Kate Wilson</h4>
+                                <p class="text-xs text-slate-400">QAS Checker</p>
+                            </div>
+                        </div>
+                        <span class="text-red-400 font-bold text-lg">4<span class="text-slate-500 text-sm">/10</span></span>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden border border-white/5">
+                        <div class="progress-fill h-full bg-gradient-to-r from-red-600 to-red-400" style="width: 0%" data-width="40%"></div>
+                    </div>
+                    <p class="text-right text-[10px] text-red-400 mt-2 uppercase tracking-wide">Behind Schedule</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- KY CARDS TABLE -->
+    <section class="py-12 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between items-end mb-6">
+                <h2 class="font-header text-3xl text-white">Submitted <span class="text-royal-400">Cards</span></h2>
+                <button class="bg-royal-600 hover:bg-royal-500 text-white text-xs font-bold uppercase py-2 px-6 rounded shadow-lg shadow-royal-600/30 transition-all hover:-translate-y-1">
+                    <i class="fas fa-plus mr-2"></i> Submit New Card
+                </button>
+            </div>
+
+            <div class="glass-card rounded-xl overflow-hidden fade-in" style="animation-delay: 0.3s;">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse ky-table">
+                        <thead>
+                            <tr class="bg-slate-900/50">
+                                <th class="p-4 text-xs uppercase">Card ID</th>
+                                <th class="p-4 text-xs uppercase">Time</th>
+                                <th class="p-4 text-xs uppercase">Area</th>
+                                <th class="p-4 text-xs uppercase">Observer</th>
+                                <th class="p-4 text-xs uppercase">Hazard Description</th>
+                                <th class="p-4 text-xs uppercase">Countermeasure</th>
+                                <th class="p-4 text-xs uppercase text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-slate-300 text-sm">
+                            <!-- Row 1 -->
+                            <tr class="transition-colors">
+                                <td class="p-4 font-mono text-xs text-slate-500">#KY-206</td>
+                                <td class="p-4">08:15 AM</td>
+                                <td class="p-4"><span class="bg-slate-800 border border-white/10 px-2 py-1 rounded text-xs">Bagging A</span></td>
+                                <td class="p-4 text-white">John Doe</td>
+                                <td class="p-4 text-slate-200">Slippery floor near conveyor belt due to moisture.</td>
+                                <td class="p-4 text-xs text-slate-400">Placed caution sign, requested cleaning.</td>
+                                <td class="p-4 text-center">
+                                    <span class="inline-block px-2 py-1 bg-green-500/10 border border-green-500/30 text-green-400 text-[10px] font-bold uppercase rounded">Closed</span>
+                                </td>
+                            </tr>
+                            <!-- Row 2 -->
+                            <tr class="transition-colors">
+                                <td class="p-4 font-mono text-xs text-slate-500">#KY-207</td>
+                                <td class="p-4">09:30 AM</td>
+                                <td class="p-4"><span class="bg-slate-800 border border-white/10 px-2 py-1 rounded text-xs">Warehouse</span></td>
+                                <td class="p-4 text-white">Robert Miller</td>
+                                <td class="p-4 text-slate-200">Forklift reverse alarm volume too low.</td>
+                                <td class="p-4 text-xs text-slate-400">Reported to maintenance for repair.</td>
+                                <td class="p-4 text-center">
+                                    <span class="inline-block px-2 py-1 bg-royal-500/10 border border-royal-500/30 text-royal-400 text-[10px] font-bold uppercase rounded">Pending</span>
+                                </td>
+                            </tr>
+                            <!-- Row 3 -->
+                            <tr class="transition-colors">
+                                <td class="p-4 font-mono text-xs text-slate-500">#KY-208</td>
+                                <td class="p-4">10:05 AM</td>
+                                <td class="p-4"><span class="bg-slate-800 border border-white/10 px-2 py-1 rounded text-xs">Loading Bay</span></td>
+                                <td class="p-4 text-white">Alex Smith</td>
+                                <td class="p-4 text-slate-200">Loose strapping on pallet ID #4402.</td>
+                                <td class="p-4 text-xs text-slate-400">Re-strapped manually before loading.</td>
+                                <td class="p-4 text-center">
+                                    <span class="inline-block px-2 py-1 bg-green-500/10 border border-green-500/30 text-green-400 text-[10px] font-bold uppercase rounded">Closed</span>
+                                </td>
+                            </tr>
+                            <!-- Row 4 -->
+                            <tr class="transition-colors">
+                                <td class="p-4 font-mono text-xs text-slate-500">#KY-209</td>
+                                <td class="p-4">11:45 AM</td>
+                                <td class="p-4"><span class="bg-slate-800 border border-white/10 px-2 py-1 rounded text-xs">Bagging B</span></td>
+                                <td class="p-4 text-white">Kate Wilson</td>
+                                <td class="p-4 text-slate-200">Dust accumulation on sensor lens.</td>
+                                <td class="p-4 text-xs text-slate-400">Cleaned with microfiber cloth.</td>
+                                <td class="p-4 text-center">
+                                    <span class="inline-block px-2 py-1 bg-green-500/10 border border-green-500/30 text-green-400 text-[10px] font-bold uppercase rounded">Closed</span>
+                                </td>
+        

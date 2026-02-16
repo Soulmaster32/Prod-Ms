@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety Protocol | QualityGroup HSE</title>
+    
+    <!-- Fonts: Inter & Oswald -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Supabase & SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        header: ['Oswald', 'sans-serif'],
+                    },
+                    colors: {
+                        // Royal Blue Palette
+                        slate: { 
+                            50: '#eff6ff', 
+                            100: '#dbeafe', 
+                            200: '#bfdbfe', 
+                            300: '#93c5fd', 
+                            400: '#60a5fa', 
+                            500: '#3b82f6', 
+                            600: '#2563eb', 
+                            700: '#1d4ed8', 
+                            800: '#002855', // Card Background (Royal)
+                            850: '#001d3d', // Custom Dark Royal
+                            900: '#001845', // Main Background (Deep Royal)
+                            950: '#001233'  // Darkest Background (Navy)
+                        },
+                        gold: { 400: '#facc15', 500: '#eab308', 600: '#ca8a04' },
+                        // Safety Specific Accents (keeping orange for semantic safety meanings within blue theme)
+                        safety: { 500: '#f97316', 600: '#ea580c' }
+                    },
+                    backgroundImage: {
+                        'tech-grid': "linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)",
+                        'hazard-stripe': "repeating-linear-gradient(45deg, #eab308, #eab308 10px, #001233 10px, #001233 20px)"
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #001233; /* Deep Royal Navy */
+            color: #eff6ff;
+            overflow-x: hidden;
+        }
+        
+        /* Glassmorphism - Blue Tint */
+        .glass {
+            background: rgba(0, 24, 69, 0.75);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(0, 40, 85, 0.5); /* Royal Blue Card */
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        /* Tech Card Styles */
+        .tech-card {
+            background: linear-gradient(145deg, rgba(0, 40, 85, 0.7), rgba(0, 24, 69, 0.9));
+            border: 1px solid rgba(255,255,255,0.08);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .tech-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(234, 179, 8, 0.4);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+        }
+
+        /* Hazard Border */
+        .hazard-border-bottom {
+            position: relative;
+        }
+        .hazard-border-bottom::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: repeating-linear-gradient(45deg, #eab308, #eab308 10px, transparent 10px, transparent 20px);
+            opacity: 0.5;
+        }
+
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <!-- NAVIGATION -->
+    <nav class="fixed w-full z-50 glass transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <!-- Back to Home -->
+                <a href="../index.html" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 rounded bg-slate-800 flex items-center justify-center border border-white/10 group-hover:border-gold-500 transition-colors">
+                        <i class="fas fa-chevron-left text-gold-400"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <h2 class="font-header text-xl tracking-widest font-bold text-white leading-none">QUALITY<span class="text-gold-400">GROUP</span></h2>
+                        <span class="text-[9px] text-slate-300 uppercase tracking-[0.2em]">Return to Dashboard</span>
+                    </div>
+                </a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <span class="hidden md:block text-xs font-bold text-safety-500 bg-safety-500/10 border border-safety-500/20 px-3 py-1 rounded uppercase tracking-wider">
+                    <i class="fas fa-exclamation-circle text-[10px] mr-2 animate-pulse"></i> HSE Priority
+                </span>
+                <button onclick="downloadProtocol()" class="px-6 py-2 bg-slate-800 hover:bg-gold-500 hover:text-slate-900 text-gold-400 border border-gold-500/30 font-bold text-xs uppercase tracking-wider rounded transition-all shadow-[0_0_15px_rgba(234,179,8,0.1)]">
+                    <i class="fas fa-file-download mr-2"></i> Download PDF
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="pt-32 pb-20 relative min-h-screen">
+        <!-- Background Elements -->
+        <div class="fixed inset-0 bg-tech-grid opacity-20 pointer-events-none"></div>
+        <div class="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-gold-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-6">
+            
+            <!-- Header Section -->
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 fade-in-section border-b border-white/10 pb-8">
+                <div>
+                    <p class="text-safety-500 font-bold tracking-[0.2em] text-xs uppercase mb-2"><i class="fas fa-shield-alt mr-2"></i> Zero Harm Policy</p>
+                    <h1 class="font-header text-4xl md:text-6xl text-white">SAFETY <span class="text-gold-400">PROTOCOL</span></h1>
+                    <p class="text-slate-400 text-sm mt-2 max-w-xl">
+                        Mandatory guidelines for Warehouse Operations, Pier Logistics, and Chemical Handling. 
+                        Compliance is non-negotiable.
+                    </p>
+                </div>
+                <div class="mt-6 md:mt-0 flex gap-4 text-center">
+                    <div class="glass-card px-4 py-2 rounded">
+                        <div class="text-2xl font-header text-white">0</div>
+                        <div class="text-[9px] text-slate-400 uppercase tracking-wider">Accidents (YTD)</div>
+                    </div>
+                    <div class="glass-card px-4 py-2 rounded">
+                        <div class="text-2xl font-header text-gold-400">100%</div>
+                        <div class="text-[9px] text-slate-400 uppercase tracking-wider">PPE Compliance</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- COLUMN 1: PPE & FUNDAMENTALS -->
+                <div class="space-y-6 fade-in-section">
+                    <h3 class="font-header text-xl text-white flex items-center">
+                        <span class="w-1 h-6 bg-gold-500 mr-3"></span> Mandatory PPE
+                    </h3>
+                    
+                    <div class="tech-card p-6 rounded-xl hazard-border-bottom">
+                        <div class="flex items-start gap-4 mb-4">
+                            <div class="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center text-gold-400 text-xl border border-white/10 shrink-0">
+                                <i class="fas fa-hard-hat"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold uppercase text-sm">Standard Gear</h4>
+                                <p class="text-slate-400 text-xs mt-1">Required at all times within operational zones (Warehouse & Pier).</p>
+                            </div>
+                        </div>
+                        <ul class="space-y-3">
+                            <li class="flex items-center text-sm text-slate-300 bg-slate-900/50 p-2 rounded border border-white/5">
+                                <i class="fas fa-check text-green-400 mr-3 text-xs"></i> Safety Helmet (Chin strap on)
+                            </li>
+                            <li class="flex items-center text-sm text-slate-300 bg-slate-900/50 p-2 rounded border border-white/5">
+                                <i class="fas fa-check text-green-400 mr-3 text-xs"></i> High-Visibility Vest
+                            </li>
+                            <li class="flex items-center text-sm text-slate-300 bg-slate-900/50 p-2 rounded border border-white/5">
+                                <i class="fas fa-check text-green-400 mr-3 text-xs"></i> Safety Shoes (Steel toe)
+                            </li>
+                            <li class="flex items-center text-sm text-slate-300 bg-slate-900/50 p-2 rounded border border-white/5">
+                                <i class="fas fa-check text-green-400 mr-3 text-xs"></i> Safety Glasses (Processing Areas)
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-xl">
+                        <h4 class="text-white font-bold uppercase text-sm mb-3 text-safety-500"><i class="fas fa-ban mr-2"></i> Prohibited Items</h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="text-xs text-slate-400 bg-slate-900/80 p-2 rounded text-center border border-white/5">Loose Clothing</div>
+                            <div class="text-xs text-slate-400 bg-slate-900/80 p-2 rounded text-center border border-white/5">Headphones</div>
+                            <div class="text-xs text-slate-400 bg-slate-900/80 p-2 rounded text-center border border-white/5">Open Sandals</div>
+                            <div class="text-xs text-slate-400 bg-slate-900/80 p-2 rounded text-center border border-white/5">Mobile Phones (While Walking)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMN 2: OPERATIONAL ZONES -->
+                <div class="space-y-6 lg:col-span-2 fade-in-section" style="transition-delay: 100ms;">
+                    <h3 class="font-header text-xl text-white flex items-center">
+                        <span class="w-1 h-6 bg-blue-500 mr-3"></span> Operational Guidelines
+                    </h3>
+
+                    <!-- Warehouse Safety -->
+                    <div class="tech-card p-6 rounded-xl group">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 bg-blue-500/20 rounded text-blue-400"><i class="fas fa-warehouse text-xl"></i></div>
+                                <h4 class="text-white font-bold uppercase tracking-wide group-hover:text-gold-400 transition-colors">Warehouse Operations</h4>
+                            </div>
+                            <span class="text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-1 rounded uppercase">Zone A</span>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-slate-900/50 p-3 rounded border border-white/5">
+                                <h5 class="text-gold-400 text-xs font-bold uppercase mb-2">Pedestrian Safety</h5>
+                                <p class="text-slate-400 text-xs leading-relaxed">
+                                    Walk only on designated <span class="text-white">Green Pathways</span>. Establish eye contact with forklift operators before crossing intersections.
+                                </p>
+                            </div>
+                            <div class="bg-slate-900/50 p-3 rounded border border-white/5">
+                                <h5 class="text-gold-400 text-xs font-bold uppercase mb-2">Stacking Height</h5>
+                                <p class="text-slate-400 text-xs leading-relaxed">
+                                    Maximum stack height for MS Bags is <span class="text-white">3 Layers</span>. Ensure pyramids are stable before removing shrink wrap.
+                                </p>
+                            </div>
+                            <div class="bg-slate-900/50 p-3 rounded border border-white/5">
+                                <h5 class="text-gold-400 text-xs font-bold uppercase mb-2">LOTO Procedure</h5>
+                                <p class="text-slate-400 text-xs leading-relaxed">
+                                    Lock Out Tag Out mandatory during conveyor maintenance. Only authorized electrical personnel may remove tags.
+                                </p>
+                            </div>
+                            <div class="bg-slate-900/50 p-3 rounded border border-white/5">
+                                <h5 class="text-gold-400 text-xs font-bold uppercase mb-2">H2S Monitoring</h5>
+                                <p class="text-slate-400 text-xs leading-relaxed">
+                                    Personal gas monitors required near sulfur pits. Evacuate immediately if alarm triggers (Sound + Vibration).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pier Safety -->
+                    <div class="tech-card p-6 rounded-xl group">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 bg-safety-500/20 rounded text-safety-500"><i class="fas fa-ship text-xl"></i></div>
+                                <h4 class="text-white font-bold uppercase tracking-wide group-hover:text-gold-400 transition-colors">Pier & Loading</h4>
+                            </div>
+                            <span class="text-[10px] font-bold bg-safety-500/10 text-safety-500 border border-safety-500/20 px-2 py-1 rounded uppercase">Zone B</span>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-water text-blue-400 mt-1 text-xs"></i>
+                                <p class="text-slate-400 text-xs"><strong class="text-white">Life Vests:</strong> Mandatory within 2 meters of the pier edge. No exceptions.</p>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-truck-loading text-blue-400 mt-1 text-xs"></i>
+                                <p class="text-slate-400 text-xs"><strong class="text-white">Suspended Loads:</strong> Never walk under crane loads. Maintain a 10-meter exclusion zone during active lifting.</p>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-wind text-blue-400 mt-1 text-xs"></i>
+                                <p class="text-slate-400 text-xs"><strong class="text-white">Weather Protocol:</strong> Operations cease immediately if wind speed exceeds 25 knots or lightning is detected within 10km.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Emergency Section -->
+            <div class="mt-8 fade-in-section" style="transition-delay: 200ms;">
+                <div class="bg-gradient-to-r from-red-900/40 to-slate-900/40 border border-red-500/30 rounded-xl p-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10">
+                        <i class="fas fa-ambulance text-9xl text-white"></i>
+                    </div>
+                    
+                    <div class="relative z-10 grid md:grid-cols-3 gap-6 items-center">
+                        <div>
+                            <h3 class="font-header text-2xl text-white mb-2 text-red-400">IN CASE OF EMERGENCY</h3>
+                            <p class="text-slate-300 text-sm">Stay calm. Follow the evacuation route. Do not use elevators.</p>
+                        </div>
+                        
+                        <div class="flex gap-4">
+                            <div class="bg-slate-900/80 p-3 rounded border border-red-500/30 flex items-center gap-3">
+                                <div class="bg-red-500 text-white w-8 h-8 rounded flex items-center justify-center font-bold"><i class="fas fa-phone"></i></div>
+                                <div>
+                                    <p class="text-[10px] text-slate-400 uppercase">Control Room</p>
+                                    <p class="text-white font-mono font-bold">Loc 1001</p>
+                                </div>
+                            </div>
+                            <div class="bg-slate-900/80 p-3 rounded border border-red-500/30 flex items-center gap-3">
+                                <div class="bg-red-500 text-white w-8 h-8 rounded flex items-center justify-center font-bold"><i class="fas fa-user-md"></i></div>
+                                <div>
+                                    <p class="text-[10px] text-slate-400 uppercase">Clinic</p>
+                                    <p class="text-white font-mono font-bold">Loc 1009</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-right">
+                            <button onclick="reportIncident()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded shadow-lg transition-all transform hover:scale-105 uppercase tracking-wider text-xs">
+                                Report Incident <i class="fas fa-bullhorn ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-950 border-t border-white/5 py-8">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
+            <p class="text-slate-400 text-xs">&copy; 2026 QualityGroup Management. HSE Dept.</p>
+            <div class="flex gap-4 mt-4 md:mt-0 text-xs text-slate-500">
+                <span>Doc: HSE-PRO-001</span>
+                <span>Rev: 4.2</span>
+                <span class="text-green-500"><i class="fas fa-check-circle"></i> Active</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Fade In Animation
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+
+            document.querySelectorAll('.fade-in-section').forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(20px)';
+                section.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
+                observer.observe(section);
+            });
+        });
+
+        // Interactions
+        function downloadProtocol() {
+            Swal.fire({
+                title: 'Downloading...',
+                text: 'HSE_Protocol_Rev4.pdf',
+                timer: 1500,
+                showConfirmButton: false,
+                background: '#002855', /* Royal Blue */
+                color: '#fff',
+                icon: 'success'
+            });
+        }
+
+        function reportIncident() {
+            Swal.fire({
+                title: 'Report Incident',
+                input: 'textarea',
+                inputLabel: 'Describe the hazard or incident',
+                inputPlaceholder: 'Type here...',
+                showCancelButton: true,
+                confirmButtonText: 'Submit Report',
+                confirmButtonColor: '#dc2626',
+                background: '#002855',
+                color: '#fff',
+                customClass: {
+                    input: 'bg-slate-800 text-white border-white/20'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Submitted',
+                        text: 'Safety Team has been notified.',
+                        icon: 'success',
+                        background: '#002855',
+                        color: '#fff'
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>
