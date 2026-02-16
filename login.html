@@ -11,22 +11,14 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- SweetAlert2 (For nice popups) -->
+    <!-- Supabase & SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Supabase JS Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-<!-- 1. Load Supabase FIRST -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- 2. Load other libraries -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <!-- Tailwind Config -->
+    <!-- Tailwind Config (Matched to Index.html) -->
     <script>
         tailwind.config = {
             theme: {
@@ -36,12 +28,26 @@
                         header: ['Oswald', 'sans-serif'],
                     },
                     colors: {
-                        slate: { 850: '#1e293b', 900: '#0f172a', 950: '#020617' },
+                        // Royal Blue Palette from Index
+                        slate: { 
+                            50: '#eff6ff', 
+                            100: '#dbeafe', 
+                            200: '#bfdbfe', 
+                            300: '#93c5fd', 
+                            400: '#60a5fa', 
+                            500: '#3b82f6', 
+                            600: '#2563eb', 
+                            700: '#1d4ed8', 
+                            800: '#002855', // Card Background
+                            850: '#001d3d', 
+                            900: '#001845', 
+                            950: '#001233'  // Darkest Background
+                        },
                         gold: { 400: '#facc15', 500: '#eab308', 600: '#ca8a04' },
                     },
                     backgroundImage: {
-                        // Using a placeholder or the image from your index if available in your folder
-                        'hero-pattern': "linear-gradient(to right bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.8)), url('img/IMG_20251215_081420.jpg')",
+                        // Exact gradient from Index
+                        'hero-pattern': "linear-gradient(to right bottom, rgba(0, 24, 69, 0.9), rgba(0, 24, 69, 0.7)), url('img/IMG_20251215_081420.jpg')",
                         'tech-grid': "linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)"
                     }
                 }
@@ -50,16 +56,24 @@
     </script>
 
     <style>
-        body { background-color: #0f172a; color: #f1f5f9; overflow-x: hidden; }
-        .glass-card {
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        body { 
+            background-color: #001233; /* Deep Royal Navy */
+            color: #eff6ff; 
+            overflow-x: hidden; 
         }
-        /* Custom Input Styles */
+
+        /* Updated Glass Card to match Index style */
+        .glass-card {
+            background: rgba(0, 40, 85, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s ease;
+        }
+
+        /* Input Styling adapted for Blue Theme */
         .qg-input {
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(0, 24, 69, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: white;
             transition: all 0.3s;
@@ -67,7 +81,17 @@
         .qg-input:focus {
             outline: none;
             border-color: #eab308;
-            box-shadow: 0 0 15px rgba(234, 179, 8, 0.1);
+            background: rgba(0, 24, 69, 0.8);
+            box-shadow: 0 0 15px rgba(234, 179, 8, 0.15);
+        }
+
+        /* Autofill fix for dark theme */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active{
+            -webkit-box-shadow: 0 0 0 30px #001845 inset !important;
+            -webkit-text-fill-color: white !important;
         }
     </style>
 </head>
@@ -76,11 +100,22 @@
     <!-- Grid Overlay -->
     <div class="absolute inset-0 bg-tech-grid opacity-20 pointer-events-none"></div>
 
+    <!-- Back to Main Page Button -->
+    <a href="index.html" class="absolute top-6 left-6 z-50 flex items-center gap-2 text-slate-400 hover:text-gold-400 transition-all group">
+        <div class="w-8 h-8 rounded-full border border-slate-600 group-hover:border-gold-400 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm">
+            <i class="fas fa-arrow-left text-xs group-hover:-translate-x-0.5 transition-transform"></i>
+        </div>
+        <span class="text-xs font-header font-bold uppercase tracking-wider">Return to Home</span>
+    </a>
+
     <div class="relative z-10 w-full max-w-md px-6">
         <!-- Logo Area -->
         <div class="text-center mb-8">
+            <!-- Added Logo Here -->
+            <img src="img/logo.png" alt="Quality Group Logo" class="h-16 mx-auto mb-4 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+            
             <h2 class="font-header text-3xl tracking-widest font-bold text-white leading-none">QUALITY<span class="text-gold-400">GROUP</span></h2>
-            <span class="text-[10px] text-slate-400 uppercase tracking-[0.3em]">Portal Access V2.0</span>
+            <span class="text-[10px] text-slate-300 uppercase tracking-[0.3em]">Portal Access V2.0</span>
         </div>
 
         <!-- Login Card -->
@@ -94,24 +129,24 @@
                 <div class="space-y-5">
                     <!-- Email -->
                     <div>
-                        <label class="block text-xs uppercase tracking-wider text-slate-400 mb-2">Email Address</label>
+                        <label class="block text-xs uppercase tracking-wider text-slate-300 mb-2">Email Address</label>
                         <div class="relative">
-                            <i class="fas fa-envelope absolute left-4 top-3.5 text-slate-500"></i>
+                            <i class="fas fa-envelope absolute left-4 top-3.5 text-slate-400"></i>
                             <input type="email" id="login-email" required placeholder="MSQuality@gmail.com" 
-                                class="qg-input w-full rounded pl-10 pr-4 py-3 text-sm placeholder-slate-600">
+                                class="qg-input w-full rounded pl-10 pr-4 py-3 text-sm placeholder-slate-500 focus:placeholder-slate-400">
                         </div>
                     </div>
 
                     <!-- Password -->
                     <div>
-                        <label class="block text-xs uppercase tracking-wider text-slate-400 mb-2 flex justify-between">
+                        <label class="block text-xs uppercase tracking-wider text-slate-300 mb-2 flex justify-between">
                             <span>Password</span>
                             <a href="#" class="text-gold-500 hover:text-white transition-colors text-[10px]">Forgot?</a>
                         </label>
                         <div class="relative">
-                            <i class="fas fa-lock absolute left-4 top-3.5 text-slate-500"></i>
+                            <i class="fas fa-lock absolute left-4 top-3.5 text-slate-400"></i>
                             <input type="password" id="login-password" required placeholder="••••••••" 
-                                class="qg-input w-full rounded pl-10 pr-4 py-3 text-sm placeholder-slate-600">
+                                class="qg-input w-full rounded pl-10 pr-4 py-3 text-sm placeholder-slate-500 focus:placeholder-slate-400">
                         </div>
                     </div>
 
@@ -123,15 +158,15 @@
             </form>
 
             <!-- Footer -->
-            <div class="mt-8 pt-6 border-t border-white/5 text-center">
-                <p class="text-slate-400 text-sm">Don't have an ID?</p>
+            <div class="mt-8 pt-6 border-t border-white/10 text-center">
+                <p class="text-slate-300 text-sm">Don't have an ID?</p>
                 <a href="register.html" class="text-gold-400 hover:text-white font-bold text-sm uppercase tracking-wide mt-2 inline-block transition-colors border-b border-transparent hover:border-gold-400">
                     Register New Account
                 </a>
             </div>
         </div>
         
-        <div class="text-center mt-6 text-slate-600 text-xs">
+        <div class="text-center mt-6 text-slate-400 text-xs">
              &copy; 2026 QualityGroup Management System. Secure Connection.
         </div>
     </div>
