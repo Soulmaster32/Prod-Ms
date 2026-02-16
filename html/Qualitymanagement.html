@@ -11,6 +11,10 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Supabase & SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -31,8 +35,16 @@
                         header: ['Oswald', 'sans-serif'],
                     },
                     colors: {
-                        slate: { 850: '#1e293b', 900: '#0f172a', 950: '#020617' },
+                        slate: { 
+                            50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 
+                            300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 
+                            600: '#2563eb', 700: '#1d4ed8', 800: '#002855', 
+                            850: '#001d3d', 900: '#001845', 950: '#001233'
+                        },
                         gold: { 400: '#facc15', 500: '#eab308', 600: '#ca8a04' },
+                    },
+                    backgroundImage: {
+                        'hero-pattern': "linear-gradient(to right bottom, rgba(0, 24, 69, 0.9), rgba(0, 24, 69, 0.7)), url('../img/IMG_20251215_081420.jpg')",
                     },
                     boxShadow: {
                         'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.3)',
@@ -44,50 +56,72 @@
     </script>
 
     <style>
-@keyframes float-gentle {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-.animate-bounce-slow {
-    animation: float-gentle 3s ease-in-out infinite;
-}
-
-
-
         /* --- CORE STYLES --- */
         body {
-            background-color: #0f172a; /* Fallback */
-            background-image: radial-gradient(circle at 10% 20%, #1e293b 0%, #020617 90%);
-            color: #f1f5f9;
-            overflow: hidden; /* Prevent body scroll, handle inside containers */
+            background-color: #001233;
+            color: #eff6ff;
+            overflow: hidden; 
         }
 
-        /* Glassmorphism Panel */
+        /* Grid Overlay */
+        .bg-tech-grid-overlay {
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        /* GLASS PANEL */
         .glass-panel {
-            background: rgba(30, 41, 59, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            background: rgba(0, 24, 69, 0.90);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
         }
 
         /* Custom Scrollbar */
         .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
         .custom-scroll::-webkit-scrollbar-thumb:hover { background: #eab308; }
 
         /* Sidebar Animation */
         #sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease; }
         
-        /* Sidebar Collapsed State (Desktop) */
-        #sidebar.collapsed { width: 70px; }
+        /* Sidebar Collapsed State */
+        #sidebar.collapsed { width: 80px; }
         #sidebar.collapsed .sidebar-text, 
         #sidebar.collapsed .menu-category, 
-        #sidebar.collapsed .badge-pill { display: none; opacity: 0; }
-        #sidebar.collapsed .nav-item { justify-content: center; padding-left: 0; padding-right: 0; }
-        #sidebar.collapsed .nav-icon { margin-right: 0; font-size: 1.2rem; }
+        #sidebar.collapsed .badge-pill,
+        #sidebar.collapsed .profile-card-details { display: none; opacity: 0; }
         
+        #sidebar.collapsed .nav-item { justify-content: center; padding-left: 0; padding-right: 0; }
+        #sidebar.collapsed .nav-icon { margin-right: 0; font-size: 1.3rem; }
+        #sidebar.collapsed .profile-avatar { width: 40px; height: 40px; margin: 0 auto; }
+        
+        /* Active Nav State */
+        .nav-item.active-nav {
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+            border-right: 3px solid #facc15;
+            color: white;
+        }
+        .nav-item.active-nav .nav-icon {
+            color: #facc15;
+            text-shadow: 0 0 10px rgba(250, 204, 21, 0.6);
+        }
+
+        /* Pulse Animation */
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .badge-pulse { animation: pulse-red 2s infinite; }
+
         /* Tooltip Logic for Collapsed Sidebar */
         #sidebar.collapsed .nav-item:hover::after {
             content: attr(data-tooltip);
@@ -95,20 +129,20 @@
             left: 100%;
             top: 50%;
             transform: translateY(-50%);
-            margin-left: 10px;
+            margin-left: 12px;
             background: #eab308;
             color: #020617;
-            padding: 4px 8px;
+            padding: 6px 10px;
             border-radius: 4px;
             font-size: 0.75rem;
             font-weight: bold;
             white-space: nowrap;
             z-index: 50;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
 
         /* Table Styles */
-        .glass-table th { background: rgba(15, 23, 42, 0.8); color: #facc15; font-family: 'Oswald'; letter-spacing: 0.05em; text-transform: uppercase; font-size: 0.75rem; }
+        .glass-table th { background: rgba(0, 24, 69, 0.95); color: #facc15; font-family: 'Oswald'; letter-spacing: 0.05em; text-transform: uppercase; font-size: 0.75rem; }
         .glass-table td { border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; }
         .glass-table tr:hover td { background: rgba(255,255,255,0.05); }
 
@@ -122,83 +156,131 @@
         @media (max-width: 1024px) {
             #sidebar { position: fixed; height: 100%; z-index: 50; transform: translateX(-100%); width: 260px; }
             #sidebar.mobile-open { transform: translateX(0); }
-            .desktop-search { display: none; }
         }
     </style>
 </head>
-<body class="antialiased font-sans text-slate-200">
+<body class="antialiased font-sans text-slate-200 bg-hero-pattern bg-cover bg-fixed">
+
+<!-- Grid Overlay -->
+<div class="bg-tech-grid-overlay"></div>
 
 <!-- Mobile Backdrop -->
 <div id="mobileBackdrop" onclick="App.toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
 
-<div class="flex h-screen w-full">
+<div class="flex h-screen w-full relative z-10">
 
-    <!-- SIDEBAR -->
-    <aside id="sidebar" class="glass-panel h-full flex flex-col flex-shrink-0 z-50">
-        <!-- Brand -->
-        <div class="h-16 flex items-center justify-center border-b border-white/10 relative">
+    <!-- UPDATED SIDEBAR -->
+    <aside id="sidebar" class="glass-panel h-full flex flex-col flex-shrink-0 z-50 border-r border-white/10 relative">
+        
+        <!-- Brand / Logo Area -->
+        <div class="h-20 flex items-center justify-center border-b border-white/10 relative bg-gradient-to-b from-slate-900/80 to-slate-900/40">
+            <!-- EXPANDED VIEW LOGO -->
             <div class="flex items-center gap-3 sidebar-text transition-opacity duration-200">
-                <i class="fas fa-shield-alt text-gold-400 text-2xl drop-shadow-lg"></i>
-                <h2 class="font-header text-xl tracking-wider font-bold text-white">Quality<span class="text-gold-400">Group</span></h2>
+                <div class="w-10 h-10 rounded bg-white/5 flex items-center justify-center border border-white/10 shadow-neon">
+                    <img src="../img/logo.png" alt="Logo" class="h-8 w-auto object-contain">
+                </div>
+                <div>
+                    <h2 class="font-header text-xl tracking-wider font-bold text-white leading-none">Quality<span class="text-gold-400">Group</span></h2>
+                    <span class="text-[9px] text-slate-400 uppercase tracking-[0.2em]">Enterprise</span>
+                </div>
             </div>
-            <!-- Icon only when collapsed -->
-            <i class="fas fa-shield-alt text-gold-400 text-2xl absolute left-1/2 -translate-x-1/2 opacity-0 transition-opacity duration-200" id="brandIconCollapsed"></i>
+            
+            <!-- COLLAPSED VIEW LOGO (Icon Only) -->
+            <img src="../img/logo.png" id="brandIconCollapsed" alt="Logo" class="h-8 w-auto absolute left-1/2 -translate-x-1/2 opacity-0 transition-opacity duration-200 object-contain drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]">
         </div>
 
-        <!-- User Profile -->
-        <div class="p-6 text-center border-b border-white/10 sidebar-text">
-            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 border-2 border-gold-500 mx-auto flex items-center justify-center shadow-neon mb-3">
-                <span class="font-header text-xl text-gold-400">AD</span>
+        <!-- Enhanced User Profile Card -->
+        <div class="p-4 border-b border-white/10">
+            <div class="bg-slate-800/40 rounded-xl p-3 border border-white/5 flex items-center gap-3 transition-all hover:bg-slate-800/60 group cursor-default">
+                <div class="relative profile-avatar transition-all">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-slate-600 to-slate-900 border border-gold-500/50 flex items-center justify-center text-xs font-bold text-gold-400 shadow-lg">AD</div>
+                    <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-slate-900 rounded-full"></div>
+                </div>
+                <div class="sidebar-text profile-card-details overflow-hidden">
+                    <h4 class="font-bold text-white text-sm truncate group-hover:text-gold-400 transition-colors">Admin User</h4>
+                    <div class="text-[10px] text-slate-400 uppercase tracking-wide flex items-center gap-1">
+                        <i class="fas fa-shield-alt text-xs"></i> Quality Lead
+                    </div>
+                </div>
             </div>
-            <h4 class="font-bold text-white text-sm">Admin User</h4>
-            <span class="text-xs text-slate-400 uppercase tracking-wider">Quality Lead</span>
         </div>
 
         <!-- Navigation -->
-        <nav class="flex-1 overflow-y-auto custom-scroll py-4 px-2 space-y-1">
-            <a href="#dashboard" class="nav-item relative flex items-center px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg transition-all group" data-tooltip="Dashboard">
-                <i class="fas fa-chart-line nav-icon w-5 text-center text-slate-400 group-hover:text-gold-400 transition-colors mr-3"></i>
-                <span class="sidebar-text font-medium text-sm">Dashboard</span>
+        <nav class="flex-1 overflow-y-auto custom-scroll py-4 space-y-1" id="sidebarNav">
+            
+            <div class="menu-category px-6 mb-2 mt-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                <span class="w-2 h-[1px] bg-slate-500"></span> Main
+            </div>
+
+            <a href="#dashboard" class="nav-item relative flex items-center px-6 py-3 text-slate-400 hover:text-white hover:bg-white/5 transition-all group border-r-2 border-transparent" data-target="dashboard" data-tooltip="Dashboard">
+                <i class="fas fa-chart-line nav-icon w-6 text-center group-hover:scale-110 transition-transform duration-300"></i>
+                <span class="sidebar-text font-medium text-sm ml-3">Dashboard Overview</span>
             </a>
 
-            <div class="menu-category mt-6 mb-2 px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Quality Modules</div>
+            <div class="menu-category px-6 mb-2 mt-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                <span class="w-2 h-[1px] bg-slate-500"></span> Modules
+            </div>
 
-            <a href="#section-product" class="nav-item relative flex items-center px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg transition-all group" data-tooltip="Product Quality">
-                <i class="fas fa-boxes nav-icon w-5 text-center text-slate-400 group-hover:text-gold-400 transition-colors mr-3"></i>
-                <span class="sidebar-text font-medium text-sm">Product Quality</span>
+            <a href="#section-product" class="nav-item relative flex items-center px-6 py-3 text-slate-400 hover:text-white hover:bg-white/5 transition-all group border-r-2 border-transparent" data-target="section-product" data-tooltip="Product Quality">
+                <i class="fas fa-flask nav-icon w-6 text-center group-hover:scale-110 transition-transform duration-300"></i>
+                <span class="sidebar-text font-medium text-sm ml-3">Product Lab</span>
             </a>
             
-            <a href="#section-audit" class="nav-item relative flex items-center px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg transition-all group" data-tooltip="Audit Findings">
-                <i class="fas fa-clipboard-check nav-icon w-5 text-center text-slate-400 group-hover:text-gold-400 transition-colors mr-3"></i>
-                <span class="sidebar-text font-medium text-sm">Audit Findings</span>
-                <span class="badge-pill ml-auto bg-red-500/80 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">3</span>
+            <a href="#section-audit" class="nav-item relative flex items-center px-6 py-3 text-slate-400 hover:text-white hover:bg-white/5 transition-all group border-r-2 border-transparent" data-target="section-audit" data-tooltip="Audit Findings">
+                <div class="relative">
+                    <i class="fas fa-clipboard-check nav-icon w-6 text-center group-hover:scale-110 transition-transform duration-300"></i>
+                    <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5 sidebar-text">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                    </span>
+                </div>
+                <span class="sidebar-text font-medium text-sm ml-3">Audit Findings</span>
+                <span class="badge-pill ml-auto bg-red-500/20 text-red-400 border border-red-500/50 text-[10px] font-bold px-2 py-0.5 rounded-full badge-pulse">3</span>
             </a>
 
-            <a href="#section-scrum" class="nav-item relative flex items-center px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg transition-all group" data-tooltip="Scrum Board">
-                <i class="fas fa-th-large nav-icon w-5 text-center text-slate-400 group-hover:text-gold-400 transition-colors mr-3"></i>
-                <span class="sidebar-text font-medium text-sm">Scrum Board</span>
+            <a href="#section-scrum" class="nav-item relative flex items-center px-6 py-3 text-slate-400 hover:text-white hover:bg-white/5 transition-all group border-r-2 border-transparent" data-target="section-scrum" data-tooltip="Scrum Board">
+                <i class="fas fa-th-large nav-icon w-6 text-center group-hover:scale-110 transition-transform duration-300"></i>
+                <span class="sidebar-text font-medium text-sm ml-3">Kaizen Board</span>
             </a>
 
-            <a href="#section-claims" class="nav-item relative flex items-center px-4 py-3 text-slate-300 hover:bg-white/10 hover:text-white rounded-lg transition-all group" data-tooltip="Claims">
-                <i class="fas fa-exclamation-triangle nav-icon w-5 text-center text-slate-400 group-hover:text-gold-400 transition-colors mr-3"></i>
-                <span class="sidebar-text font-medium text-sm">Claims Report</span>
+            <a href="#section-claims" class="nav-item relative flex items-center px-6 py-3 text-slate-400 hover:text-white hover:bg-white/5 transition-all group border-r-2 border-transparent" data-target="section-claims" data-tooltip="Claims">
+                <i class="fas fa-exclamation-triangle nav-icon w-6 text-center group-hover:scale-110 transition-transform duration-300"></i>
+                <span class="sidebar-text font-medium text-sm ml-3">Claims & Reports</span>
+            </a>
+
+            <div class="mt-auto"></div> <!-- Spacer -->
+            
+            <a href="../index.html" class="nav-item relative flex items-center px-6 py-3 text-slate-500 hover:text-gold-400 hover:bg-white/5 transition-all group mt-6" data-tooltip="Public Home">
+                <i class="fas fa-globe nav-icon w-6 text-center group-hover:rotate-12 transition-transform"></i>
+                <span class="sidebar-text font-medium text-sm ml-3">Public Portal</span>
             </a>
         </nav>
         
-        <!-- Footer -->
-        <div class="p-4 border-t border-white/10 sidebar-text text-center">
-            <p class="text-[10px] text-slate-500">&copy; 2026 QM System v4.1</p>
+        <!-- Enhanced Footer -->
+        <div class="p-4 border-t border-white/10 bg-slate-900/60 backdrop-blur-md">
+            <button onclick="window.handleLogout()" class="w-full group relative overflow-hidden bg-slate-800 hover:bg-red-500/10 border border-white/10 hover:border-red-500/50 text-slate-300 hover:text-red-400 py-2.5 rounded-lg transition-all duration-300">
+                <div class="flex items-center justify-center gap-2 relative z-10 sidebar-text">
+                    <i class="fas fa-power-off text-xs"></i>
+                    <span class="text-xs font-bold uppercase tracking-wider">Sign Out</span>
+                </div>
+                <!-- Icon Only Mode -->
+                <i class="fas fa-power-off text-lg absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity" style="display: none;" id="logoutIconOnly"></i>
+            </button>
+            <div class="sidebar-text text-center mt-3">
+                <p class="text-[9px] text-slate-600 font-mono">QM SYS v4.2.1-build</p>
+            </div>
         </div>
     </aside>
 
     <!-- MAIN CONTENT -->
-    <main class="flex-1 flex flex-col h-full overflow-hidden relative bg-slate-900/50">
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative bg-slate-900/30">
         
         <!-- Top Header -->
         <header class="h-16 glass-panel border-b border-white/5 flex items-center justify-between px-6 z-30">
             <div class="flex items-center gap-4">
-                <button onclick="App.toggleSidebar()" class="text-slate-400 hover:text-gold-400 transition-colors p-2 rounded-lg hover:bg-white/5">
-                    <i class="fas fa-bars text-lg"></i>
+                <!-- Hamburger Menu -->
+                <button onclick="App.toggleSidebar()" class="text-slate-300 hover:text-gold-400 transition-colors p-2 rounded-lg hover:bg-white/5">
+                    <i class="fas fa-bars text-xl"></i>
                 </button>
                 <h1 class="font-header text-xl text-white tracking-wide hidden sm:block">QUALITY MANAGEMENT DASHBOARD</h1>
             </div>
@@ -208,19 +290,19 @@
                 <div class="relative hidden md:block">
                     <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
                     <input type="text" oninput="App.handleSearch(this.value)" placeholder="Search audits, tasks..." 
-                        class="bg-slate-950/50 border border-white/10 rounded-full py-1.5 pl-9 pr-4 text-sm focus:outline-none focus:border-gold-500 w-64 transition-all">
+                        class="bg-slate-950/50 border border-white/10 rounded-full py-1.5 pl-9 pr-4 text-sm focus:outline-none focus:border-gold-500 w-64 transition-all text-white placeholder-slate-500 shadow-inner">
                 </div>
 
                 <!-- Actions -->
                 <div class="flex gap-2">
-                    <button onclick="App.exportData()" title="Export JSON" class="bg-slate-800 hover:bg-slate-700 text-slate-200 p-2 rounded-lg border border-white/10 transition-colors">
+                    <button onclick="App.exportData()" title="Export JSON" class="bg-slate-800 hover:bg-slate-700 text-slate-200 p-2 rounded-lg border border-white/10 transition-colors shadow hover:shadow-gold-500/20">
                         <i class="fas fa-download"></i>
                     </button>
-                    <label title="Import JSON" class="bg-slate-800 hover:bg-slate-700 text-slate-200 p-2 rounded-lg border border-white/10 transition-colors cursor-pointer">
+                    <label title="Import JSON" class="bg-slate-800 hover:bg-slate-700 text-slate-200 p-2 rounded-lg border border-white/10 transition-colors cursor-pointer shadow hover:shadow-gold-500/20">
                         <i class="fas fa-upload"></i>
                         <input type="file" id="importFile" hidden onchange="App.importData(event)">
                     </label>
-                    <button onclick="App.resetAll()" title="Reset Data" class="bg-red-900/30 hover:bg-red-900/50 text-red-400 p-2 rounded-lg border border-red-500/30 transition-colors">
+                    <button onclick="App.resetAll()" title="Reset Data" class="bg-red-900/20 hover:bg-red-900/40 text-red-400 p-2 rounded-lg border border-red-500/30 transition-colors">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
@@ -228,37 +310,39 @@
         </header>
 
         <!-- Scrollable Content -->
-        <div class="flex-1 overflow-y-auto custom-scroll p-4 md:p-6" id="dashboard">
+        <div class="flex-1 overflow-y-auto custom-scroll p-4 md:p-6 scroll-smooth" id="mainScrollContainer">
             
-            <!-- KPI CARDS ROW -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div class="glass-panel p-4 rounded-xl flex items-center justify-between border-l-4 border-gold-500">
-                    <div>
-                        <p class="text-xs text-slate-400 uppercase font-bold">Total Audits</p>
-                        <h3 class="text-2xl font-header text-white mt-1">124</h3>
+            <div id="dashboard" class="mb-6">
+                <!-- KPI CARDS ROW -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-panel p-4 rounded-xl flex items-center justify-between border-l-4 border-gold-500 hover:bg-white/5 transition-colors group">
+                        <div>
+                            <p class="text-xs text-slate-400 uppercase font-bold group-hover:text-gold-400 transition-colors">Total Audits</p>
+                            <h3 class="text-2xl font-header text-white mt-1">124</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-gold-500/10 flex items-center justify-center text-gold-400 group-hover:scale-110 transition-transform"><i class="fas fa-clipboard-list"></i></div>
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-gold-500/10 flex items-center justify-center text-gold-400"><i class="fas fa-clipboard-list"></i></div>
-                </div>
-                <div class="glass-panel p-4 rounded-xl flex items-center justify-between border-l-4 border-blue-500">
-                    <div>
-                        <p class="text-xs text-slate-400 uppercase font-bold">Compliance Rate</p>
-                        <h3 class="text-2xl font-header text-white mt-1">98.5%</h3>
+                    <div class="glass-panel p-4 rounded-xl flex items-center justify-between border-l-4 border-blue-500 hover:bg-white/5 transition-colors group">
+                        <div>
+                            <p class="text-xs text-slate-400 uppercase font-bold group-hover:text-blue-400 transition-colors">Compliance Rate</p>
+                            <h3 class="text-2xl font-header text-white mt-1">98.5%</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform"><i class="fas fa-check-circle"></i></div>
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400"><i class="fas fa-check-circle"></i></div>
-                </div>
-                <div class="glass-panel p-4 rounded-xl flex items-center justify-between border-l-4 border-red-500">
-                    <div>
-                        <p class="text-xs text-slate-400 uppercase font-bold">Open Claims</p>
-                        <h3 class="text-2xl font-header text-white mt-1" id="kpiClaims">0</h3>
+                    <div class="glass-panel p-4 rounded-xl flex items-center justify-between border-l-4 border-red-500 hover:bg-white/5 transition-colors group">
+                        <div>
+                            <p class="text-xs text-slate-400 uppercase font-bold group-hover:text-red-400 transition-colors">Open Claims</p>
+                            <h3 class="text-2xl font-header text-white mt-1" id="kpiClaims">0</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center text-red-400 group-hover:scale-110 transition-transform"><i class="fas fa-exclamation-triangle"></i></div>
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center text-red-400"><i class="fas fa-exclamation-triangle"></i></div>
-                </div>
-                <div class="glass-panel p-4 rounded-xl flex items-center justify-between border-l-4 border-green-500">
-                    <div>
-                        <p class="text-xs text-slate-400 uppercase font-bold">Scrum Done</p>
-                        <h3 class="text-2xl font-header text-white mt-1" id="kpiScrum">0%</h3>
+                    <div class="glass-panel p-4 rounded-xl flex items-center justify-between border-l-4 border-green-500 hover:bg-white/5 transition-colors group">
+                        <div>
+                            <p class="text-xs text-slate-400 uppercase font-bold group-hover:text-green-400 transition-colors">Scrum Done</p>
+                            <h3 class="text-2xl font-header text-white mt-1" id="kpiScrum">0%</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-400 group-hover:scale-110 transition-transform"><i class="fas fa-tasks"></i></div>
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-400"><i class="fas fa-tasks"></i></div>
                 </div>
             </div>
 
@@ -280,7 +364,7 @@
                     <div class="absolute top-0 right-0 -mt-4 -mr-4 text-9xl text-white opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
                         <i class="fas fa-bullseye"></i>
                     </div>
-                    <h3 class="font-header text-lg text-white mb-6 border-b border-white/10 pb-2">Vission & Mission</h3>
+                    <h3 class="font-header text-lg text-white mb-6 border-b border-white/10 pb-2">Vision & Mission</h3>
                     
                     <div class="mb-6">
                         <div class="flex items-center gap-2 mb-2">
@@ -497,10 +581,13 @@ const App = (() => {
         if(window.innerWidth > 1024 && state.sidebarCollapsed) {
             $('#sidebar').addClass('collapsed');
             $('#brandIconCollapsed').removeClass('opacity-0');
+            // Hide footer text logic
+            $('#logoutIconOnly').show();
         }
 
         initChart();
         render();
+        initScrollSpy();
         
         // Listeners
         $('#auditProgress').on('input', function() { $('#auditProgressVal').text(this.value + '%'); });
@@ -511,11 +598,12 @@ const App = (() => {
         render();
     };
 
-    // --- UI LOGIC ---
+    // --- SIDEBAR & SCROLL SPY LOGIC ---
     const toggleSidebar = () => {
         const sb = $('#sidebar');
         const overlay = $('#mobileBackdrop');
         const brandIcon = $('#brandIconCollapsed');
+        const logoutIcon = $('#logoutIconOnly');
 
         if(window.innerWidth <= 1024) {
             // Mobile
@@ -532,15 +620,49 @@ const App = (() => {
             state.sidebarCollapsed = sb.hasClass('collapsed');
             
             if(state.sidebarCollapsed) {
-                setTimeout(() => brandIcon.removeClass('opacity-0'), 150);
+                setTimeout(() => {
+                    brandIcon.removeClass('opacity-0');
+                    logoutIcon.show();
+                }, 150);
             } else {
                 brandIcon.addClass('opacity-0');
+                logoutIcon.hide();
             }
             
             localStorage.setItem(STORE_KEY, JSON.stringify(state));
             // Trigger resize for chart
             setTimeout(() => { if(chartInstance) chartInstance.resize(); }, 350);
         }
+    };
+
+    const initScrollSpy = () => {
+        const container = document.getElementById('mainScrollContainer');
+        const navLinks = document.querySelectorAll('.nav-item');
+        
+        // Simple Intersection Observer to highlight sidebar
+        const observerOptions = {
+            root: container,
+            threshold: 0.5
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    const id = entry.target.id;
+                    navLinks.forEach(link => {
+                        link.classList.remove('active-nav');
+                        if(link.getAttribute('data-target') === id) {
+                            link.classList.add('active-nav');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        // Observe sections
+        document.querySelectorAll('div[id^="section-"], div[id="dashboard"]').forEach(section => {
+            observer.observe(section);
+        });
     };
 
     // --- CHART.JS ---
@@ -797,9 +919,11 @@ const App = (() => {
 document.addEventListener('DOMContentLoaded', App.init);
 </script>
 
-<script src="js/productqy.js" defer></script>
-<script src="js/bubble.js" defer></script>
+<!-- Link to external IMP.JS for Logout Logic -->
+<script src="../js/imp.js"></script>
 
+<script src="../js/productqy.js" defer></script>
+<script src="../js/bubble.js" defer></script>
 
 </body>
 </html>
