@@ -1,927 +1,1161 @@
-<!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QualityGroup | Enterprise Excellence</title>
-    
-    <!-- Fonts: Inter & Oswald -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
-    
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Slick Slider CSS -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import {
+  LayoutDashboard, CalendarDays, ListChecks, UserCircle2, Users, ShieldCheck, LogOut,
+  Plus, X, ChevronLeft, ChevronRight, Search, CheckCircle2, Clock, AlertTriangle,
+  TrendingUp, Menu, Eye, EyeOff, Trash2, Save, Building2, Mail, Lock, Phone,
+  ImagePlus, ArrowRight, Loader2, CircleDot, Crown, UserCog, KeyRound, Briefcase,
+  CalendarPlus, ChevronDown, Filter as FilterIcon
+} from 'lucide-react';
+import {
+  ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip,
+  CartesianGrid, AreaChart, Area
+} from 'recharts';
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+/* ============================== THEME ============================== */
+const T = {
+  bg: '#0A0F1C',
+  bg2: '#0D1424',
+  panel: '#111A2E',
+  panelAlt: '#16213A',
+  border: 'rgba(232,163,61,0.14)',
+  borderStrong: 'rgba(232,163,61,0.4)',
+  amber: '#E8A33D',
+  amberBright: '#FFC968',
+  amberDim: 'rgba(232,163,61,0.35)',
+  green: '#39D6A0',
+  greenDim: 'rgba(57,214,160,0.16)',
+  blue: '#4FA3E3',
+  blueDim: 'rgba(79,163,227,0.16)',
+  red: '#F2604A',
+  redDim: 'rgba(242,96,74,0.16)',
+  text: '#EAEFF8',
+  textMuted: '#8B98B4',
+  textFaint: '#57628080',
+  mono: "'JetBrains Mono', monospace",
+  display: "'Oswald', sans-serif",
+  body: "'Inter', sans-serif",
+};
 
-    <!-- 1. Load Supabase FIRST -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+const CATEGORIES = [
+  'MS Bagger Checking', 'CTS Quality Checking', 'Warehouse Checking', 'End of Shift Check',
+  'End of Day Check', 'Logistics Daily Check', 'Managerial Review', 'Warehouse to Pier Transfer',
+  'Ship Loading', 'Other',
+];
+const PRIORITIES = ['Low', 'Medium', 'High', 'Critical'];
+const STAGES = ['Pending', 'In Progress', 'Under Review', 'Completed'];
+const DEPARTMENTS = ['MS-Design', 'FNTRL', 'H2S', 'Limestone', 'DCS Control', 'Logistics', 'Quality Assurance', 'Other'];
 
-<!-- 2. Load other libraries -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+/* ============================== UTIL ============================== */
+function uid(p) { return p + '-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase(); }
+function nowIso() { return new Date().toISOString(); }
+function fmtDateTime(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString(undefined, { month: 'short', day: '2-digit' }) + ' · ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+}
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString(undefined, { month: 'short', day: '2-digit', year: 'numeric' });
+}
+function initials(name) {
+  if (!name) return '??';
+  const parts = name.trim().split(/\s+/);
+  return ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase();
+}
+function statusColor(s) {
+  if (s === 'Completed') return T.green;
+  if (s === 'In Progress') return T.amber;
+  if (s === 'Under Review') return T.blue;
+  return T.textMuted;
+}
+function priorityColor(p) {
+  if (p === 'Critical') return T.red;
+  if (p === 'High') return T.amber;
+  if (p === 'Medium') return T.blue;
+  return T.textMuted;
+}
+function obfuscate(str) { try { return btoa(unescape(encodeURIComponent(str))); } catch { return str; } }
+function todayStr() { return new Date().toISOString().slice(0, 10); }
 
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const size = 160;
+        const canvas = document.createElement('canvas');
+        canvas.width = size; canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        const scale = Math.max(size / img.width, size / img.height);
+        const w = img.width * scale, h = img.height * scale;
+        ctx.fillStyle = '#111A2E'; ctx.fillRect(0, 0, size, size);
+        ctx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.72));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
-    <!-- Tailwind Config -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        header: ['Oswald', 'sans-serif'],
-                    },
-                    colors: {
-                        slate: { 850: '#1e293b', 900: '#0f172a', 950: '#020617' },
-                        gold: { 400: '#facc15', 500: '#eab308', 600: '#ca8a04' },
-                    },
-                    backgroundImage: {
-                        'hero-pattern': "linear-gradient(to right bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.7)), url('img/IMG_20251215_081420.jpg')",
-                        'tech-grid': "linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)"
-                    },
-                    animation: {
-                        'marquee': 'marquee 25s linear infinite',
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    },
-                    keyframes: {
-                        marquee: {
-                            '0%': { transform: 'translateX(100%)' },
-                            '100%': { transform: 'translateX(-100%)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        body {
-            background-color: #0f172a;
-            color: #f1f5f9;
-            overflow-x: hidden;
-        }
-        
-        /* Glassmorphism Global */
-        .glass {
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .glass-card {
-            background: rgba(30, 41, 59, 0.4);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.4s ease;
-        }
-
-        .glass-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(234, 179, 8, 0.5);
-            box-shadow: 0 10px 30px -10px rgba(234, 179, 8, 0.15);
-        }
-
-        /* Tech Grid Background Size */
-        .bg-grid-pattern {
-            background-size: 40px 40px;
-        }
-
-        /* Animation Classes */
-        .fade-in-section {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-        }
-        .fade-in-section.is-visible {
-            opacity: 1;
-            transform: none;
-        }
-
-        /* Slick Slider Customization */
-        .slick-slide { margin: 0 15px; padding: 10px 0; }
-        .slick-list { margin: 0 -15px; padding: 20px 0; }
-        .slick-dots li button:before { color: #facc15; font-size: 10px; opacity: 0.3; }
-        .slick-dots li.slick-active button:before { color: #eab308; opacity: 1; }
-        
-        /* NEW TECH CARD STYLES */
-        .tech-card {
-            background: linear-gradient(145deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8));
-            border: 1px solid rgba(255,255,255,0.05);
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-
-        .tech-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, transparent, rgba(234, 179, 8, 0.03));
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .tech-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            border-color: rgba(234, 179, 8, 0.4);
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5), 0 0 15px rgba(234, 179, 8, 0.1);
-        }
-
-        .tech-card:hover::before { opacity: 1; }
-
-        /* Corner Accents */
-        .corner {
-            position: absolute;
-            width: 8px; height: 8px;
-            border-color: rgba(234, 179, 8, 0.3);
-            transition: all 0.3s;
-        }
-        .tech-card:hover .corner { border-color: #facc15; width: 12px; height: 12px; }
-        .c-tl { top: 0; left: 0; border-top: 2px solid; border-left: 2px solid; }
-        .c-tr { top: 0; right: 0; border-top: 2px solid; border-right: 2px solid; }
-        .c-bl { bottom: 0; left: 0; border-bottom: 2px solid; border-left: 2px solid; }
-        .c-br { bottom: 0; right: 0; border-bottom: 2px solid; border-right: 2px solid; }
-
-        /* Icon Float */
-        .tech-icon-container {
-            transition: transform 0.4s;
-        }
-        .tech-card:hover .tech-icon-container {
-            transform: translateY(-5px) scale(1.1);
-        }
-
-        /* Button Slide Up */
-        .action-btn {
-            transform: translateY(20px);
-            opacity: 0;
-            transition: all 0.3s ease 0.1s;
-        }
-        .tech-card:hover .action-btn {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    </style>
-</head>
-<body class="antialiased font-sans">
-
-    <!-- NAVIGATION -->
-    <nav class="fixed w-full z-50 glass transition-all duration-300" id="navbar">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <!-- LOGO -->
-                <img src="img/logo.png" onerror="this.src='https://via.placeholder.com/50x50?text=QG'" alt="QualityGroup Logo" class="h-10 w-auto object-contain drop-shadow-md">
-                
-                <div class="flex flex-col">
-                    <h2 class="font-header text-xl tracking-widest font-bold text-white leading-none">QUALITY<span class="text-gold-400">GROUP</span></h2>
-                    <span class="text-[9px] text-slate-400 uppercase tracking-[0.2em]">Enterprise Assurance</span>
-                </div>
-            </div>
-
-            <div class="hidden md:flex items-center gap-8">
-                <a href="#home" class="text-sm font-medium text-slate-300 hover:text-gold-400 transition-colors uppercase tracking-wide">Home</a>
-                <a href="#attachments" class="text-sm font-medium text-slate-300 hover:text-gold-400 transition-colors uppercase tracking-wide">Documents</a>
-                <a href="#capabilities" class="text-sm font-medium text-slate-300 hover:text-gold-400 transition-colors uppercase tracking-wide">Flowchart</a>
-                
-                <!-- UPDATED: DIRECT LINK TO LOGIN PAGE -->
-                <a href="login.html" class="group relative px-6 py-2 border border-gold-500/50 text-gold-400 font-bold text-xs uppercase tracking-wider rounded overflow-hidden transition-all hover:bg-gold-500 hover:text-slate-900 shadow-[0_0_10px_rgba(234,179,8,0.1)] hover:shadow-[0_0_20px_rgba(234,179,8,0.4)]">
-                    <span class="relative z-10">Access Portal <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i></span>
-                </a>
-            </div>
-
-            <button class="md:hidden text-white text-xl hover:text-gold-400"><i class="fas fa-bars"></i></button>
-        </div>
-    </nav>
-
-    <!-- HERO SECTION -->
-    <header id="home" class="relative h-[90vh] flex items-center bg-hero-pattern bg-cover bg-center bg-fixed bg-no-repeat">
-        <!-- Overlay Gradient -->
-        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-slate-900/80"></div>
-        <div class="absolute top-0 left-10 w-px h-full bg-gradient-to-b from-transparent via-gold-500/30 to-transparent hidden lg:block"></div>
-
-        <div class="max-w-7xl mx-auto px-6 w-full relative z-10 pt-10">
-            <div class="fade-in-section">
-                <p class="text-gold-400 font-bold tracking-[0.2em] text-sm mb-4 uppercase flex items-center gap-3">
-                    <span class="w-8 h-px bg-gold-400 shadow-[0_0_5px_#facc15]"></span> T202603 System Update
-                </p>
-                <h1 class="font-header text-5xl md:text-7xl lg:text-8xl text-white font-bold leading-tight mb-6 drop-shadow-2xl">
-                    QUALITY<br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-yellow-200 to-yellow-600">MANAGEMENT</span>
-                </h1>
-                <p class="max-w-xl text-slate-300 text-lg leading-relaxed mb-10 border-l-2 border-white/20 pl-6 backdrop-blur-sm">
-                    <span class="text-gold-400 font-bold">VISION:</span> Achieving annual MS production with zero internal
-                    and external quality claims through establishing excellent quality 
-                    in work, process and product.
-                    </br></br> 
-                    <span class="text-gold-400 font-bold">MISSION:</span> To achieve production targets and continually improve product, process, and work quality through sustainability, standardization, and discipline.
-                </p>
-                
-                <div class="flex gap-4">
-                    <!-- UPDATED: Link to Login Page -->
-                    <a href="login.html" class="bg-gold-500 hover:bg-white text-slate-900 font-header text-lg px-8 py-3 rounded-sm transition-all hover:-translate-y-1 shadow-[0_0_20px_rgba(234,179,8,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)]">
-                        ENTER DASHBOARD
-                    </a>
-                    <a href="#attachments" class="border border-white/20 hover:border-gold-400 text-white hover:text-gold-400 font-header text-lg px-8 py-3 rounded-sm transition-all hover:bg-slate-800/50 backdrop-blur-md">
-                        VIEW DOCUMENTS
-                    </a>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- LIVE NEWS MARQUEE -->
-    <div class="bg-gold-500 py-3 relative z-30 overflow-hidden border-y border-white/10 shadow-lg">
-        <div class="absolute inset-0 bg-gradient-to-r from-gold-600 via-transparent to-gold-600 z-10 pointer-events-none"></div>
-        <div class="flex whitespace-nowrap animate-marquee hover:[animation-play-state:paused] text-slate-900 font-bold text-sm uppercase tracking-wider items-center">
-            <span class="mx-8"><i class="fas fa-bullhorn mr-2"></i> New Attachment: MS Bag Quality Checking Rev.2 Released</span>
-            <span class="mx-8"><i class="fas fa-chart-line mr-2"></i> Current Compliance Rate: 99.9%</span>
-            <span class="mx-8"><i class="fas fa-shipping-fast mr-2"></i> Zero Claims recorded for Shipment #402</span>
-            <span class="mx-8"><i class="fas fa-clipboard-check mr-2"></i> Audit T202603 Completed Successfully</span>
-            <span class="mx-8"><i class="fas fa-exclamation-circle mr-2"></i> Reminder: Calibrate Moisture Sensors Daily</span>
-            <!-- Repeat -->
-            <span class="mx-8"><i class="fas fa-bullhorn mr-2"></i> New Attachment: MS Bag Quality Checking Rev.2 Released</span>
-            <span class="mx-8"><i class="fas fa-chart-line mr-2"></i> Current Compliance Rate: 99.9%</span>
-        </div>
+/* ============================== PRIMITIVES ============================== */
+function Panel({ children, style, ...rest }) {
+  return (
+    <div style={{ background: T.panel, border: `1px solid ${T.border}`, borderRadius: 14, position: 'relative', ...style }} {...rest}>
+      {children}
     </div>
+  );
+}
+function CornerTicks() {
+  const s = { position: 'absolute', width: 7, height: 7, borderColor: T.amberDim };
+  return (
+    <>
+      <span style={{ ...s, top: 6, left: 6, borderTop: '1.5px solid', borderLeft: '1.5px solid', borderColor: T.amberDim }} />
+      <span style={{ ...s, top: 6, right: 6, borderTop: '1.5px solid', borderRight: '1.5px solid', borderColor: T.amberDim }} />
+      <span style={{ ...s, bottom: 6, left: 6, borderBottom: '1.5px solid', borderLeft: '1.5px solid', borderColor: T.amberDim }} />
+      <span style={{ ...s, bottom: 6, right: 6, borderBottom: '1.5px solid', borderRight: '1.5px solid', borderColor: T.amberDim }} />
+    </>
+  );
+}
+function Tag({ children, color }) {
+  return (
+    <span style={{
+      fontFamily: T.mono, fontSize: 10, letterSpacing: '0.06em', textTransform: 'uppercase',
+      color, background: color + '22', border: `1px solid ${color}55`, borderRadius: 4, padding: '3px 7px',
+      whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 5,
+    }}>{children}</span>
+  );
+}
+function LED({ color, pulse }) {
+  return <span style={{
+    width: 7, height: 7, borderRadius: '50%', background: color, boxShadow: `0 0 6px ${color}`,
+    display: 'inline-block', animation: pulse ? 'qgPulse 1.6s ease-in-out infinite' : 'none',
+  }} />;
+}
+function Rail({ status }) {
+  const idx = STAGES.indexOf(status);
+  return (
+    <div style={{ display: 'flex', gap: 3 }}>
+      {STAGES.map((s, i) => (
+        <span key={s} style={{
+          height: 4, flex: 1, borderRadius: 2,
+          background: i <= idx ? statusColor(status) : 'rgba(255,255,255,0.07)',
+          boxShadow: i <= idx ? `0 0 5px ${statusColor(status)}77` : 'none',
+        }} />
+      ))}
+    </div>
+  );
+}
+function Btn({ children, onClick, variant = 'ghost', style, type = 'button', disabled, full }) {
+  const base = {
+    fontFamily: T.body, fontWeight: 600, fontSize: 13, borderRadius: 8, padding: '10px 16px',
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: disabled ? 'not-allowed' : 'pointer',
+    transition: 'all .15s ease', border: '1px solid transparent', width: full ? '100%' : 'auto', opacity: disabled ? 0.5 : 1,
+  };
+  const variants = {
+    primary: { background: T.amber, color: '#1A1305', border: `1px solid ${T.amber}` },
+    outline: { background: 'transparent', color: T.amber, border: `1px solid ${T.borderStrong}` },
+    ghost: { background: 'rgba(255,255,255,0.03)', color: T.text, border: `1px solid ${T.border}` },
+    danger: { background: 'transparent', color: T.red, border: `1px solid ${T.red}55` },
+  };
+  return (
+    <button type={type} disabled={disabled} onClick={onClick} style={{ ...base, ...variants[variant], ...style }}
+      onMouseEnter={(e) => { if (!disabled) e.currentTarget.style.filter = 'brightness(1.15)'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.filter = 'none'; }}>
+      {children}
+    </button>
+  );
+}
+function Field({ label, children }) {
+  return (
+    <label style={{ display: 'block', marginBottom: 14 }}>
+      <span style={{ display: 'block', fontFamily: T.mono, fontSize: 10.5, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.textMuted, marginBottom: 6 }}>{label}</span>
+      {children}
+    </label>
+  );
+}
+const inputStyle = {
+  width: '100%', background: '#0B1324', border: `1px solid ${T.border}`, borderRadius: 8, padding: '10px 12px',
+  color: T.text, fontFamily: T.body, fontSize: 14, outline: 'none', boxSizing: 'border-box',
+};
+function Input(props) { return <input {...props} style={{ ...inputStyle, ...(props.style || {}) }} onFocus={(e) => e.target.style.borderColor = T.borderStrong} onBlur={(e) => { e.target.style.borderColor = T.border; props.onBlur?.(e); }} />; }
+function Select(props) { return <select {...props} style={{ ...inputStyle, ...(props.style || {}) }}>{props.children}</select>; }
+function TextArea(props) { return <textarea {...props} style={{ ...inputStyle, resize: 'vertical', minHeight: 80, ...(props.style || {}) }} />; }
 
-    <!-- STATS STRIP -->
-    <section id="stats" class="bg-slate-950 py-12 relative overflow-hidden">
-        <div class="absolute inset-0 bg-tech-grid opacity-20 pointer-events-none"></div>
-        <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 relative z-10">
-            <div class="text-center md:text-left border-r border-white/5 last:border-0">
-                <h3 class="font-header text-4xl text-white mb-1 counter drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]" data-target="124">0</h3>
-                <p class="text-xs text-slate-500 uppercase tracking-widest">Active Audits</p>
-            </div>
-            <div class="text-center md:text-left border-r border-white/5 last:border-0">
-                <h3 class="font-header text-4xl text-gold-400 mb-1 drop-shadow-[0_0_10px_rgba(234,179,8,0.5)]">99.9%</h3>
-                <p class="text-xs text-slate-500 uppercase tracking-widest">Compliance Rate</p>
-            </div>
-            <div class="text-center md:text-left border-r border-white/5 last:border-0">
-                <h3 class="font-header text-4xl text-white mb-1">0</h3>
-                <p class="text-xs text-slate-500 uppercase tracking-widest">Critical Claims</p>
-            </div>
-            <div class="text-center md:text-left">
-                <h3 class="font-header text-4xl text-white mb-1">24/7</h3>
-                <p class="text-xs text-slate-500 uppercase tracking-widest">System Uptime</p>
-            </div>
+function StatCard({ label, value, sub, color }) {
+  return (
+    <Panel style={{ padding: '18px 20px' }}>
+      <CornerTicks />
+      <p style={{ fontFamily: T.mono, fontSize: 10.5, letterSpacing: '0.1em', textTransform: 'uppercase', color: T.textMuted, margin: '0 0 10px' }}>{label}</p>
+      <p style={{ fontFamily: T.display, fontSize: 32, fontWeight: 600, color: color || T.text, margin: 0, lineHeight: 1 }}>{value}</p>
+      {sub && <p style={{ fontSize: 12, color: T.textMuted, margin: '8px 0 0' }}>{sub}</p>}
+    </Panel>
+  );
+}
+
+function Avatar({ user, size = 40 }) {
+  if (user?.avatar) {
+    return <img src={user.avatar} alt={user.fullName} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', border: `1px solid ${T.border}` }} />;
+  }
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: '50%', background: T.panelAlt, border: `1px solid ${T.border}`,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.amber, fontFamily: T.display,
+      fontSize: size * 0.36, fontWeight: 600, flexShrink: 0,
+    }}>{initials(user?.fullName)}</div>
+  );
+}
+
+function Modal({ title, onClose, children, width = 520 }) {
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(4,7,15,0.72)', backdropFilter: 'blur(4px)', zIndex: 100,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
+    }} onClick={onClose}>
+      <div onClick={(e) => e.stopPropagation()} style={{
+        width: '100%', maxWidth: width, maxHeight: '88vh', overflowY: 'auto', background: T.panel,
+        border: `1px solid ${T.borderStrong}`, borderRadius: 16, padding: 24,
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+          <h3 style={{ fontFamily: T.display, fontSize: 19, color: T.text, margin: 0, textTransform: 'uppercase', letterSpacing: '0.03em' }}>{title}</h3>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: T.textMuted, cursor: 'pointer', padding: 4 }}><X size={18} /></button>
         </div>
-    </section>
+        {children}
+      </div>
+    </div>
+  );
+}
 
-    <!-- IMPROVED ATTACHMENT SLIDER SECTION -->
-    <section id="attachments" class="py-24 bg-slate-900 relative">
-        <!-- Background Decor -->
-        <div class="absolute inset-0 bg-tech-grid opacity-30 pointer-events-none"></div>
-        <div class="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
-        <div class="absolute bottom-0 left-0 w-96 h-96 bg-gold-500/5 rounded-full blur-3xl"></div>
+function EmptyState({ icon: Icon, title, sub, action }) {
+  return (
+    <Panel style={{ padding: '48px 24px', textAlign: 'center' }}>
+      <Icon size={28} color={T.textMuted} style={{ marginBottom: 12 }} />
+      <p style={{ fontFamily: T.display, fontSize: 17, color: T.text, margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>{title}</p>
+      <p style={{ fontSize: 13, color: T.textMuted, margin: '0 0 16px' }}>{sub}</p>
+      {action}
+    </Panel>
+  );
+}
 
-        <div class="max-w-7xl mx-auto px-6 mb-12 relative z-10">
-            <div class="flex flex-col md:flex-row justify-between items-end">
-                <div>
-                    <h2 class="font-header text-3xl md:text-4xl text-white mb-2">Technical <span class="text-gold-400">Documentation</span></h2>
-                    <div class="h-1 w-24 bg-gradient-to-r from-gold-500 to-transparent"></div>
-                </div>
-                <div class="flex gap-2 mt-4 md:mt-0">
-                    <span class="text-slate-400 text-xs uppercase tracking-wider border border-white/10 px-3 py-1 rounded-full bg-slate-800">
-                        <i class="fas fa-database mr-2 text-gold-400"></i> Archive: 2026
-                    </span>
-                    <span class="text-slate-400 text-xs uppercase tracking-wider border border-white/10 px-3 py-1 rounded-full bg-slate-800">
-                        <i class="fas fa-lock mr-2 text-green-400"></i> Secure
-                    </span>
-                </div>
-            </div>
+/* ============================== AUTH ============================== */
+function AuthScreen({ onLogin, onSignup, isFirstUser, error, busy }) {
+  const [mode, setMode] = useState('login');
+  const [showPw, setShowPw] = useState(false);
+  const [form, setForm] = useState({ username: '', password: '', fullName: '', email: '', phone: '', department: DEPARTMENTS[0] });
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (mode === 'login') onLogin(form.username, form.password);
+    else onSignup(form);
+  };
+
+  return (
+    <div style={{
+      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: `radial-gradient(ellipse 900px 600px at 50% -10%, #16213A 0%, ${T.bg} 60%)`, padding: 20,
+    }}>
+      <div style={{ width: '100%', maxWidth: 420 }}>
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <div style={{
+            width: 52, height: 52, margin: '0 auto 14px', borderRadius: 12, background: T.panelAlt,
+            border: `1px solid ${T.borderStrong}`, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}><ShieldCheck size={24} color={T.amber} /></div>
+          <h1 style={{ fontFamily: T.display, fontSize: 26, color: T.text, margin: 0, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            Quality<span style={{ color: T.amber }}>Group</span>
+          </h1>
+          <p style={{ fontFamily: T.mono, fontSize: 11, letterSpacing: '0.12em', color: T.textMuted, textTransform: 'uppercase', marginTop: 6 }}>
+            Operations &amp; Assurance Console
+          </p>
         </div>
 
-        <div class="max-w-7xl mx-auto px-6 relative z-10">
-            <div class="attachment-slider" dir="ltr">
-                
-                <!-- Card 1: Flowchart -->
-                <div class="h-full px-2">
-                    <div class="tech-card rounded-xl h-[380px] flex flex-col justify-between p-8 group cursor-pointer">
-                        <div class="corner c-tl"></div><div class="corner c-tr"></div><div class="corner c-bl"></div><div class="corner c-br"></div>
-                        
-                        <div class="flex justify-between items-start">
-                            <div class="tech-icon-container w-14 h-14 rounded-lg bg-slate-800 border border-white/10 flex items-center justify-center text-gold-400 text-2xl shadow-lg group-hover:bg-gold-500 group-hover:text-slate-900 transition-colors">
-                                <i class="fas fa-project-diagram"></i>
-                            </div>
-                            <span class="text-[10px] font-bold bg-gold-500/10 text-gold-400 border border-gold-500/20 px-2 py-1 rounded uppercase tracking-wider">REV.2 Updated</span>
-                        </div>
+        <Panel style={{ padding: 26 }}>
+          <CornerTicks />
+          <div style={{ display: 'flex', gap: 4, background: '#0B1324', borderRadius: 9, padding: 4, marginBottom: 20 }}>
+            {['login', 'signup'].map((m) => (
+              <button key={m} onClick={() => setMode(m)} style={{
+                flex: 1, padding: '9px 0', borderRadius: 6, border: 'none', cursor: 'pointer',
+                fontFamily: T.mono, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase',
+                background: mode === m ? T.amber : 'transparent', color: mode === m ? '#1A1305' : T.textMuted, fontWeight: 700,
+              }}>{m === 'login' ? 'Sign in' : 'Register'}</button>
+            ))}
+          </div>
 
-                        <div class="mt-6">
-                            <h4 class="font-header text-2xl text-white uppercase tracking-wide group-hover:text-gold-400 transition-colors">MS Bag Workflow</h4>
-                            <p class="text-slate-400 text-xs mt-3 leading-relaxed border-l-2 border-white/10 pl-3">
-                                Official process flowchart detailing all critical control points.
-                                <br><span class="text-slate-500 italic mt-1 block">Auth: Process Eng.</span>
-                            </p>
-                        </div>
-
-                        <div class="relative mt-4">
-                            <!-- Progress Bar Visual -->
-                            <div class="w-full h-1 bg-slate-700 rounded overflow-hidden mb-4">
-                                <div class="h-full bg-gold-500 w-full animate-pulse-slow"></div>
-                            </div>
-                            <!-- Button -->
-                            <a href="#" class="action-btn flex items-center justify-center w-full bg-slate-800 hover:bg-gold-500 border border-white/10 hover:border-gold-500 text-slate-300 hover:text-slate-900 font-bold text-xs uppercase py-3 rounded transition-all tracking-widest">
-                                Download PDF <i class="fas fa-download ml-2"></i>
-                            </a>
-                        </div>
-                    </div>
+          <form onSubmit={submit}>
+            {mode === 'signup' && (
+              <>
+                <Field label="Full name">
+                  <Input required value={form.fullName} onChange={set('fullName')} placeholder="Juan Dela Cruz" />
+                </Field>
+                <Field label="Department">
+                  <Select value={form.department} onChange={set('department')}>
+                    {DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}
+                  </Select>
+                </Field>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <Field label="Email">
+                    <Input type="email" value={form.email} onChange={set('email')} placeholder="you@qualitygroup.com" />
+                  </Field>
+                  <Field label="Phone">
+                    <Input value={form.phone} onChange={set('phone')} placeholder="09xx xxx xxxx" />
+                  </Field>
                 </div>
+              </>
+            )}
+            <Field label="Username">
+              <Input required value={form.username} onChange={set('username')} placeholder="j.delacruz" autoCapitalize="none" />
+            </Field>
+            <Field label="Password">
+              <div style={{ position: 'relative' }}>
+                <Input required type={showPw ? 'text' : 'password'} value={form.password} onChange={set('password')} placeholder="••••••••" style={{ paddingRight: 40 }} />
+                <button type="button" onClick={() => setShowPw((s) => !s)} style={{ position: 'absolute', right: 10, top: 9, background: 'none', border: 'none', color: T.textMuted, cursor: 'pointer' }}>
+                  {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </Field>
 
-                <!-- Card 2: Checklist -->
-                <div class="h-full px-2">
-                    <div class="tech-card rounded-xl h-[380px] flex flex-col justify-between p-8 group cursor-pointer">
-                        <div class="corner c-tl"></div><div class="corner c-tr"></div><div class="corner c-bl"></div><div class="corner c-br"></div>
-                        
-                        <div class="flex justify-between items-start">
-                            <div class="tech-icon-container w-14 h-14 rounded-lg bg-slate-800 border border-white/10 flex items-center justify-center text-blue-400 text-2xl shadow-lg group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                                <i class="fas fa-clipboard-list"></i>
-                            </div>
-                            <span class="text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-1 rounded uppercase tracking-wider">FORM 02-A</span>
-                        </div>
+            {mode === 'signup' && isFirstUser && (
+              <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', background: T.amberDim, border: `1px solid ${T.borderStrong}`, borderRadius: 8, padding: '10px 12px', marginBottom: 14 }}>
+                <Crown size={15} color={T.amber} style={{ marginTop: 1, flexShrink: 0 }} />
+                <p style={{ fontSize: 11.5, color: T.amberBright, margin: 0, lineHeight: 1.5 }}>First account on this console — you'll be registered as Administrator.</p>
+              </div>
+            )}
 
-                        <div class="mt-6">
-                            <h4 class="font-header text-2xl text-white uppercase tracking-wide group-hover:text-blue-400 transition-colors">Daily K.Y</h4>
-                            <p class="text-slate-400 text-xs mt-3 leading-relaxed border-l-2 border-white/10 pl-3">
-                                Daily reporting of K.Y, 100% target 
-                                <br><span class="text-slate-500 italic mt-1 block">Freq: Daily/Shift</span>
-                            </p>
-                        </div>
+            {error && (
+              <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', background: T.redDim, border: `1px solid ${T.red}55`, borderRadius: 8, padding: '10px 12px', marginBottom: 14 }}>
+                <AlertTriangle size={15} color={T.red} style={{ marginTop: 1, flexShrink: 0 }} />
+                <p style={{ fontSize: 12, color: T.red, margin: 0 }}>{error}</p>
+              </div>
+            )}
 
-                        <div class="relative mt-4">
-                            <div class="w-full h-1 bg-slate-700 rounded overflow-hidden mb-4">
-                                <div class="h-full bg-blue-500 w-3/4"></div>
-                            </div>
-                            <a href="html/Dailyky.html" class="action-btn flex items-center justify-center w-full bg-slate-800 hover:bg-blue-500 border border-white/10 hover:border-blue-500 text-slate-300 hover:text-white font-bold text-xs uppercase py-3 rounded transition-all tracking-widest">
-                                visit daily k.y report <i class="fas fa-eye ml-2"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
+            <Btn type="submit" variant="primary" full disabled={busy}>
+              {busy ? <Loader2 size={15} className="qgspin" /> : (mode === 'login' ? <><Lock size={14} /> Sign in</> : <><ArrowRight size={14} /> Create account</>)}
+            </Btn>
+          </form>
+        </Panel>
+        <p style={{ textAlign: 'center', fontSize: 11, color: T.textFaint, marginTop: 16, lineHeight: 1.6 }}>
+          Prototype credentials store in shared artifact storage — visible to everyone using this app. Do not use a real password.
+        </p>
+      </div>
+    </div>
+  );
+}
 
-                <!-- Card 3: ISO Cert -->
-                <div class="h-full px-2">
-                    <div class="tech-card rounded-xl h-[380px] flex flex-col justify-between p-8 group cursor-pointer">
-                        <div class="corner c-tl"></div><div class="corner c-tr"></div><div class="corner c-bl"></div><div class="corner c-br"></div>
-                        
-                        <div class="flex justify-between items-start">
-                            <div class="tech-icon-container w-14 h-14 rounded-lg bg-slate-800 border border-white/10 flex items-center justify-center text-red-400 text-2xl shadow-lg group-hover:bg-red-500 group-hover:text-white transition-colors">
-                                <i class="fas fa-certificate"></i>
-                            </div>
-                            <span class="text-[10px] font-bold bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-1 rounded uppercase tracking-wider">Active</span>
-                        </div>
+/* ============================== SIDEBAR / SHELL ============================== */
+const NAV_MAIN = [
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'schedule', label: 'Schedule', icon: CalendarDays },
+  { id: 'activities', label: 'Activities', icon: ListChecks },
+  { id: 'profile', label: 'Profile', icon: UserCircle2 },
+];
+const NAV_ADMIN = [
+  { id: 'admin-overview', label: 'Org Overview', icon: TrendingUp },
+  { id: 'admin-users', label: 'Manage Users', icon: Users },
+  { id: 'admin-activities', label: 'All Activities', icon: Building2 },
+];
 
-                        <div class="mt-6">
-                            <h4 class="font-header text-2xl text-white uppercase tracking-wide group-hover:text-red-400 transition-colors">ISO 9001:2015</h4>
-                            <p class="text-slate-400 text-xs mt-3 leading-relaxed border-l-2 border-white/10 pl-3">
-                                Quality Management System Certification. Global compliance standard.
-                                <br><span class="text-slate-500 italic mt-1 block">Valid: 2028</span>
-                            </p>
-                        </div>
+function NavItem({ item, active, onClick }) {
+  const Icon = item.icon;
+  return (
+    <button onClick={onClick} style={{
+      display: 'flex', alignItems: 'center', gap: 11, width: '100%', textAlign: 'left',
+      padding: '10px 12px', borderRadius: 9, border: 'none', cursor: 'pointer', marginBottom: 3,
+      background: active ? T.amberDim : 'transparent', color: active ? T.amberBright : T.textMuted,
+      fontFamily: T.body, fontSize: 13.5, fontWeight: active ? 600 : 500, position: 'relative',
+      borderLeft: active ? `2px solid ${T.amber}` : '2px solid transparent',
+    }}>
+      <Icon size={16} strokeWidth={2} /> {item.label}
+    </button>
+  );
+}
 
-                        <div class="relative mt-4">
-                             <!-- ISO Seal Decoration -->
-                            <i class="fas fa-seal text-slate-700 text-6xl absolute -bottom-2 -right-2 opacity-20 group-hover:text-gold-500 group-hover:opacity-40 transition-all duration-500"></i>
-                            
-                            <div class="w-full h-1 bg-slate-700 rounded overflow-hidden mb-4">
-                                <div class="h-full bg-red-500 w-full"></div>
-                            </div>
-                            <a href="html/ISO.html" class="action-btn flex items-center justify-center w-full bg-slate-800 hover:bg-red-500 border border-white/10 hover:border-red-500 text-slate-300 hover:text-white font-bold text-xs uppercase py-3 rounded transition-all tracking-widest">
-                                Verify Cert <i class="fas fa-check-circle ml-2"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 4: Yield Report -->
-                <div class="h-full px-2">
-                    <div class="tech-card rounded-xl h-[380px] flex flex-col justify-between p-8 group cursor-pointer">
-                        <div class="corner c-tl"></div><div class="corner c-tr"></div><div class="corner c-bl"></div><div class="corner c-br"></div>
-                        
-                        <div class="flex justify-between items-start">
-                            <div class="tech-icon-container w-14 h-14 rounded-lg bg-slate-800 border border-white/10 flex items-center justify-center text-purple-400 text-2xl shadow-lg group-hover:bg-purple-500 group-hover:text-white transition-colors">
-                                <i class="fas fa-chart-pie"></i>
-                            </div>
-                            <span class="text-[10px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-1 rounded uppercase tracking-wider">DATA</span>
-                        </div>
-
-                        <div class="mt-6">
-                            <h4 class="font-header text-2xl text-white uppercase tracking-wide group-hover:text-purple-400 transition-colors">Yield Report</h4>
-                            <p class="text-slate-400 text-xs mt-3 leading-relaxed border-l-2 border-white/10 pl-3">
-                                Monthly Production & Quality Analysis. Includes defect rate pareto.
-                                <br><span class="text-slate-500 italic mt-1 block">Month: Jan 2026</span>
-                            </p>
-                        </div>
-
-                        <div class="relative mt-4">
-                            <div class="w-full h-1 bg-slate-700 rounded overflow-hidden mb-4">
-                                <div class="h-full bg-purple-500 w-1/2"></div>
-                            </div>
-                            <a href="#" class="action-btn flex items-center justify-center w-full bg-slate-800 hover:bg-purple-500 border border-white/10 hover:border-purple-500 text-slate-300 hover:text-white font-bold text-xs uppercase py-3 rounded transition-all tracking-widest">
-                                Analyze <i class="fas fa-chart-bar ml-2"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 5: Safety -->
-                <div class="h-full px-2">
-                    <div class="tech-card rounded-xl h-[380px] flex flex-col justify-between p-8 group cursor-pointer">
-                        <div class="corner c-tl"></div><div class="corner c-tr"></div><div class="corner c-bl"></div><div class="corner c-br"></div>
-                        
-                        <div class="flex justify-between items-start">
-                            <div class="tech-icon-container w-14 h-14 rounded-lg bg-slate-800 border border-white/10 flex items-center justify-center text-orange-400 text-2xl shadow-lg group-hover:bg-orange-500 group-hover:text-white transition-colors">
-                                <i class="fas fa-hard-hat"></i>
-                            </div>
-                            <span class="text-[10px] font-bold bg-orange-500/10 text-orange-400 border border-orange-500/20 px-2 py-1 rounded uppercase tracking-wider">HSE</span>
-                        </div>
-
-                        <div class="mt-6">
-                            <h4 class="font-header text-2xl text-white uppercase tracking-wide group-hover:text-orange-400 transition-colors">Safety Protocol</h4>
-                            <p class="text-slate-400 text-xs mt-3 leading-relaxed border-l-2 border-white/10 pl-3">
-                                Warehouse & Pier Operations Safety Guidelines. Mandatory Read.
-                                <br><span class="text-slate-500 italic mt-1 block">Priority: High</span>
-                            </p>
-                        </div>
-
-                        <div class="relative mt-4">
-                            <div class="w-full h-1 bg-slate-700 rounded overflow-hidden mb-4">
-                                <div class="h-full bg-orange-500 w-full animate-pulse"></div>
-                            </div>
-                            <a href="html/safetyprotocol.html" class="action-btn flex items-center justify-center w-full bg-slate-800 hover:bg-orange-500 border border-white/10 hover:border-orange-500 text-slate-300 hover:text-white font-bold text-xs uppercase py-3 rounded transition-all tracking-widest">
-                                Read Protocol <i class="fas fa-book ml-2"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
+function Sidebar({ view, setView, role, user, onLogout, mobileOpen, setMobileOpen }) {
+  const content = (
+    <>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 8px 22px' }}>
+        <div style={{ width: 34, height: 34, borderRadius: 8, background: T.panelAlt, border: `1px solid ${T.borderStrong}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <ShieldCheck size={17} color={T.amber} />
         </div>
-    </section>
-
-    <!-- CAPABILITIES GRID -->
-    <section id="capabilities" class="py-24 bg-slate-950 relative overflow-hidden border-t border-white/5">
-        <div class="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-slate-800/20 to-transparent pointer-events-none"></div>
-
-        <div class="max-w-7xl mx-auto px-6 relative z-10">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-16 fade-in-section">
-                <div>
-                    <h2 class="font-header text-4xl md:text-5xl text-white mb-2">9-Stage Quality Checking <span class="text-gold-400">Rev.2</span></h2>
-                    <div class="h-1 w-20 bg-gold-500"></div>
-                </div>
-                <p class="text-slate-400 text-sm max-w-md mt-4 md:mt-0 text-right">
-                    Rigorous checkpoint system ensuring product integrity from bagging station to vessel loading.
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Stage 1 -->
-                <div class="glass-card p-6 rounded-xl fade-in-section group relative">
-                    <div class="absolute top-4 right-4 text-slate-700 group-hover:text-gold-500/20 transition-colors font-header text-5xl font-bold">01</div>
-                    <div class="w-10 h-10 bg-slate-800 border border-white/10 rounded-lg flex items-center justify-center text-gold-400 text-lg mb-4 group-hover:bg-gold-500 group-hover:text-slate-900 transition-colors">
-                        <i class="fas fa-box-open"></i>
-                    </div>
-                    <h3 class="font-header text-xl text-white mb-2 group-hover:text-gold-400 transition-colors">MS Bagger Checking</h3>
-                    <p class="text-slate-400 text-xs leading-relaxed">Initial verification by MS Bagger or QAS. Immediate error rectification protocol.</p>
-                </div>
-
-                <!-- Stage 2 -->
-                <div class="glass-card p-6 rounded-xl fade-in-section group relative" style="transition-delay: 100ms;">
-                    <div class="absolute top-4 right-4 text-slate-700 group-hover:text-gold-500/20 transition-colors font-header text-5xl font-bold">02</div>
-                    <div class="w-10 h-10 bg-slate-800 border border-white/10 rounded-lg flex items-center justify-center text-gold-400 text-lg mb-4 group-hover:bg-gold-500 group-hover:text-slate-900 transition-colors">
-                        <i class="fas fa-tasks"></i>
-                    </div>
-                    <h3 class="font-header text-xl text-white mb-2 group-hover:text-gold-400 transition-colors">CTS Quality Checker</h3>
-                    <p class="text-slate-400 text-xs leading-relaxed">Secondary verification ensuring packaging standards before warehouse entry.</p>
-                </div>
-
-                <!-- Stage 3 -->
-                <div class="glass-card p-6 rounded-xl fade-in-section group relative" style="transition-delay: 200ms;">
-                    <div class="absolute top-4 right-4 text-slate-700 group-hover:text-gold-500/20 transition-colors font-header text-5xl font-bold">03</div>
-                    <div class="w-10 h-10 bg-slate-800 border border-white/10 rounded-lg flex items-center justify-center text-gold-400 text-lg mb-4 group-hover:bg-gold-500 group-hover:text-slate-900 transition-colors">
-                        <i class="fas fa-warehouse"></i>
-                    </div>
-                    <h3 class="font-header text-xl text-white mb-2 group-hover:text-gold-400 transition-colors">Warehouse Checking</h3>
-                    <p class="text-slate-400 text-xs leading-relaxed">Verification by TPSI, RDP, and Logistics. Photographic evidence required.</p>
-                </div>
-
-                <!-- Stage 4 -->
-                <div class="glass-card p-6 rounded-xl fade-in-section group relative">
-                    <div class="absolute top-4 right-4 text-slate-700 group-hover:text-gold-500/20 transition-colors font-header text-5xl font-bold">04</div>
-                    <div class="w-10 h-10 bg-slate-800 border border-white/10 rounded-lg flex items-center justify-center text-gold-400 text-lg mb-4 group-hover:bg-gold-500 group-hover:text-slate-900 transition-colors">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <h3 class="font-header text-xl text-white mb-2 group-hover:text-gold-400 transition-colors">End of Shift Check</h3>
-                    <p class="text-slate-400 text-xs leading-relaxed">H2S Supervisor & Logistics personnel review. QAS rectification loop.</p>
-                </div>
-
-                <!-- Stage 5 -->
-                <div class="glass-card p-6 rounded-xl fade-in-section group relative" style="transition-delay: 100ms;">
-                    <div class="absolute top-4 right-4 text-slate-700 group-hover:text-gold-500/20 transition-colors font-header text-5xl font-bold">05</div>
-                    <div class="w-10 h-10 bg-slate-800 border border-white/10 rounded-lg flex items-center justify-center text-gold-400 text-lg mb-4 group-hover:bg-gold-500 group-hover:text-slate-900 transition-colors">
-                        <i class="fas fa-calendar-day"></i>
-                    </div>
-                    <h3 class="font-header text-xl text-white mb-2 group-hover:text-gold-400 transition-colors">End of Day Check</h3>
-                    <p class="text-slate-400 text-xs leading-relaxed">Comprehensive MS Bagging Checklist review by H2S, QAS, and Logistics.</p>
-                </div>
-
-                <!-- Stage 6 -->
-                <div class="glass-card p-6 rounded-xl fade-in-section group relative" style="transition-delay: 200ms;">
-                    <div class="absolute top-4 right-4 text-slate-700 group-hover:text-gold-500/20 transition-colors font-header text-5xl font-bold">06</div>
-                    <div class="w-10 h-10 bg-slate-800 border border-white/10 rounded-lg flex items-center justify-center text-gold-400 text-lg mb-4 group-hover:bg-gold-500 group-hover:text-slate-900 transition-colors">
-                        <i class="fas fa-clipboard-check"></i>
-                    </div>
-                    <h3 class="font-header text-xl text-white mb-2 group-hover:text-gold-400 transition-colors">Logistics Daily Check</h3>
-                    <p class="text-slate-400 text-xs leading-relaxed">Storage area transfer verification following product analysis.</p>
-                </div>
-
-                <!-- Stage 7 -->
-                <div class="glass-card p-6 rounded-xl fade-in-section group relative">
-                    <div class="absolute top-4 right-4 text-slate-700 group-hover:text-gold-500/20 transition-colors font-header text-5xl font-bold">07</div>
-                    <div class="w-10 h-10 bg-slate-800 border border-white/10 rounded-lg flex items-center justify-center text-gold-400 text-lg mb-4 group-hover:bg-gold-500 group-hover:text-slate-900 transition-colors">
-                        <i class="fas fa-user-tie"></i>
-                    </div>
-                    <h3 class="font-header text-xl text-white mb-2 group-hover:text-gold-400 transition-colors">Managerial Review</h3>
-                    <p class="text-slate-400 text-xs leading-relaxed">High-level oversight by PLD Manager, Logistics Section Manager & MS Foreman.</p>
-                </div>
-
-                <!-- Stage 8 -->
-                <div class="glass-card p-6 rounded-xl fade-in-section group relative" style="transition-delay: 100ms;">
-                    <div class="absolute top-4 right-4 text-slate-700 group-hover:text-gold-500/20 transition-colors font-header text-5xl font-bold">08</div>
-                    <div class="w-10 h-10 bg-slate-800 border border-white/10 rounded-lg flex items-center justify-center text-gold-400 text-lg mb-4 group-hover:bg-gold-500 group-hover:text-slate-900 transition-colors">
-                        <i class="fas fa-truck-loading"></i>
-                    </div>
-                    <h3 class="font-header text-xl text-white mb-2 group-hover:text-gold-400 transition-colors">Warehouse to Pier</h3>
-                    <p class="text-slate-400 text-xs leading-relaxed">Pre-transport verification by THPAL Logistics Assistant. Error loop active.</p>
-                </div>
-
-                <!-- Stage 9 -->
-                <div class="glass-card p-6 rounded-xl fade-in-section group relative" style="transition-delay: 200ms;">
-                    <div class="absolute top-4 right-4 text-slate-700 group-hover:text-gold-500/20 transition-colors font-header text-5xl font-bold">09</div>
-                    <div class="w-10 h-10 bg-slate-800 border border-white/10 rounded-lg flex items-center justify-center text-gold-400 text-lg mb-4 group-hover:bg-gold-500 group-hover:text-slate-900 transition-colors">
-                        <i class="fas fa-ship"></i>
-                    </div>
-                    <h3 class="font-header text-xl text-white mb-2 group-hover:text-gold-400 transition-colors">Ship Loading</h3>
-                    <p class="text-slate-400 text-xs leading-relaxed">Final checkpoint before shipment release to NNR. Zero-defect mandatory.</p>
-                </div>
-            </div>
+        <div>
+          <p style={{ fontFamily: T.display, fontSize: 15, color: T.text, margin: 0, letterSpacing: '0.03em', textTransform: 'uppercase' }}>Quality<span style={{ color: T.amber }}>Group</span></p>
+          <p style={{ fontFamily: T.mono, fontSize: 9, color: T.textMuted, margin: 0, letterSpacing: '0.1em' }}>CONSOLE v2.6</p>
         </div>
-    </section>
+      </div>
 
-    <!-- TEAM GROUP SECTION (DYNAMIC SUPABASE) -->
-    <section id="team" class="py-24 bg-slate-900 relative border-t border-white/5">
-        <div class="absolute inset-0 bg-tech-grid opacity-20 pointer-events-none"></div>
+      <p style={{ fontFamily: T.mono, fontSize: 10, letterSpacing: '0.12em', color: T.textFaint, textTransform: 'uppercase', margin: '0 0 8px 12px' }}>Workspace</p>
+      {NAV_MAIN.map((item) => <NavItem key={item.id} item={item} active={view === item.id} onClick={() => { setView(item.id); setMobileOpen(false); }} />)}
 
-        <div class="max-w-7xl mx-auto px-6 relative z-10">
-            
-            <!-- Header -->
-            <div class="text-center mb-12">
-                <p class="text-gold-400 font-bold tracking-[0.2em] text-xs uppercase mb-3">Workforce Structure</p>
-                <h2 class="font-header text-4xl md:text-5xl text-white mb-6">Operational <span class="text-gold-400">Team</span></h2>
-                
-                <!-- Filter Tabs -->
-                <div class="flex flex-wrap justify-center gap-3 mt-8">
-                    <button class="filter-btn active px-6 py-2 rounded-full border border-white/10 text-slate-300 text-xs font-bold uppercase tracking-wider transition-all hover:border-gold-500 hover:text-gold-400" data-filter="all">All Groups</button>
-                    <button class="filter-btn px-6 py-2 rounded-full border border-white/10 text-slate-300 text-xs font-bold uppercase tracking-wider transition-all hover:border-gold-500 hover:text-gold-400" data-filter="ms-design">MS-Design</button>
-                    <button class="filter-btn px-6 py-2 rounded-full border border-white/10 text-slate-300 text-xs font-bold uppercase tracking-wider transition-all hover:border-gold-500 hover:text-gold-400" data-filter="fntrl">FNTRL</button>
-                    <button class="filter-btn px-6 py-2 rounded-full border border-white/10 text-slate-300 text-xs font-bold uppercase tracking-wider transition-all hover:border-gold-500 hover:text-gold-400" data-filter="h2s">H2S</button>
-                    <button class="filter-btn px-6 py-2 rounded-full border border-white/10 text-slate-300 text-xs font-bold uppercase tracking-wider transition-all hover:border-gold-500 hover:text-gold-400" data-filter="limestone">Limestone</button>
-                    <button class="filter-btn px-6 py-2 rounded-full border border-white/10 text-slate-300 text-xs font-bold uppercase tracking-wider transition-all hover:border-gold-500 hover:text-gold-400" data-filter="dcs">DCS Control</button>
-                </div>
-            </div>
+      {role === 'admin' && (
+        <>
+          <p style={{ fontFamily: T.mono, fontSize: 10, letterSpacing: '0.12em', color: T.textFaint, textTransform: 'uppercase', margin: '20px 0 8px 12px' }}>Administration</p>
+          {NAV_ADMIN.map((item) => <NavItem key={item.id} item={item} active={view === item.id} onClick={() => { setView(item.id); setMobileOpen(false); }} />)}
+        </>
+      )}
 
-            <!-- Team Grid (Dynamic Content) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="team-grid">
-                <!-- Loader -->
-                <div class="col-span-full text-center py-10">
-                    <i class="fas fa-circle-notch fa-spin text-3xl text-gold-500"></i>
-                    <p class="text-slate-400 mt-2 text-sm uppercase tracking-widest">Loading Personnel...</p>
-                </div>
-            </div>
-            
-            <div class="text-center mt-12">
-                 <a href="register.html" class="inline-block px-8 py-3 border border-gold-500/30 bg-gold-500/10 hover:bg-gold-500 hover:text-slate-900 text-gold-400 font-bold text-sm uppercase tracking-wider rounded transition-all">
-                    <i class="fas fa-user-plus mr-2"></i> Register New Member
-                </a>
-            </div>
+      <div style={{ flex: 1 }} />
+
+      <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 14, marginTop: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
+        <Avatar user={user} size={36} />
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <p style={{ fontSize: 13, color: T.text, margin: 0, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.fullName}</p>
+          <p style={{ fontSize: 10.5, color: T.textMuted, margin: 0, fontFamily: T.mono, textTransform: 'uppercase' }}>{role === 'admin' ? 'Administrator' : user.department}</p>
         </div>
-    </section>
-    
-    
-    
-    <!-- FOOTER -->
-    <footer class="bg-slate-950 border-t border-white/5 pt-16 pb-8">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="flex flex-col md:flex-row justify-between items-start mb-12">
-                <div class="mb-8 md:mb-0">
-                    <h2 class="font-header text-2xl text-white mb-4">QUALITY<span class="text-gold-400">GROUP</span></h2>
-                    <p class="text-slate-500 text-sm max-w-xs">
-                        Defining the standard for infrastructure quality management through technology and discipline.
-                    </p>
-                </div>
-                <div class="flex gap-12">
-                    <div>
-                        <h4 class="text-white font-bold uppercase text-xs tracking-widest mb-4">Portal</h4>
-                        <ul class="space-y-2 text-sm text-slate-400">
-                            <!-- UPDATED: Link to Login Page -->
-                            <li><a href="login.html" class="hover:text-gold-400 transition-colors">Dashboard</a></li>
-                            <li><a href="#" class="hover:text-gold-400 transition-colors">System Status</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="text-white font-bold uppercase text-xs tracking-widest mb-4">Support</h4>
-                        <ul class="space-y-2 text-sm text-slate-400">
-                            <li><a href="#" class="hover:text-gold-400 transition-colors">Help Center</a></li>
-                            <li><a href="#" class="hover:text-gold-400 transition-colors">Contact IT</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-600">
-                <p>&copy; 2026 QualityGroup Management.</p>
-                <div class="flex gap-4 mt-4 md:mt-0">
-                    <a href="#" class="hover:text-white"><i class="fab fa-linkedin"></i></a>
-                    <a href="#" class="hover:text-white"><i class="fab fa-twitter"></i></a>
-                </div>
-            </div>
+        <button onClick={onLogout} title="Log out" style={{ background: 'none', border: 'none', color: T.textMuted, cursor: 'pointer', padding: 6 }}>
+          <LogOut size={16} />
+        </button>
+      </div>
+    </>
+  );
+
+  return (
+    <>
+      <aside className="qg-sidebar-desktop" style={{
+        width: 240, flexShrink: 0, background: T.bg2, borderRight: `1px solid ${T.border}`,
+        padding: '18px 14px', display: 'flex', flexDirection: 'column', position: 'sticky', top: 0, height: '100vh',
+      }}>{content}</aside>
+
+      {mobileOpen && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 90, display: 'flex' }} className="qg-sidebar-mobile">
+          <div style={{ width: 260, background: T.bg2, borderRight: `1px solid ${T.border}`, padding: '18px 14px', display: 'flex', flexDirection: 'column', height: '100vh' }}>{content}</div>
+          <div style={{ flex: 1, background: 'rgba(4,7,15,0.7)' }} onClick={() => setMobileOpen(false)} />
         </div>
-    </footer>
+      )}
+    </>
+  );
+}
 
-    <!-- JQUERY & SLICK -->
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+function Topbar({ title, sub, onMenu }) {
+  const [clock, setClock] = useState(new Date());
+  useEffect(() => { const t = setInterval(() => setClock(new Date()), 1000 * 30); return () => clearInterval(t); }, []);
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 26, gap: 12, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <button className="qg-menu-btn" onClick={onMenu} style={{ display: 'none', background: T.panel, border: `1px solid ${T.border}`, borderRadius: 8, padding: 8, color: T.text, cursor: 'pointer' }}>
+          <Menu size={17} />
+        </button>
+        <div>
+          <h1 style={{ fontFamily: T.display, fontSize: 25, color: T.text, margin: 0, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{title}</h1>
+          {sub && <p style={{ fontSize: 12.5, color: T.textMuted, margin: '4px 0 0' }}>{sub}</p>}
+        </div>
+      </div>
+      <Tag color={T.green}><LED color={T.green} pulse /> System online · {clock.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</Tag>
+    </div>
+  );
+}
 
-    <!-- MAIN SCRIPTS -->
-    <script>
-        $(document).ready(function(){
-            // Initialize Slick Slider
-            $('.attachment-slider').slick({
-                dots: true,
-                infinite: true,
-                speed: 600,
-                slidesToShow: 3,
-                slidesToScroll: 1,
-                autoplay: true,
-                autoplaySpeed: 4000,
-                arrows: false,
-                centerMode: false,
-                cssEase: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                responsive: [
-                    {
-                        breakpoint: 1024,
-                        settings: {
-                            slidesToShow: 2,
-                            slidesToScroll: 1
-                        }
-                    },
-                    {
-                        breakpoint: 640,
-                        settings: {
-                            slidesToShow: 1,
-                            slidesToScroll: 1,
-                            centerMode: true,
-                            centerPadding: '20px'
-                        }
-                    }
-                ]
-            });
+/* ============================== ACTIVITY CARD ============================== */
+function ActivityCard({ activity, onOpen, ownerLabel }) {
+  const overdue = activity.dueDate && activity.status !== 'Completed' && activity.dueDate < todayStr();
+  return (
+    <Panel style={{ padding: 18, cursor: 'pointer' }} onClick={() => onOpen(activity)}>
+      <CornerTicks />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, marginBottom: 10 }}>
+        <div style={{ minWidth: 0 }}>
+          <p style={{ fontFamily: T.mono, fontSize: 10, color: T.textFaint, margin: '0 0 4px', letterSpacing: '0.06em' }}>{activity.id}</p>
+          <h4 style={{ fontFamily: T.display, fontSize: 16, color: T.text, margin: 0, textTransform: 'uppercase', letterSpacing: '0.01em', lineHeight: 1.25 }}>{activity.title}</h4>
+        </div>
+        <LED color={statusColor(activity.status)} pulse={activity.status === 'In Progress'} />
+      </div>
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
+        <Tag color={T.blue}>{activity.category}</Tag>
+        <Tag color={priorityColor(activity.priority)}>{activity.priority}</Tag>
+        {overdue && <Tag color={T.red}><AlertTriangle size={10} /> Overdue</Tag>}
+      </div>
+      {ownerLabel && <p style={{ fontSize: 11.5, color: T.textMuted, margin: '0 0 10px' }}>Owner: <span style={{ color: T.text }}>{ownerLabel}</span></p>}
+      <Rail status={activity.status} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10 }}>
+        <span style={{ fontFamily: T.mono, fontSize: 10.5, color: statusColor(activity.status) }}>{activity.status}</span>
+        <span style={{ fontFamily: T.mono, fontSize: 10.5, color: T.textMuted }}>{activity.dueDate ? 'Due ' + fmtDate(activity.dueDate) : 'No due date'}</span>
+      </div>
+    </Panel>
+  );
+}
 
-            // Animated Counter
-            const counters = document.querySelectorAll('.counter');
-            counters.forEach(counter => {
-                const target = +counter.getAttribute('data-target');
-                let count = 0;
-                const inc = target / 100;
-                
-                const updateCount = () => {
-                    count += inc;
-                    if(count < target) {
-                        counter.innerText = Math.ceil(count);
-                        setTimeout(updateCount, 15);
-                    } else {
-                        counter.innerText = target;
-                    }
-                }
-                
-                // Trigger animation when in view
-                const observer = new IntersectionObserver((entries) => {
-                    if(entries[0].isIntersecting){
-                        updateCount();
-                        observer.disconnect();
-                    }
-                });
-                observer.observe(counter);
-            });
-        });
+/* ============================== ACTIVITY MODALS ============================== */
+function NewActivityModal({ onClose, onCreate, defaultDate }) {
+  const [f, setF] = useState({ title: '', category: CATEGORIES[0], priority: 'Medium', description: '', dueDate: defaultDate || '' });
+  const set = (k) => (e) => setF((s) => ({ ...s, [k]: e.target.value }));
+  return (
+    <Modal title="New activity entry" onClose={onClose}>
+      <form onSubmit={(e) => { e.preventDefault(); if (!f.title.trim()) return; onCreate(f); }}>
+        <Field label="Title"><Input required value={f.title} onChange={set('title')} placeholder="e.g. Bag seal integrity spot check" /></Field>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <Field label="Category">
+            <Select value={f.category} onChange={set('category')}>{CATEGORIES.map((c) => <option key={c}>{c}</option>)}</Select>
+          </Field>
+          <Field label="Priority">
+            <Select value={f.priority} onChange={set('priority')}>{PRIORITIES.map((p) => <option key={p}>{p}</option>)}</Select>
+          </Field>
+        </div>
+        <Field label="Due date"><Input type="date" value={f.dueDate} onChange={set('dueDate')} /></Field>
+        <Field label="Description"><TextArea value={f.description} onChange={set('description')} placeholder="Scope of the check, control points, references..." /></Field>
+        <div style={{ display: 'flex', gap: 10, marginTop: 6 }}>
+          <Btn variant="ghost" onClick={onClose} style={{ flex: 1 }}>Cancel</Btn>
+          <Btn type="submit" variant="primary" style={{ flex: 1 }}><Plus size={14} /> Create activity</Btn>
+        </div>
+      </form>
+    </Modal>
+  );
+}
 
-        // Native JS for Scroll Animations & Navbar
-        document.addEventListener('DOMContentLoaded', () => {
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.1
-            };
+function ActivityDetailModal({ activity, onClose, onAdvance, onDelete, canManage, ownerLabel }) {
+  if (!activity) return null;
+  const idx = STAGES.indexOf(activity.status);
+  const next = STAGES[idx + 1];
+  return (
+    <Modal title="Activity record" onClose={onClose} width={560}>
+      <p style={{ fontFamily: T.mono, fontSize: 11, color: T.textFaint, margin: '0 0 4px' }}>{activity.id}</p>
+      <h2 style={{ fontFamily: T.display, fontSize: 21, color: T.text, textTransform: 'uppercase', margin: '0 0 12px' }}>{activity.title}</h2>
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>
+        <Tag color={T.blue}>{activity.category}</Tag>
+        <Tag color={priorityColor(activity.priority)}>{activity.priority} priority</Tag>
+        <Tag color={statusColor(activity.status)}><LED color={statusColor(activity.status)} pulse={activity.status === 'In Progress'} /> {activity.status}</Tag>
+      </div>
+      <Rail status={activity.status} />
 
-            const observer = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, observerOptions);
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, margin: '18px 0' }}>
+        <div><p style={{ fontFamily: T.mono, fontSize: 10, color: T.textMuted, textTransform: 'uppercase', margin: '0 0 4px' }}>Owner</p><p style={{ fontSize: 13.5, color: T.text, margin: 0 }}>{ownerLabel}</p></div>
+        <div><p style={{ fontFamily: T.mono, fontSize: 10, color: T.textMuted, textTransform: 'uppercase', margin: '0 0 4px' }}>Due date</p><p style={{ fontSize: 13.5, color: T.text, margin: 0 }}>{activity.dueDate ? fmtDate(activity.dueDate) : 'Not scheduled'}</p></div>
+        <div><p style={{ fontFamily: T.mono, fontSize: 10, color: T.textMuted, textTransform: 'uppercase', margin: '0 0 4px' }}>Created</p><p style={{ fontSize: 13.5, color: T.text, margin: 0 }}>{fmtDateTime(activity.createdAt)}</p></div>
+        <div><p style={{ fontFamily: T.mono, fontSize: 10, color: T.textMuted, textTransform: 'uppercase', margin: '0 0 4px' }}>Last updated</p><p style={{ fontSize: 13.5, color: T.text, margin: 0 }}>{fmtDateTime(activity.updatedAt)}</p></div>
+      </div>
 
-            document.querySelectorAll('.fade-in-section').forEach(section => {
-                observer.observe(section);
-            });
+      {activity.description && (
+        <div style={{ marginBottom: 18 }}>
+          <p style={{ fontFamily: T.mono, fontSize: 10, color: T.textMuted, textTransform: 'uppercase', margin: '0 0 6px' }}>Description</p>
+          <p style={{ fontSize: 13.5, color: T.text, lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap' }}>{activity.description}</p>
+        </div>
+      )}
 
-            const nav = document.getElementById('navbar');
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 50) {
-                    nav.classList.add('bg-slate-900/90', 'shadow-lg', 'border-b', 'border-gold-500/20');
-                    nav.classList.remove('glass');
-                } else {
-                    nav.classList.add('glass');
-                    nav.classList.remove('bg-slate-900/90', 'shadow-lg', 'border-b', 'border-gold-500/20');
-                }
-            });
-        });
-    </script>
-    <script src="js/imp.js"></script>
-    
-    <!-- 2. MAIN LOGIC SCRIPT -->
-    <script>
-        // --- SLIDER & COUNTER LOGIC ---
-        $(document).ready(function(){
-            // Initialize Slick Slider
-            $('.attachment-slider').slick({
-                dots: true,
-                infinite: true,
-                speed: 600,
-                slidesToShow: 3,
-                slidesToScroll: 1,
-                autoplay: true,
-                autoplaySpeed: 4000,
-                arrows: false,
-                cssEase: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                responsive: [
-                    { breakpoint: 1024, settings: { slidesToShow: 2, slidesToScroll: 1 } },
-                    { breakpoint: 640, settings: { slidesToShow: 1, slidesToScroll: 1 } }
-                ]
-            });
+      <div style={{ marginBottom: 20 }}>
+        <p style={{ fontFamily: T.mono, fontSize: 10, color: T.textMuted, textTransform: 'uppercase', margin: '0 0 10px' }}>Processing timeline</p>
+        <div style={{ borderLeft: `2px solid ${T.border}`, paddingLeft: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {activity.history.map((h, i) => (
+            <div key={i} style={{ position: 'relative' }}>
+              <span style={{ position: 'absolute', left: -19, top: 3, width: 8, height: 8, borderRadius: '50%', background: statusColor(h.status) }} />
+              <p style={{ margin: 0, fontSize: 12.5, color: T.text, fontWeight: 600 }}>{h.status}</p>
+              <p style={{ margin: 0, fontSize: 11, color: T.textMuted, fontFamily: T.mono }}>{fmtDateTime(h.at)}</p>
+            </div>
+          ))}
+        </div>
+      </div>
 
-            // Animated Counter
-            const counters = document.querySelectorAll('.counter');
-            counters.forEach(counter => {
-                const target = +counter.getAttribute('data-target');
-                let count = 0;
-                const inc = target / 100;
-                const updateCount = () => {
-                    count += inc;
-                    if(count < target) {
-                        counter.innerText = Math.ceil(count);
-                        setTimeout(updateCount, 15);
-                    } else {
-                        counter.innerText = target;
-                    }
-                }
-                const observer = new IntersectionObserver((entries) => {
-                    if(entries[0].isIntersecting){ updateCount(); observer.disconnect(); }
-                });
-                observer.observe(counter);
-            });
-        });
+      <div style={{ display: 'flex', gap: 10 }}>
+        {canManage && next && (
+          <Btn variant="primary" style={{ flex: 1 }} onClick={() => onAdvance(activity.id)}>
+            <ArrowRight size={14} /> Advance to "{next}"
+          </Btn>
+        )}
+        {canManage && !next && (
+          <Btn variant="ghost" style={{ flex: 1 }} disabled><CheckCircle2 size={14} /> Completed</Btn>
+        )}
+        {canManage && (
+          <Btn variant="danger" onClick={() => { onDelete(activity.id); onClose(); }}><Trash2 size={14} /></Btn>
+        )}
+      </div>
+    </Modal>
+  );
+}
 
-        // --- SCROLL ANIMATIONS ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
-            const observer = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, observerOptions);
-            document.querySelectorAll('.fade-in-section').forEach(section => observer.observe(section));
+/* ============================== DASHBOARDS ============================== */
+function statusBreakdown(list) {
+  return STAGES.map((s) => ({ name: s, value: list.filter((a) => a.status === s).length, color: statusColor(s) }));
+}
+function categoryBreakdown(list) {
+  return CATEGORIES.map((c) => ({ name: c.length > 14 ? c.slice(0, 13) + '…' : c, value: list.filter((a) => a.category === c).length }))
+    .filter((c) => c.value > 0);
+}
+function completionTrend(list) {
+  const days = [...Array(14)].map((_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - (13 - i));
+    return d.toISOString().slice(0, 10);
+  });
+  return days.map((day) => ({
+    day: day.slice(5),
+    completed: list.filter((a) => a.status === 'Completed' && a.updatedAt && a.updatedAt.slice(0, 10) === day).length,
+  }));
+}
 
-            const nav = document.getElementById('navbar');
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 50) {
-                    nav.classList.add('bg-slate-950/90', 'shadow-lg', 'border-b', 'border-gold-500/20');
-                    nav.classList.remove('glass');
-                } else {
-                    nav.classList.add('glass');
-                    nav.classList.remove('bg-slate-950/90', 'shadow-lg', 'border-b', 'border-gold-500/20');
-                }
-            });
-        });
+const chartTooltip = { contentStyle: { background: T.panelAlt, border: `1px solid ${T.border}`, borderRadius: 8, fontSize: 12, color: T.text }, labelStyle: { color: T.textMuted } };
 
-        // --- DYNAMIC TEAM LOADING (SUPABASE) ---
-        document.addEventListener('DOMContentLoaded', async () => {
-            const teamGrid = document.getElementById('team-grid');
-            
-            // Check if Supabase client is initialized from imp.js
-            if (!window.supabaseClient) {
-                teamGrid.innerHTML = '<div class="col-span-full text-center text-red-400">Error: Database connection failed (Supabase SDK not initialized).</div>';
-                return;
-            }
+function DashboardUser({ user, activities }) {
+  const mine = useMemo(() => activities.filter((a) => a.ownerUsername === user.username), [activities, user]);
+  const completed = mine.filter((a) => a.status === 'Completed').length;
+  const overdue = mine.filter((a) => a.dueDate && a.status !== 'Completed' && a.dueDate < todayStr()).length;
+  const rate = mine.length ? Math.round((completed / mine.length) * 100) : 0;
+  const sb = statusBreakdown(mine);
+  const trend = completionTrend(mine);
 
-            try {
-                // Fetch Team Members from Supabase using window.supabaseClient
-                const { data: members, error } = await window.supabaseClient
-                    .from('team_members')
-                    .select('*')
-                    .order('created_at', { ascending: false });
+  return (
+    <>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 14, marginBottom: 22 }}>
+        <StatCard label="Total activities" value={mine.length} />
+        <StatCard label="Completed" value={completed} color={T.green} />
+        <StatCard label="Completion rate" value={rate + '%'} color={T.amber} />
+        <StatCard label="Overdue" value={overdue} color={overdue ? T.red : T.text} />
+      </div>
 
-                if (error) throw error;
+      <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 14 }} className="qg-dash-grid">
+        <Panel style={{ padding: 20 }}>
+          <CornerTicks />
+          <p style={{ fontFamily: T.mono, fontSize: 10.5, color: T.textMuted, textTransform: 'uppercase', margin: '0 0 14px' }}>Completions · last 14 days</p>
+          <div style={{ height: 210 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={trend}>
+                <defs>
+                  <linearGradient id="qgArea" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={T.amber} stopOpacity={0.5} />
+                    <stop offset="100%" stopColor={T.amber} stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                <XAxis dataKey="day" tick={{ fill: T.textMuted, fontSize: 10 }} axisLine={{ stroke: T.border }} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fill: T.textMuted, fontSize: 10 }} axisLine={false} tickLine={false} width={24} />
+                <Tooltip {...chartTooltip} />
+                <Area type="monotone" dataKey="completed" stroke={T.amber} fill="url(#qgArea)" strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </Panel>
 
-                if (members && members.length > 0) {
-                    teamGrid.innerHTML = ''; // Clear loader
+        <Panel style={{ padding: 20 }}>
+          <CornerTicks />
+          <p style={{ fontFamily: T.mono, fontSize: 10.5, color: T.textMuted, textTransform: 'uppercase', margin: '0 0 14px' }}>Status distribution</p>
+          <div style={{ height: 210 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={sb} dataKey="value" nameKey="name" innerRadius={48} outerRadius={72} paddingAngle={3}>
+                  {sb.map((s, i) => <Cell key={i} fill={s.color} stroke="none" />)}
+                </Pie>
+                <Tooltip {...chartTooltip} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8, justifyContent: 'center' }}>
+            {sb.map((s) => <span key={s.name} style={{ fontSize: 10.5, color: T.textMuted, display: 'flex', alignItems: 'center', gap: 5 }}><LED color={s.color} />{s.name} ({s.value})</span>)}
+          </div>
+        </Panel>
+      </div>
+    </>
+  );
+}
 
-                    members.forEach(member => {
-                        // Define colors based on category
-                        let colorClass = 'text-slate-400'; 
-                        let icon = 'fa-user';
-                        
-                        switch(member.category) {
-                            case 'ms-design': colorClass = 'text-blue-400'; icon = 'fa-layer-group'; break;
-                            case 'fntrl': colorClass = 'text-cyan-400'; icon = 'fa-cogs'; break;
-                            case 'h2s': colorClass = 'text-orange-400'; icon = 'fa-flask'; break;
-                            case 'limestone': colorClass = 'text-green-400'; icon = 'fa-industry'; break;
-                            case 'dcs': colorClass = 'text-purple-400'; icon = 'fa-desktop'; break;
-                        }
+function DashboardAdmin({ users, activities }) {
+  const completed = activities.filter((a) => a.status === 'Completed').length;
+  const rate = activities.length ? Math.round((completed / activities.length) * 100) : 0;
+  const sb = statusBreakdown(activities);
+  const perUser = users.map((u) => ({ name: u.fullName.split(' ')[0], value: activities.filter((a) => a.ownerUsername === u.username).length }))
+    .sort((a, b) => b.value - a.value).slice(0, 8);
 
-                        // Create Card HTML
-                        const cardHTML = `
-                            <div class="team-card group glass-card p-6 rounded-xl flex flex-col items-center text-center relative overflow-hidden fade-in-section" style="display:flex" data-category="${member.category}">
-                                <div class="absolute top-0 w-full h-1 bg-gradient-to-r from-transparent via-gold-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                
-                                <div class="team-image-wrapper w-24 h-24 rounded-full mb-4 p-1">
-                                    <img src="${member.image_url || 'https://via.placeholder.com/150?text=No+Img'}" 
-                                         alt="${member.full_name}" 
-                                         class="w-full h-full rounded-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
-                                </div>
-                                
-                                <h3 class="font-header text-xl text-white mb-1">${member.full_name}</h3>
-                                <p class="${colorClass} text-xs font-bold uppercase tracking-wider mb-3">${member.role}</p>
-                                
-                                <div class="mt-auto pt-4 w-full border-t border-white/5">
-                                    <span class="inline-block bg-slate-800 border border-white/10 text-slate-300 text-[10px] px-3 py-1 rounded-full uppercase tracking-widest group-hover:border-gold-500/50 transition-colors">
-                                        <i class="fas ${icon} mr-1 ${colorClass}"></i> ${member.category.toUpperCase()}
-                                    </span>
-                                </div>
-                            </div>
-                        `;
-                        teamGrid.insertAdjacentHTML('beforeend', cardHTML);
-                    });
+  return (
+    <>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 14, marginBottom: 22 }}>
+        <StatCard label="Registered users" value={users.length} />
+        <StatCard label="Total activities" value={activities.length} />
+        <StatCard label="Org completion rate" value={rate + '%'} color={T.amber} />
+        <StatCard label="In progress now" value={activities.filter((a) => a.status === 'In Progress').length} color={T.blue} />
+      </div>
 
-                    // Trigger Filtering Logic for new elements
-                    initFilters(); 
-                } else {
-                    teamGrid.innerHTML = '<div class="col-span-full text-center text-slate-500">No team members found. <a href="register.html" class="text-gold-400 underline">Be the first to join.</a></div>';
-                }
+      <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 14 }} className="qg-dash-grid">
+        <Panel style={{ padding: 20 }}>
+          <CornerTicks />
+          <p style={{ fontFamily: T.mono, fontSize: 10.5, color: T.textMuted, textTransform: 'uppercase', margin: '0 0 14px' }}>Top contributors</p>
+          <div style={{ height: 230 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={perUser}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                <XAxis dataKey="name" tick={{ fill: T.textMuted, fontSize: 10 }} axisLine={{ stroke: T.border }} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fill: T.textMuted, fontSize: 10 }} axisLine={false} tickLine={false} width={24} />
+                <Tooltip {...chartTooltip} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+                <Bar dataKey="value" fill={T.amber} radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </Panel>
 
-            } catch (err) {
-                console.error('Error loading team:', err);
-                teamGrid.innerHTML = '<div class="col-span-full text-center text-red-400">Failed to load team data. Check console.</div>';
-            }
-        });
+        <Panel style={{ padding: 20 }}>
+          <CornerTicks />
+          <p style={{ fontFamily: T.mono, fontSize: 10.5, color: T.textMuted, textTransform: 'uppercase', margin: '0 0 14px' }}>Org status split</p>
+          <div style={{ height: 230 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={sb} dataKey="value" nameKey="name" innerRadius={50} outerRadius={78} paddingAngle={3}>
+                  {sb.map((s, i) => <Cell key={i} fill={s.color} stroke="none" />)}
+                </Pie>
+                <Tooltip {...chartTooltip} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </Panel>
+      </div>
+    </>
+  );
+}
 
-        // --- FILTERING FUNCTION ---
-        function initFilters() {
-            const filterBtns = document.querySelectorAll('.filter-btn');
-            const teamCards = document.querySelectorAll('.team-card');
+/* ============================== SCHEDULE ============================== */
+function SchedulePage({ user, activities, onCreate, onOpen }) {
+  const [cursor, setCursor] = useState(() => { const d = new Date(); d.setDate(1); return d; });
+  const [selectedDay, setSelectedDay] = useState(todayStr());
+  const [showNew, setShowNew] = useState(false);
 
-            filterBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    filterBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    const filterValue = btn.getAttribute('data-filter');
+  const mine = useMemo(() => activities.filter((a) => a.ownerUsername === user.username), [activities, user]);
 
-                    document.querySelectorAll('.team-card').forEach(card => {
-                        card.style.opacity = '0';
-                        card.style.transform = 'scale(0.95)';
-                        
-                        setTimeout(() => {
-                            if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
-                                card.style.display = 'flex'; 
-                                setTimeout(() => {
-                                    card.style.opacity = '1';
-                                    card.style.transform = 'scale(1)';
-                                }, 50);
-                            } else {
-                                card.style.display = 'none';
-                            }
-                        }, 300);
-                    });
-                });
-            });
-        }
-    </script>
+  const year = cursor.getFullYear(), month = cursor.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const startOffset = firstDay.getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const cells = [];
+  for (let i = 0; i < startOffset; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
 
-</body>
-</html>
+  const dayKey = (d) => `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  const dayActs = (key) => mine.filter((a) => a.dueDate === key);
+  const selectedActs = dayActs(selectedDay);
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 16 }} className="qg-schedule-grid">
+      <Panel style={{ padding: 20 }}>
+        <CornerTicks />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <p style={{ fontFamily: T.display, fontSize: 17, color: T.text, textTransform: 'uppercase', margin: 0 }}>
+            {cursor.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
+          </p>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button onClick={() => setCursor(new Date(year, month - 1, 1))} style={{ background: T.panelAlt, border: `1px solid ${T.border}`, borderRadius: 6, padding: 6, color: T.text, cursor: 'pointer' }}><ChevronLeft size={15} /></button>
+            <button onClick={() => setCursor(new Date(year, month + 1, 1))} style={{ background: T.panelAlt, border: `1px solid ${T.border}`, borderRadius: 6, padding: 6, color: T.text, cursor: 'pointer' }}><ChevronRight size={15} /></button>
+          </div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 4, marginBottom: 6 }}>
+          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => <div key={i} style={{ textAlign: 'center', fontFamily: T.mono, fontSize: 10, color: T.textMuted }}>{d}</div>)}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 4 }}>
+          {cells.map((d, i) => {
+            if (!d) return <div key={i} />;
+            const key = dayKey(d);
+            const acts = dayActs(key);
+            const isToday = key === todayStr();
+            const isSel = key === selectedDay;
+            return (
+              <button key={i} onClick={() => setSelectedDay(key)} style={{
+                aspectRatio: '1', borderRadius: 8, border: `1px solid ${isSel ? T.borderStrong : T.border}`,
+                background: isSel ? T.amberDim : isToday ? 'rgba(255,255,255,0.03)' : 'transparent',
+                color: isToday ? T.amberBright : T.text, cursor: 'pointer', display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center', gap: 3, padding: 2,
+              }}>
+                <span style={{ fontSize: 12.5, fontFamily: T.mono }}>{d}</span>
+                <div style={{ display: 'flex', gap: 2 }}>
+                  {acts.slice(0, 3).map((a, j) => <span key={j} style={{ width: 4, height: 4, borderRadius: '50%', background: statusColor(a.status) }} />)}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </Panel>
+
+      <Panel style={{ padding: 20 }}>
+        <CornerTicks />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+          <p style={{ fontFamily: T.mono, fontSize: 11, color: T.textMuted, textTransform: 'uppercase', margin: 0 }}>{fmtDate(selectedDay)}</p>
+          <Btn variant="outline" onClick={() => setShowNew(true)} style={{ padding: '6px 10px', fontSize: 11.5 }}><CalendarPlus size={13} /> Add</Btn>
+        </div>
+        {selectedActs.length === 0 ? (
+          <p style={{ fontSize: 12.5, color: T.textMuted }}>Nothing scheduled for this day.</p>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {selectedActs.map((a) => (
+              <div key={a.id} onClick={() => onOpen(a)} style={{ cursor: 'pointer', padding: 12, borderRadius: 9, background: T.panelAlt, border: `1px solid ${T.border}` }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: T.text }}>{a.title}</span>
+                  <LED color={statusColor(a.status)} pulse={a.status === 'In Progress'} />
+                </div>
+                <Rail status={a.status} />
+              </div>
+            ))}
+          </div>
+        )}
+      </Panel>
+
+      {showNew && (
+        <NewActivityModal defaultDate={selectedDay} onClose={() => setShowNew(false)} onCreate={(f) => { onCreate(f); setShowNew(false); }} />
+      )}
+    </div>
+  );
+}
+
+/* ============================== ACTIVITIES PAGE ============================== */
+function ActivitiesPage({ user, activities, onCreate, onAdvance, onDelete }) {
+  const [showNew, setShowNew] = useState(false);
+  const [detail, setDetail] = useState(null);
+  const [q, setQ] = useState('');
+  const [statusF, setStatusF] = useState('All');
+
+  const mine = useMemo(() => activities.filter((a) => a.ownerUsername === user.username), [activities, user]);
+  const filtered = mine.filter((a) =>
+    (statusF === 'All' || a.status === statusF) &&
+    (a.title.toLowerCase().includes(q.toLowerCase()) || a.category.toLowerCase().includes(q.toLowerCase()))
+  ).sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: 10, marginBottom: 18, flexWrap: 'wrap' }}>
+        <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
+          <Search size={14} color={T.textMuted} style={{ position: 'absolute', left: 12, top: 12 }} />
+          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search activities..." style={{ paddingLeft: 34 }} />
+        </div>
+        <Select value={statusF} onChange={(e) => setStatusF(e.target.value)} style={{ width: 170 }}>
+          <option>All</option>
+          {STAGES.map((s) => <option key={s}>{s}</option>)}
+        </Select>
+        <Btn variant="primary" onClick={() => setShowNew(true)}><Plus size={14} /> New activity</Btn>
+      </div>
+
+      {filtered.length === 0 ? (
+        <EmptyState icon={ListChecks} title="No activities yet" sub="Log your first quality-checking activity to start tracking progress." action={<Btn variant="primary" onClick={() => setShowNew(true)}><Plus size={14} /> New activity</Btn>} />
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(270px,1fr))', gap: 14 }}>
+          {filtered.map((a) => <ActivityCard key={a.id} activity={a} onOpen={setDetail} />)}
+        </div>
+      )}
+
+      {showNew && <NewActivityModal onClose={() => setShowNew(false)} onCreate={(f) => { onCreate(f); setShowNew(false); }} />}
+      {detail && <ActivityDetailModal activity={detail} onClose={() => setDetail(null)} onAdvance={onAdvance} onDelete={onDelete} canManage ownerLabel={user.fullName} />}
+    </div>
+  );
+}
+
+/* ============================== PROFILE ============================== */
+function ProfilePage({ user, onUpdate }) {
+  const [f, setF] = useState({ fullName: user.fullName, email: user.email, phone: user.phone, department: user.department });
+  const [saved, setSaved] = useState(false);
+  const fileRef = useRef(null);
+  const set = (k) => (e) => setF((s) => ({ ...s, [k]: e.target.value }));
+
+  const submit = (e) => { e.preventDefault(); onUpdate(f); setSaved(true); setTimeout(() => setSaved(false), 2200); };
+
+  const onPickImage = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try { const dataUrl = await compressImage(file); onUpdate({ avatar: dataUrl }); } catch { /* ignore */ }
+  };
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 16 }} className="qg-profile-grid">
+      <Panel style={{ padding: 24, textAlign: 'center' }}>
+        <CornerTicks />
+        <div style={{ position: 'relative', width: 96, height: 96, margin: '0 auto 14px' }}>
+          <Avatar user={user} size={96} />
+          <button onClick={() => fileRef.current?.click()} style={{
+            position: 'absolute', bottom: -2, right: -2, background: T.amber, border: `2px solid ${T.panel}`,
+            borderRadius: '50%', width: 30, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+          }}><ImagePlus size={14} color="#1A1305" /></button>
+          <input ref={fileRef} type="file" accept="image/*" onChange={onPickImage} style={{ display: 'none' }} />
+        </div>
+        <p style={{ fontFamily: T.display, fontSize: 18, color: T.text, margin: '0 0 2px', textTransform: 'uppercase' }}>{user.fullName}</p>
+        <p style={{ fontFamily: T.mono, fontSize: 11, color: T.textMuted, margin: '0 0 14px' }}>@{user.username}</p>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginBottom: 6 }}>
+          <Tag color={user.role === 'admin' ? T.amber : T.blue}>{user.role === 'admin' ? <><Crown size={10} /> Admin</> : 'Member'}</Tag>
+          <Tag color={T.textMuted}>{user.department}</Tag>
+        </div>
+        <p style={{ fontSize: 11, color: T.textFaint, marginTop: 12 }}>Member since {fmtDate(user.joinDate)}</p>
+      </Panel>
+
+      <Panel style={{ padding: 24 }}>
+        <CornerTicks />
+        <p style={{ fontFamily: T.mono, fontSize: 10.5, color: T.textMuted, textTransform: 'uppercase', margin: '0 0 16px' }}>Full information details</p>
+        <form onSubmit={submit}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <Field label="Full name"><Input value={f.fullName} onChange={set('fullName')} required /></Field>
+            <Field label="Department">
+              <Select value={f.department} onChange={set('department')}>{DEPARTMENTS.map((d) => <option key={d}>{d}</option>)}</Select>
+            </Field>
+            <Field label="Email"><Input type="email" value={f.email} onChange={set('email')} /></Field>
+            <Field label="Phone"><Input value={f.phone} onChange={set('phone')} /></Field>
+          </div>
+          <Field label="Username (fixed)"><Input value={user.username} disabled style={{ opacity: 0.6 }} /></Field>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <Btn type="submit" variant="primary"><Save size={14} /> Save changes</Btn>
+            {saved && <span style={{ color: T.green, fontSize: 12.5, display: 'flex', alignItems: 'center', gap: 5 }}><CheckCircle2 size={14} /> Saved</span>}
+          </div>
+        </form>
+      </Panel>
+    </div>
+  );
+}
+
+/* ============================== ADMIN PAGES ============================== */
+function AdminUsersPage({ users, currentUser, onToggleRole, onDelete }) {
+  const [q, setQ] = useState('');
+  const filtered = users.filter((u) => u.fullName.toLowerCase().includes(q.toLowerCase()) || u.username.toLowerCase().includes(q.toLowerCase()));
+  return (
+    <div>
+      <div style={{ position: 'relative', maxWidth: 320, marginBottom: 16 }}>
+        <Search size={14} color={T.textMuted} style={{ position: 'absolute', left: 12, top: 12 }} />
+        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search users..." style={{ paddingLeft: 34 }} />
+      </div>
+      <Panel style={{ padding: 0, overflow: 'hidden' }}>
+        <CornerTicks />
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 560 }}>
+            <thead>
+              <tr style={{ borderBottom: `1px solid ${T.border}` }}>
+                {['User', 'Department', 'Role', 'Joined', ''].map((h) => (
+                  <th key={h} style={{ textAlign: 'left', padding: '12px 16px', fontFamily: T.mono, fontSize: 10, color: T.textMuted, textTransform: 'uppercase' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((u) => (
+                <tr key={u.username} style={{ borderBottom: `1px solid ${T.border}` }}>
+                  <td style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <Avatar user={u} size={30} />
+                    <div><p style={{ margin: 0, fontSize: 13, color: T.text, fontWeight: 600 }}>{u.fullName}</p><p style={{ margin: 0, fontSize: 11, color: T.textMuted, fontFamily: T.mono }}>@{u.username}</p></div>
+                  </td>
+                  <td style={{ padding: '10px 16px', fontSize: 12.5, color: T.textMuted }}>{u.department}</td>
+                  <td style={{ padding: '10px 16px' }}><Tag color={u.role === 'admin' ? T.amber : T.blue}>{u.role}</Tag></td>
+                  <td style={{ padding: '10px 16px', fontSize: 12, color: T.textMuted, fontFamily: T.mono }}>{fmtDate(u.joinDate)}</td>
+                  <td style={{ padding: '10px 16px' }}>
+                    <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+                      <button onClick={() => onToggleRole(u.username)} title="Toggle role" style={{ background: T.panelAlt, border: `1px solid ${T.border}`, borderRadius: 6, padding: 6, color: T.amber, cursor: 'pointer' }}><UserCog size={14} /></button>
+                      {u.username !== currentUser.username && (
+                        <button onClick={() => onDelete(u.username)} title="Remove user" style={{ background: T.panelAlt, border: `1px solid ${T.border}`, borderRadius: 6, padding: 6, color: T.red, cursor: 'pointer' }}><Trash2 size={14} /></button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Panel>
+    </div>
+  );
+}
+
+function AdminActivitiesPage({ users, activities, onAdvance, onDelete }) {
+  const [q, setQ] = useState('');
+  const [statusF, setStatusF] = useState('All');
+  const [userF, setUserF] = useState('All');
+  const [detail, setDetail] = useState(null);
+  const nameOf = (username) => users.find((u) => u.username === username)?.fullName || username;
+
+  const filtered = activities.filter((a) =>
+    (statusF === 'All' || a.status === statusF) &&
+    (userF === 'All' || a.ownerUsername === userF) &&
+    (a.title.toLowerCase().includes(q.toLowerCase()))
+  ).sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: 10, marginBottom: 18, flexWrap: 'wrap' }}>
+        <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
+          <Search size={14} color={T.textMuted} style={{ position: 'absolute', left: 12, top: 12 }} />
+          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search all activities..." style={{ paddingLeft: 34 }} />
+        </div>
+        <Select value={userF} onChange={(e) => setUserF(e.target.value)} style={{ width: 170 }}>
+          <option value="All">All users</option>
+          {users.map((u) => <option key={u.username} value={u.username}>{u.fullName}</option>)}
+        </Select>
+        <Select value={statusF} onChange={(e) => setStatusF(e.target.value)} style={{ width: 160 }}>
+          <option>All</option>
+          {STAGES.map((s) => <option key={s}>{s}</option>)}
+        </Select>
+      </div>
+      {filtered.length === 0 ? (
+        <EmptyState icon={Building2} title="No matching activities" sub="Adjust filters to see organization activity." />
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(270px,1fr))', gap: 14 }}>
+          {filtered.map((a) => <ActivityCard key={a.id} activity={a} onOpen={setDetail} ownerLabel={nameOf(a.ownerUsername)} />)}
+        </div>
+      )}
+      {detail && <ActivityDetailModal activity={detail} onClose={() => setDetail(null)} onAdvance={onAdvance} onDelete={onDelete} canManage ownerLabel={nameOf(detail.ownerUsername)} />}
+    </div>
+  );
+}
+
+/* ============================== APP ROOT ============================== */
+const PAGE_META = {
+  dashboard: ['Dashboard', 'Your activity analytics at a glance'],
+  schedule: ['Schedule', 'Calendar of upcoming and logged activities'],
+  activities: ['Activities', 'Log and process your quality-checking tasks'],
+  profile: ['Profile', 'Your account and personal details'],
+  'admin-overview': ['Org overview', 'Organization-wide performance analytics'],
+  'admin-users': ['Manage users', 'Registered accounts and role assignment'],
+  'admin-activities': ['All activities', 'Every logged activity across the organization'],
+};
+
+export default function QualityGroupApp() {
+  const [booted, setBooted] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [activities, setActivities] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [view, setView] = useState('dashboard');
+  const [authError, setAuthError] = useState('');
+  const [authBusy, setAuthBusy] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [storageWarning, setStorageWarning] = useState(false);
+
+  const persist = useCallback(async (nextUsers, nextActivities) => {
+    setUsers(nextUsers); setActivities(nextActivities);
+    try {
+      const ok = await window.storage.set('qg-data', JSON.stringify({ users: nextUsers, activities: nextActivities }), true);
+      if (!ok) setStorageWarning(true);
+    } catch { setStorageWarning(true); }
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      let loadedUsers = [], loadedActivities = [], sessionUser = null;
+      try {
+        const res = await window.storage.get('qg-data', true);
+        if (res?.value) { const parsed = JSON.parse(res.value); loadedUsers = parsed.users || []; loadedActivities = parsed.activities || []; }
+      } catch { /* no data yet */ }
+      try {
+        const sess = await window.storage.get('session', false);
+        if (sess?.value) sessionUser = sess.value;
+      } catch { /* no session */ }
+      setUsers(loadedUsers); setActivities(loadedActivities);
+      if (sessionUser) {
+        const found = loadedUsers.find((u) => u.username === sessionUser);
+        if (found) setCurrentUser(found);
+      }
+      setBooted(true);
+    })();
+  }, []);
+
+  const handleSignup = async (form) => {
+    setAuthError(''); setAuthBusy(true);
+    const uname = form.username.trim().toLowerCase();
+    if (!uname || !form.password) { setAuthError('Username and password are required.'); setAuthBusy(false); return; }
+    if (users.some((u) => u.username === uname)) { setAuthError('That username is already taken.'); setAuthBusy(false); return; }
+    const newUser = {
+      username: uname, password: obfuscate(form.password), fullName: form.fullName || uname,
+      email: form.email || '', phone: form.phone || '', department: form.department || DEPARTMENTS[0],
+      role: users.length === 0 ? 'admin' : 'user', avatar: null, joinDate: todayStr(),
+    };
+    const nextUsers = [...users, newUser];
+    await persist(nextUsers, activities);
+    try { await window.storage.set('session', uname, false); } catch { /* ignore */ }
+    setCurrentUser(newUser); setAuthBusy(false); setView('dashboard');
+  };
+
+  const handleLogin = async (username, password) => {
+    setAuthError(''); setAuthBusy(true);
+    const uname = username.trim().toLowerCase();
+    const found = users.find((u) => u.username === uname && u.password === obfuscate(password));
+    if (!found) { setAuthError('Invalid username or password.'); setAuthBusy(false); return; }
+    try { await window.storage.set('session', uname, false); } catch { /* ignore */ }
+    setCurrentUser(found); setAuthBusy(false); setView('dashboard');
+  };
+
+  const handleLogout = async () => {
+    try { await window.storage.delete('session', false); } catch { /* ignore */ }
+    setCurrentUser(null); setView('dashboard');
+  };
+
+  const handleCreateActivity = async (form) => {
+    const act = {
+      id: uid('ACT'), ownerUsername: currentUser.username, title: form.title.trim(),
+      category: form.category, priority: form.priority, description: form.description || '',
+      dueDate: form.dueDate || '', status: 'Pending', createdAt: nowIso(), updatedAt: nowIso(),
+      history: [{ status: 'Pending', at: nowIso() }],
+    };
+    await persist(users, [act, ...activities]);
+  };
+
+  const handleAdvance = async (id) => {
+    const next = activities.map((a) => {
+      if (a.id !== id) return a;
+      const idx = STAGES.indexOf(a.status);
+      const nextStatus = STAGES[idx + 1];
+      if (!nextStatus) return a;
+      return { ...a, status: nextStatus, updatedAt: nowIso(), history: [...a.history, { status: nextStatus, at: nowIso() }] };
+    });
+    await persist(users, next);
+  };
+
+  const handleDeleteActivity = async (id) => { await persist(users, activities.filter((a) => a.id !== id)); };
+
+  const handleUpdateProfile = async (patch) => {
+    const nextUsers = users.map((u) => u.username === currentUser.username ? { ...u, ...patch } : u);
+    setCurrentUser((c) => ({ ...c, ...patch }));
+    await persist(nextUsers, activities);
+  };
+
+  const handleToggleRole = async (username) => {
+    const nextUsers = users.map((u) => u.username === username ? { ...u, role: u.role === 'admin' ? 'user' : 'admin' } : u);
+    if (username === currentUser.username) setCurrentUser((c) => ({ ...c, role: c.role === 'admin' ? 'user' : 'admin' }));
+    await persist(nextUsers, activities);
+  };
+
+  const handleDeleteUser = async (username) => {
+    await persist(users.filter((u) => u.username !== username), activities.filter((a) => a.ownerUsername !== username));
+  };
+
+  if (!booted) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: T.bg }}>
+        <style>{fontStyles}</style>
+        <div style={{ textAlign: 'center' }}>
+          <Loader2 size={26} color={T.amber} className="qgspin" />
+          <p style={{ fontFamily: T.mono, fontSize: 11, color: T.textMuted, marginTop: 10, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Booting console...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return (
+      <div style={{ background: T.bg, minHeight: '100vh' }}>
+        <style>{fontStyles}</style>
+        <AuthScreen onLogin={handleLogin} onSignup={handleSignup} isFirstUser={users.length === 0} error={authError} busy={authBusy} />
+      </div>
+    );
+  }
+
+  const [pageTitle, pageSub] = PAGE_META[view] || ['Dashboard', ''];
+
+  return (
+    <div style={{ display: 'flex', background: T.bg, minHeight: '100vh', fontFamily: T.body, color: T.text }}>
+      <style>{fontStyles}</style>
+      <Sidebar view={view} setView={setView} role={currentUser.role} user={currentUser} onLogout={handleLogout} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
+      <main style={{ flex: 1, padding: '26px 28px 60px', minWidth: 0 }}>
+        <Topbar title={pageTitle} sub={pageSub} onMenu={() => setMobileOpen(true)} />
+
+        {storageWarning && (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', background: T.redDim, border: `1px solid ${T.red}55`, borderRadius: 8, padding: '10px 14px', marginBottom: 18 }}>
+            <AlertTriangle size={14} color={T.red} /><p style={{ fontSize: 12, color: T.red, margin: 0 }}>Could not sync to storage. Changes may not persist.</p>
+          </div>
+        )}
+
+        {view === 'dashboard' && <DashboardUser user={currentUser} activities={activities} />}
+        {view === 'schedule' && <SchedulePage user={currentUser} activities={activities} onCreate={handleCreateActivity} onOpen={() => {}} />}
+        {view === 'activities' && <ActivitiesPage user={currentUser} activities={activities} onCreate={handleCreateActivity} onAdvance={handleAdvance} onDelete={handleDeleteActivity} />}
+        {view === 'profile' && <ProfilePage user={currentUser} onUpdate={handleUpdateProfile} />}
+        {view === 'admin-overview' && currentUser.role === 'admin' && <DashboardAdmin users={users} activities={activities} />}
+        {view === 'admin-users' && currentUser.role === 'admin' && <AdminUsersPage users={users} currentUser={currentUser} onToggleRole={handleToggleRole} onDelete={handleDeleteUser} />}
+        {view === 'admin-activities' && currentUser.role === 'admin' && <AdminActivitiesPage users={users} activities={activities} onAdvance={handleAdvance} onDelete={handleDeleteActivity} />}
+      </main>
+    </div>
+  );
+}
+
+const fontStyles = `
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@keyframes qgPulse { 0%,100% { opacity:1; } 50% { opacity:0.35; } }
+.qgspin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+input::placeholder, textarea::placeholder { color: #57628099; }
+select option { background: #111A2E; }
+@media (max-width: 900px) {
+  .qg-sidebar-desktop { display: none !important; }
+  .qg-menu-btn { display: flex !important; }
+  .qg-dash-grid, .qg-schedule-grid, .qg-profile-grid { grid-template-columns: 1fr !important; }
+}
+@media (min-width: 901px) {
+  .qg-sidebar-mobile { display: none !important; }
+}
+`;
