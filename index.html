@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
@@ -48,6 +48,12 @@
         .submenu-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
         .submenu-open { max-height: 500px; }
         .tab-btn.active { background: #2563eb; color: #ffffff; border-color: #38bdf8; box-shadow: 0 0 15px rgba(56,189,248,0.4); }
+        /* Custom animation for modal popups */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-fadeIn { animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-white bg-dark-900 overflow-x-hidden" id="body-wrap">
@@ -93,7 +99,7 @@
 
                 <!-- Navigation Links with Interactive Accordions -->
                 <div class="px-3 py-6 space-y-4 overflow-y-auto max-h-[calc(100vh-170px)]">
-                    
+
                     <!-- 1. QA Dashboard -->
                     <div>
                         <a href="#home" onclick="closeSidebarOnMobile()" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-bold bg-royalblue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all">
@@ -101,7 +107,7 @@
                         </a>
                     </div>
 
-                    <!-- 2. QA MS Product (Accordion Dropdown) -->
+                    <!-- 2. QA MS Product (Accordion Dropdown connected to qamsproduct.js) -->
                     <div>
                         <button onclick="toggleSubmenu('submenu-msp', 'icon-msp')" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all group">
                             <span class="flex items-center gap-3">
@@ -110,16 +116,16 @@
                             <i id="icon-msp" class="fas fa-chevron-down text-xs text-slate-500 transition-transform duration-300"></i>
                         </button>
                         <div id="submenu-msp" class="submenu-content pl-9 pr-2 space-y-1 mt-1 border-l-2 border-slate-800 ml-4">
-                            <a href="#calendar-section" onclick="filterEvents('all'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors">
+                            <a href="#qamsproduct-portal" onclick="QAMSProduct.open('analysis'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer">
                                 <i class="fas fa-chart-line mr-2 text-sky-500"></i> QA Analysis
                             </a>
-                            <a href="#sop-section" onclick="closeSidebarOnMobile()" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors">
+                            <a href="#qamsproduct-portal" onclick="QAMSProduct.open('document'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer">
                                 <i class="fas fa-file-invoice mr-2 text-cyan-500"></i> QA Documents and Report
                             </a>
-                            <a href="#calendar-section" onclick="filterEvents('nearmiss'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors">
+                            <a href="#qamsproduct-portal" onclick="QAMSProduct.open('nearmiss'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer">
                                 <i class="fas fa-exclamation-triangle mr-2 text-amber-400"></i> QA Near Miss & Incident
                             </a>
-                            <a href="#calendar-section" onclick="filterEvents('improvement'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors">
+                            <a href="#qamsproduct-portal" onclick="QAMSProduct.open('improvement'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer">
                                 <i class="fas fa-lightbulb mr-2 text-emerald-400"></i> For Improvement
                             </a>
                         </div>
@@ -265,21 +271,26 @@
                     </p>
 
                     <div class="flex flex-wrap justify-center items-center gap-3 sm:gap-4">
-                        <a href="#calendar-section" class="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-royalblue-600 to-sky-500 hover:from-royalblue-500 hover:to-sky-400 text-white font-bold text-sm rounded-xl shadow-[0_0_20px_rgba(14,165,233,0.4)] transition-all flex items-center justify-center gap-2">
-                            <span>Interactive QA Calendar</span>
-                            <i class="fas fa-calendar-check text-xs"></i>
+                        <a href="#qamsproduct-portal" onclick="QAMSProduct.open('all');" class="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-royalblue-600 to-sky-500 hover:from-royalblue-500 hover:to-sky-400 text-white font-bold text-sm rounded-xl shadow-[0_0_20px_rgba(14,165,233,0.4)] transition-all flex items-center justify-center gap-2">
+                            <span>Interactive QA MS Product</span>
+                            <i class="fas fa-microscope text-xs"></i>
                         </a>
-                        <a href="#area-explorer" class="w-full sm:w-auto px-6 py-3.5 bg-dark-500/80 hover:bg-dark-400/80 border border-slate-700 hover:border-slate-500 text-slate-200 hover:text-white font-semibold text-sm rounded-xl transition-all text-center backdrop-blur-sm">
+                        <a href="#calendar-section" class="w-full sm:w-auto px-6 py-3.5 bg-dark-500/80 hover:bg-dark-400/80 border border-slate-700 hover:border-slate-500 text-slate-200 hover:text-white font-semibold text-sm rounded-xl transition-all text-center backdrop-blur-sm">
+                            QA Event Calendar
+                        </a>
+                        <a href="#area-explorer" class="w-full sm:w-auto px-6 py-3.5 bg-slate-800/80 hover:bg-slate-700/80 border border-cyan-500/30 text-cyan-300 hover:text-white font-semibold text-sm rounded-xl transition-all text-center">
                             Explore QA Areas
-                        </a>
-                        <a href="#dcs-section" class="w-full sm:w-auto px-6 py-3.5 bg-slate-800/80 hover:bg-slate-700/80 border border-cyan-500/30 text-cyan-300 hover:text-white font-semibold text-sm rounded-xl transition-all text-center">
-                            DCS Control Hub
                         </a>
                     </div>
                 </div>
             </section>
 
-            <!-- INTERACTIVE MODULE 1: QA CALENDAR (CONNECTED TO NEAR MISS, INCIDENT & IMPROVEMENT) -->
+            <!-- INTERACTIVE MODULE 1: QA MS PRODUCT PORTAL (Powered by qamsproduct.js) -->
+            <section id="qamsproduct-portal" class="py-16 px-4 sm:px-8 bg-dark-900 border-b border-slate-800/80">
+                <!-- Content is automatically rendered and injected here by qamsproduct.js -->
+            </section>
+
+            <!-- INTERACTIVE MODULE 2: QA CALENDAR (CONNECTED TO NEAR MISS, INCIDENT & IMPROVEMENT) -->
             <section id="calendar-section" class="py-16 px-4 sm:px-8 bg-dark-900 border-b border-slate-800/80">
                 <div class="max-w-6xl mx-auto">
                     <div class="flex flex-col md:flex-row md:items-end justify-between mb-8" data-aos="fade-up">
@@ -331,14 +342,14 @@
                                 <div class="p-2 sm:p-3 opacity-20">28</div>
                                 <div class="p-2 sm:p-3 opacity-20">29</div>
                                 <div class="p-2 sm:p-3 opacity-20">30</div>
-                                
+
                                 <div onclick="selectDate(1, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer border border-transparent hover:border-slate-600">1</div>
                                 <div onclick="selectDate(2, 'improvement')" id="cell-2" class="p-2 sm:p-3 rounded-xl bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40 cursor-pointer shadow-[0_0_10px_rgba(16,185,129,0.2)] relative">
                                     2 <span class="block w-1.5 h-1.5 rounded-full bg-emerald-400 mx-auto mt-1"></span>
                                 </div>
                                 <div onclick="selectDate(3, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">3</div>
                                 <div onclick="selectDate(4, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">4</div>
-                                
+
                                 <div onclick="selectDate(5, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">5</div>
                                 <div onclick="selectDate(6, 'nearmiss')" id="cell-6" class="p-2 sm:p-3 rounded-xl bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40 cursor-pointer shadow-[0_0_10px_rgba(245,158,11,0.2)]">
                                     6 <span class="block w-1.5 h-1.5 rounded-full bg-amber-400 mx-auto mt-1"></span>
@@ -429,7 +440,7 @@
                 </div>
             </section>
 
-            <!-- INTERACTIVE MODULE 2: QA AREA EXPLORER (FNTRL, MS-DEZINC, H2S, LIMESTONE) -->
+            <!-- INTERACTIVE MODULE 3: QA AREA EXPLORER (FNTRL, MS-DEZINC, H2S, LIMESTONE) -->
             <section id="area-explorer" class="py-16 px-4 sm:px-8 bg-dark-700/60 border-b border-slate-800/80">
                 <div class="max-w-6xl mx-auto">
                     <div class="text-center max-w-3xl mx-auto mb-10" data-aos="fade-up">
@@ -458,7 +469,6 @@
 
                     <!-- Dynamic Area Display Card -->
                     <div id="area-card-content" class="bg-dark-500 rounded-2xl p-6 sm:p-10 border border-slate-800 shadow-2xl transition-all duration-300">
-                        <!-- Content updated via JS switchAreaTab() -->
                         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                             <div class="lg:col-span-7">
                                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-sky-500/10 text-sky-400 font-bold text-xs mb-4">
@@ -519,7 +529,7 @@
                 </div>
             </section>
 
-            <!-- INTERACTIVE MODULE 3: SEPARATED DCS CONTROL VS. SUB DCS CONTROL -->
+            <!-- INTERACTIVE MODULE 4: SEPARATED DCS CONTROL VS. SUB DCS CONTROL -->
             <section id="dcs-section" class="py-16 px-4 sm:px-8 bg-dark-900 border-b border-slate-800/80">
                 <div class="max-w-6xl mx-auto">
                     <div class="text-center max-w-3xl mx-auto mb-12" data-aos="fade-up">
@@ -686,6 +696,7 @@
                     <div>
                         <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-xs">Interactive QA Zones</h4>
                         <ul class="space-y-2 text-xs sm:text-sm font-medium">
+                            <li><a href="#qamsproduct-portal" onclick="QAMSProduct.open('all');" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> QA MS Product Management Hub</a></li>
                             <li><a href="#area-explorer" onclick="switchAreaTab('fntrl')" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> FNTRL Area Specifications</a></li>
                             <li><a href="#area-explorer" onclick="switchAreaTab('dezinc')" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> MS-Dezinc Area Specifications</a></li>
                             <li><a href="#area-explorer" onclick="switchAreaTab('h2s')" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> H2S Plant Scrubber QA</a></li>
@@ -737,7 +748,7 @@
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Event Classification</label>
-                            <select required class="w-full border border-slate-700 p-2.5 rounded-xl bg-dark-700 text-white text-xs outline-none focus:border-rose-500">
+                            <select id="inc-class" required class="w-full border border-slate-700 p-2.5 rounded-xl bg-dark-700 text-white text-xs outline-none focus:border-rose-500">
                                 <option value="nearmiss">Near Miss (Potential Hazard)</option>
                                 <option value="accident">Incident / Accident</option>
                                 <option value="improvement">For Improvement (QA Suggestion)</option>
@@ -745,7 +756,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Plant Area</label>
-                            <select required class="w-full border border-slate-700 p-2.5 rounded-xl bg-dark-700 text-white text-xs outline-none focus:border-rose-500">
+                            <select id="inc-area" required class="w-full border border-slate-700 p-2.5 rounded-xl bg-dark-700 text-white text-xs outline-none focus:border-rose-500">
                                 <option value="FNTRL Area">FNTRL Area</option>
                                 <option value="MS-Dezinc Area">MS-Dezinc Area</option>
                                 <option value="H2S Area">H2S Area</option>
@@ -756,11 +767,11 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Event Title / Brief Summary</label>
-                        <input type="text" required placeholder="e.g., Valve #302 Pressure Spike during Slurry Transfer" class="w-full border border-slate-700 p-2.5 rounded-xl bg-dark-700 text-white placeholder-slate-500 text-xs outline-none focus:border-rose-500">
+                        <input type="text" id="inc-title" required placeholder="e.g., Valve #302 Pressure Spike during Slurry Transfer" class="w-full border border-slate-700 p-2.5 rounded-xl bg-dark-700 text-white placeholder-slate-500 text-xs outline-none focus:border-rose-500">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Detailed Description & Recommended CAPA</label>
-                        <textarea rows="3" required placeholder="Describe what occurred and what corrective action is recommended..." class="w-full border border-slate-700 p-2.5 rounded-xl bg-dark-700 text-white placeholder-slate-500 text-xs outline-none focus:border-rose-500"></textarea>
+                        <textarea id="inc-desc" rows="3" required placeholder="Describe what occurred and what corrective action is recommended..." class="w-full border border-slate-700 p-2.5 rounded-xl bg-dark-700 text-white placeholder-slate-500 text-xs outline-none focus:border-rose-500"></textarea>
                     </div>
                     <div class="pt-2 flex gap-3">
                         <button type="button" onclick="closeModal('incidentModal')" class="w-1/3 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold">Cancel</button>
@@ -1066,6 +1077,20 @@
 
         function submitIncident(e) {
             e.preventDefault();
+            // Optional: You can also push this incident directly into your QAMSProduct database!
+            if (window.QAMSProduct && window.QAMSProduct.openAddModal) {
+                const classification = document.getElementById('inc-class').value;
+                const area = document.getElementById('inc-area').value;
+                const title = document.getElementById('inc-title').value;
+                const desc = document.getElementById('inc-desc').value;
+                alert('QA Incident logged! Opening the interactive QA MS Product record builder to complete CAPA details.');
+                closeModal('incidentModal');
+                QAMSProduct.openAddModal(classification);
+                document.getElementById('form-title').value = title;
+                document.getElementById('form-area').value = area;
+                document.getElementById('form-description').value = desc;
+                return;
+            }
             alert('QA Incident logged successfully! It has been synced to the interactive July 2026 QA Calendar and assigned an investigation tracking number.');
             closeModal('incidentModal');
         }
@@ -1079,5 +1104,8 @@
             setTimeout(() => { window.location.href = '/app'; }, 1100);
         }
     </script>
+
+    <!-- INTEGRATE STANDALONE QA MS PRODUCT DATA & MANAGEMENT MODULE -->
+    <script src="qamsproduct.js"></script>
 </body>
 </html>
