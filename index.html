@@ -3,8 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QualityGroup - Operations & Assurance Console</title>
+    <title>QualityGroup | THPAL Operations & Assurance Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-main: #070B14;
+            --bg-panel: #101828;
+            --bg-panel-hover: #162034;
+            --bg-card: #0B1324;
+            --amber: #E8A33D;
+            --amber-glow: rgba(232, 163, 61, 0.25);
+            --amber-border: rgba(232, 163, 61, 0.35);
+            --emerald: #10B981;
+            --cyan: #06B6D4;
+            --rose: #F43F5E;
+            --text-main: #F8FAFC;
+            --text-muted: #8B98B4;
+            --border: rgba(232, 163, 61, 0.15);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,132 +33,118 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #0A0F1C;
-            color: #EAEFF8;
+            background: var(--bg-main);
+            color: var(--text-main);
             line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(232, 163, 61, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.05) 0px, transparent 50%);
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.98); }
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
         }
 
-        .qgspin {
-            animation: spin 1s linear infinite;
+        /* --- CORNER TICKS DESIGN MOTIF --- */
+        .corner-ticks {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-color: var(--amber-border);
+            pointer-events: none;
+            transition: var(--transition);
         }
+        .corner-ticks-tl { top: 6px; left: 6px; border-top: 1.5px solid; border-left: 1.5px solid; }
+        .corner-ticks-tr { top: 6px; right: 6px; border-top: 1.5px solid; border-right: 1.5px solid; }
+        .corner-ticks-bl { bottom: 6px; left: 6px; border-bottom: 1.5px solid; border-left: 1.5px solid; }
+        .corner-ticks-br { bottom: 6px; right: 6px; border-bottom: 1.5px solid; border-right: 1.5px solid; }
 
-        .container {
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .panel:hover .corner-ticks { border-color: var(--amber); }
+
+        /* --- AUTHENTICATION SCREEN --- */
+        #auth-section {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(ellipse 900px 600px at 50% -10%, #16213A 0%, #0A0F1C 60%);
             padding: 20px;
+            position: relative;
+            z-index: 10;
         }
 
         .auth-box {
             width: 100%;
-            max-width: 420px;
+            max-width: 440px;
+            animation: float 6s ease-in-out infinite;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
 
         .logo {
-            width: 52px;
-            height: 52px;
-            margin: 0 auto 14px;
-            border-radius: 12px;
-            background: #16213A;
-            border: 1px solid rgba(232,163,61,0.4);
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 16px;
+            border-radius: 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--amber-border);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 28px;
+            box-shadow: 0 0 20px var(--amber-glow);
         }
 
         h1 {
             font-family: 'Oswald', sans-serif;
-            font-size: 26px;
-            margin: 0;
-            letter-spacing: 0.04em;
+            font-size: 28px;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
         }
 
-        .amber { color: #E8A33D; }
+        .amber { color: var(--amber); }
 
         .subtitle {
             font-family: 'JetBrains Mono', monospace;
             font-size: 11px;
-            letter-spacing: 0.12em;
-            color: #8B98B4;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
             text-transform: uppercase;
-            margin-top: 6px;
-        }
-
-        .panel {
-            background: #111A2E;
-            border: 1px solid rgba(232,163,61,0.14);
-            border-radius: 14px;
-            padding: 26px;
-            position: relative;
-            margin-bottom: 16px;
-        }
-
-        .corner-ticks {
-            position: absolute;
-            width: 7px;
-            height: 7px;
-            border-color: rgba(232,163,61,0.35);
-        }
-
-        .corner-ticks-tl {
-            top: 6px;
-            left: 6px;
-            border-top: 1.5px solid;
-            border-left: 1.5px solid;
-        }
-
-        .corner-ticks-tr {
-            top: 6px;
-            right: 6px;
-            border-top: 1.5px solid;
-            border-right: 1.5px solid;
-        }
-
-        .corner-ticks-bl {
-            bottom: 6px;
-            left: 6px;
-            border-bottom: 1.5px solid;
-            border-left: 1.5px solid;
-        }
-
-        .corner-ticks-br {
-            bottom: 6px;
-            right: 6px;
-            border-bottom: 1.5px solid;
-            border-right: 1.5px solid;
+            margin-top: 4px;
         }
 
         .mode-tabs {
             display: flex;
             gap: 4px;
-            background: #0B1324;
-            border-radius: 9px;
+            background: var(--bg-card);
+            border-radius: 10px;
             padding: 4px;
             margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
         .mode-tab {
             flex: 1;
-            padding: 9px 0;
-            border-radius: 6px;
+            padding: 10px 0;
+            border-radius: 8px;
             border: none;
             cursor: pointer;
             font-family: 'JetBrains Mono', monospace;
@@ -146,79 +152,69 @@
             letter-spacing: 0.08em;
             text-transform: uppercase;
             background: transparent;
-            color: #8B98B4;
+            color: var(--text-muted);
             font-weight: 700;
+            transition: var(--transition);
         }
 
         .mode-tab.active {
-            background: #E8A33D;
+            background: var(--amber);
             color: #1A1305;
+            box-shadow: 0 4px 12px var(--amber-glow);
         }
 
-        .form-group {
-            display: block;
-            margin-bottom: 14px;
-        }
-
+        .form-group { margin-bottom: 16px; display: block; }
         .form-label {
             display: block;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 10.5px;
+            font-size: 11px;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            color: #8B98B4;
+            color: var(--text-muted);
             margin-bottom: 6px;
         }
 
         input, select, textarea {
             width: 100%;
-            background: #0B1324;
-            border: 1px solid rgba(232,163,61,0.14);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 10px 12px;
-            color: #EAEFF8;
+            padding: 12px 14px;
+            color: var(--text-main);
             font-family: 'Inter', sans-serif;
             font-size: 14px;
             outline: none;
-            box-sizing: border-box;
+            transition: var(--transition);
         }
 
         input:focus, select:focus, textarea:focus {
-            border-color: rgba(232,163,61,0.4);
+            border-color: var(--amber);
+            box-shadow: 0 0 0 3px rgba(232, 163, 61, 0.15);
         }
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
         .alert {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             align-items: flex-start;
             border-radius: 8px;
-            padding: 10px 12px;
-            margin-bottom: 14px;
-            font-size: 11.5px;
+            padding: 12px;
+            margin-bottom: 16px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
         .alert-warning {
-            background: rgba(232,163,61,0.16);
-            border: 1px solid rgba(232,163,61,0.35);
-            color: #FFC968;
+            background: rgba(232, 163, 61, 0.12);
+            border: 1px solid rgba(232, 163, 61, 0.3);
+            color: #FFD185;
         }
 
         .alert-error {
-            background: rgba(242,96,74,0.16);
-            border: 1px solid rgba(242,96,74,0.33);
-            color: #F2604A;
-        }
-
-        .alert-icon {
-            flex-shrink: 0;
-            margin-top: 1px;
+            background: rgba(244, 63, 94, 0.12);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            color: #FDA4AF;
         }
 
         .btn {
@@ -226,182 +222,903 @@
             font-weight: 600;
             font-size: 13px;
             border-radius: 8px;
-            padding: 10px 16px;
+            padding: 12px 18px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: var(--transition);
             border: 1px solid transparent;
             width: 100%;
-            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .btn-primary {
-            background: #E8A33D;
+            background: var(--amber);
             color: #1A1305;
-            border: 1px solid #E8A33D;
+            box-shadow: 0 4px 15px var(--amber-glow);
         }
 
-        .btn-primary:hover:not(:disabled) {
-            filter: brightness(1.15);
-        }
+        .btn-primary:hover { filter: brightness(1.15); transform: translateY(-1px); }
 
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--amber-border);
+            color: var(--amber);
+            margin-top: 10px;
         }
+        .btn-outline:hover { background: rgba(232, 163, 61, 0.1); }
 
-        .footer-text {
-            text-align: center;
-            font-size: 11px;
-            color: rgba(87, 98, 128, 0.5);
-            margin-top: 16px;
-            line-height: 1.6;
-        }
-
+        .password-wrapper { position: relative; }
         .password-toggle {
             position: absolute;
-            right: 10px;
-            top: 9px;
+            right: 12px;
+            top: 12px;
             background: none;
             border: none;
-            color: #8B98B4;
+            color: var(--text-muted);
             cursor: pointer;
-            padding: 4px;
+            font-size: 14px;
         }
 
-        .password-wrapper {
+        /* --- DASHBOARD WEB APPLICATION --- */
+        #app-section {
+            display: none;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--amber-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .nav-title h2 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px;
+            letter-spacing: 0.05em;
+            line-height: 1.1;
+        }
+
+        .nav-title span {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--emerald);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--emerald);
+            animation: pulse 2s infinite;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-logout {
+            background: rgba(244, 63, 94, 0.1);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+            color: #FDA4AF;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-logout:hover { background: rgba(244, 63, 94, 0.2); }
+
+        .dashboard-nav {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .dash-tab {
+            padding: 14px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .dash-tab:hover { color: var(--text-main); }
+        .dash-tab.active {
+            color: var(--amber);
+            border-bottom-color: var(--amber);
+            background: rgba(232, 163, 61, 0.05);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 32px;
+            max-width: 1440px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .tab-pane { display: none; animation: fadeIn 0.3s ease; }
+        .tab-pane.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- STATS GRID --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
             position: relative;
         }
 
-        @media (max-width: 640px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
+        .stat-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 8px;
         }
+
+        .stat-value {
+            font-family: 'Oswald', sans-serif;
+            font-size: 28px;
+            color: var(--text-main);
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .stat-unit { font-size: 14px; font-family: 'JetBrains Mono', monospace; color: var(--amber); font-weight: 400;}
+        .stat-sub { font-size: 11px; color: var(--emerald); margin-top: 6px; font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 4px; }
+
+        /* --- CONTENT GRIDS --- */
+        .content-grid-2 {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+
+        @media(max-width: 992px) {
+            .content-grid-2 { grid-template-columns: 1fr; }
+        }
+
+        .section-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .info-list {
+            list-style: none;
+        }
+        .info-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+        .info-item:last-child { border-bottom: none; }
+        .info-key { color: var(--text-muted); font-weight: 500; }
+        .info-val { font-family: 'JetBrains Mono', monospace; color: var(--text-main); font-weight: 600; text-align: right; }
+
+        /* --- INTERACTIVE 7-STAGE PROCESS MONITOR --- */
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        @media(max-width: 1200px) {
+            .process-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+        @media(max-width: 768px) {
+            .process-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .process-step {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .process-step:hover, .process-step.active {
+            background: var(--bg-panel-hover);
+            border-color: var(--amber);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .step-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--amber);
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .step-title {
+            font-weight: 600;
+            font-size: 13px;
+            line-height: 1.3;
+            margin-bottom: 8px;
+        }
+
+        .step-status {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--emerald);
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .process-detail-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--amber-border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 16px;
+            position: relative;
+        }
+
+        /* --- SLIDER / CAROUSEL --- */
+        .slider-container {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: #000;
+            height: 440px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            display: flex;
+            align-items: flex-end;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .slide.active { opacity: 1; z-index: 1; }
+
+        .slide-overlay {
+            background: linear-gradient(to top, rgba(7, 11, 20, 0.95) 0%, rgba(7, 11, 20, 0.6) 50%, transparent 100%);
+            width: 100%;
+            padding: 40px 32px 28px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .slide-tag {
+            background: var(--amber);
+            color: #1A1305;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .slide-title { font-family: 'Oswald', sans-serif; font-size: 26px; margin-bottom: 6px; }
+        .slide-desc { font-size: 14px; color: var(--text-muted); max-width: 700px; }
+
+        .slider-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(16, 24, 40, 0.7);
+            border: 1px solid var(--border);
+            color: white;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: var(--transition);
+            font-size: 18px;
+        }
+        .slider-btn:hover { background: var(--amber); color: #1A1305; border-color: var(--amber); }
+        .prev-btn { left: 20px; }
+        .next-btn { right: 20px; }
+
+        .slider-dots {
+            position: absolute;
+            bottom: 28px;
+            right: 32px;
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .dot.active { background: var(--amber); width: 24px; border-radius: 10px; }
+
+        /* --- INTERACTIVE CHECKLIST --- */
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .checklist-item:hover { border-color: var(--amber-border); }
+        .checklist-left { display: flex; align-items: center; gap: 12px; }
+        .check-box {
+            width: 20px; height: 20px;
+            border-radius: 6px;
+            border: 2px solid var(--text-muted);
+            display: flex; align-items: center; justify-content: center;
+            color: transparent;
+            font-size: 12px;
+            transition: var(--transition);
+        }
+        .checklist-item.checked .check-box {
+            background: var(--emerald);
+            border-color: var(--emerald);
+            color: white;
+        }
+        .checklist-item.checked .check-text { text-decoration: line-through; color: var(--text-muted); }
+        .check-text { font-size: 14px; font-weight: 500; }
+        .check-tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--amber); }
+
+        /* --- MODAL / TOAST --- */
+        #toast {
+            position: fixed;
+            bottom: 24px; right: 24px;
+            background: var(--bg-panel);
+            border: 1px solid var(--emerald);
+            border-left: 6px solid var(--emerald);
+            padding: 16px 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex; align-items: center; gap: 12px;
+            z-index: 1000;
+            transform: translateY(150%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #toast.show { transform: translateY(0); }
     </style>
 </head>
 <body>
-    <div class="container">
+
+    <!-- ================= AUTHENTICATION PORTAL ================= -->
+    <div id="auth-section">
         <div class="auth-box">
-            <!-- Header -->
             <div class="header">
                 <div class="logo">🛡️</div>
                 <h1>Quality<span class="amber">Group</span></h1>
-                <p class="subtitle">Operations &amp; Assurance Console</p>
+                <p class="subtitle">THPAL Operations &amp; Assurance Console</p>
             </div>
 
-            <!-- Auth Panel -->
             <div class="panel">
                 <div class="corner-ticks corner-ticks-tl"></div>
                 <div class="corner-ticks corner-ticks-tr"></div>
                 <div class="corner-ticks corner-ticks-bl"></div>
                 <div class="corner-ticks corner-ticks-br"></div>
 
-                <!-- Mode Tabs -->
                 <div class="mode-tabs">
-                    <button class="mode-tab active" id="loginTab" onclick="switchMode('login')">Sign in</button>
-                    <button class="mode-tab" id="signupTab" onclick="switchMode('signup')">Register</button>
+                    <button class="mode-tab active" id="loginTab" onclick="switchAuthMode('login')">Sign In</button>
+                    <button class="mode-tab" id="signupTab" onclick="switchAuthMode('signup')">Register</button>
                 </div>
 
-                <!-- Form -->
-                <form id="authForm" onsubmit="handleSubmit(event)">
-                    <!-- Signup Fields -->
+                <form id="authForm" onsubmit="handleAuthSubmit(event)">
                     <div id="signupFields" style="display: none;">
                         <div class="form-group">
-                            <label class="form-label">Full name</label>
+                            <label class="form-label">Full Name</label>
                             <input type="text" id="fullName" placeholder="Juan Dela Cruz">
                         </div>
-
                         <div class="form-group">
-                            <label class="form-label">Department</label>
+                            <label class="form-label">Assigned Department / Division</label>
                             <select id="department">
-                                <option>MS-Design</option>
-                                <option>FNTRL</option>
-                                <option>H2S</option>
-                                <option>Limestone</option>
-                                <option>DCS Control</option>
-                                <option>Logistics</option>
-                                <option>Quality Assurance</option>
-                                <option>Other</option>
+                                <option value="HPAL Processing">HPAL (High-Pressure Acid Leach)</option>
+                                <option value="MS Production">MS-Design &amp; Sulfide Production</option>
+                                <option value="CCD & Neutralization">CCD &amp; Pre-Neutralization</option>
+                                <option value="H2S Plant">H2S Gas Facility</option>
+                                <option value="Limestone & Reagents">Limestone &amp; Reagents Prep</option>
+                                <option value="DCS Control Room">DCS Automated Control Room</option>
+                                <option value="Environmental & MMT">Environmental Assurance (MMT/ECC)</option>
+                                <option value="Quality Assurance">Quality Assurance &amp; Lab Testing</option>
                             </select>
                         </div>
-
                         <div class="form-grid">
                             <div class="form-group">
-                                <label class="form-label">Email</label>
-                                <input type="email" id="email" placeholder="you@qualitygroup.com">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" id="email" placeholder="j.delacruz@thpal.com.ph">
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Phone</label>
-                                <input type="tel" id="phone" placeholder="09xx xxx xxxx">
+                                <label class="form-label">Contact No.</label>
+                                <input type="tel" id="phone" placeholder="0917 xxx xxxx">
                             </div>
                         </div>
-
                         <div class="alert alert-warning">
-                            <span class="alert-icon">👑</span>
-                            <p>First account on this console — you'll be registered as Administrator.</p>
+                            <span>👑</span>
+                            <div><strong>Notice:</strong> Account registered will be synced with DENR-EMB Region 13 compliance auditing protocols.</div>
                         </div>
                     </div>
 
-                    <!-- Common Fields -->
                     <div class="form-group">
-                        <label class="form-label">Username</label>
-                        <input type="text" id="username" placeholder="j.delacruz" required>
+                        <label class="form-label">Username / Engineer ID</label>
+                        <input type="text" id="username" placeholder="e.g. j.delacruz" value="admin.thpal" required>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Password</label>
+                        <label class="form-label">Security Password</label>
                         <div class="password-wrapper">
-                            <input type="password" id="password" placeholder="••••••••" required>
+                            <input type="password" id="password" placeholder="••••••••" value="sumitomo2026" required>
                             <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
                         </div>
                     </div>
 
-                    <!-- Error Alert -->
                     <div id="errorAlert" class="alert alert-error" style="display: none;">
-                        <span class="alert-icon">⚠️</span>
-                        <p id="errorMsg"></p>
+                        <span>⚠️</span>
+                        <div id="errorMsg"></div>
                     </div>
 
-                    <!-- Submit Button -->
                     <button type="submit" class="btn btn-primary" id="submitBtn">
-                        <span id="btnText">Sign in</span>
+                        <span id="btnText">Sign In To Console</span>
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="launchDemo()">
+                        🚀 Quick Launch / Demo Console
                     </button>
                 </form>
             </div>
-
-            <!-- Footer -->
-            <p class="footer-text">
-                Prototype credentials store in shared artifact storage — visible to everyone using this app. Do not use a real password.
+            <p style="text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 16px;">
+                Taganito HPAL Nickel Corporation (THPAL) • Claver, Surigao del Norte
             </p>
         </div>
     </div>
 
-    <script>
-        let currentMode = 'login';
+    <!-- ================= DASHBOARD WEB APPLICATION ================= -->
+    <div id="app-section">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <div class="nav-logo">🛡️</div>
+                <div class="nav-title">
+                    <h2>Quality<span class="amber">Group</span></h2>
+                    <span>THPAL Operations &amp; Assurance Console</span>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    <span>DCS ONLINE: AUTOCLAVE A/B NORMAL</span>
+                </div>
+                <div style="text-align: right; font-size: 12px; font-family: 'JetBrains Mono', monospace;">
+                    <div style="color: var(--amber);" id="userDisplay">Engr. Admin (HPAL Div)</div>
+                    <div style="font-size: 10px; color: var(--text-muted);">Claver, Surigao del Norte</div>
+                </div>
+                <button class="btn-logout" onclick="logout()">Sign Out</button>
+            </div>
+        </nav>
 
-        function switchMode(mode) {
-            currentMode = mode;
+        <!-- Dashboard Sub-Nav Tabs -->
+        <div class="dashboard-nav">
+            <button class="dash-tab active" onclick="switchTab('overview', this)">📊 Plant Overview &amp; Telemetry</button>
+            <button class="dash-tab" onclick="switchTab('process', this)">⚙️ 7-Stage HPAL Process Monitor</button>
+            <button class="dash-tab" onclick="switchTab('slider', this)">🖼️ Facility Visuals &amp; Slider</button>
+            <button class="dash-tab" onclick="switchTab('assurance', this)">🌿 Environmental &amp; Quality Assurance</button>
+        </div>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- TAB 1: OVERVIEW & TELEMETRY -->
+            <div id="tab-overview" class="tab-pane active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="corner-ticks corner-ticks-tr"></div>
+                        <div class="stat-label">Annual Nickel Target (Ni)</div>
+                        <div class="stat-value" id="simNi">30,000 <span class="stat-unit">MT/Year</span></div>
+                        <div class="stat-sub">🟢 99.8% Recovery Efficiency</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="corner-ticks corner-ticks-tr"></div>
+                        <div class="stat-label">Annual Cobalt Target (Co)</div>
+                        <div class="stat-value" id="simCo">2,640 <span class="stat-unit">MT/Year</span></div>
+                        <div class="stat-sub">🟢 Mixed Sulfide Grade A</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="corner-ticks corner-ticks-tr"></div>
+                        <div class="stat-label">Autoclave Core Temp</div>
+                        <div class="stat-value" id="simTemp">255.4 <span class="stat-unit">°C</span></div>
+                        <div class="stat-sub">🔵 High Pressure Leaching</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="corner-ticks corner-ticks-tr"></div>
+                        <div class="stat-label">ECC Compliance Status</div>
+                        <div class="stat-value" style="color: var(--emerald);">100% <span class="stat-unit">COMPLIANT</span></div>
+                        <div class="stat-sub">🟢 DENR-EMB Region XIII</div>
+                    </div>
+                </div>
+
+                <div class="content-grid-2">
+                    <div class="panel">
+                        <div class="corner-ticks corner-ticks-tl"></div><div class="corner-ticks corner-ticks-br"></div>
+                        <h3 class="section-title">🏭 Taganito HPAL Nickel Corporation (THPAL) Profile</h3>
+                        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">
+                            THPAL is a pioneering hydrometallurgical processing plant situated at the Taganito Special Economic Zone in Claver, Surigao del Norte. Utilizing advanced <strong>High-Pressure Acid Leach (HPAL)</strong> technology, the plant extracts high-value nickel and cobalt from low-grade lateritic/limonite ore.
+                        </p>
+                        <div style="background: var(--bg-card); padding: 16px; border-radius: 10px; border: 1px solid var(--border);">
+                            <h4 style="font-size: 13px; color: var(--amber); margin-bottom: 8px; font-family: 'JetBrains Mono', monospace;">⚡ STRATEGIC REFINING VALUE CHAIN</h4>
+                            <p style="font-size: 13px; color: var(--text-main);">
+                                Low-grade ore (1.15% - 1.35% Ni) supplied by <strong>Taganito Mining Corporation (TMC)</strong> is processed in high-temperature titanium autoclaves using sulfuric acid ($H_2SO_4$). The resulting Nickel/Cobalt Mixed Sulfide is exported directly to Sumitomo Metal Mining's (SMM) Niihama Nickel Refinery in Japan to produce 99.99% electrolytic battery-grade nickel.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="corner-ticks corner-ticks-tr"></div><div class="corner-ticks corner-ticks-bl"></div>
+                        <h3 class="section-title">📋 Corporate &amp; Technical Data</h3>
+                        <ul class="info-list">
+                            <li class="info-item"><span class="info-key">Incorporation Date</span><span class="info-val">August 22, 2008</span></li>
+                            <li class="info-item"><span class="info-key">Commercial Ops Start</span><span class="info-val">September 2013</span></li>
+                            <li class="info-item"><span class="info-key">Majority Stakeholder</span><span class="info-val">Sumitomo Metal Mining (75%)</span></li>
+                            <li class="info-item"><span class="info-key">Joint Venture Partners</span><span class="info-val">Nickel Asia (10%) / Mitsui (15%)</span></li>
+                            <li class="info-item"><span class="info-key">Feedstock Supplier</span><span class="info-val">Taganito Mining Corp (TMC)</span></li>
+                            <li class="info-item"><span class="info-key">Primary Reagent</span><span class="info-val">Sulfuric Acid ($H_2SO_4$) / $H_2S$ Gas</span></li>
+                            <li class="info-item"><span class="info-key">ECC Reference</span><span class="info-val">ECC No. 9209-017-301A</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: 7-STAGE HPAL PROCESS MONITOR -->
+            <div id="tab-process" class="tab-pane">
+                <div class="panel" style="margin-bottom: 24px;">
+                    <div class="corner-ticks corner-ticks-tl"></div><div class="corner-ticks corner-ticks-tr"></div>
+                    <h3 class="section-title">⚡ Interactive 7-Stage Hydrometallurgical Process Monitor</h3>
+                    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">
+                        Click on any of the 7 stages below to inspect live DCS telemetry, chemical reaction parameters, and equipment health across the Taganito processing complex.
+                    </p>
+
+                    <div class="process-grid">
+                        <div class="process-step active" onclick="selectProcessStep(1, this)">
+                            <span class="step-num">STAGE 01</span>
+                            <div class="step-title">Ore Preparation</div>
+                            <span class="step-status">ACTIVE</span>
+                        </div>
+                        <div class="process-step" onclick="selectProcessStep(2, this)">
+                            <span class="step-num">STAGE 02</span>
+                            <div class="step-title">High-Pressure Acid Leach (HPAL)</div>
+                            <span class="step-status">255°C / 4.5MPa</span>
+                        </div>
+                        <div class="process-step" onclick="selectProcessStep(3, this)">
+                            <span class="step-num">STAGE 03</span>
+                            <div class="step-title">Pre-Neutralization &amp; CCD</div>
+                            <span class="step-status">WASHING</span>
+                        </div>
+                        <div class="process-step" onclick="selectProcessStep(4, this)">
+                            <span class="step-num">STAGE 04</span>
+                            <div class="step-title">Neutralization</div>
+                            <span class="step-status">Fe/Al REMOVAL</span>
+                        </div>
+                        <div class="process-step" onclick="selectProcessStep(5, this)">
+                            <span class="step-num">STAGE 05</span>
+                            <div class="step-title">Zinc Removal ($ZnS$)</div>
+                            <span class="step-status">PRECIPITATION</span>
+                        </div>
+                        <div class="process-step" onclick="selectProcessStep(6, this)">
+                            <span class="step-num">STAGE 06</span>
+                            <div class="step-title">Mixed Sulfide ($MS$) Prod</div>
+                            <span class="step-status">$H_2S$ REACTION</span>
+                        </div>
+                        <div class="process-step" onclick="selectProcessStep(7, this)">
+                            <span class="step-num">STAGE 07</span>
+                            <div class="step-title">Final Neutralization &amp; TSF</div>
+                            <span class="step-status">EFFLUVENT CLEAR</span>
+                        </div>
+                    </div>
+
+                    <!-- Process Detail Box -->
+                    <div class="process-detail-card" id="processDetailContent">
+                        <div class="corner-ticks corner-ticks-bl"></div><div class="corner-ticks corner-ticks-br"></div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+                            <div>
+                                <span style="color: var(--amber); font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;">LIVE TELEMETRY • STAGE 01</span>
+                                <h3 style="font-family: 'Oswald', sans-serif; font-size: 24px; margin: 4px 0 10px;">Ore Preparation &amp; Slurry Screening</h3>
+                                <p style="color: var(--text-muted); font-size: 14px; max-width: 800px; line-height: 1.6;">
+                                    Low-grade limonite ore delivered by Taganito Mining Corp (TMC) conveyor systems is screened, washed, and mixed with water in ball mills to produce a uniform slurry with optimal solid density (~35-40%) ready for autoclave feeding.
+                                </p>
+                            </div>
+                            <div style="background: var(--bg-card); padding: 16px 24px; border-radius: 10px; border: 1px solid var(--border); min-width: 260px;">
+                                <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); margin-bottom: 8px;">SIMULATED PARAMETERS</div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px;"><span>Slurry Feed Density:</span><strong style="color: var(--cyan);">38.5% Solids</strong></div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px;"><span>Conveyor Flow Rate:</span><strong style="color: var(--emerald);">450 Tonnes/hr</strong></div>
+                                <div style="display: flex; justify-content: space-between; font-size: 13px;"><span>Screening Mesh:</span><strong style="color: var(--amber);">Nominal 0.5mm</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: FACILITY VISUALS & SLIDER -->
+            <div id="tab-slider" class="tab-pane">
+                <div class="panel" style="margin-bottom: 24px;">
+                    <div class="corner-ticks corner-ticks-tl"></div><div class="corner-ticks corner-ticks-tr"></div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                        <h3 class="section-title" style="margin: 0;">📸 THPAL Facility &amp; Operations Gallery</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-outline" style="margin:0; padding: 6px 14px; font-size: 11px;" onclick="toggleAutoPlay()" id="autoPlayBtn">⏸️ Pause Auto-Scroll</button>
+                        </div>
+                    </div>
+
+                    <div class="slider-container" id="slider">
+                        <!-- Slide 1 -->
+                        <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1600&q=80');">
+                            <div class="slide-overlay">
+                                <span class="slide-tag">Complex Overview</span>
+                                <h3 class="slide-title">Panoramic View of Taganito Hydrometallurgical Complex</h3>
+                                <p class="slide-desc">Located at Barangay Taganito, Claver, Surigao del Norte. The 30,000 MT/year capacity plant operates inside the Taganito Special Economic Zone as a registered Ecozone Export Enterprise.</p>
+                            </div>
+                        </div>
+                        <!-- Slide 2 -->
+                        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1516937941344-00b4e0337589?auto=format&fit=crop&w=1600&q=80');">
+                            <div class="slide-overlay">
+                                <span class="slide-tag">Core Technology</span>
+                                <h3 class="slide-title">High-Pressure Acid Leach (HPAL) Autoclave Systems</h3>
+                                <p class="slide-desc">Titanium-lined autoclaves operate at high temperature (approx. 250-260°C) and pressure (4.5 MPa), leaching nickel and cobalt selectively with sulfuric acid while rejecting iron, aluminum, and silicon.</p>
+                            </div>
+                        </div>
+                        <!-- Slide 3 -->
+                        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1600&q=80');">
+                            <div class="slide-overlay">
+                                <span class="slide-tag">DCS Automation</span>
+                                <h3 class="slide-title">Centralized Control Room &amp; Automated Assurance</h3>
+                                <p class="slide-desc">24/7 real-time telemetry monitoring valve isolation, $H_2S$ gas reactivity, and automated neutralization sequences to ensure highest extraction recovery rates and operator safety.</p>
+                            </div>
+                        </div>
+                        <!-- Slide 4 -->
+                        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?auto=format&fit=crop&w=1600&q=80');">
+                            <div class="slide-overlay">
+                                <span class="slide-tag">Stage 03 Separation</span>
+                                <h3 class="slide-title">Countercurrent Decantation (CCD) Thickeners</h3>
+                                <p class="slide-desc">Massive multi-stage decantation circuits separate the nickel/cobalt pregnant leach solution (PLS) from the barren residue solids through continuous countercurrent washing.</p>
+                            </div>
+                        </div>
+                        <!-- Slide 5 -->
+                        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=1600&q=80');">
+                            <div class="slide-overlay">
+                                <span class="slide-tag">Environmental Care</span>
+                                <h3 class="slide-title">Sencio Creek Clean-Up &amp; Water Quality Preservation</h3>
+                                <p class="slide-desc">In partnership with EMB Region XIII and Barangay Hayanggabon residents, THPAL actively adopts and preserves local water bodies, conducting regular orchestrated coastal and creek clean-up drives.</p>
+                            </div>
+                        </div>
+
+                        <!-- Navigation Arrows -->
+                        <button class="slider-btn prev-btn" onclick="changeSlide(-1)">&#10094;</button>
+                        <button class="slider-btn next-btn" onclick="changeSlide(1)">&#10095;</button>
+
+                        <!-- Dot Indicators -->
+                        <div class="slider-dots">
+                            <span class="dot active" onclick="goToSlide(0)"></span>
+                            <span class="dot" onclick="goToSlide(1)"></span>
+                            <span class="dot" onclick="goToSlide(2)"></span>
+                            <span class="dot" onclick="goToSlide(3)"></span>
+                            <span class="dot" onclick="goToSlide(4)"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: ENVIRONMENTAL & QUALITY ASSURANCE -->
+            <div id="tab-assurance" class="tab-pane">
+                <div class="content-grid-2">
+                    <div class="panel">
+                        <div class="corner-ticks corner-ticks-tl"></div><div class="corner-ticks corner-ticks-br"></div>
+                        <h3 class="section-title">🌿 Environmental Compliance &amp; MMT Protocol</h3>
+                        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+                            THPAL operates under strict compliance with DENR-EMB Region 13 regulations. Regular monitoring is conducted by the Multi-Partite Monitoring Team (MMT) representing local LGUs, indigenous communities, and environmental regulators.
+                        </p>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <h4 style="font-size: 14px; color: var(--amber); margin-bottom: 6px;">♻️ Tailings &amp; By-Product Innovation</h4>
+                            <p style="font-size: 13px; color: var(--text-main); line-height: 1.5;">
+                                • <strong>TSF1 Facility Management:</strong> Tailings consisting predominantly of inert hematite and gypsum are neutralized and safely deposited in engineered Tailings Storage Facility 1 (THPAL TSF1).<br>
+                                • <strong>Scandium Recovery Project:</strong> Innovating beyond nickel, THPAL utilizes barren liquor from the HPAL process to extract valuable Scandium Oxalate (~23% Sc) using resin and oxalic acid, turning industrial waste into high-tech commercial resources.
+                            </p>
+                        </div>
+
+                        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 14px; border-radius: 8px;">
+                            <strong style="color: var(--emerald); font-size: 13px; display: block; margin-bottom: 4px;">🤝 Community &amp; Ecological Adoption</strong>
+                            <span style="font-size: 12px; color: var(--text-main);">
+                                Active adopter of a 1.6 km stretch of <strong>Sencio Creek</strong> and coastal zones in Brgy. Hayanggabon and Taganito, engaging local communities in continuous environmental education and preservation.
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="corner-ticks corner-ticks-tr"></div><div class="corner-ticks corner-ticks-bl"></div>
+                        <h3 class="section-title">✅ Daily Quality Assurance Checklist</h3>
+                        <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 14px;">
+                            Click to verify digital sign-off for shift inspection protocols:
+                        </p>
+
+                        <div id="checklistContainer">
+                            <div class="checklist-item" onclick="toggleCheck(this)">
+                                <div class="checklist-left">
+                                    <div class="check-box">✓</div>
+                                    <span class="check-text">Autoclave Titanium Lining &amp; Pressure Seal</span>
+                                </div>
+                                <span class="check-tag">HPAL-01</span>
+                            </div>
+                            <div class="checklist-item" onclick="toggleCheck(this)">
+                                <div class="checklist-left">
+                                    <div class="check-box">✓</div>
+                                    <span class="check-text">H2S Isolation Valves &amp; Gas Sensor Calibration</span>
+                                </div>
+                                <span class="check-tag">SULF-02</span>
+                            </div>
+                            <div class="checklist-item" onclick="toggleCheck(this)">
+                                <div class="checklist-left">
+                                    <div class="check-box">✓</div>
+                                    <span class="check-text">CCD Slurry Wash Efficiency &amp; Turbidity</span>
+                                </div>
+                                <span class="check-tag">CCD-03</span>
+                            </div>
+                            <div class="checklist-item" onclick="toggleCheck(this)">
+                                <div class="checklist-left">
+                                    <div class="check-box">✓</div>
+                                    <span class="check-text">Final Neutralization Effluent pH Limit (&lt; 8.5)</span>
+                                </div>
+                                <span class="check-tag">NEUT-04</span>
+                            </div>
+                            <div class="checklist-item" onclick="toggleCheck(this)">
+                                <div class="checklist-left">
+                                    <div class="check-box">✓</div>
+                                    <span class="check-text">Sencio Creek Water Quality Sampling</span>
+                                </div>
+                                <span class="check-tag">ENV-05</span>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" style="margin-top: 14px;" onclick="submitAssuranceReport()">
+                            📝 Submit Digital Assurance Sign-Off
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast">
+        <span style="font-size: 20px;">✅</span>
+        <div>
+            <strong style="display: block; font-size: 13px;" id="toastTitle">Success</strong>
+            <span style="font-size: 12px; color: var(--text-muted);" id="toastDesc">Operation completed successfully.</span>
+        </div>
+    </div>
+
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <script>
+        /* --- AUTHENTICATION & MODE SWITCHING --- */
+        let currentAuthMode = 'login';
+
+        function switchAuthMode(mode) {
+            currentAuthMode = mode;
             const signupFields = document.getElementById('signupFields');
             const loginTab = document.getElementById('loginTab');
             const signupTab = document.getElementById('signupTab');
             const btnText = document.getElementById('btnText');
+            const errorAlert = document.getElementById('errorAlert');
 
             if (mode === 'signup') {
                 signupFields.style.display = 'block';
                 loginTab.classList.remove('active');
                 signupTab.classList.add('active');
-                btnText.textContent = 'Create account';
+                btnText.textContent = 'Register Engineer Account';
             } else {
                 signupFields.style.display = 'none';
                 loginTab.classList.add('active');
                 signupTab.classList.remove('active');
-                btnText.textContent = 'Sign in';
+                btnText.textContent = 'Sign In To Console';
             }
-            document.getElementById('errorAlert').style.display = 'none';
+            errorAlert.style.display = 'none';
         }
 
         function togglePassword() {
@@ -409,45 +1126,219 @@
             input.type = input.type === 'password' ? 'text' : 'password';
         }
 
-        function handleSubmit(event) {
+        function handleAuthSubmit(event) {
             event.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
             const errorAlert = document.getElementById('errorAlert');
             const errorMsg = document.getElementById('errorMsg');
 
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
-
             if (!username || !password) {
-                errorMsg.textContent = 'Username and password are required.';
+                errorMsg.textContent = 'Please enter both Username and Password.';
                 errorAlert.style.display = 'flex';
                 return;
             }
 
-            if (currentMode === 'signup') {
+            if (currentAuthMode === 'signup') {
                 const fullName = document.getElementById('fullName').value.trim();
-                const email = document.getElementById('email').value.trim();
-
+                const dept = document.getElementById('department').value;
                 if (!fullName) {
-                    errorMsg.textContent = 'Full name is required.';
+                    errorMsg.textContent = 'Full Name is required for DENR-EMB compliance registration.';
                     errorAlert.style.display = 'flex';
                     return;
                 }
-
-                console.log('Signup Data:', {
-                    fullName,
-                    username,
-                    password,
-                    email,
-                    phone: document.getElementById('phone').value,
-                    department: document.getElementById('department').value
-                });
-                alert('✅ Account registered! (Check console for details)');
+                document.getElementById('userDisplay').textContent = `Engr. ${fullName} (${dept})`;
             } else {
-                console.log('Login Data:', { username, password });
-                alert('✅ Login successful! (Check console for details)');
+                document.getElementById('userDisplay').textContent = `Engr. ${username} (HPAL Div)`;
             }
 
-            errorAlert.style.display = 'none';
+            enterDashboard();
+        }
+
+        function launchDemo() {
+            document.getElementById('userDisplay').textContent = 'Engr. Demo User (DCS Control Room)';
+            enterDashboard();
+            showToast("Demo Mode Activated", "Welcome to Taganito HPAL Operations Console.");
+        }
+
+        function enterDashboard() {
+            document.getElementById('auth-section').style.display = 'none';
+            const app = document.getElementById('app-section');
+            app.style.display = 'flex';
+            startTelemetrySimulation();
+        }
+
+        function logout() {
+            document.getElementById('app-section').style.display = 'none';
+            document.getElementById('auth-section').style.display = 'flex';
+            showToast("Signed Out", "You have securely logged out of the THPAL console.");
+        }
+
+        /* --- TAB SWITCHING --- */
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.dash-tab').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+
+        /* --- INTERACTIVE 7-STAGE PROCESS DATA --- */
+        const processData = {
+            1: {
+                title: "Ore Preparation & Slurry Screening",
+                desc: "Low-grade limonite ore delivered by Taganito Mining Corp (TMC) conveyor systems is screened, washed, and mixed with water in ball mills to produce a uniform slurry with optimal solid density (~35-40%) ready for autoclave feeding.",
+                p1Label: "Slurry Feed Density:", p1Val: "38.5% Solids", p1Color: "var(--cyan)",
+                p2Label: "Conveyor Flow Rate:", p2Val: "450 Tonnes/hr", p2Color: "var(--emerald)",
+                p3Label: "Screening Mesh:", p3Val: "Nominal 0.5mm", p3Color: "var(--amber)"
+            },
+            2: {
+                title: "High-Pressure Acid Leach (HPAL) Autoclave",
+                desc: "Slurry is pumped into titanium autoclaves and reacted with sulfuric acid ($H_2SO_4$) at 250-260°C and 4.5 MPa. This selectively leaches >95% of Nickel and Cobalt into solution while precipitating iron and aluminum as hematite.",
+                p1Label: "Autoclave Temp:", p1Val: "255.4 °C", p1Color: "var(--rose)",
+                p2Label: "Operating Pressure:", p2Val: "4.52 MPa", p2Color: "var(--amber)",
+                p3Label: "H2SO4 Acid Feed:", p3Val: "320 Tonnes/day", p3Color: "var(--cyan)"
+            },
+            3: {
+                title: "Pre-Neutralization & Countercurrent Decantation (CCD)",
+                desc: "The leached slurry is cooled and pre-neutralized before entering a 7-stage Countercurrent Decantation (CCD) thickener circuit. Continuous washing separates the pregnant leach solution (PLS) from the barren solid residue.",
+                p1Label: "CCD Wash Efficiency:", p1Val: "98.9% Recovery", p1Color: "var(--emerald)",
+                p2Label: "Thickener Overflow pH:", p2Val: "pH 1.8 - 2.1", p2Color: "var(--cyan)",
+                p3Label: "Underflow Solids:", p3Val: "48.2% Density", p3Color: "var(--amber)"
+            },
+            4: {
+                title: "Neutralization & Impurity Removal",
+                desc: "Limestone slurry is added to the PLS in neutralization tanks to carefully adjust pH, precipitating remaining residual impurities such as iron, aluminum, and silicon without losing nickel or cobalt values.",
+                p1Label: "Limestone Feed Rate:", p1Val: "85 Tonnes/hr", p1Color: "var(--amber)",
+                p2Label: "Target Solution pH:", p2Val: "pH 3.2 - 3.5", p2Color: "var(--emerald)",
+                p3Label: "Al/Fe Rejection Rate:", p3Val: "99.4% Removed", p3Color: "var(--cyan)"
+            },
+            5: {
+                title: "Zinc Removal System ($ZnS$ Precipitation)",
+                desc: "Controlled sulfuration using hydrogen sulfide gas precipitates trace zinc impurities as Zinc Sulfide ($ZnS$). Particle size control in this stage is vital to optimize downstream filtration capacity.",
+                p1Label: "H2S Gas Reagent Flow:", p1Val: "14.2 Nm³/min", p1Color: "var(--rose)",
+                p2Label: "ZnS Filter Efficiency:", p2Val: "99.1% Pass", p2Color: "var(--emerald)",
+                p3Label: "Particle Size Control:", p3Val: "15 - 25 µm Optimal", p3Color: "var(--amber)"
+            },
+            6: {
+                title: "Mixed Sulfide ($MS$) Production ($H_2S$ Reaction)",
+                desc: "Purified solution is reacted with high-purity hydrogen sulfide ($H_2S$) gas in pressurized reactors. Nickel and cobalt co-precipitate as a high-grade Mixed Sulfide ($Ni/Co~MS$), which is thickened, filtered, and bagged for export to Japan.",
+                p1Label: "Ni Grade in MS:", p1Val: "~57.5% Ni", p1Color: "var(--emerald)",
+                p2Label: "Co Grade in MS:", p2Val: "~4.8% Co", p2Color: "var(--cyan)",
+                p3Label: "Daily Bagging Output:", p3Val: "165 Bags (2T each)", p3Color: "var(--amber)"
+            },
+            7: {
+                title: "Final Neutralization & Tailings Storage (TSF1)",
+                desc: "Barren liquor and solid residues are treated with slaked lime to neutralize pH (< 8.5) and precipitate heavy metals. The inert slurry (hematite/gypsum) is safely discharged to THPAL Tailings Storage Facility 1 (TSF1).",
+                p1Label: "Discharge pH Level:", p1Val: "pH 8.2 (Compliant)", p1Color: "var(--emerald)",
+                p2Label: "TSF1 Impound Status:", p2Val: "Normal / Stable", p2Color: "var(--cyan)",
+                p3Label: "Scandium Recovery:", p3Val: "Active Oxalate Extr.", p3Color: "var(--amber)"
+            }
+        };
+
+        function selectProcessStep(stepId, element) {
+            document.querySelectorAll('.process-step').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            const data = processData[stepId];
+            const container = document.getElementById('processDetailContent');
+            
+            container.innerHTML = `
+                <div class="corner-ticks corner-ticks-bl"></div><div class="corner-ticks corner-ticks-br"></div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; animation: fadeIn 0.3s ease;">
+                    <div>
+                        <span style="color: var(--amber); font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;">LIVE TELEMETRY • STAGE 0${stepId}</span>
+                        <h3 style="font-family: 'Oswald', sans-serif; font-size: 24px; margin: 4px 0 10px;">${data.title}</h3>
+                        <p style="color: var(--text-muted); font-size: 14px; max-width: 800px; line-height: 1.6;">${data.desc}</p>
+                    </div>
+                    <div style="background: var(--bg-card); padding: 16px 24px; border-radius: 10px; border: 1px solid var(--border); min-width: 260px;">
+                        <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); margin-bottom: 8px;">SIMULATED PARAMETERS</div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px;"><span>${data.p1Label}</span><strong style="color: ${data.p1Color};">${data.p1Val}</strong></div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px;"><span>${data.p2Label}</span><strong style="color: ${data.p2Color};">${data.p2Val}</strong></div>
+                        <div style="display: flex; justify-content: space-between; font-size: 13px;"><span>${data.p3Label}</span><strong style="color: ${data.p3Color};">${data.p3Val}</strong></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* --- IMAGE SLIDER LOGIC --- */
+        let currentSlideIndex = 0;
+        let slideInterval;
+        let isPlaying = true;
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
+
+        function showSlide(index) {
+            slides.forEach((s, i) => {
+                s.classList.toggle('active', i === index);
+                dots[i].classList.toggle('active', i === index);
+            });
+            currentSlideIndex = index;
+        }
+
+        function changeSlide(direction) {
+            let nextIndex = (currentSlideIndex + direction + slides.length) % slides.length;
+            showSlide(nextIndex);
+        }
+
+        function goToSlide(index) {
+            showSlide(index);
+        }
+
+        function toggleAutoPlay() {
+            const btn = document.getElementById('autoPlayBtn');
+            if (isPlaying) {
+                clearInterval(slideInterval);
+                btn.innerHTML = "▶️ Resume Auto-Scroll";
+                isPlaying = false;
+            } else {
+                startSlideTimer();
+                btn.innerHTML = "⏸️ Pause Auto-Scroll";
+                isPlaying = true;
+            }
+        }
+
+        function startSlideTimer() {
+            clearInterval(slideInterval);
+            slideInterval = setInterval(() => { changeSlide(1); }, 4500);
+        }
+        startSlideTimer();
+
+        /* --- CHECKLIST & TOAST NOTIFICATION --- */
+        function toggleCheck(item) {
+            item.classList.toggle('checked');
+        }
+
+        function submitAssuranceReport() {
+            const checkedCount = document.querySelectorAll('.checklist-item.checked').length;
+            const total = document.querySelectorAll('.checklist-item').length;
+            
+            if (checkedCount < total) {
+                showToast("Incomplete Audit", `You have verified ${checkedCount}/${total} items. Please inspect all parameters.`);
+            } else {
+                showToast("Assurance Report Logged", "Shift compliance digitally timestamped and synced with EMB MMT protocol.");
+            }
+        }
+
+        function showToast(title, desc) {
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastDesc').textContent = desc;
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 4000);
+        }
+
+        /* --- LIVE TELEMETRY SIMULATION --- */
+        function startTelemetrySimulation() {
+            setInterval(() => {
+                // Randomly fluctuate Autoclave Temp slightly
+                const tempEl = document.getElementById('simTemp');
+                if (tempEl) {
+                    let currentTemp = parseFloat(tempEl.textContent);
+                    let delta = (Math.random() * 0.4 - 0.2);
+                    tempEl.innerHTML = (currentTemp + delta).toFixed(1) + ' <span class="stat-unit">°C</span>';
+                }
+            }, 3000);
         }
     </script>
 </body>
