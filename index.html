@@ -1,665 +1,147 @@
+<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CollabHub | Drupal Innovation & Knowledge Portal</title>
-    <!-- Google Fonts & FontAwesome for Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        /* ==========================================
-           1. UI DESIGN SYSTEM & VARIABLES (SDC Basis)
-           ========================================== */
-        :root {
-            --navy: #0F172A;
-            --navy-light: #1E293B;
-            --teal: #0D9488;
-            --teal-hover: #0F766E;
-            --teal-light: #CCFBF1;
-            --bg: #F8FAFC;
-            --card-bg: #FFFFFF;
-            --text-main: #334155;
-            --text-dark: #0F172A;
-            --text-light: #64748B;
-            --border: #E2E8F0;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
-            --radius: 8px;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            line-height: 1.5;
-        }
-
-        /* Typography */
-        h1, h2, h3, h4 { color: var(--text-dark); font-weight: 700; }
-        .body-text { font-family: 'Source Sans Pro', sans-serif; font-size: 1.05rem; line-height: 1.6; }
-
-        /* Utility Classes */
-        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
-        .btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 10px 18px; border-radius: var(--radius); font-weight: 600;
-            cursor: pointer; transition: all 0.2s; border: none; font-size: 0.9rem;
-        }
-        .btn-primary { background-color: var(--teal); color: white; }
-        .btn-primary:hover { background-color: var(--teal-hover); }
-        .btn-outline { background-color: transparent; border: 1px solid var(--border); color: var(--text-dark); }
-        .btn-outline:hover { background-color: #F1F5F9; }
-        .btn-block { width: 100%; justify-content: center; }
-        
-        .badge {
-            display: inline-block; padding: 4px 10px; border-radius: 20px;
-            font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
-        }
-        .badge-teal { background-color: var(--teal-light); color: var(--teal-hover); }
-        .badge-gray { background-color: #F1F5F9; color: var(--text-light); }
-        .badge-warning { background-color: #FEF3C7; color: #D97706; }
-
-        .card {
-            background: var(--card-bg); border-radius: var(--radius);
-            border: 1px solid var(--border); padding: 20px; box-shadow: var(--shadow);
-            margin-bottom: 20px; transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .card:hover { box-shadow: var(--shadow-lg); }
-        .card-interactive { cursor: pointer; }
-        .card-interactive:hover { transform: translateY(-2px); border-color: var(--teal); }
-
-        /* ==========================================
-           2. GLOBAL NAVIGATION (Drupal Header Block)
-           ========================================== */
-        header {
-            background-color: var(--navy); color: white;
-            position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .nav-container {
-            display: flex; justify-content: space-between; align-items: center;
-            height: 70px;
-        }
-        .logo { font-size: 1.3rem; font-weight: 700; color: white; text-decoration: none; display: flex; align-items: center; gap: 10px; }
-        .logo span { color: var(--teal); }
-        
-        .nav-links { display: flex; gap: 5px; list-style: none; }
-        .nav-links button {
-            background: none; border: none; color: #94A3B8; padding: 10px 15px;
-            font-size: 0.95rem; font-weight: 500; cursor: pointer; border-radius: var(--radius);
-            transition: all 0.2s;
-        }
-        .nav-links button:hover, .nav-links button.active { color: white; background-color: var(--navy-light); }
-        .nav-links button.active { border-bottom: 2px solid var(--teal); border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
-
-        .user-controls { display: flex; align-items: center; gap: 15px; }
-        .search-bar {
-            background: var(--navy-light); border: 1px solid #334155;
-            padding: 8px 15px; border-radius: 20px; color: white; width: 250px;
-            font-size: 0.85rem;
-        }
-        .search-bar::placeholder { color: #64748B; }
-        
-        /* RBAC Simulation Toggle */
-        .rbac-toggle {
-            background: #1E293B; border: 1px solid var(--teal); padding: 5px 10px;
-            border-radius: 4px; font-size: 0.75rem; color: var(--teal-light);
-            display: flex; align-items: center; gap: 6px; cursor: pointer;
-        }
-        
-        .avatar { width: 35px; height: 35px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
-
-        /* ==========================================
-           3. LAYOUT & SCREENS (Drupal Layout Builder)
-           ========================================== */
-        .screen { display: none; padding: 30px 0; }
-        .screen.active { display: block; }
-        
-        /* Screen 1: Dashboard Grid */
-        .dashboard-grid { display: grid; grid-template-columns: 220px 1fr 300px; gap: 25px; }
-        
-        /* Screen 2: Detail Grid */
-        .detail-grid { display: grid; grid-template-columns: 1fr 340px; gap: 30px; }
-        
-        /* Screen 3: Knowledge Base Grid */
-        .kb-grid { display: grid; grid-template-columns: 260px 1fr; gap: 30px; }
-
-        /* Sidebar Navigation & Filters (Drupal Views Blocks) */
-        .sidebar-title { font-size: 0.8rem; text-transform: uppercase; color: var(--text-light); margin-bottom: 12px; font-weight: 700; letter-spacing: 0.5px; }
-        .sidebar-menu { list-style: none; margin-bottom: 25px; }
-        .sidebar-menu li a { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; color: var(--text-main); text-decoration: none; border-radius: var(--radius); font-size: 0.95rem; margin-bottom: 2px; }
-        .sidebar-menu li a:hover, .sidebar-menu li a.active { background-color: #E2E8F0; color: var(--text-dark); font-weight: 600; }
-        
-        .filter-group { margin-bottom: 20px; }
-        .filter-label { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; margin-bottom: 8px; cursor: pointer; color: var(--text-main); }
-        
-        /* Interactive Flag Module (Upvotes) */
-        .upvote-box {
-            text-align: center; padding: 15px; background: #F8FAFC;
-            border: 2px dashed var(--border); border-radius: var(--radius);
-            margin-bottom: 20px; transition: all 0.2s;
-        }
-        .upvote-btn {
-            background: white; border: 1px solid var(--border); padding: 10px 20px;
-            border-radius: 30px; font-size: 1.1rem; font-weight: 700; color: var(--text-dark);
-            cursor: pointer; box-shadow: var(--shadow); transition: all 0.2s;
-            display: inline-flex; align-items: center; gap: 10px; width: 100%; justify-content: center;
-        }
-        .upvote-btn:hover, .upvote-btn.flagged {
-            background: var(--teal); color: white; border-color: var(--teal);
-        }
-        
-        /* Moderator Panel (Drupal Content Moderation / Workflows) */
-        .moderator-panel {
-            display: none; /* Hidden by default, shown via RBAC JS */
-            background: #FFFBEB; border: 1px solid #FCD34D;
-            padding: 15px; border-radius: var(--radius); margin-bottom: 20px;
-        }
-        body.role-manager .moderator-panel { display: block; }
-        
-        /* Comments Component */
-        .comment { display: flex; gap: 15px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
-        .comment-content { background: #F1F5F9; padding: 12px 16px; border-radius: var(--radius); flex-grow: 1; }
-        .comment-author { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; color: var(--navy); }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .dashboard-grid, .detail-grid, .kb-grid { grid-template-columns: 1fr; }
-            .user-controls .search-bar { display: none; }
-        }
-    </style>
+    <title>105&106_DeZn_MS_SR - AVEVA PI Vision Clone</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <div class="hmi-header">
+        <div class="logo">AVEVA™ PI Vision™</div>
+        <div class="display-name">105&106_DeZn_MS_SR</div>
+    </div>
 
-    <!-- ==========================================
-       HEADER & NAVIGATION (Drupal Global Region)
-       ========================================== -->
-    <header>
-        <div class="container nav-container">
-            <a href="#" class="logo" onclick="switchScreen('dashboard')">
-                <i class="fa-solid fa-layer-group"></i> Collab<span>Hub</span>
-            </a>
+    <div class="hmi-container">
+        <!-- LEFT SIDE: Real-Time Dark Charts -->
+        <div class="left-panel">
+            <div class="chart-wrapper"><canvas id="chartFlow"></canvas></div>
+            <div class="chart-wrapper"><canvas id="chartH2S"></canvas></div>
+            <div class="chart-wrapper"><canvas id="chartPressure"></canvas></div>
+            <div class="chart-wrapper"><canvas id="chartLevel"></canvas></div>
+        </div>
+
+        <!-- RIGHT SIDE: Process Graphics (P&ID Canvas) -->
+        <div class="right-panel">
             
-            <ul class="nav-links">
-                <li><button class="active" onclick="switchScreen('dashboard', this)"><i class="fa-solid fa-house"></i> Dashboard</button></li>
-                <li><button onclick="switchScreen('idea-detail', this)"><i class="fa-solid fa-lightbulb"></i> Idea Detail (Sample)</button></li>
-                <li><button onclick="switchScreen('knowledge-base', this)"><i class="fa-solid fa-book-open"></i> Knowledge Base</button></li>
-            </ul>
+            <!-- SVG Piping Layer -->
+            <svg class="piping-layer" width="100%" height="100%">
+                <!-- Main top horizontal pipe -->
+                <line x1="100" y1="180" x2="650" y2="180" stroke="#00ffff" stroke-width="3" stroke-dasharray="5,5" />
+                <!-- Vertical drops to reactors -->
+                <line x1="150" y1="180" x2="150" y2="280" stroke="#00ffff" stroke-width="3" />
+                <line x1="300" y1="180" x2="300" y2="280" stroke="#00ffff" stroke-width="3" />
+                <line x1="450" y1="180" x2="450" y2="280" stroke="#00ffff" stroke-width="3" />
+                <line x1="600" y1="180" x2="600" y2="280" stroke="#00ffff" stroke-width="3" />
+            </svg>
 
-            <div class="user-controls">
-                <!-- Role Based Access Control Simulation -->
-                <label class="rbac-toggle" title="Simulates Drupal Role Permissions">
-                    <input type="checkbox" id="roleToggle" onchange="toggleRBAC(this)">
-                    <span><i class="fa-solid fa-user-shield"></i> Manager Role</span>
-                </label>
+            <!-- Bypassed overlay -->
+            <div class="bypassed-badge">Bypassed</div>
 
-                <input type="text" class="search-bar" placeholder="Search Drupal nodes... (/)">
-                <i class="fa-regular fa-bell" style="cursor: pointer;"></i>
-                <div class="avatar" title="Authenticated User: Alex">AJ</div>
-            </div>
-        </div>
-    </header>
-
-    <main class="container">
-        
-        <!-- ==================================================================
-           SCREEN 1: THE PERSONALIZED DASHBOARD (Drupal Layout Builder Home)
-           ================================================================== -->
-        <div id="screen-dashboard" class="screen active">
-            <div class="dashboard-grid">
+            <!-- Reactors Array -->
+            <div class="reactors-container">
                 
-                <!-- Left Column: Navigation & Taxonomy Filters (Drupal Blocks) -->
-                <aside>
-                    <div class="sidebar-title">Menu</div>
-                    <ul class="sidebar-menu">
-                        <li><a href="#" class="active"><i class="fa-solid fa-square-rss"></i> Activity Feed</a></li>
-                        <li><a href="#" onclick="switchScreen('knowledge-base', document.querySelectorAll('.nav-links button')[2])"><i class="fa-solid fa-book"></i> Knowledge Base</a></li>
-                        <li><a href="#"><i class="fa-solid fa-users"></i> My Groups</a></li>
-                        <li><a href="#"><i class="fa-solid fa-folder-tree"></i> Directory</a></li>
-                    </ul>
-
-                    <div class="sidebar-title">Filter Feed by Dept.</div>
-                    <div class="filter-group">
-                        <label class="filter-label"><input type="checkbox" checked onchange="filterFeed()"> Engineering</label>
-                        <label class="filter-label"><input type="checkbox" checked onchange="filterFeed()"> Human Resources</label>
-                        <label class="filter-label"><input type="checkbox" checked onchange="filterFeed()"> Marketing</label>
-                        <label class="filter-label"><input type="checkbox" checked onchange="filterFeed()"> Product Design</label>
+                <!-- 106VE01 -->
+                <div class="reactor-group">
+                    <div class="motor">M</div>
+                    <div class="tank">
+                        <div class="shaft"></div><div class="blade blade-top"></div><div class="blade blade-bottom"></div>
+                        <div class="liquid" id="liquid1"></div>
+                        <div class="capacity">759m3</div>
                     </div>
-                </aside>
-
-                <!-- Center Column: Infinite Scroll Activity Feed (Drupal Views) -->
-                <section>
-                    <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h2>Welcome back, Alex! 👋</h2>
-                            <p style="color: var(--text-light); font-size: 0.9rem;">Here is what is happening in your Drupal workspace today.</p>
-                        </div>
-                        <span class="badge badge-gray"><i class="fa-solid fa-rotate"></i> Live Feed</span>
-                    </div>
-
-                    <!-- Feed Card 1: Innovation Idea Node -->
-                    <div class="card card-interactive feed-item" data-dept="Engineering" onclick="switchScreen('idea-detail', document.querySelectorAll('.nav-links button')[1])">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <span class="badge badge-teal">Innovation Idea</span>
-                            <span class="badge badge-warning">Under Review</span>
-                        </div>
-                        <h3>Automate Employee Onboarding Equipment Dispatch</h3>
-                        <p style="color: var(--text-light); margin: 10px 0; font-size: 0.95rem;">
-                            New hires currently wait an average of 4 days to receive laptops due to manual IT triage emails. Let's integrate Workday directly with ServiceNow...
-                        </p>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-light);">
-                            <span><i class="fa-regular fa-user"></i> Submitted by <strong>Sarah Jenkins</strong> (Engineering)</span>
-                            <div style="display: flex; gap: 15px;">
-                                <span style="color: var(--teal); font-weight: bold;"><i class="fa-solid fa-caret-up"></i> 84 Upvotes</span>
-                                <span><i class="fa-regular fa-comment"></i> 14 Comments</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Feed Card 2: Knowledge Base Article Node -->
-                    <div class="card card-interactive feed-item" data-dept="Human Resources" onclick="switchScreen('knowledge-base', document.querySelectorAll('.nav-links button')[2])">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <span class="badge badge-gray">Knowledge Article</span>
-                            <span style="font-size: 0.8rem; color: var(--text-light);"><i class="fa-regular fa-clock"></i> 5 min read</span>
-                        </div>
-                        <h3>Annual Leave & Time-Off Policy (Updated for 2026)</h3>
-                        <p style="color: var(--text-light); margin: 10px 0; font-size: 0.95rem;">
-                            To request time off, log into the HR portal at least 14 days prior to your planned leave. This guide outlines rollover hours and parental leave guidelines...
-                        </p>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-light);">
-                            <span><i class="fa-solid fa-folder"></i> Department: <strong>Human Resources</strong></span>
-                            <span><i class="fa-regular fa-bookmark"></i> 32 Bookmarks</span>
-                        </div>
-                    </div>
-
-                    <!-- Feed Card 3: Another Idea -->
-                    <div class="card card-interactive feed-item" data-dept="Marketing">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <span class="badge badge-teal">Innovation Idea</span>
-                            <span class="badge badge-gray">Submitted</span>
-                        </div>
-                        <h3>Implement AI Triage for Customer Helpdesk</h3>
-                        <p style="color: var(--text-light); margin: 10px 0; font-size: 0.95rem;">
-                            We can reduce tier-1 support tickets by 40% by deploying an LLM trained on our public documentation to answer basic inquiries before routing to humans...
-                        </p>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-light);">
-                            <span><i class="fa-regular fa-user"></i> Submitted by <strong>David Ross</strong> (Marketing)</span>
-                            <div style="display: flex; gap: 15px;">
-                                <span style="color: var(--teal); font-weight: bold;"><i class="fa-solid fa-caret-up"></i> 42 Upvotes</span>
-                                <span><i class="fa-regular fa-comment"></i> 5 Comments</span>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Right Column: Quick Actions & Groups Block -->
-                <aside>
-                    <div class="card" style="background: linear-gradient(135deg, var(--navy), var(--navy-light)); color: white; border: none;">
-                        <h3 style="color: white; margin-bottom: 10px;">Have an idea?</h3>
-                        <p style="font-size: 0.85rem; color: #94A3B8; margin-bottom: 15px;">Submit your innovation proposals to the team for voting and review.</p>
-                        <button class="btn btn-primary btn-block" onclick="alert('Drupal Modal: Opens Node Add Form (/node/add/innovation_idea)')">
-                            <i class="fa-solid fa-plus"></i> Submit New Idea
-                        </button>
-                    </div>
-
-                    <div class="card">
-                        <div class="sidebar-title">My Drupal Groups</div>
-                        <ul class="sidebar-menu" style="margin-bottom: 0;">
-                            <li><a href="#"><span><i class="fa-solid fa-layer-group" style="color: var(--teal);"></i> Engineering Guild</span> <span class="badge badge-gray">24</span></a></li>
-                            <li><a href="#"><span><i class="fa-solid fa-layer-group" style="color: var(--teal);"></i> AI Taskforce</span> <span class="badge badge-gray">8</span></a></li>
-                            <li><a href="#"><span><i class="fa-solid fa-layer-group" style="color: var(--teal);"></i> UX Design Team</span> <span class="badge badge-gray">12</span></a></li>
-                        </ul>
-                    </div>
-
-                    <div class="card">
-                        <div class="sidebar-title">Upcoming Events</div>
-                        <div style="font-size: 0.9rem; margin-bottom: 12px;">
-                            <strong>Q3 All-Hands Town Hall</strong><br>
-                            <span style="color: var(--text-light); font-size: 0.8rem;"><i class="fa-regular fa-calendar"></i> Oct 14, 2026 @ 2:00 PM</span>
-                        </div>
-                        <div style="font-size: 0.9rem;">
-                            <strong>Drupal 11 Component Workshop</strong><br>
-                            <span style="color: var(--text-light); font-size: 0.8rem;"><i class="fa-regular fa-calendar"></i> Oct 18, 2026 @ 10:00 AM</span>
-                        </div>
-                    </div>
-                </aside>
-
-            </div>
-        </div>
-
-        <!-- ==================================================================
-           SCREEN 2: IDEA DETAIL & VOTING PAGE (Drupal Node Detail View)
-           ================================================================== -->
-        <div id="screen-idea-detail" class="screen">
-            <button class="btn btn-outline" style="margin-bottom: 20px;" onclick="switchScreen('dashboard', document.querySelectorAll('.nav-links button')[0])">
-                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
-            </button>
-
-            <div class="detail-grid">
-                <!-- Left Column: Node Content & Comments -->
-                <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <div>
-                            <span class="badge badge-teal">Process Improvement</span>
-                            <span class="badge badge-gray" style="margin-left: 5px;">Node ID: #1042</span>
-                        </div>
-                        <span class="badge badge-warning" style="font-size: 0.85rem;"><i class="fa-regular fa-clock"></i> Status: Under Review</span>
-                    </div>
-
-                    <h1 style="margin-bottom: 15px; font-size: 1.8rem;">Automate Employee Onboarding Equipment Dispatch</h1>
-                    
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border); color: var(--text-light); font-size: 0.9rem;">
-                        <div class="avatar" style="width: 30px; height: 30px; font-size: 0.8rem;">SJ</div>
-                        <span>Submitted by <strong style="color: var(--text-dark);">Sarah Jenkins</strong> on Oct 10, 2026</span>
-                    </div>
-
-                    <!-- Drupal Body Fields -->
-                    <h3 style="margin-bottom: 10px; color: var(--navy);">The Problem Statement</h3>
-                    <p class="body-text" style="margin-bottom: 25px;">
-                        New hires currently wait an average of 4 days to receive their laptops and security keys due to manual IT triage emails between HR and IT. Whenever an employee is added to Workday, an HR coordinator has to manually copy-paste their equipment requirements into an email to the IT helpdesk, resulting in missed tickets, human errors, and significant onboarding friction.
-                    </p>
-
-                    <h3 style="margin-bottom: 10px; color: var(--navy);">Proposed Solution</h3>
-                    <p class="body-text" style="margin-bottom: 25px;">
-                        Integrate our Workday HR system directly with the ServiceNow hardware dispatch API using an automated webhook. When a new hire is marked as "Hired" in Workday, a ticket with the correct hardware profile (e.g., Mac vs PC, required peripherals) should automatically generate in ServiceNow and route directly to the dispatch queue.
-                    </p>
-
-                    <!-- Attached Media Field -->
-                    <h4 style="margin-bottom: 10px;">Attachments (Drupal Media Entity)</h4>
-                    <div style="display: flex; gap: 10px; margin-bottom: 30px;">
-                        <a href="#" onclick="return false;" class="btn btn-outline" style="font-size: 0.8rem;">
-                            <i class="fa-solid fa-file-pdf" style="color: #EF4444;"></i> workflow_diagram_v2.pdf
-                        </a>
-                    </div>
-
-                    <!-- Drupal Comments Section -->
-                    <h3 style="margin-bottom: 15px;">Discussion (14 Comments)</h3>
-                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                        <input type="text" class="search-bar" style="width: 100%; background: white; color: var(--text-dark); border-color: var(--border);" placeholder="Write a comment... (Markdown supported)">
-                        <button class="btn btn-primary">Post</button>
-                    </div>
-
-                    <div class="comment">
-                        <div class="avatar" style="background: var(--navy);">MR</div>
-                        <div class="comment-content">
-                            <div class="comment-author">Mark Rivera (IT Infrastructure Lead) <span style="font-weight: normal; color: var(--text-light); font-size: 0.8rem;">• 2 hours ago</span></div>
-                            <p style="font-size: 0.95rem;">We actually already have the enterprise API keys for ServiceNow! If Engineering can help us map the JSON payloads from Workday, we could build and test this MVP in less than a sprint. Great proposal Sarah!</p>
-                        </div>
-                    </div>
+                    <div class="equipment-name">106VE01</div>
                 </div>
 
-                <!-- Right Column: Sticky Upvote & Moderator Action Panels -->
-                <aside style="position: sticky; top: 90px; align-self: start;">
-                    
-                    <!-- Drupal Flag Module Simulation -->
-                    <div class="upvote-box">
-                        <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px;">DO YOU SUPPORT THIS INITIATIVE?</p>
-                        <button class="upvote-btn" id="flagBtn" onclick="toggleUpvote(this)">
-                            <i class="fa-solid fa-thumbs-up"></i> <span id="voteCount">84</span> Upvotes
-                        </button>
-                        <p style="font-size: 0.75rem; color: var(--text-light); margin-top: 10px;">
-                            <i class="fa-solid fa-check"></i> Clicking triggers asynchronous Drupal Flag AJAX
-                        </p>
+                <!-- 106VE02 -->
+                <div class="reactor-group">
+                    <div class="motor">M</div>
+                    <div class="tank">
+                        <div class="shaft"></div><div class="blade blade-top"></div><div class="blade blade-bottom"></div>
+                        <div class="liquid" id="liquid2"></div>
+                        <div class="capacity">759m3</div>
                     </div>
+                    <div class="equipment-name">106VE02</div>
+                </div>
 
-                    <!-- Drupal Workflows/Content Moderation (RBAC Protected) -->
-                    <div class="moderator-panel">
-                        <div style="display: flex; align-items: center; gap: 8px; font-weight: bold; color: #92400E; margin-bottom: 10px; font-size: 0.9rem;">
-                            <i class="fa-solid fa-lock-open"></i> Moderator Actions (RBAC)
-                        </div>
-                        <p style="font-size: 0.8rem; color: #B45309; margin-bottom: 12px;">
-                            You are seeing this block because your user role has `moderate innovation_idea workflow` permissions.
-                        </p>
-                        <label style="display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 4px;">Transition Workflow State:</label>
-                        <select style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #D97706; margin-bottom: 10px; font-family: inherit;">
-                            <option value="review">Under Review (Current)</option>
-                            <option value="approved">Approved for Roadmap</option>
-                            <option value="rejected">Archived / Rejected</option>
-                        </select>
-                        <button class="btn btn-block" style="background: #D97706; color: white;" onclick="alert('Drupal Workflows: State transitioned to Approved. Rules module triggered email notification to author.')">
-                            Update Status
-                        </button>
+                <!-- 106VE03 -->
+                <div class="reactor-group">
+                    <div class="motor">M</div>
+                    <div class="tank">
+                        <div class="shaft"></div><div class="blade blade-top"></div><div class="blade blade-bottom"></div>
+                        <div class="liquid" id="liquid3"></div>
+                        <div class="capacity">759m3</div>
                     </div>
+                    <div class="equipment-name">106VE03</div>
+                </div>
 
-                    <!-- Related Ideas Block (Drupal Views Reference) -->
-                    <div class="card">
-                        <div class="sidebar-title">Related Ideas (Views Block)</div>
-                        <ul class="sidebar-menu" style="margin-bottom: 0;">
-                            <li><a href="#"><span>IT Asset Tracking System v3</span></a></li>
-                            <li><a href="#"><span>Redesign HR Onboarding Portal</span></a></li>
-                            <li><a href="#"><span>Automated Slack Welcome Bot</span></a></li>
-                        </ul>
+                <!-- 106VE04 -->
+                <div class="reactor-group">
+                    <div class="motor">M</div>
+                    <div class="tank">
+                        <div class="shaft"></div><div class="blade blade-top"></div><div class="blade blade-bottom"></div>
+                        <div class="liquid" id="liquid4"></div>
+                        <div class="capacity">759m3</div>
                     </div>
-
-                </aside>
-            </div>
-        </div>
-
-        <!-- ==================================================================
-           SCREEN 3: KNOWLEDGE BASE (Drupal Search API & Facets UI)
-           ================================================================== -->
-        <div id="screen-knowledge-base" class="screen">
-            <!-- Big Search Header -->
-            <div class="card" style="background: var(--navy); color: white; padding: 40px; text-align: center; margin-bottom: 30px;">
-                <h1 style="color: white; margin-bottom: 10px;">How can we help you today?</h1>
-                <p style="color: #94A3B8; margin-bottom: 20px;">Search policies, technical documentation, and employee guides.</p>
-                <div style="max-width: 600px; margin: 0 auto; display: flex; gap: 10px;">
-                    <input type="text" class="search-bar" id="kbSearchInput" style="width: 100%; padding: 12px 20px; font-size: 1rem; background: white; color: var(--text-dark);" placeholder="Type keywords (e.g. 'leave', 'VPN', 'AWS')..." onkeyup="filterKnowledgeBase()">
-                    <button class="btn btn-primary" style="padding: 0 25px;"><i class="fa-solid fa-magnifying-glass"></i></button>
+                    <div class="equipment-name">106VE04</div>
                 </div>
             </div>
 
-            <div class="kb-grid">
-                <!-- Left Sidebar: Drupal Facets -->
-                <aside class="card" style="align-self: start;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h3 style="font-size: 1rem;">Filter Results</h3>
-                        <a href="#" style="font-size: 0.8rem; color: var(--teal); text-decoration: none;" onclick="resetFacets(); return false;">Reset All</a>
-                    </div>
-
-                    <div class="sidebar-title">By Department (Taxonomy)</div>
-                    <div class="filter-group">
-                        <label class="filter-label"><input type="checkbox" class="facet-dept" value="HR" checked onchange="filterKnowledgeBase()"> Human Resources (32)</label>
-                        <label class="filter-label"><input type="checkbox" class="facet-dept" value="DevOps" checked onchange="filterKnowledgeBase()"> Engineering / DevOps (45)</label>
-                        <label class="filter-label"><input type="checkbox" class="facet-dept" value="Finance" checked onchange="filterKnowledgeBase()"> Finance & Legal (18)</label>
-                    </div>
-
-                    <div class="sidebar-title">By Content Type</div>
-                    <div class="filter-group" style="margin-bottom: 0;">
-                        <label class="filter-label"><input type="checkbox" checked> Standard Guide (90)</label>
-                        <label class="filter-label"><input type="checkbox" checked> Policy Document (40)</label>
-                        <label class="filter-label"><input type="checkbox" checked> Video Tutorial (12)</label>
-                    </div>
-                </aside>
-
-                <!-- Right Column: Search Results (Drupal Search API Solr View) -->
-                <section id="kb-results-container">
-                    <div style="margin-bottom: 15px; font-size: 0.9rem; color: var(--text-light);">
-                        Showing <strong id="kb-count">3</strong> relevant documents sorted by <strong>Relevance</strong>.
-                    </div>
-
-                    <!-- KB Result 1 -->
-                    <div class="card kb-card" data-dept="HR" data-title="annual leave time off vacation benefits policy">
-                        <div style="display: flex; justify-content: space-between; align-items: start;">
-                            <div>
-                                <span class="badge badge-gray" style="margin-bottom: 8px;">Human Resources</span>
-                                <h3><a href="#" style="color: var(--navy); text-decoration: none;">Annual Leave & Time-Off Policy (2026 Guidelines)</a></h3>
-                            </div>
-                            <button class="btn btn-outline bookmark-btn" onclick="toggleBookmark(this)" title="Bookmark this article">
-                                <i class="fa-regular fa-bookmark"></i>
-                            </button>
-                        </div>
-                        <p style="color: var(--text-light); margin: 10px 0; font-size: 0.95rem;">
-                            To request time off, log into the HR portal at least 14 days prior to your planned leave. This guide outlines rollover hours, medical certificates required for sick leave exceeding 3 days, and how to register public holiday substitutions...
-                        </p>
-                        <div style="font-size: 0.8rem; color: var(--text-light); display: flex; gap: 15px;">
-                            <span><i class="fa-solid fa-tag"></i> Tags: Benefits, Vacation, HR Portal</span>
-                            <span><i class="fa-regular fa-clock"></i> Updated 2 days ago</span>
-                        </div>
-                    </div>
-
-                    <!-- KB Result 2 -->
-                    <div class="card kb-card" data-dept="DevOps" data-title="aws cloud credits engineering devops server request">
-                        <div style="display: flex; justify-content: space-between; align-items: start;">
-                            <div>
-                                <span class="badge badge-teal" style="margin-bottom: 8px;">Engineering / DevOps</span>
-                                <h3><a href="#" style="color: var(--navy); text-decoration: none;">How to Request AWS Cloud Credits for Sandbox Testing</a></h3>
-                            </div>
-                            <button class="btn btn-outline bookmark-btn" onclick="toggleBookmark(this)" title="Bookmark this article">
-                                <i class="fa-regular fa-bookmark"></i>
-                            </button>
-                        </div>
-                        <p style="color: var(--text-light); margin: 10px 0; font-size: 0.95rem;">
-                            Engineers can spin up isolated AWS EC2 and S3 instances for R&D purposes. To prevent budget overruns, all non-production instances must be tagged with your Department ID and configured to auto-terminate after 72 hours of inactivity...
-                        </p>
-                        <div style="font-size: 0.8rem; color: var(--text-light); display: flex; gap: 15px;">
-                            <span><i class="fa-solid fa-tag"></i> Tags: Cloud, AWS, DevOps, Security</span>
-                            <span><i class="fa-regular fa-clock"></i> Updated 1 week ago</span>
-                        </div>
-                    </div>
-
-                    <!-- KB Result 3 -->
-                    <div class="card kb-card" data-dept="Finance" data-title="corporate credit card expense reimbursement finance travel">
-                        <div style="display: flex; justify-content: space-between; align-items: start;">
-                            <div>
-                                <span class="badge badge-gray" style="margin-bottom: 8px;">Finance & Legal</span>
-                                <h3><a href="#" style="color: var(--navy); text-decoration: none;">Travel Expense & Client Reimbursement Guidelines</a></h3>
-                            </div>
-                            <button class="btn btn-outline bookmark-btn" onclick="toggleBookmark(this)" title="Bookmark this article">
-                                <i class="fa-regular fa-bookmark"></i>
-                            </button>
-                        </div>
-                        <p style="color: var(--text-light); margin: 10px 0; font-size: 0.95rem;">
-                            All corporate travel must be pre-approved by your department head. Itemized receipts are required for any individual meal or transit expense exceeding $25. Reimbursements are processed bi-weekly via direct deposit...
-                        </p>
-                        <div style="font-size: 0.8rem; color: var(--text-light); display: flex; gap: 15px;">
-                            <span><i class="fa-solid fa-tag"></i> Tags: Expenses, Travel, Finance</span>
-                            <span><i class="fa-regular fa-clock"></i> Updated 3 weeks ago</span>
-                        </div>
-                    </div>
-
-                </section>
+            <!-- PI Vision Tags -->
+            <div class="pi-tag" style="top: 150px; left: 30px;">
+                <div class="tag-name">106FIC002A</div>
+                <div class="tag-value-row">
+                    <div class="status-indicator" style="background:#0055ff;"></div>
+                    <span class="tag-value" id="val_flow">0</span>
+                    <span class="tag-unit">m3/h</span>
+                </div>
             </div>
+
+            <div class="pi-tag" style="top: 250px; left: 30px;">
+                <div class="tag-name">106PI001</div>
+                <div class="tag-value-row">
+                    <div class="status-indicator" style="background:#00ff00;"></div>
+                    <span class="tag-value" id="val_pressure">0</span>
+                    <span class="tag-unit">kPag</span>
+                </div>
+            </div>
+
+            <div class="pi-tag" style="top: 480px; left: 140px;">
+                <div class="tag-name">106LIC003</div>
+                <div class="tag-value-row">
+                    <span class="tag-value" id="val_ve01">0</span>
+                    <span class="tag-unit">%</span>
+                </div>
+            </div>
+
+            <div class="pi-tag" style="top: 480px; left: 290px;">
+                <div class="tag-name">106LIC004</div>
+                <div class="tag-value-row">
+                    <span class="tag-value" id="val_ve02">0</span>
+                    <span class="tag-unit">%</span>
+                </div>
+            </div>
+            
+            <div class="pi-tag" style="top: 480px; left: 440px;">
+                <div class="tag-name">106LIC005</div>
+                <div class="tag-value-row">
+                    <span class="tag-value" id="val_ve03">0</span>
+                    <span class="tag-unit">%</span>
+                </div>
+            </div>
+
+            <div class="pi-tag" style="top: 480px; left: 590px;">
+                <div class="tag-name">106LIC006</div>
+                <div class="tag-value-row">
+                    <span class="tag-value" id="val_ve04">0</span>
+                    <span class="tag-unit">%</span>
+                </div>
+            </div>
+
         </div>
+    </div>
 
-    </main>
-
-    <!-- ==========================================
-       4. INTERACTIVE JAVASCRIPT (Simulating Drupal Core/Contrib JS)
-       ========================================== -->
-    <script>
-        /**
-         * 1. Screen Switching Logic (Simulates Drupal Page Routing)
-         */
-        function switchScreen(screenId, navButton) {
-            // Hide all screens
-            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
-            // Show target screen
-            document.getElementById('screen-' + screenId).classList.add('active');
-            
-            // Update nav active states if triggered via navbar
-            if (navButton) {
-                document.querySelectorAll('.nav-links button').forEach(el => el.classList.remove('active'));
-                navButton.classList.add('active');
-            }
-            window.scrollTo(0, 0);
-        }
-
-        /**
-         * 2. Drupal Flag Module Simulation (Upvoting Idea)
-         */
-        let isFlagged = false;
-        let currentVotes = 84;
-        function toggleUpvote(btn) {
-            const countSpan = document.getElementById('voteCount');
-            if (!isFlagged) {
-                currentVotes++;
-                btn.classList.add('flagged');
-                btn.innerHTML = `<i class="fa-solid fa-check"></i> <span id="voteCount">${currentVotes}</span> Upvoted!`;
-                isFlagged = true;
-            } else {
-                currentVotes--;
-                btn.classList.remove('flagged');
-                btn.innerHTML = `<i class="fa-solid fa-thumbs-up"></i> <span id="voteCount">${currentVotes}</span> Upvotes`;
-                isFlagged = false;
-            }
-        }
-
-        /**
-         * 3. Drupal Flag Module Simulation (Bookmarking Knowledge Articles)
-         */
-        function toggleBookmark(btn) {
-            const icon = btn.querySelector('i');
-            if (icon.classList.contains('fa-regular')) {
-                icon.classList.replace('fa-regular', 'fa-solid');
-                btn.style.color = 'var(--teal)';
-                btn.style.borderColor = 'var(--teal)';
-            } else {
-                icon.classList.replace('fa-solid', 'fa-regular');
-                btn.style.color = '';
-                btn.style.borderColor = '';
-            }
-        }
-
-        /**
-         * 4. Role-Based Access Control (RBAC) Simulation
-         */
-        function toggleRBAC(checkbox) {
-            if (checkbox.checked) {
-                document.body.classList.add('role-manager');
-                alert("Drupal RBAC: Switched to 'Department Manager' role. Moderator blocks are now visible!");
-            } else {
-                document.body.classList.remove('role-manager');
-            }
-        }
-
-        /**
-         * 5. Faceted Search Simulation (Drupal Search API + Facets)
-         */
-        function filterKnowledgeBase() {
-            const query = document.getElementById('kbSearchInput').value.toLowerCase();
-            
-            // Get checked departments
-            const checkedDepts = Array.from(document.querySelectorAll('.facet-dept:checked')).map(cb => cb.value);
-            
-            const cards = document.querySelectorAll('.kb-card');
-            let visibleCount = 0;
-
-            cards.forEach(card => {
-                const titleText = card.getAttribute('data-title').toLowerCase();
-                const dept = card.getAttribute('data-dept');
-                
-                const matchesQuery = titleText.includes(query);
-                const matchesDept = checkedDepts.includes(dept);
-
-                if (matchesQuery && matchesDept) {
-                    card.style.display = 'block';
-                    visibleCount++;
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-
-            document.getElementById('kb-count').innerText = visibleCount;
-        }
-
-        function resetFacets() {
-            document.querySelectorAll('.facet-dept').forEach(cb => cb.checked = true);
-            document.getElementById('kbSearchInput').value = '';
-            filterKnowledgeBase();
-        }
-
-        /**
-         * 6. Simple Dashboard Feed Filter Simulation
-         */
-        function filterFeed() {
-            // In a real Drupal application, this triggers a Views AJAX refresh
-            console.log("Drupal Views AJAX: Re-querying database nodes based on taxonomy filter...");
-        }
-    </script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>
