@@ -1,1137 +1,665 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QualityGroup | THPAL Operations & Assurance Console</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+    <title>CollabHub | Drupal Innovation & Knowledge Portal</title>
+    <!-- Google Fonts & FontAwesome for Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* --- CORE CSS VARIABLES (DARK MODE DEFAULT) --- */
+        /* ==========================================
+           1. UI DESIGN SYSTEM & VARIABLES (SDC Basis)
+           ========================================== */
         :root {
-            --bg-main: #070B14;
-            --bg-panel: #101828;
-            --bg-panel-hover: #162034;
-            --bg-card: #0B1324;
-            --amber: #E8A33D;
-            --amber-glow: rgba(232, 163, 61, 0.25);
-            --amber-border: rgba(232, 163, 61, 0.35);
-            --emerald: #10B981;
-            --cyan: #06B6D4;
-            --rose: #F43F5E;
-            --text-main: #F8FAFC;
-            --text-muted: #8B98B4;
-            --border: rgba(232, 163, 61, 0.15);
-            --nav-bg: rgba(16, 24, 40, 0.85);
-            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            --shadow: 0 10px 30px rgba(0,0,0,0.5);
+            --navy: #0F172A;
+            --navy-light: #1E293B;
+            --teal: #0D9488;
+            --teal-hover: #0F766E;
+            --teal-light: #CCFBF1;
+            --bg: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-main: #334155;
+            --text-dark: #0F172A;
+            --text-light: #64748B;
+            --border: #E2E8F0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+            --radius: 8px;
         }
 
-        /* --- LIGHT MODE VARIABLES --- */
-        [data-theme="light"] {
-            --bg-main: #F0F4F8;
-            --bg-panel: #FFFFFF;
-            --bg-panel-hover: #F8FAFC;
-            --bg-card: #E2E8F0;
-            --amber: #D97706;
-            --amber-glow: rgba(217, 119, 6, 0.15);
-            --amber-border: rgba(217, 119, 6, 0.4);
-            --emerald: #059669;
-            --cyan: #0284C7;
-            --rose: #E11D48;
-            --text-main: #0F172A;
-            --text-muted: #475569;
-            --border: rgba(15, 23, 42, 0.12);
-            --nav-bg: rgba(255, 255, 255, 0.85);
-            --shadow: 0 10px 30px rgba(0,0,0,0.08);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--bg-main);
-            color: var(--text-main);
-            line-height: 1.6;
-            min-height: 100vh;
-            overflow-x: hidden;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(232, 163, 61, 0.08) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.05) 0px, transparent 50%);
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.98); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* --- CORNER TICKS DESIGN MOTIF --- */
-        .corner-ticks {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            border-color: var(--amber-border);
-            pointer-events: none;
-            transition: var(--transition);
-        }
-        .corner-ticks-tl { top: 6px; left: 6px; border-top: 1.5px solid; border-left: 1.5px solid; }
-        .corner-ticks-tr { top: 6px; right: 6px; border-top: 1.5px solid; border-right: 1.5px solid; }
-        .corner-ticks-bl { bottom: 6px; left: 6px; border-bottom: 1.5px solid; border-left: 1.5px solid; }
-        .corner-ticks-br { bottom: 6px; right: 6px; border-bottom: 1.5px solid; border-right: 1.5px solid; }
-
-        .panel {
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            position: relative;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
-        .panel:hover .corner-ticks { border-color: var(--amber); }
-
-        /* --- DASHBOARD WEB APPLICATION LAYOUT --- */
-        #app-section {
-            display: flex;
-            min-height: 100vh;
-            flex-direction: column;
-        }
-
-        .navbar {
-            background: var(--nav-bg);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            transition: var(--transition);
-        }
-
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .nav-logo {
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
-            background: var(--bg-card);
-            border: 1px solid var(--amber-border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            box-shadow: 0 0 15px var(--amber-glow);
-        }
-
-        .nav-title h2 {
-            font-family: 'Oswald', sans-serif;
-            font-size: 20px;
-            letter-spacing: 0.05em;
-            line-height: 1.1;
-            text-transform: uppercase;
-        }
-
-        .amber { color: var(--amber); }
-
-        .nav-title span {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            color: var(--text-muted);
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: var(--emerald);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--emerald);
-            animation: pulse 2s infinite;
-        }
-
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        /* --- THEME TOGGLE BUTTON --- */
-        .btn-theme-toggle {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .btn-theme-toggle:hover {
-            border-color: var(--amber);
-            background: var(--bg-panel-hover);
-            transform: translateY(-1px);
-        }
-
-        .dashboard-nav {
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border);
-            padding: 0 32px;
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            scrollbar-width: none;
-            -webkit-overflow-scrolling: touch;
-        }
-        .dashboard-nav::-webkit-scrollbar { display: none; }
-
-        .dash-tab {
-            padding: 16px 20px;
-            background: transparent;
-            border: none;
-            border-bottom: 2px solid transparent;
-            color: var(--text-muted);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            white-space: nowrap;
-        }
-
-        .dash-tab:hover { color: var(--text-main); }
-        .dash-tab.active {
-            color: var(--amber);
-            border-bottom-color: var(--amber);
-            background: rgba(232, 163, 61, 0.05);
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 32px;
-            max-width: 1440px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .tab-pane { display: none; animation: fadeIn 0.3s ease; }
-        .tab-pane.active { display: block; }
-
-        /* --- STATS GRID --- */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-bottom: 28px;
-        }
-
-        .stat-card {
-            background: var(--bg-panel);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            position: relative;
-            box-shadow: var(--shadow);
-        }
-
-        .stat-label {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-
-        .stat-value {
-            font-family: 'Oswald', sans-serif;
-            font-size: 28px;
-            color: var(--text-main);
-            display: flex;
-            align-items: baseline;
-            gap: 6px;
-        }
-
-        .stat-unit { font-size: 14px; font-family: 'JetBrains Mono', monospace; color: var(--amber); font-weight: 400; }
-        .stat-sub { font-size: 11px; color: var(--emerald); margin-top: 6px; font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 4px; }
-
-        /* --- CONTENT GRIDS --- */
-        .content-grid-2 {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 24px;
-            margin-bottom: 28px;
-        }
-
-        .section-title {
-            font-family: 'Oswald', sans-serif;
-            font-size: 20px;
-            margin-bottom: 16px;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-
-        .info-list { list-style: none; }
-        .info-item {
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-        }
-        .info-item:last-child { border-bottom: none; }
-        .info-key { color: var(--text-muted); font-weight: 500; }
-        .info-val { font-family: 'JetBrains Mono', monospace; color: var(--text-main); font-weight: 600; text-align: right; }
-
-        /* --- INTERACTIVE 7-STAGE PROCESS MONITOR --- */
-        .process-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 12px;
-            margin-bottom: 24px;
-            padding-bottom: 6px;
-        }
-
-        .process-step {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 16px;
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .process-step:hover, .process-step.active {
-            background: var(--bg-panel-hover);
-            border-color: var(--amber);
-            transform: translateY(-4px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-        }
-
-        .step-num {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            color: var(--amber);
-            font-weight: 700;
-            margin-bottom: 6px;
-            display: block;
-        }
-
-        .step-title {
-            font-weight: 600;
-            font-size: 13px;
-            line-height: 1.3;
-            margin-bottom: 8px;
-        }
-
-        .step-status {
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 10px;
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--emerald);
-            display: inline-block;
-            font-family: 'JetBrains Mono', monospace;
-            width: fit-content;
-        }
-
-        .process-detail-card {
-            background: var(--bg-panel);
-            border: 1px solid var(--amber-border);
-            border-radius: 12px;
-            padding: 24px;
-            margin-top: 16px;
-            position: relative;
-        }
-
-        /* --- SLIDER / CAROUSEL --- */
-        .slider-container {
-            position: relative;
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            background: #000;
-            height: 440px;
-            box-shadow: var(--shadow);
-        }
-
-        .slide {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            opacity: 0;
-            transition: opacity 0.8s ease-in-out;
-            display: flex;
-            align-items: flex-end;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .slide.active { opacity: 1; z-index: 1; }
-
-        .slide-overlay {
-            background: linear-gradient(to top, rgba(7, 11, 20, 0.95) 0%, rgba(7, 11, 20, 0.7) 60%, transparent 100%);
-            width: 100%;
-            padding: 40px 32px 28px;
-            position: relative;
-            z-index: 2;
-            color: #F8FAFC; /* Always white on dark slide overlays */
-        }
-
-        .slide-tag {
-            background: var(--amber);
-            color: #1A1305;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            display: inline-block;
-            margin-bottom: 10px;
-        }
-
-        .slide-title { font-family: 'Oswald', sans-serif; font-size: 26px; margin-bottom: 6px; color: #FFFFFF; }
-        .slide-desc { font-size: 14px; color: #CBD5E1; max-width: 700px; }
-
-        .slider-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(16, 24, 40, 0.7);
-            border: 1px solid var(--border);
-            color: white;
-            width: 44px; height: 44px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-            z-index: 10;
-            transition: var(--transition);
-            font-size: 18px;
-        }
-        .slider-btn:hover { background: var(--amber); color: #1A1305; border-color: var(--amber); }
-        .prev-btn { left: 20px; }
-        .next-btn { right: 20px; }
-
-        .slider-dots {
-            position: absolute;
-            bottom: 28px;
-            right: 32px;
-            display: flex;
-            gap: 8px;
-            z-index: 10;
-        }
-
-        .dot {
-            width: 10px; height: 10px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .dot.active { background: var(--amber); width: 24px; border-radius: 10px; }
-
-        /* --- BUTTONS & CHECKLIST --- */
-        .btn {
             font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 13px;
-            border-radius: 8px;
-            padding: 12px 18px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: var(--transition);
-            border: 1px solid transparent;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .btn-primary {
-            background: var(--amber);
-            color: #1A1305;
-            box-shadow: 0 4px 15px var(--amber-glow);
-            width: 100%;
-        }
-        .btn-primary:hover { filter: brightness(1.15); transform: translateY(-1px); }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--amber-border);
-            color: var(--amber);
-        }
-        .btn-outline:hover { background: rgba(232, 163, 61, 0.1); }
-
-        .checklist-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            padding: 14px 18px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .checklist-item:hover { border-color: var(--amber-border); }
-        .checklist-left { display: flex; align-items: center; gap: 12px; }
-        .check-box {
-            width: 20px; height: 20px;
-            border-radius: 6px;
-            border: 2px solid var(--text-muted);
-            display: flex; align-items: center; justify-content: center;
-            color: transparent;
-            font-size: 12px;
-            transition: var(--transition);
-        }
-        .checklist-item.checked .check-box {
-            background: var(--emerald);
-            border-color: var(--emerald);
-            color: white;
-        }
-        .checklist-item.checked .check-text { text-decoration: line-through; color: var(--text-muted); }
-        .check-text { font-size: 14px; font-weight: 500; }
-        .check-tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--amber); }
-
-        /* --- MODAL / TOAST --- */
-        #toast {
-            position: fixed;
-            bottom: 24px; right: 24px;
-            background: var(--bg-panel);
-            border: 1px solid var(--emerald);
-            border-left: 6px solid var(--emerald);
-            padding: 16px 20px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: flex; align-items: center; gap: 12px;
-            z-index: 1000;
-            transform: translateY(150%);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background-color: var(--bg);
             color: var(--text-main);
-        }
-        #toast.show { transform: translateY(0); }
-
-        /* ==========================================================
-           RESPONSIVE MOBILE DISPLAY ENHANCEMENTS
-           ========================================================== */
-        @media (max-width: 1200px) {
-            .process-grid { grid-template-columns: repeat(4, 1fr); }
-            .content-grid-2 { grid-template-columns: 1fr; }
+            line-height: 1.5;
         }
 
-        @media (max-width: 768px) {
-            .navbar {
-                padding: 12px 16px;
-                flex-direction: column;
-                align-items: stretch;
-                gap: 12px;
-            }
-            .nav-brand { justify-content: space-between; }
-            .nav-actions { justify-content: space-between; width: 100%; flex-wrap: wrap; }
-            
-            .dashboard-nav { padding: 0 16px; }
-            .dash-tab { padding: 14px 12px; font-size: 11px; }
+        /* Typography */
+        h1, h2, h3, h4 { color: var(--text-dark); font-weight: 700; }
+        .body-text { font-family: 'Source Sans Pro', sans-serif; font-size: 1.05rem; line-height: 1.6; }
 
-            .main-content { padding: 16px; }
-            
-            .process-grid { grid-template-columns: repeat(2, 1fr); }
-            .slider-container { height: 360px; }
-            .slide-overlay { padding: 24px 16px 20px; }
-            .slide-title { font-size: 20px; }
-            .slider-btn { width: 36px; height: 36px; font-size: 14px; }
-            .prev-btn { left: 10px; }
-            .next-btn { right: 10px; }
-            .slider-dots { bottom: 16px; right: 16px; }
-            
-            .stat-value { font-size: 24px; }
-            .panel { padding: 18px; }
+        /* Utility Classes */
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 18px; border-radius: var(--radius); font-weight: 600;
+            cursor: pointer; transition: all 0.2s; border: none; font-size: 0.9rem;
         }
+        .btn-primary { background-color: var(--teal); color: white; }
+        .btn-primary:hover { background-color: var(--teal-hover); }
+        .btn-outline { background-color: transparent; border: 1px solid var(--border); color: var(--text-dark); }
+        .btn-outline:hover { background-color: #F1F5F9; }
+        .btn-block { width: 100%; justify-content: center; }
+        
+        .badge {
+            display: inline-block; padding: 4px 10px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+        }
+        .badge-teal { background-color: var(--teal-light); color: var(--teal-hover); }
+        .badge-gray { background-color: #F1F5F9; color: var(--text-light); }
+        .badge-warning { background-color: #FEF3C7; color: #D97706; }
 
-        @media (max-width: 480px) {
-            .process-grid { grid-template-columns: 1fr; }
-            .stats-grid { grid-template-columns: 1fr; }
-            .status-badge { font-size: 10px; padding: 4px 8px; }
-            .nav-title h2 { font-size: 18px; }
-            .nav-title span { font-size: 9px; }
-            .btn-theme-toggle { padding: 6px 12px; font-size: 11px; }
-            .info-item { flex-direction: column; gap: 4px; }
-            .info-val { text-align: left; }
+        .card {
+            background: var(--card-bg); border-radius: var(--radius);
+            border: 1px solid var(--border); padding: 20px; box-shadow: var(--shadow);
+            margin-bottom: 20px; transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover { box-shadow: var(--shadow-lg); }
+        .card-interactive { cursor: pointer; }
+        .card-interactive:hover { transform: translateY(-2px); border-color: var(--teal); }
+
+        /* ==========================================
+           2. GLOBAL NAVIGATION (Drupal Header Block)
+           ========================================== */
+        header {
+            background-color: var(--navy); color: white;
+            position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .nav-container {
+            display: flex; justify-content: space-between; align-items: center;
+            height: 70px;
+        }
+        .logo { font-size: 1.3rem; font-weight: 700; color: white; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .logo span { color: var(--teal); }
+        
+        .nav-links { display: flex; gap: 5px; list-style: none; }
+        .nav-links button {
+            background: none; border: none; color: #94A3B8; padding: 10px 15px;
+            font-size: 0.95rem; font-weight: 500; cursor: pointer; border-radius: var(--radius);
+            transition: all 0.2s;
+        }
+        .nav-links button:hover, .nav-links button.active { color: white; background-color: var(--navy-light); }
+        .nav-links button.active { border-bottom: 2px solid var(--teal); border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+
+        .user-controls { display: flex; align-items: center; gap: 15px; }
+        .search-bar {
+            background: var(--navy-light); border: 1px solid #334155;
+            padding: 8px 15px; border-radius: 20px; color: white; width: 250px;
+            font-size: 0.85rem;
+        }
+        .search-bar::placeholder { color: #64748B; }
+        
+        /* RBAC Simulation Toggle */
+        .rbac-toggle {
+            background: #1E293B; border: 1px solid var(--teal); padding: 5px 10px;
+            border-radius: 4px; font-size: 0.75rem; color: var(--teal-light);
+            display: flex; align-items: center; gap: 6px; cursor: pointer;
+        }
+        
+        .avatar { width: 35px; height: 35px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
+
+        /* ==========================================
+           3. LAYOUT & SCREENS (Drupal Layout Builder)
+           ========================================== */
+        .screen { display: none; padding: 30px 0; }
+        .screen.active { display: block; }
+        
+        /* Screen 1: Dashboard Grid */
+        .dashboard-grid { display: grid; grid-template-columns: 220px 1fr 300px; gap: 25px; }
+        
+        /* Screen 2: Detail Grid */
+        .detail-grid { display: grid; grid-template-columns: 1fr 340px; gap: 30px; }
+        
+        /* Screen 3: Knowledge Base Grid */
+        .kb-grid { display: grid; grid-template-columns: 260px 1fr; gap: 30px; }
+
+        /* Sidebar Navigation & Filters (Drupal Views Blocks) */
+        .sidebar-title { font-size: 0.8rem; text-transform: uppercase; color: var(--text-light); margin-bottom: 12px; font-weight: 700; letter-spacing: 0.5px; }
+        .sidebar-menu { list-style: none; margin-bottom: 25px; }
+        .sidebar-menu li a { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; color: var(--text-main); text-decoration: none; border-radius: var(--radius); font-size: 0.95rem; margin-bottom: 2px; }
+        .sidebar-menu li a:hover, .sidebar-menu li a.active { background-color: #E2E8F0; color: var(--text-dark); font-weight: 600; }
+        
+        .filter-group { margin-bottom: 20px; }
+        .filter-label { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; margin-bottom: 8px; cursor: pointer; color: var(--text-main); }
+        
+        /* Interactive Flag Module (Upvotes) */
+        .upvote-box {
+            text-align: center; padding: 15px; background: #F8FAFC;
+            border: 2px dashed var(--border); border-radius: var(--radius);
+            margin-bottom: 20px; transition: all 0.2s;
+        }
+        .upvote-btn {
+            background: white; border: 1px solid var(--border); padding: 10px 20px;
+            border-radius: 30px; font-size: 1.1rem; font-weight: 700; color: var(--text-dark);
+            cursor: pointer; box-shadow: var(--shadow); transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 10px; width: 100%; justify-content: center;
+        }
+        .upvote-btn:hover, .upvote-btn.flagged {
+            background: var(--teal); color: white; border-color: var(--teal);
+        }
+        
+        /* Moderator Panel (Drupal Content Moderation / Workflows) */
+        .moderator-panel {
+            display: none; /* Hidden by default, shown via RBAC JS */
+            background: #FFFBEB; border: 1px solid #FCD34D;
+            padding: 15px; border-radius: var(--radius); margin-bottom: 20px;
+        }
+        body.role-manager .moderator-panel { display: block; }
+        
+        /* Comments Component */
+        .comment { display: flex; gap: 15px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+        .comment-content { background: #F1F5F9; padding: 12px 16px; border-radius: var(--radius); flex-grow: 1; }
+        .comment-author { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; color: var(--navy); }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .dashboard-grid, .detail-grid, .kb-grid { grid-template-columns: 1fr; }
+            .user-controls .search-bar { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ================= DASHBOARD WEB APPLICATION ================= -->
-    <div id="app-section">
-        <!-- Navbar -->
-        <nav class="navbar">
-            <div class="nav-brand">
-                <div class="nav-logo">🛡️</div>
-                <div class="nav-title">
-                    <h2>Quality<span class="amber">Group</span></h2>
-                    <span>THPAL Operations &amp; Assurance Console</span>
-                </div>
-            </div>
-            <div class="nav-actions">
-                <div class="status-badge">
-                    <span class="status-dot"></span>
-                    <span>DCS ONLINE: AUTOCLAVE NORMAL</span>
-                </div>
-                <div style="text-align: right; font-size: 12px; font-family: 'JetBrains Mono', monospace;">
-                    <div style="color: var(--amber);" id="userDisplay">Engr. Admin (HPAL Div)</div>
-                    <div style="font-size: 10px; color: var(--text-muted);">Claver, Surigao del Norte</div>
-                </div>
-                <!-- Dark/Light Mode Toggle Button -->
-                <button class="btn-theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Toggle Display Mode">
-                    🌙 Dark Mode
-                </button>
-            </div>
-        </nav>
-
-        <!-- Dashboard Sub-Nav Tabs -->
-        <div class="dashboard-nav">
-            <button class="dash-tab active" onclick="switchTab('overview', this)">📊 Plant Overview &amp; Telemetry</button>
-            <button class="dash-tab" onclick="switchTab('process', this)">⚙️ 7-Stage HPAL Process Monitor</button>
-            <button class="dash-tab" onclick="switchTab('slider', this)">🖼️ Facility Visuals &amp; Slider</button>
-            <button class="dash-tab" onclick="switchTab('assurance', this)">🌿 Environmental &amp; Quality Assurance</button>
-        </div>
-
-        <!-- Main Content Area -->
-        <main class="main-content">
+    <!-- ==========================================
+       HEADER & NAVIGATION (Drupal Global Region)
+       ========================================== -->
+    <header>
+        <div class="container nav-container">
+            <a href="#" class="logo" onclick="switchScreen('dashboard')">
+                <i class="fa-solid fa-layer-group"></i> Collab<span>Hub</span>
+            </a>
             
-            <!-- TAB 1: OVERVIEW & TELEMETRY -->
-            <div id="tab-overview" class="tab-pane active">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="corner-ticks corner-ticks-tr"></div>
-                        <div class="stat-label">Annual Nickel Target (Ni)</div>
-                        <div class="stat-value" id="simNi">30,000 <span class="stat-unit">MT/Year</span></div>
-                        <div class="stat-sub">🟢 99.8% Recovery Efficiency</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="corner-ticks corner-ticks-tr"></div>
-                        <div class="stat-label">Annual Cobalt Target (Co)</div>
-                        <div class="stat-value" id="simCo">2,640 <span class="stat-unit">MT/Year</span></div>
-                        <div class="stat-sub">🟢 Mixed Sulfide Grade A</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="corner-ticks corner-ticks-tr"></div>
-                        <div class="stat-label">Autoclave Core Temp</div>
-                        <div class="stat-value" id="simTemp">255.4 <span class="stat-unit">°C</span></div>
-                        <div class="stat-sub">🔵 High Pressure Leaching</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="corner-ticks corner-ticks-tr"></div>
-                        <div class="stat-label">ECC Compliance Status</div>
-                        <div class="stat-value" style="color: var(--emerald);">100% <span class="stat-unit">COMPLIANT</span></div>
-                        <div class="stat-sub">🟢 DENR-EMB Region XIII</div>
-                    </div>
-                </div>
+            <ul class="nav-links">
+                <li><button class="active" onclick="switchScreen('dashboard', this)"><i class="fa-solid fa-house"></i> Dashboard</button></li>
+                <li><button onclick="switchScreen('idea-detail', this)"><i class="fa-solid fa-lightbulb"></i> Idea Detail (Sample)</button></li>
+                <li><button onclick="switchScreen('knowledge-base', this)"><i class="fa-solid fa-book-open"></i> Knowledge Base</button></li>
+            </ul>
 
-                <div class="content-grid-2">
-                    <div class="panel">
-                        <div class="corner-ticks corner-ticks-tl"></div><div class="corner-ticks corner-ticks-br"></div>
-                        <h3 class="section-title">🏭 Taganito HPAL Nickel Corporation (THPAL) Profile</h3>
-                        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">
-                            THPAL is a pioneering hydrometallurgical processing plant situated at the Taganito Special Economic Zone in Claver, Surigao del Norte. Utilizing advanced <strong>High-Pressure Acid Leach (HPAL)</strong> technology, the plant extracts high-value nickel and cobalt from low-grade lateritic/limonite ore.
-                        </p>
-                        <div style="background: var(--bg-card); padding: 16px; border-radius: 10px; border: 1px solid var(--border);">
-                            <h4 style="font-size: 13px; color: var(--amber); margin-bottom: 8px; font-family: 'JetBrains Mono', monospace;">⚡ STRATEGIC REFINING VALUE CHAIN</h4>
-                            <p style="font-size: 13px; color: var(--text-main);">
-                                Low-grade ore (1.15% - 1.35% Ni) supplied by <strong>Taganito Mining Corporation (TMC)</strong> is processed in high-temperature titanium autoclaves using sulfuric acid ($H_2SO_4$). The resulting Nickel/Cobalt Mixed Sulfide is exported directly to Sumitomo Metal Mining's (SMM) Niihama Nickel Refinery in Japan to produce 99.99% electrolytic battery-grade nickel.
-                            </p>
-                        </div>
-                    </div>
+            <div class="user-controls">
+                <!-- Role Based Access Control Simulation -->
+                <label class="rbac-toggle" title="Simulates Drupal Role Permissions">
+                    <input type="checkbox" id="roleToggle" onchange="toggleRBAC(this)">
+                    <span><i class="fa-solid fa-user-shield"></i> Manager Role</span>
+                </label>
 
-                    <div class="panel">
-                        <div class="corner-ticks corner-ticks-tr"></div><div class="corner-ticks corner-ticks-bl"></div>
-                        <h3 class="section-title">📋 Corporate &amp; Technical Data</h3>
-                        <ul class="info-list">
-                            <li class="info-item"><span class="info-key">Incorporation Date</span><span class="info-val">August 22, 2008</span></li>
-                            <li class="info-item"><span class="info-key">Commercial Ops Start</span><span class="info-val">September 2013</span></li>
-                            <li class="info-item"><span class="info-key">Majority Stakeholder</span><span class="info-val">Sumitomo Metal Mining (75%)</span></li>
-                            <li class="info-item"><span class="info-key">Joint Venture Partners</span><span class="info-val">Nickel Asia (10%) / Mitsui (15%)</span></li>
-                            <li class="info-item"><span class="info-key">Feedstock Supplier</span><span class="info-val">Taganito Mining Corp (TMC)</span></li>
-                            <li class="info-item"><span class="info-key">Primary Reagent</span><span class="info-val">Sulfuric Acid ($H_2SO_4$) / $H_2S$ Gas</span></li>
-                            <li class="info-item"><span class="info-key">ECC Reference</span><span class="info-val">ECC No. 9209-017-301A</span></li>
-                        </ul>
-                    </div>
-                </div>
+                <input type="text" class="search-bar" placeholder="Search Drupal nodes... (/)">
+                <i class="fa-regular fa-bell" style="cursor: pointer;"></i>
+                <div class="avatar" title="Authenticated User: Alex">AJ</div>
             </div>
+        </div>
+    </header>
 
-            <!-- TAB 2: 7-STAGE HPAL PROCESS MONITOR -->
-            <div id="tab-process" class="tab-pane">
-                <div class="panel" style="margin-bottom: 24px;">
-                    <div class="corner-ticks corner-ticks-tl"></div><div class="corner-ticks corner-ticks-tr"></div>
-                    <h3 class="section-title">⚡ Interactive 7-Stage Hydrometallurgical Process Monitor</h3>
-                    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">
-                        Click on any of the 7 stages below to inspect live DCS telemetry, chemical reaction parameters, and equipment health across the Taganito processing complex.
-                    </p>
+    <main class="container">
+        
+        <!-- ==================================================================
+           SCREEN 1: THE PERSONALIZED DASHBOARD (Drupal Layout Builder Home)
+           ================================================================== -->
+        <div id="screen-dashboard" class="screen active">
+            <div class="dashboard-grid">
+                
+                <!-- Left Column: Navigation & Taxonomy Filters (Drupal Blocks) -->
+                <aside>
+                    <div class="sidebar-title">Menu</div>
+                    <ul class="sidebar-menu">
+                        <li><a href="#" class="active"><i class="fa-solid fa-square-rss"></i> Activity Feed</a></li>
+                        <li><a href="#" onclick="switchScreen('knowledge-base', document.querySelectorAll('.nav-links button')[2])"><i class="fa-solid fa-book"></i> Knowledge Base</a></li>
+                        <li><a href="#"><i class="fa-solid fa-users"></i> My Groups</a></li>
+                        <li><a href="#"><i class="fa-solid fa-folder-tree"></i> Directory</a></li>
+                    </ul>
 
-                    <div class="process-grid">
-                        <div class="process-step active" onclick="selectProcessStep(1, this)">
-                            <span class="step-num">STAGE 01</span>
-                            <div class="step-title">Ore Preparation</div>
-                            <span class="step-status">ACTIVE</span>
+                    <div class="sidebar-title">Filter Feed by Dept.</div>
+                    <div class="filter-group">
+                        <label class="filter-label"><input type="checkbox" checked onchange="filterFeed()"> Engineering</label>
+                        <label class="filter-label"><input type="checkbox" checked onchange="filterFeed()"> Human Resources</label>
+                        <label class="filter-label"><input type="checkbox" checked onchange="filterFeed()"> Marketing</label>
+                        <label class="filter-label"><input type="checkbox" checked onchange="filterFeed()"> Product Design</label>
+                    </div>
+                </aside>
+
+                <!-- Center Column: Infinite Scroll Activity Feed (Drupal Views) -->
+                <section>
+                    <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h2>Welcome back, Alex! 👋</h2>
+                            <p style="color: var(--text-light); font-size: 0.9rem;">Here is what is happening in your Drupal workspace today.</p>
                         </div>
-                        <div class="process-step" onclick="selectProcessStep(2, this)">
-                            <span class="step-num">STAGE 02</span>
-                            <div class="step-title">High-Pressure Acid Leach (HPAL)</div>
-                            <span class="step-status">255°C / 4.5MPa</span>
-                        </div>
-                        <div class="process-step" onclick="selectProcessStep(3, this)">
-                            <span class="step-num">STAGE 03</span>
-                            <div class="step-title">Pre-Neutralization &amp; CCD</div>
-                            <span class="step-status">WASHING</span>
-                        </div>
-                        <div class="process-step" onclick="selectProcessStep(4, this)">
-                            <span class="step-num">STAGE 04</span>
-                            <div class="step-title">Neutralization</div>
-                            <span class="step-status">Fe/Al REMOVAL</span>
-                        </div>
-                        <div class="process-step" onclick="selectProcessStep(5, this)">
-                            <span class="step-num">STAGE 05</span>
-                            <div class="step-title">Zinc Removal ($ZnS$)</div>
-                            <span class="step-status">PRECIPITATION</span>
-                        </div>
-                        <div class="process-step" onclick="selectProcessStep(6, this)">
-                            <span class="step-num">STAGE 06</span>
-                            <div class="step-title">Mixed Sulfide ($MS$) Prod</div>
-                            <span class="step-status">$H_2S$ REACTION</span>
-                        </div>
-                        <div class="process-step" onclick="selectProcessStep(7, this)">
-                            <span class="step-num">STAGE 07</span>
-                            <div class="step-title">Final Neutralization &amp; TSF</div>
-                            <span class="step-status">EFFLUENT CLEAR</span>
-                        </div>
+                        <span class="badge badge-gray"><i class="fa-solid fa-rotate"></i> Live Feed</span>
                     </div>
 
-                    <!-- Process Detail Box -->
-                    <div class="process-detail-card" id="processDetailContent">
-                        <div class="corner-ticks corner-ticks-bl"></div><div class="corner-ticks corner-ticks-br"></div>
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
-                            <div style="flex: 1; min-width: 280px;">
-                                <span style="color: var(--amber); font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;">LIVE TELEMETRY • STAGE 01</span>
-                                <h3 style="font-family: 'Oswald', sans-serif; font-size: 24px; margin: 4px 0 10px;">Ore Preparation &amp; Slurry Screening</h3>
-                                <p style="color: var(--text-muted); font-size: 14px; max-width: 800px; line-height: 1.6;">
-                                    Low-grade limonite ore delivered by Taganito Mining Corp (TMC) conveyor systems is screened, washed, and mixed with water in ball mills to produce a uniform slurry with optimal solid density (~35-40%) ready for autoclave feeding.
-                                </p>
-                            </div>
-                            <div style="background: var(--bg-card); padding: 16px 24px; border-radius: 10px; border: 1px solid var(--border); min-width: 260px; flex-shrink: 0;">
-                                <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); margin-bottom: 8px;">SIMULATED PARAMETERS</div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px;"><span>Slurry Feed Density:</span><strong style="color: var(--cyan);">38.5% Solids</strong></div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px;"><span>Conveyor Flow Rate:</span><strong style="color: var(--emerald);">450 Tonnes/hr</strong></div>
-                                <div style="display: flex; justify-content: space-between; font-size: 13px;"><span>Screening Mesh:</span><strong style="color: var(--amber);">Nominal 0.5mm</strong></div>
-                            </div>
+                    <!-- Feed Card 1: Innovation Idea Node -->
+                    <div class="card card-interactive feed-item" data-dept="Engineering" onclick="switchScreen('idea-detail', document.querySelectorAll('.nav-links button')[1])">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span class="badge badge-teal">Innovation Idea</span>
+                            <span class="badge badge-warning">Under Review</span>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 3: FACILITY VISUALS & SLIDER -->
-            <div id="tab-slider" class="tab-pane">
-                <div class="panel" style="margin-bottom: 24px;">
-                    <div class="corner-ticks corner-ticks-tl"></div><div class="corner-ticks corner-ticks-tr"></div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
-                        <h3 class="section-title" style="margin: 0;">📸 THPAL Facility &amp; Operations Gallery</h3>
-                        <div style="display: flex; gap: 10px;">
-                            <button class="btn btn-outline" style="margin:0; padding: 6px 14px; font-size: 11px;" onclick="toggleAutoPlay()" id="autoPlayBtn">⏸️ Pause Auto-Scroll</button>
-                        </div>
-                    </div>
-
-                    <div class="slider-container" id="slider">
-                        <!-- Slide 1 -->
-                        <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1600&q=80');">
-                            <div class="slide-overlay">
-                                <span class="slide-tag">Complex Overview</span>
-                                <h3 class="slide-title">Panoramic View of Taganito Hydrometallurgical Complex</h3>
-                                <p class="slide-desc">Located at Barangay Taganito, Claver, Surigao del Norte. The 30,000 MT/year capacity plant operates inside the Taganito Special Economic Zone as a registered Ecozone Export Enterprise.</p>
-                            </div>
-                        </div>
-                        <!-- Slide 2 -->
-                        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1516937941344-00b4e0337589?auto=format&fit=crop&w=1600&q=80');">
-                            <div class="slide-overlay">
-                                <span class="slide-tag">Core Technology</span>
-                                <h3 class="slide-title">High-Pressure Acid Leach (HPAL) Autoclave Systems</h3>
-                                <p class="slide-desc">Titanium-lined autoclaves operate at high temperature (approx. 250-260°C) and pressure (4.5 MPa), leaching nickel and cobalt selectively with sulfuric acid while rejecting iron, aluminum, and silicon.</p>
-                            </div>
-                        </div>
-                        <!-- Slide 3 -->
-                        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1600&q=80');">
-                            <div class="slide-overlay">
-                                <span class="slide-tag">DCS Automation</span>
-                                <h3 class="slide-title">Centralized Control Room &amp; Automated Assurance</h3>
-                                <p class="slide-desc">24/7 real-time telemetry monitoring valve isolation, $H_2S$ gas reactivity, and automated neutralization sequences to ensure highest extraction recovery rates and operator safety.</p>
-                            </div>
-                        </div>
-                        <!-- Slide 4 -->
-                        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?auto=format&fit=crop&w=1600&q=80');">
-                            <div class="slide-overlay">
-                                <span class="slide-tag">Stage 03 Separation</span>
-                                <h3 class="slide-title">Countercurrent Decantation (CCD) Thickeners</h3>
-                                <p class="slide-desc">Massive multi-stage decantation circuits separate the nickel/cobalt pregnant leach solution (PLS) from the barren residue solids through continuous countercurrent washing.</p>
-                            </div>
-                        </div>
-                        <!-- Slide 5 -->
-                        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=1600&q=80');">
-                            <div class="slide-overlay">
-                                <span class="slide-tag">Environmental Care</span>
-                                <h3 class="slide-title">Sencio Creek Clean-Up &amp; Water Quality Preservation</h3>
-                                <p class="slide-desc">In partnership with EMB Region XIII and Barangay Hayanggabon residents, THPAL actively adopts and preserves local water bodies, conducting regular orchestrated coastal and creek clean-up drives.</p>
-                            </div>
-                        </div>
-
-                        <!-- Navigation Arrows -->
-                        <button class="slider-btn prev-btn" onclick="changeSlide(-1)">&#10094;</button>
-                        <button class="slider-btn next-btn" onclick="changeSlide(1)">&#10095;</button>
-
-                        <!-- Dot Indicators -->
-                        <div class="slider-dots">
-                            <span class="dot active" onclick="goToSlide(0)"></span>
-                            <span class="dot" onclick="goToSlide(1)"></span>
-                            <span class="dot" onclick="goToSlide(2)"></span>
-                            <span class="dot" onclick="goToSlide(3)"></span>
-                            <span class="dot" onclick="goToSlide(4)"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 4: ENVIRONMENTAL & QUALITY ASSURANCE -->
-            <div id="tab-assurance" class="tab-pane">
-                <div class="content-grid-2">
-                    <div class="panel">
-                        <div class="corner-ticks corner-ticks-tl"></div><div class="corner-ticks corner-ticks-br"></div>
-                        <h3 class="section-title">🌿 Environmental Compliance &amp; MMT Protocol</h3>
-                        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
-                            THPAL operates under strict compliance with DENR-EMB Region 13 regulations. Regular monitoring is conducted by the Multi-Partite Monitoring Team (MMT) representing local LGUs, indigenous communities, and environmental regulators.
+                        <h3>Automate Employee Onboarding Equipment Dispatch</h3>
+                        <p style="color: var(--text-light); margin: 10px 0; font-size: 0.95rem;">
+                            New hires currently wait an average of 4 days to receive laptops due to manual IT triage emails. Let's integrate Workday directly with ServiceNow...
                         </p>
-                        
-                        <div style="margin-bottom: 16px;">
-                            <h4 style="font-size: 14px; color: var(--amber); margin-bottom: 6px;">♻️ Tailings &amp; By-Product Innovation</h4>
-                            <p style="font-size: 13px; color: var(--text-main); line-height: 1.5;">
-                                • <strong>TSF1 Facility Management:</strong> Tailings consisting predominantly of inert hematite and gypsum are neutralized and safely deposited in engineered Tailings Storage Facility 1 (THPAL TSF1).<br>
-                                • <strong>Scandium Recovery Project:</strong> Innovating beyond nickel, THPAL utilizes barren liquor from the HPAL process to extract valuable Scandium Oxalate (~23% Sc) using resin and oxalic acid, turning industrial waste into high-tech commercial resources.
-                            </p>
-                        </div>
-
-                        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 14px; border-radius: 8px;">
-                            <strong style="color: var(--emerald); font-size: 13px; display: block; margin-bottom: 4px;">🤝 Community &amp; Ecological Adoption</strong>
-                            <span style="font-size: 12px; color: var(--text-main);">
-                                Active adopter of a 1.6 km stretch of <strong>Sencio Creek</strong> and coastal zones in Brgy. Hayanggabon and Taganito, engaging local communities in continuous environmental education and preservation.
-                            </span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-light);">
+                            <span><i class="fa-regular fa-user"></i> Submitted by <strong>Sarah Jenkins</strong> (Engineering)</span>
+                            <div style="display: flex; gap: 15px;">
+                                <span style="color: var(--teal); font-weight: bold;"><i class="fa-solid fa-caret-up"></i> 84 Upvotes</span>
+                                <span><i class="fa-regular fa-comment"></i> 14 Comments</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="panel">
-                        <div class="corner-ticks corner-ticks-tr"></div><div class="corner-ticks corner-ticks-bl"></div>
-                        <h3 class="section-title">✅ Daily Quality Assurance Checklist</h3>
-                        <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 14px;">
-                            Click to verify digital sign-off for shift inspection protocols:
+                    <!-- Feed Card 2: Knowledge Base Article Node -->
+                    <div class="card card-interactive feed-item" data-dept="Human Resources" onclick="switchScreen('knowledge-base', document.querySelectorAll('.nav-links button')[2])">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span class="badge badge-gray">Knowledge Article</span>
+                            <span style="font-size: 0.8rem; color: var(--text-light);"><i class="fa-regular fa-clock"></i> 5 min read</span>
+                        </div>
+                        <h3>Annual Leave & Time-Off Policy (Updated for 2026)</h3>
+                        <p style="color: var(--text-light); margin: 10px 0; font-size: 0.95rem;">
+                            To request time off, log into the HR portal at least 14 days prior to your planned leave. This guide outlines rollover hours and parental leave guidelines...
                         </p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-light);">
+                            <span><i class="fa-solid fa-folder"></i> Department: <strong>Human Resources</strong></span>
+                            <span><i class="fa-regular fa-bookmark"></i> 32 Bookmarks</span>
+                        </div>
+                    </div>
 
-                        <div id="checklistContainer">
-                            <div class="checklist-item" onclick="toggleCheck(this)">
-                                <div class="checklist-left">
-                                    <div class="check-box">✓</div>
-                                    <span class="check-text">Autoclave Titanium Lining &amp; Pressure Seal</span>
-                                </div>
-                                <span class="check-tag">HPAL-01</span>
-                            </div>
-                            <div class="checklist-item" onclick="toggleCheck(this)">
-                                <div class="checklist-left">
-                                    <div class="check-box">✓</div>
-                                    <span class="check-text">H2S Isolation Valves &amp; Gas Sensor Calibration</span>
-                                </div>
-                                <span class="check-tag">SULF-02</span>
-                            </div>
-                            <div class="checklist-item" onclick="toggleCheck(this)">
-                                <div class="checklist-left">
-                                    <div class="check-box">✓</div>
-                                    <span class="check-text">CCD Slurry Wash Efficiency &amp; Turbidity</span>
-                                </div>
-                                <span class="check-tag">CCD-03</span>
-                            </div>
-                            <div class="checklist-item" onclick="toggleCheck(this)">
-                                <div class="checklist-left">
-                                    <div class="check-box">✓</div>
-                                    <span class="check-text">Final Neutralization Effluent pH Limit (&lt; 8.5)</span>
-                                </div>
-                                <span class="check-tag">NEUT-04</span>
-                            </div>
-                            <div class="checklist-item" onclick="toggleCheck(this)">
-                                <div class="checklist-left">
-                                    <div class="check-box">✓</div>
-                                    <span class="check-text">Sencio Creek Water Quality Sampling</span>
-                                </div>
-                                <span class="check-tag">ENV-05</span>
+                    <!-- Feed Card 3: Another Idea -->
+                    <div class="card card-interactive feed-item" data-dept="Marketing">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span class="badge badge-teal">Innovation Idea</span>
+                            <span class="badge badge-gray">Submitted</span>
+                        </div>
+                        <h3>Implement AI Triage for Customer Helpdesk</h3>
+                        <p style="color: var(--text-light); margin: 10px 0; font-size: 0.95rem;">
+                            We can reduce tier-1 support tickets by 40% by deploying an LLM trained on our public documentation to answer basic inquiries before routing to humans...
+                        </p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-light);">
+                            <span><i class="fa-regular fa-user"></i> Submitted by <strong>David Ross</strong> (Marketing)</span>
+                            <div style="display: flex; gap: 15px;">
+                                <span style="color: var(--teal); font-weight: bold;"><i class="fa-solid fa-caret-up"></i> 42 Upvotes</span>
+                                <span><i class="fa-regular fa-comment"></i> 5 Comments</span>
                             </div>
                         </div>
+                    </div>
+                </section>
 
-                        <button class="btn btn-primary" style="margin-top: 14px;" onclick="submitAssuranceReport()">
-                            📝 Submit Digital Assurance Sign-Off
+                <!-- Right Column: Quick Actions & Groups Block -->
+                <aside>
+                    <div class="card" style="background: linear-gradient(135deg, var(--navy), var(--navy-light)); color: white; border: none;">
+                        <h3 style="color: white; margin-bottom: 10px;">Have an idea?</h3>
+                        <p style="font-size: 0.85rem; color: #94A3B8; margin-bottom: 15px;">Submit your innovation proposals to the team for voting and review.</p>
+                        <button class="btn btn-primary btn-block" onclick="alert('Drupal Modal: Opens Node Add Form (/node/add/innovation_idea)')">
+                            <i class="fa-solid fa-plus"></i> Submit New Idea
                         </button>
                     </div>
+
+                    <div class="card">
+                        <div class="sidebar-title">My Drupal Groups</div>
+                        <ul class="sidebar-menu" style="margin-bottom: 0;">
+                            <li><a href="#"><span><i class="fa-solid fa-layer-group" style="color: var(--teal);"></i> Engineering Guild</span> <span class="badge badge-gray">24</span></a></li>
+                            <li><a href="#"><span><i class="fa-solid fa-layer-group" style="color: var(--teal);"></i> AI Taskforce</span> <span class="badge badge-gray">8</span></a></li>
+                            <li><a href="#"><span><i class="fa-solid fa-layer-group" style="color: var(--teal);"></i> UX Design Team</span> <span class="badge badge-gray">12</span></a></li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="sidebar-title">Upcoming Events</div>
+                        <div style="font-size: 0.9rem; margin-bottom: 12px;">
+                            <strong>Q3 All-Hands Town Hall</strong><br>
+                            <span style="color: var(--text-light); font-size: 0.8rem;"><i class="fa-regular fa-calendar"></i> Oct 14, 2026 @ 2:00 PM</span>
+                        </div>
+                        <div style="font-size: 0.9rem;">
+                            <strong>Drupal 11 Component Workshop</strong><br>
+                            <span style="color: var(--text-light); font-size: 0.8rem;"><i class="fa-regular fa-calendar"></i> Oct 18, 2026 @ 10:00 AM</span>
+                        </div>
+                    </div>
+                </aside>
+
+            </div>
+        </div>
+
+        <!-- ==================================================================
+           SCREEN 2: IDEA DETAIL & VOTING PAGE (Drupal Node Detail View)
+           ================================================================== -->
+        <div id="screen-idea-detail" class="screen">
+            <button class="btn btn-outline" style="margin-bottom: 20px;" onclick="switchScreen('dashboard', document.querySelectorAll('.nav-links button')[0])">
+                <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+            </button>
+
+            <div class="detail-grid">
+                <!-- Left Column: Node Content & Comments -->
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div>
+                            <span class="badge badge-teal">Process Improvement</span>
+                            <span class="badge badge-gray" style="margin-left: 5px;">Node ID: #1042</span>
+                        </div>
+                        <span class="badge badge-warning" style="font-size: 0.85rem;"><i class="fa-regular fa-clock"></i> Status: Under Review</span>
+                    </div>
+
+                    <h1 style="margin-bottom: 15px; font-size: 1.8rem;">Automate Employee Onboarding Equipment Dispatch</h1>
+                    
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border); color: var(--text-light); font-size: 0.9rem;">
+                        <div class="avatar" style="width: 30px; height: 30px; font-size: 0.8rem;">SJ</div>
+                        <span>Submitted by <strong style="color: var(--text-dark);">Sarah Jenkins</strong> on Oct 10, 2026</span>
+                    </div>
+
+                    <!-- Drupal Body Fields -->
+                    <h3 style="margin-bottom: 10px; color: var(--navy);">The Problem Statement</h3>
+                    <p class="body-text" style="margin-bottom: 25px;">
+                        New hires currently wait an average of 4 days to receive their laptops and security keys due to manual IT triage emails between HR and IT. Whenever an employee is added to Workday, an HR coordinator has to manually copy-paste their equipment requirements into an email to the IT helpdesk, resulting in missed tickets, human errors, and significant onboarding friction.
+                    </p>
+
+                    <h3 style="margin-bottom: 10px; color: var(--navy);">Proposed Solution</h3>
+                    <p class="body-text" style="margin-bottom: 25px;">
+                        Integrate our Workday HR system directly with the ServiceNow hardware dispatch API using an automated webhook. When a new hire is marked as "Hired" in Workday, a ticket with the correct hardware profile (e.g., Mac vs PC, required peripherals) should automatically generate in ServiceNow and route directly to the dispatch queue.
+                    </p>
+
+                    <!-- Attached Media Field -->
+                    <h4 style="margin-bottom: 10px;">Attachments (Drupal Media Entity)</h4>
+                    <div style="display: flex; gap: 10px; margin-bottom: 30px;">
+                        <a href="#" onclick="return false;" class="btn btn-outline" style="font-size: 0.8rem;">
+                            <i class="fa-solid fa-file-pdf" style="color: #EF4444;"></i> workflow_diagram_v2.pdf
+                        </a>
+                    </div>
+
+                    <!-- Drupal Comments Section -->
+                    <h3 style="margin-bottom: 15px;">Discussion (14 Comments)</h3>
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <input type="text" class="search-bar" style="width: 100%; background: white; color: var(--text-dark); border-color: var(--border);" placeholder="Write a comment... (Markdown supported)">
+                        <button class="btn btn-primary">Post</button>
+                    </div>
+
+                    <div class="comment">
+                        <div class="avatar" style="background: var(--navy);">MR</div>
+                        <div class="comment-content">
+                            <div class="comment-author">Mark Rivera (IT Infrastructure Lead) <span style="font-weight: normal; color: var(--text-light); font-size: 0.8rem;">• 2 hours ago</span></div>
+                            <p style="font-size: 0.95rem;">We actually already have the enterprise API keys for ServiceNow! If Engineering can help us map the JSON payloads from Workday, we could build and test this MVP in less than a sprint. Great proposal Sarah!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Sticky Upvote & Moderator Action Panels -->
+                <aside style="position: sticky; top: 90px; align-self: start;">
+                    
+                    <!-- Drupal Flag Module Simulation -->
+                    <div class="upvote-box">
+                        <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px;">DO YOU SUPPORT THIS INITIATIVE?</p>
+                        <button class="upvote-btn" id="flagBtn" onclick="toggleUpvote(this)">
+                            <i class="fa-solid fa-thumbs-up"></i> <span id="voteCount">84</span> Upvotes
+                        </button>
+                        <p style="font-size: 0.75rem; color: var(--text-light); margin-top: 10px;">
+                            <i class="fa-solid fa-check"></i> Clicking triggers asynchronous Drupal Flag AJAX
+                        </p>
+                    </div>
+
+                    <!-- Drupal Workflows/Content Moderation (RBAC Protected) -->
+                    <div class="moderator-panel">
+                        <div style="display: flex; align-items: center; gap: 8px; font-weight: bold; color: #92400E; margin-bottom: 10px; font-size: 0.9rem;">
+                            <i class="fa-solid fa-lock-open"></i> Moderator Actions (RBAC)
+                        </div>
+                        <p style="font-size: 0.8rem; color: #B45309; margin-bottom: 12px;">
+                            You are seeing this block because your user role has `moderate innovation_idea workflow` permissions.
+                        </p>
+                        <label style="display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 4px;">Transition Workflow State:</label>
+                        <select style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #D97706; margin-bottom: 10px; font-family: inherit;">
+                            <option value="review">Under Review (Current)</option>
+                            <option value="approved">Approved for Roadmap</option>
+                            <option value="rejected">Archived / Rejected</option>
+                        </select>
+                        <button class="btn btn-block" style="background: #D97706; color: white;" onclick="alert('Drupal Workflows: State transitioned to Approved. Rules module triggered email notification to author.')">
+                            Update Status
+                        </button>
+                    </div>
+
+                    <!-- Related Ideas Block (Drupal Views Reference) -->
+                    <div class="card">
+                        <div class="sidebar-title">Related Ideas (Views Block)</div>
+                        <ul class="sidebar-menu" style="margin-bottom: 0;">
+                            <li><a href="#"><span>IT Asset Tracking System v3</span></a></li>
+                            <li><a href="#"><span>Redesign HR Onboarding Portal</span></a></li>
+                            <li><a href="#"><span>Automated Slack Welcome Bot</span></a></li>
+                        </ul>
+                    </div>
+
+                </aside>
+            </div>
+        </div>
+
+        <!-- ==================================================================
+           SCREEN 3: KNOWLEDGE BASE (Drupal Search API & Facets UI)
+           ================================================================== -->
+        <div id="screen-knowledge-base" class="screen">
+            <!-- Big Search Header -->
+            <div class="card" style="background: var(--navy); color: white; padding: 40px; text-align: center; margin-bottom: 30px;">
+                <h1 style="color: white; margin-bottom: 10px;">How can we help you today?</h1>
+                <p style="color: #94A3B8; margin-bottom: 20px;">Search policies, technical documentation, and employee guides.</p>
+                <div style="max-width: 600px; margin: 0 auto; display: flex; gap: 10px;">
+                    <input type="text" class="search-bar" id="kbSearchInput" style="width: 100%; padding: 12px 20px; font-size: 1rem; background: white; color: var(--text-dark);" placeholder="Type keywords (e.g. 'leave', 'VPN', 'AWS')..." onkeyup="filterKnowledgeBase()">
+                    <button class="btn btn-primary" style="padding: 0 25px;"><i class="fa-solid fa-magnifying-glass"></i></button>
                 </div>
             </div>
 
-        </main>
-    </div>
+            <div class="kb-grid">
+                <!-- Left Sidebar: Drupal Facets -->
+                <aside class="card" style="align-self: start;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="font-size: 1rem;">Filter Results</h3>
+                        <a href="#" style="font-size: 0.8rem; color: var(--teal); text-decoration: none;" onclick="resetFacets(); return false;">Reset All</a>
+                    </div>
 
-    <!-- Toast Notification -->
-    <div id="toast">
-        <span style="font-size: 20px;">✅</span>
-        <div>
-            <strong style="display: block; font-size: 13px;" id="toastTitle">Success</strong>
-            <span style="font-size: 12px; color: var(--text-muted);" id="toastDesc">Operation completed successfully.</span>
+                    <div class="sidebar-title">By Department (Taxonomy)</div>
+                    <div class="filter-group">
+                        <label class="filter-label"><input type="checkbox" class="facet-dept" value="HR" checked onchange="filterKnowledgeBase()"> Human Resources (32)</label>
+                        <label class="filter-label"><input type="checkbox" class="facet-dept" value="DevOps" checked onchange="filterKnowledgeBase()"> Engineering / DevOps (45)</label>
+                        <label class="filter-label"><input type="checkbox" class="facet-dept" value="Finance" checked onchange="filterKnowledgeBase()"> Finance & Legal (18)</label>
+                    </div>
+
+                    <div class="sidebar-title">By Content Type</div>
+                    <div class="filter-group" style="margin-bottom: 0;">
+                        <label class="filter-label"><input type="checkbox" checked> Standard Guide (90)</label>
+                        <label class="filter-label"><input type="checkbox" checked> Policy Document (40)</label>
+                        <label class="filter-label"><input type="checkbox" checked> Video Tutorial (12)</label>
+                    </div>
+                </aside>
+
+                <!-- Right Column: Search Results (Drupal Search API Solr View) -->
+                <section id="kb-results-container">
+                    <div style="margin-bottom: 15px; font-size: 0.9rem; color: var(--text-light);">
+                        Showing <strong id="kb-count">3</strong> relevant documents sorted by <strong>Relevance</strong>.
+                    </div>
+
+                    <!-- KB Result 1 -->
+                    <div class="card kb-card" data-dept="HR" data-title="annual leave time off vacation benefits policy">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <span class="badge badge-gray" style="margin-bottom: 8px;">Human Resources</span>
+                                <h3><a href="#" style="color: var(--navy); text-decoration: none;">Annual Leave & Time-Off Policy (2026 Guidelines)</a></h3>
+                            </div>
+                            <button class="btn btn-outline bookmark-btn" onclick="toggleBookmark(this)" title="Bookmark this article">
+                                <i class="fa-regular fa-bookmark"></i>
+                            </button>
+                        </div>
+                        <p style="color: var(--text-light); margin: 10px 0; font-size: 0.95rem;">
+                            To request time off, log into the HR portal at least 14 days prior to your planned leave. This guide outlines rollover hours, medical certificates required for sick leave exceeding 3 days, and how to register public holiday substitutions...
+                        </p>
+                        <div style="font-size: 0.8rem; color: var(--text-light); display: flex; gap: 15px;">
+                            <span><i class="fa-solid fa-tag"></i> Tags: Benefits, Vacation, HR Portal</span>
+                            <span><i class="fa-regular fa-clock"></i> Updated 2 days ago</span>
+                        </div>
+                    </div>
+
+                    <!-- KB Result 2 -->
+                    <div class="card kb-card" data-dept="DevOps" data-title="aws cloud credits engineering devops server request">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <span class="badge badge-teal" style="margin-bottom: 8px;">Engineering / DevOps</span>
+                                <h3><a href="#" style="color: var(--navy); text-decoration: none;">How to Request AWS Cloud Credits for Sandbox Testing</a></h3>
+                            </div>
+                            <button class="btn btn-outline bookmark-btn" onclick="toggleBookmark(this)" title="Bookmark this article">
+                                <i class="fa-regular fa-bookmark"></i>
+                            </button>
+                        </div>
+                        <p style="color: var(--text-light); margin: 10px 0; font-size: 0.95rem;">
+                            Engineers can spin up isolated AWS EC2 and S3 instances for R&D purposes. To prevent budget overruns, all non-production instances must be tagged with your Department ID and configured to auto-terminate after 72 hours of inactivity...
+                        </p>
+                        <div style="font-size: 0.8rem; color: var(--text-light); display: flex; gap: 15px;">
+                            <span><i class="fa-solid fa-tag"></i> Tags: Cloud, AWS, DevOps, Security</span>
+                            <span><i class="fa-regular fa-clock"></i> Updated 1 week ago</span>
+                        </div>
+                    </div>
+
+                    <!-- KB Result 3 -->
+                    <div class="card kb-card" data-dept="Finance" data-title="corporate credit card expense reimbursement finance travel">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <span class="badge badge-gray" style="margin-bottom: 8px;">Finance & Legal</span>
+                                <h3><a href="#" style="color: var(--navy); text-decoration: none;">Travel Expense & Client Reimbursement Guidelines</a></h3>
+                            </div>
+                            <button class="btn btn-outline bookmark-btn" onclick="toggleBookmark(this)" title="Bookmark this article">
+                                <i class="fa-regular fa-bookmark"></i>
+                            </button>
+                        </div>
+                        <p style="color: var(--text-light); margin: 10px 0; font-size: 0.95rem;">
+                            All corporate travel must be pre-approved by your department head. Itemized receipts are required for any individual meal or transit expense exceeding $25. Reimbursements are processed bi-weekly via direct deposit...
+                        </p>
+                        <div style="font-size: 0.8rem; color: var(--text-light); display: flex; gap: 15px;">
+                            <span><i class="fa-solid fa-tag"></i> Tags: Expenses, Travel, Finance</span>
+                            <span><i class="fa-regular fa-clock"></i> Updated 3 weeks ago</span>
+                        </div>
+                    </div>
+
+                </section>
+            </div>
         </div>
-    </div>
 
-    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    </main>
+
+    <!-- ==========================================
+       4. INTERACTIVE JAVASCRIPT (Simulating Drupal Core/Contrib JS)
+       ========================================== -->
     <script>
-        /* --- DARK / LIGHT MODE TOGGLE FUNCTION --- */
-        function initTheme() {
-            const savedTheme = localStorage.getItem('thpal-theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            updateThemeButton(savedTheme);
-        }
-
-        function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        /**
+         * 1. Screen Switching Logic (Simulates Drupal Page Routing)
+         */
+        function switchScreen(screenId, navButton) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+            // Show target screen
+            document.getElementById('screen-' + screenId).classList.add('active');
             
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('thpal-theme', newTheme);
-            updateThemeButton(newTheme);
-            showToast("Display Mode Changed", `Switched to ${newTheme.toUpperCase()} mode.`);
+            // Update nav active states if triggered via navbar
+            if (navButton) {
+                document.querySelectorAll('.nav-links button').forEach(el => el.classList.remove('active'));
+                navButton.classList.add('active');
+            }
+            window.scrollTo(0, 0);
         }
 
-        function updateThemeButton(theme) {
-            const btn = document.getElementById('themeBtn');
-            if (theme === 'light') {
-                btn.innerHTML = '☀️ Light Mode';
+        /**
+         * 2. Drupal Flag Module Simulation (Upvoting Idea)
+         */
+        let isFlagged = false;
+        let currentVotes = 84;
+        function toggleUpvote(btn) {
+            const countSpan = document.getElementById('voteCount');
+            if (!isFlagged) {
+                currentVotes++;
+                btn.classList.add('flagged');
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> <span id="voteCount">${currentVotes}</span> Upvoted!`;
+                isFlagged = true;
             } else {
-                btn.innerHTML = '🌙 Dark Mode';
+                currentVotes--;
+                btn.classList.remove('flagged');
+                btn.innerHTML = `<i class="fa-solid fa-thumbs-up"></i> <span id="voteCount">${currentVotes}</span> Upvotes`;
+                isFlagged = false;
             }
         }
 
-        /* --- TAB SWITCHING --- */
-        function switchTab(tabId, btnElement) {
-            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.dash-tab').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById('tab-' + tabId).classList.add('active');
-            btnElement.classList.add('active');
-        }
-
-        /* --- INTERACTIVE 7-STAGE PROCESS DATA --- */
-        const processData = {
-            1: {
-                title: "Ore Preparation & Slurry Screening",
-                desc: "Low-grade limonite ore delivered by Taganito Mining Corp (TMC) conveyor systems is screened, washed, and mixed with water in ball mills to produce a uniform slurry with optimal solid density (~35-40%) ready for autoclave feeding.",
-                p1Label: "Slurry Feed Density:", p1Val: "38.5% Solids", p1Color: "var(--cyan)",
-                p2Label: "Conveyor Flow Rate:", p2Val: "450 Tonnes/hr", p2Color: "var(--emerald)",
-                p3Label: "Screening Mesh:", p3Val: "Nominal 0.5mm", p3Color: "var(--amber)"
-            },
-            2: {
-                title: "High-Pressure Acid Leach (HPAL) Autoclave",
-                desc: "Slurry is pumped into titanium autoclaves and reacted with sulfuric acid ($H_2SO_4$) at 250-260°C and 4.5 MPa. This selectively leaches >95% of Nickel and Cobalt into solution while precipitating iron and aluminum as hematite.",
-                p1Label: "Autoclave Temp:", p1Val: "255.4 °C", p1Color: "var(--rose)",
-                p2Label: "Operating Pressure:", p2Val: "4.52 MPa", p2Color: "var(--amber)",
-                p3Label: "H2SO4 Acid Feed:", p3Val: "320 Tonnes/day", p3Color: "var(--cyan)"
-            },
-            3: {
-                title: "Pre-Neutralization & Countercurrent Decantation (CCD)",
-                desc: "The leached slurry is cooled and pre-neutralized before entering a 7-stage Countercurrent Decantation (CCD) thickener circuit. Continuous washing separates the pregnant leach solution (PLS) from the barren solid residue.",
-                p1Label: "CCD Wash Efficiency:", p1Val: "98.9% Recovery", p1Color: "var(--emerald)",
-                p2Label: "Thickener Overflow pH:", p2Val: "pH 1.8 - 2.1", p2Color: "var(--cyan)",
-                p3Label: "Underflow Solids:", p3Val: "48.2% Density", p3Color: "var(--amber)"
-            },
-            4: {
-                title: "Neutralization & Impurity Removal",
-                desc: "Limestone slurry is added to the PLS in neutralization tanks to carefully adjust pH, precipitating remaining residual impurities such as iron, aluminum, and silicon without losing nickel or cobalt values.",
-                p1Label: "Limestone Feed Rate:", p1Val: "85 Tonnes/hr", p1Color: "var(--amber)",
-                p2Label: "Target Solution pH:", p2Val: "pH 3.2 - 3.5", p2Color: "var(--emerald)",
-                p3Label: "Al/Fe Rejection Rate:", p3Val: "99.4% Removed", p3Color: "var(--cyan)"
-            },
-            5: {
-                title: "Zinc Removal System ($ZnS$ Precipitation)",
-                desc: "Controlled sulfuration using hydrogen sulfide gas precipitates trace zinc impurities as Zinc Sulfide ($ZnS$). Particle size control in this stage is vital to optimize downstream filtration capacity.",
-                p1Label: "H2S Gas Reagent Flow:", p1Val: "14.2 Nm³/min", p1Color: "var(--rose)",
-                p2Label: "ZnS Filter Efficiency:", p2Val: "99.1% Pass", p2Color: "var(--emerald)",
-                p3Label: "Particle Size Control:", p3Val: "15 - 25 µm Optimal", p3Color: "var(--amber)"
-            },
-            6: {
-                title: "Mixed Sulfide ($MS$) Production ($H_2S$ Reaction)",
-                desc: "Purified solution is reacted with high-purity hydrogen sulfide ($H_2S$) gas in pressurized reactors. Nickel and cobalt co-precipitate as a high-grade Mixed Sulfide ($Ni/Co~MS$), which is thickened, filtered, and bagged for export to Japan.",
-                p1Label: "Ni Grade in MS:", p1Val: "~57.5% Ni", p1Color: "var(--emerald)",
-                p2Label: "Co Grade in MS:", p2Val: "~4.8% Co", p2Color: "var(--cyan)",
-                p3Label: "Daily Bagging Output:", p3Val: "165 Bags (2T each)", p3Color: "var(--amber)"
-            },
-            7: {
-                title: "Final Neutralization & Tailings Storage (TSF1)",
-                desc: "Barren liquor and solid residues are treated with slaked lime to neutralize pH (< 8.5) and precipitate heavy metals. The inert slurry (hematite/gypsum) is safely discharged to THPAL Tailings Storage Facility 1 (TSF1).",
-                p1Label: "Discharge pH Level:", p1Val: "pH 8.2 (Compliant)", p1Color: "var(--emerald)",
-                p2Label: "TSF1 Impound Status:", p2Val: "Normal / Stable", p2Color: "var(--cyan)",
-                p3Label: "Scandium Recovery:", p3Val: "Active Oxalate Extr.", p3Color: "var(--amber)"
-            }
-        };
-
-        function selectProcessStep(stepId, element) {
-            document.querySelectorAll('.process-step').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
-
-            const data = processData[stepId];
-            const container = document.getElementById('processDetailContent');
-            
-            container.innerHTML = `
-                <div class="corner-ticks corner-ticks-bl"></div><div class="corner-ticks corner-ticks-br"></div>
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; animation: fadeIn 0.3s ease;">
-                    <div style="flex: 1; min-width: 280px;">
-                        <span style="color: var(--amber); font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;">LIVE TELEMETRY • STAGE 0${stepId}</span>
-                        <h3 style="font-family: 'Oswald', sans-serif; font-size: 24px; margin: 4px 0 10px;">${data.title}</h3>
-                        <p style="color: var(--text-muted); font-size: 14px; max-width: 800px; line-height: 1.6;">${data.desc}</p>
-                    </div>
-                    <div style="background: var(--bg-card); padding: 16px 24px; border-radius: 10px; border: 1px solid var(--border); min-width: 260px; flex-shrink: 0;">
-                        <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); margin-bottom: 8px;">SIMULATED PARAMETERS</div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px;"><span>${data.p1Label}</span><strong style="color: ${data.p1Color};">${data.p1Val}</strong></div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px;"><span>${data.p2Label}</span><strong style="color: ${data.p2Color};">${data.p2Val}</strong></div>
-                        <div style="display: flex; justify-content: space-between; font-size: 13px;"><span>${data.p3Label}</span><strong style="color: ${data.p3Color};">${data.p3Val}</strong></div>
-                    </div>
-                </div>
-            `;
-        }
-
-        /* --- IMAGE SLIDER LOGIC --- */
-        let currentSlideIndex = 0;
-        let slideInterval;
-        let isPlaying = true;
-        const slides = document.querySelectorAll('.slide');
-        const dots = document.querySelectorAll('.dot');
-
-        function showSlide(index) {
-            slides.forEach((s, i) => {
-                s.classList.toggle('active', i === index);
-                dots[i].classList.toggle('active', i === index);
-            });
-            currentSlideIndex = index;
-        }
-
-        function changeSlide(direction) {
-            let nextIndex = (currentSlideIndex + direction + slides.length) % slides.length;
-            showSlide(nextIndex);
-        }
-
-        function goToSlide(index) {
-            showSlide(index);
-        }
-
-        function toggleAutoPlay() {
-            const btn = document.getElementById('autoPlayBtn');
-            if (isPlaying) {
-                clearInterval(slideInterval);
-                btn.innerHTML = "▶️ Resume Auto-Scroll";
-                isPlaying = false;
+        /**
+         * 3. Drupal Flag Module Simulation (Bookmarking Knowledge Articles)
+         */
+        function toggleBookmark(btn) {
+            const icon = btn.querySelector('i');
+            if (icon.classList.contains('fa-regular')) {
+                icon.classList.replace('fa-regular', 'fa-solid');
+                btn.style.color = 'var(--teal)';
+                btn.style.borderColor = 'var(--teal)';
             } else {
-                startSlideTimer();
-                btn.innerHTML = "⏸️ Pause Auto-Scroll";
-                isPlaying = true;
+                icon.classList.replace('fa-solid', 'fa-regular');
+                btn.style.color = '';
+                btn.style.borderColor = '';
             }
         }
 
-        function startSlideTimer() {
-            clearInterval(slideInterval);
-            slideInterval = setInterval(() => { changeSlide(1); }, 4500);
-        }
-
-        /* --- CHECKLIST & TOAST NOTIFICATION --- */
-        function toggleCheck(item) {
-            item.classList.toggle('checked');
-        }
-
-        function submitAssuranceReport() {
-            const checkedCount = document.querySelectorAll('.checklist-item.checked').length;
-            const total = document.querySelectorAll('.checklist-item').length;
-            
-            if (checkedCount < total) {
-                showToast("Incomplete Audit", `You have verified ${checkedCount}/${total} items. Please inspect all parameters.`);
+        /**
+         * 4. Role-Based Access Control (RBAC) Simulation
+         */
+        function toggleRBAC(checkbox) {
+            if (checkbox.checked) {
+                document.body.classList.add('role-manager');
+                alert("Drupal RBAC: Switched to 'Department Manager' role. Moderator blocks are now visible!");
             } else {
-                showToast("Assurance Report Logged", "Shift compliance digitally timestamped and synced with EMB MMT protocol.");
+                document.body.classList.remove('role-manager');
             }
         }
 
-        function showToast(title, desc) {
-            document.getElementById('toastTitle').textContent = title;
-            document.getElementById('toastDesc').textContent = desc;
-            const toast = document.getElementById('toast');
-            toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 4000);
-        }
+        /**
+         * 5. Faceted Search Simulation (Drupal Search API + Facets)
+         */
+        function filterKnowledgeBase() {
+            const query = document.getElementById('kbSearchInput').value.toLowerCase();
+            
+            // Get checked departments
+            const checkedDepts = Array.from(document.querySelectorAll('.facet-dept:checked')).map(cb => cb.value);
+            
+            const cards = document.querySelectorAll('.kb-card');
+            let visibleCount = 0;
 
-        /* --- LIVE TELEMETRY SIMULATION --- */
-        function startTelemetrySimulation() {
-            setInterval(() => {
-                const tempEl = document.getElementById('simTemp');
-                if (tempEl) {
-                    let currentTemp = parseFloat(tempEl.textContent);
-                    let delta = (Math.random() * 0.4 - 0.2);
-                    tempEl.innerHTML = (currentTemp + delta).toFixed(1) + ' <span class="stat-unit">°C</span>';
+            cards.forEach(card => {
+                const titleText = card.getAttribute('data-title').toLowerCase();
+                const dept = card.getAttribute('data-dept');
+                
+                const matchesQuery = titleText.includes(query);
+                const matchesDept = checkedDepts.includes(dept);
+
+                if (matchesQuery && matchesDept) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
                 }
-            }, 3000);
+            });
+
+            document.getElementById('kb-count').innerText = visibleCount;
         }
 
-        /* --- INITIALIZATION ON PAGE LOAD --- */
-        window.addEventListener('DOMContentLoaded', () => {
-            initTheme();
-            startSlideTimer();
-            startTelemetrySimulation();
-        });
+        function resetFacets() {
+            document.querySelectorAll('.facet-dept').forEach(cb => cb.checked = true);
+            document.getElementById('kbSearchInput').value = '';
+            filterKnowledgeBase();
+        }
+
+        /**
+         * 6. Simple Dashboard Feed Filter Simulation
+         */
+        function filterFeed() {
+            // In a real Drupal application, this triggers a Views AJAX refresh
+            console.log("Drupal Views AJAX: Re-querying database nodes based on taxonomy filter...");
+        }
     </script>
 </body>
 </html>
