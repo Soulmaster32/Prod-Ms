@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hpal Fleet & Inventory System - Home</title>
-    
+    <title>Production Department | MS Section - Fleet & Inventory</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
@@ -15,20 +15,21 @@
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
-    
+
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: { 
                 extend: { 
                     colors: { 
-                        brown: { 50: '#fdf8f5', 100: '#f8ece5', 500: '#8B4513', 600: '#794016', 800: '#5C4033', 900: '#3E2723' },
-                        silver: { 100: '#F5F5F5', 300: '#E0E0E0', 500: '#C0C0C0', 700: '#A9A9A9', 900: '#737373' },
-                        gold: { 50: '#fdfbf2', 100: '#f9f3db', 400: '#F1C40F', 500: '#D4AF37', 600: '#B8860B' },
-                        darkred: { 50: '#fdf2f2', 100: '#fae1e1', 600: '#DC143C', 700: '#B22222', 800: '#8B0000' }
+                        royalblue: { 400: '#60a5fa', 500: '#4169E1', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' },
+                        orange: { 400: '#fb923c', 500: '#f97316', 600: '#ea580c', 700: '#c2410c' },
+                        blue: { 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1' },
+                        dark: { 100: '#334155', 300: '#1e293b', 500: '#0f172a', 700: '#0a0f1d', 900: '#030712' }
                     },
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     backgroundImage: {
-                        'hero-pattern': "linear-gradient(to right bottom, rgba(62, 39, 35, 0.9), rgba(0, 0, 0, 0.8)), url('https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&q=80&w=1920')",
+                        'hero-pattern': "linear-gradient(to right bottom, rgba(30, 58, 138, 0.88), rgba(3, 7, 18, 0.95)), url('https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&q=80&w=1920')",
                         'texture': "url('https://www.transparenttextures.com/patterns/carbon-fibre.png')"
                     }
                 } 
@@ -38,108 +39,114 @@
     <style>
         body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
         h1, h2, h3, h4, h5, h6 { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; }
-        .slick-dots li button:before { font-size: 14px; color: #C0C0C0; }
-        .slick-dots li.slick-active button:before { color: #D4AF37; }
-        .slide-bg { background: linear-gradient(135deg, #ffffff 0%, #F5F5F5 100%); }
+        .slick-dots li button:before { font-size: 14px; color: #475569; }
+        .slick-dots li.slick-active button:before { color: #f97316; }
+        .slide-bg { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
     </style>
 </head>
-<body class="flex flex-col min-h-screen text-black bg-silver-100 overflow-hidden" id="body-wrap">
+<body class="flex flex-col min-h-screen text-white bg-dark-900 overflow-hidden" id="body-wrap">
 
     <!-- GLOBAL LOADING SCREEN -->
-    <div id="global-loader" class="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="flex items-center gap-3 mb-8">
-            <div class="w-16 h-16 bg-brown-600 border-2 border-gold-500 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.5)] transform rotate-3 animate-pulse">
+    <div id="global-loader" class="fixed inset-0 z-[9999] bg-dark-900 flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="flex items-center gap-4 mb-8">
+            <div class="w-16 h-16 bg-royalblue-600 border-2 border-orange-500 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(249,115,22,0.5)] transform rotate-3 animate-pulse">
                 <i class="fas fa-truck-monster text-white text-3xl"></i>
             </div>
-            <h1 class="text-4xl font-black text-white tracking-widest">Hpal <span class="text-gold-500">Fleet</span></h1>
+            <div class="text-left">
+                <h1 class="text-4xl font-black text-white tracking-widest leading-none">PRODUCTION <span class="text-orange-500">DEPT</span></h1>
+                <span class="text-sm font-bold tracking-widest text-royalblue-400 block mt-1">MS SECTION</span>
+            </div>
         </div>
-        <div class="w-72 h-3 bg-silver-900 rounded-full overflow-hidden border border-brown-800 shadow-inner">
-            <div id="loader-bar" class="h-full bg-gold-500 w-0 transition-all duration-150 ease-out relative">
+        <div class="w-72 h-3 bg-dark-500 rounded-full overflow-hidden border border-slate-700 shadow-inner">
+            <div id="loader-bar" class="h-full bg-orange-500 w-0 transition-all duration-150 ease-out relative shadow-[0_0_10px_#f97316]">
                 <div class="absolute inset-0 bg-white/20 w-full h-full"></div>
             </div>
         </div>
-        <div class="mt-4 text-silver-300 font-bold tracking-widest text-sm font-sans" id="loader-text">BUFFERING DATA... 0%</div>
+        <div class="mt-4 text-slate-400 font-bold tracking-widest text-sm font-sans" id="loader-text">BUFFERING DATA... 0%</div>
     </div>
 
     <!-- Navbar -->
-    <header class="bg-black shadow-lg border-b-4 border-gold-500 sticky top-0 z-50">
+    <header class="bg-dark-700 shadow-2xl border-b-4 border-orange-500 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-default">
-                <div class="w-12 h-12 bg-brown-600 border border-gold-500 rounded-xl flex items-center justify-center shadow-lg transform rotate-3">
+                <div class="w-12 h-12 bg-royalblue-600 border border-orange-500 rounded-xl flex items-center justify-center shadow-lg transform rotate-3">
                     <i class="fas fa-truck-monster text-white text-2xl"></i>
                 </div>
-                <h1 class="text-3xl font-black text-white tracking-wider m-0 mt-1">Production <span class="text-gold-500">Hpal</span></h1>
+                <div>
+                    <h1 class="text-2xl font-black text-white tracking-wider m-0 leading-none">PRODUCTION <span class="text-orange-500">DEPT</span></h1>
+                    <span class="block text-[11px] font-sans font-bold tracking-widest text-royalblue-400 mt-0.5 uppercase">MS Section</span>
+                </div>
             </div>
-            
-            <nav class="hidden xl:flex gap-6 text-silver-300 font-medium text-sm items-center font-sans">
-                <a href="#home" class="hover:text-gold-500 transition py-4">Home</a>
-                <a href="#inventory" class="hover:text-gold-500 transition py-4">Fleet Parts</a>
-                
+
+            <nav class="hidden xl:flex gap-6 text-slate-300 font-medium text-sm items-center font-sans">
+                <a href="#home" class="hover:text-orange-500 transition py-4">Home</a>
+                <a href="#inventory" class="hover:text-orange-500 transition py-4">Fleet Parts</a>
+
                 <!-- Smart Portals -->
-                <a onclick="openLoginModal('/html/toolcrib.html')" class="hover:text-gold-500 transition py-4 cursor-pointer flex items-center gap-1"><i class="fas fa-toolbox text-brown-500"></i> Tool Crib</a>
-                <a onclick="openLoginModal('/html/garage.html')" class="hover:text-gold-500 transition py-4 cursor-pointer flex items-center gap-1"><i class="fas fa-warehouse text-brown-500"></i> Fleet Garage</a>
-                <a onclick="openLoginModal('/html/maintenance.html')" class="hover:text-gold-500 transition py-4 cursor-pointer flex items-center gap-1"><i class="fas fa-cogs text-brown-500"></i> Maintenance</a>
-                
+                <a onclick="openLoginModal('/html/toolcrib.html')" class="hover:text-orange-500 transition py-4 cursor-pointer flex items-center gap-1.5"><i class="fas fa-toolbox text-royalblue-400"></i> Tool Crib</a>
+                <a onclick="openLoginModal('/html/garage.html')" class="hover:text-orange-500 transition py-4 cursor-pointer flex items-center gap-1.5"><i class="fas fa-warehouse text-royalblue-400"></i> Fleet Garage</a>
+                <a onclick="openLoginModal('/html/maintenance.html')" class="hover:text-orange-500 transition py-4 cursor-pointer flex items-center gap-1.5"><i class="fas fa-cogs text-royalblue-400"></i> Maintenance</a>
+
                 <div class="relative group py-4">
-                    <button class="hover:text-gold-500 transition flex items-center gap-1 cursor-pointer">
+                    <button class="hover:text-orange-500 transition flex items-center gap-1 cursor-pointer">
                         Waste Segregation <i class="fas fa-chevron-down text-[10px]"></i>
                     </button>
-                    <div class="absolute top-full left-0 w-52 bg-black border-t-2 border-gold-500 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                        <ul class="py-2 text-sm text-silver-300">
-                            <li><a href="#modules" class="block px-4 py-2 hover:bg-brown-600 hover:text-white transition">MRF</a></li>
-                            <li><a href="#modules" class="block px-4 py-2 hover:bg-brown-600 hover:text-white transition">Scrapyard</a></li>
-                            <li><a href="#modules" class="block px-4 py-2 hover:bg-brown-600 hover:text-white transition">Secondary Waste Bin</a></li>
-                            <li><a href="#modules" class="block px-4 py-2 hover:bg-brown-600 hover:text-white transition">Item Disposed</a></li>
+                    <div class="absolute top-full left-0 w-52 bg-dark-700 border-t-2 border-orange-500 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 rounded-b-lg overflow-hidden border border-slate-800">
+                        <ul class="py-2 text-sm text-slate-300">
+                            <li><a href="#modules" class="block px-4 py-2 hover:bg-royalblue-600 hover:text-white transition">MRF</a></li>
+                            <li><a href="#modules" class="block px-4 py-2 hover:bg-royalblue-600 hover:text-white transition">Scrapyard</a></li>
+                            <li><a href="#modules" class="block px-4 py-2 hover:bg-royalblue-600 hover:text-white transition">Secondary Waste Bin</a></li>
+                            <li><a href="#modules" class="block px-4 py-2 hover:bg-royalblue-600 hover:text-white transition">Item Disposed</a></li>
                         </ul>
                     </div>
                 </div>
 
                 <div class="relative group py-4">
-                    <button class="hover:text-gold-500 transition flex items-center gap-1 cursor-pointer">
+                    <button class="hover:text-orange-500 transition flex items-center gap-1 cursor-pointer">
                         Documents <i class="fas fa-chevron-down text-[10px]"></i>
                     </button>
-                    <div class="absolute top-full left-0 w-64 bg-black border-t-2 border-gold-500 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
-                        <ul class="py-2 text-sm text-silver-300">
-                            <li><a href="#modules" class="block px-4 py-2 hover:bg-brown-600 hover:text-white transition">Add Document Format</a></li>
-                            <li><a href="#modules" class="block px-4 py-2 hover:bg-brown-600 hover:text-white transition">Form Builder</a></li>
+                    <div class="absolute top-full left-0 w-64 bg-dark-700 border-t-2 border-orange-500 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 rounded-b-lg overflow-hidden border border-slate-800">
+                        <ul class="py-2 text-sm text-slate-300">
+                            <li><a href="#modules" class="block px-4 py-2 hover:bg-royalblue-600 hover:text-white transition">Add Document Format</a></li>
+                            <li><a href="#modules" class="block px-4 py-2 hover:bg-royalblue-600 hover:text-white transition">Form Builder</a></li>
                         </ul>
                     </div>
                 </div>
 
-                <a href="#areas" class="hover:text-gold-500 transition py-4">Depot Areas</a>
+                <a href="#areas" class="hover:text-orange-500 transition py-4">Depot Areas</a>
             </nav>
 
             <div class="hidden xl:flex">
-                <button onclick="openLoginModal('/app')" class="group bg-darkred-600 hover:bg-darkred-700 border border-darkred-800 text-white px-6 py-2.5 rounded-lg shadow-md font-sans font-bold transition-all flex items-center gap-2">
+                <button onclick="openLoginModal('/app')" class="group bg-royalblue-600 hover:bg-royalblue-700 border border-royalblue-400 text-white px-6 py-2.5 rounded-lg shadow-[0_0_15px_rgba(65,105,225,0.4)] font-sans font-bold transition-all flex items-center gap-2">
                     <i class="fas fa-desktop"></i> System Login
                 </button>
             </div>
-            <button onclick="toggleMobileMenu()" class="xl:hidden text-white text-2xl focus:outline-none hover:text-gold-500 transition">
+            <button onclick="toggleMobileMenu()" class="xl:hidden text-white text-2xl focus:outline-none hover:text-orange-500 transition">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
     </header>
 
     <!-- Mobile Menu Overlay -->
-    <div id="mobileMenu" class="fixed inset-0 bg-black/95 z-[60] flex flex-col justify-center items-center opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-md">
-        <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-white text-3xl hover:text-darkred-600 transition">
+    <div id="mobileMenu" class="fixed inset-0 bg-dark-900/95 z-[60] flex flex-col justify-center items-center opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-md">
+        <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-white text-3xl hover:text-orange-500 transition">
             <i class="fas fa-times"></i>
         </button>
-        <nav class="flex flex-col gap-5 text-center text-xl text-silver-300 font-sans w-full px-6">
-            <a href="#home" onclick="toggleMobileMenu()" class="hover:text-gold-500 transition">Home</a>
-            <a href="#inventory" onclick="toggleMobileMenu()" class="hover:text-gold-500 transition">Fleet Parts</a>
-            
-            <a onclick="toggleMobileMenu(); openLoginModal('/html/toolcrib.html')" class="hover:text-gold-500 transition cursor-pointer text-brown-400 font-bold"><i class="fas fa-toolbox mr-2"></i> Tool Crib Operations</a>
-            <a onclick="toggleMobileMenu(); openLoginModal('/html/garage.html')" class="hover:text-gold-500 transition cursor-pointer text-brown-400 font-bold"><i class="fas fa-warehouse mr-2"></i> Fleet Garage Bulk</a>
-            <a onclick="toggleMobileMenu(); openLoginModal('/html/maintenance.html')" class="hover:text-gold-500 transition cursor-pointer text-brown-400 font-bold"><i class="fas fa-cogs mr-2"></i> Maintenance Hub</a>
-            
-            <div class="h-px w-full bg-brown-800 my-2 opacity-50"></div>
-            <div class="text-gold-500 font-bold uppercase text-sm tracking-widest">Expansion Modules</div>
+        <nav class="flex flex-col gap-5 text-center text-xl text-slate-300 font-sans w-full px-6">
+            <a href="#home" onclick="toggleMobileMenu()" class="hover:text-orange-500 transition">Home</a>
+            <a href="#inventory" onclick="toggleMobileMenu()" class="hover:text-orange-500 transition">Fleet Parts</a>
+
+            <a onclick="toggleMobileMenu(); openLoginModal('/html/toolcrib.html')" class="hover:text-orange-500 transition cursor-pointer text-royalblue-400 font-bold"><i class="fas fa-toolbox mr-2"></i> Tool Crib Operations</a>
+            <a onclick="toggleMobileMenu(); openLoginModal('/html/garage.html')" class="hover:text-orange-500 transition cursor-pointer text-royalblue-400 font-bold"><i class="fas fa-warehouse mr-2"></i> Fleet Garage Bulk</a>
+            <a onclick="toggleMobileMenu(); openLoginModal('/html/maintenance.html')" class="hover:text-orange-500 transition cursor-pointer text-royalblue-400 font-bold"><i class="fas fa-cogs mr-2"></i> Maintenance Hub</a>
+
+            <div class="h-px w-full bg-slate-800 my-2 opacity-80"></div>
+            <div class="text-orange-500 font-bold uppercase text-sm tracking-widest">Expansion Modules</div>
             <a href="#modules" onclick="toggleMobileMenu()" class="text-lg hover:text-white transition">Waste Segregation</a>
             <a href="#modules" onclick="toggleMobileMenu()" class="text-lg hover:text-white transition">Custom Documents</a>
-            <div class="h-px w-full bg-brown-800 my-2 opacity-50"></div>
-            <a href="#areas" onclick="toggleMobileMenu()" class="hover:text-gold-500 transition">Depot Areas</a>
-            <button onclick="toggleMobileMenu(); openLoginModal('/app')" class="mt-6 bg-darkred-600 hover:bg-darkred-700 text-white w-full py-4 rounded-lg font-bold flex justify-center items-center gap-2">
+            <div class="h-px w-full bg-slate-800 my-2 opacity-80"></div>
+            <a href="#areas" onclick="toggleMobileMenu()" class="hover:text-orange-500 transition">Depot Areas</a>
+            <button onclick="toggleMobileMenu(); openLoginModal('/app')" class="mt-6 bg-royalblue-600 hover:bg-royalblue-700 text-white w-full py-4 rounded-lg font-bold flex justify-center items-center gap-2 shadow-lg">
                 <i class="fas fa-desktop"></i> System Login
             </button>
         </nav>
@@ -147,75 +154,78 @@
 
     <!-- Hero Section -->
     <section id="home" class="bg-hero-pattern bg-cover bg-center bg-no-repeat bg-fixed relative py-24 md:py-36">
-        <div class="absolute inset-0 bg-texture opacity-50"></div>
+        <div class="absolute inset-0 bg-texture opacity-30"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center" data-aos="zoom-in" data-aos-duration="1000">
+            <div class="inline-block px-4 py-1.5 rounded-full bg-royalblue-600/30 border border-royalblue-400/50 text-blue-300 text-xs font-bold tracking-widest uppercase mb-6 backdrop-blur-sm">
+                <i class="fas fa-shield-alt mr-1"></i> MS Section Asset Hub
+            </div>
             <h2 class="text-5xl md:text-7xl font-black text-white mb-6 drop-shadow-lg">
-                Heavy Fleet Resource <br class="hidden md:block"/> & <span class="text-gold-500">Asset Management</span>
+                Heavy Fleet Resource <br class="hidden md:block"/> & <span class="text-orange-500">Asset Management</span>
             </h2>
-            <p class="text-lg md:text-xl text-silver-300 max-w-3xl mx-auto leading-relaxed mb-10 font-sans font-light">
+            <p class="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed mb-10 font-sans font-light">
                 A robust solution for industrial vehicles. Track spare parts, monitor maintenance tools, and seamlessly control deployments for Forklifts, Vacuum Trucks, and Jet Trucks.
             </p>
             <div class="flex flex-col sm:flex-row justify-center gap-4 font-sans">
-                <a href="#inventory" class="px-8 py-4 bg-gold-500 hover:bg-gold-600 text-black font-bold rounded-lg shadow-xl transition-all w-full sm:w-auto text-center">Explore Parts</a>
-                <button onclick="openLoginModal('/app')" class="px-8 py-4 bg-black/50 backdrop-blur-sm border-2 border-silver-300 hover:border-white text-white font-bold rounded-lg transition-all w-full sm:w-auto">Access Dashboard</button>
+                <a href="#inventory" class="px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg shadow-[0_0_20px_rgba(249,115,22,0.4)] transition-all w-full sm:w-auto text-center">Explore Parts</a>
+                <button onclick="openLoginModal('/app')" class="px-8 py-4 bg-dark-700/80 backdrop-blur-sm border-2 border-slate-600 hover:border-white text-white font-bold rounded-lg transition-all w-full sm:w-auto">Access Dashboard</button>
             </div>
         </div>
     </section>
 
     <!-- Core Materials / Inventory Slider Section -->
-    <section id="inventory" class="py-20 bg-silver-100 border-b border-silver-300">
+    <section id="inventory" class="py-20 bg-dark-900 border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-4 text-center mb-12" data-aos="fade-up">
-            <h3 class="text-sm font-bold tracking-widest text-darkred-600 mb-2 font-sans">MASTER STORAGE</h3>
-            <h2 class="text-4xl md:text-5xl font-black text-black">Fleet Spare Parts & Equipment</h2>
-            <div class="w-24 h-1.5 bg-gold-500 mx-auto mt-6"></div>
+            <h3 class="text-sm font-bold tracking-widest text-orange-500 mb-2 font-sans uppercase">Master Storage</h3>
+            <h2 class="text-4xl md:text-5xl font-black text-white">Fleet Spare Parts & Equipment</h2>
+            <div class="w-24 h-1.5 bg-royalblue-500 mx-auto mt-6"></div>
         </div>
-        <div class="slider-wrapper max-w-6xl mx-auto w-full bg-white rounded-xl shadow-2xl border border-silver-300 overflow-hidden relative pb-10" data-aos="fade-up" data-aos-delay="200">
+        <div class="slider-wrapper max-w-6xl mx-auto w-full bg-dark-500 rounded-xl shadow-2xl border border-slate-700 overflow-hidden relative pb-10" data-aos="fade-up" data-aos-delay="200">
             <div class="home-feature-slider font-sans">
                 <!-- Slide 1 -->
-                <div class="p-8 md:p-12 slide-bg outline-none border-b-8 border-brown-600">
+                <div class="p-8 md:p-12 slide-bg outline-none border-b-8 border-royalblue-600">
                     <div class="flex flex-col lg:flex-row items-center gap-10">
                         <div class="flex-1 text-left">
-                            <h3 class="text-3xl font-black text-black mb-4 font-barlow uppercase">
-                                <i class="fas fa-dolly text-brown-600 mr-2"></i> Forklift Spares
+                            <h3 class="text-3xl font-black text-white mb-4 font-barlow uppercase">
+                                <i class="fas fa-dolly text-royalblue-400 mr-2"></i> Forklift Spares
                             </h3>
-                            <p class="text-gray-600 text-lg leading-relaxed mb-4">
+                            <p class="text-slate-300 text-lg leading-relaxed mb-4">
                                 Keep your material handling equipment operational. Monitor inventory levels for critical forklift components to prevent warehouse downtime.
                             </p>
                         </div>
                         <div class="flex-1 w-full relative">
-                            <img src="https://images.unsplash.com/photo-1587293852726-70cdb56c2866?auto=format&fit=crop&q=80&w=800" class="rounded-xl shadow-md border-4 border-silver-300 w-full object-cover h-64">
+                            <img src="https://images.unsplash.com/photo-1587293852726-70cdb56c2866?auto=format&fit=crop&q=80&w=800" class="rounded-xl shadow-md border-4 border-slate-700 w-full object-cover h-64">
                         </div>
                     </div>
                 </div>
                 <!-- Slide 2 -->
-                <div class="p-8 md:p-12 slide-bg outline-none border-b-8 border-gold-500">
+                <div class="p-8 md:p-12 slide-bg outline-none border-b-8 border-orange-500">
                     <div class="flex flex-col lg:flex-row items-center gap-10">
                         <div class="flex-1 text-left">
-                            <h3 class="text-3xl font-black text-black mb-4 font-barlow uppercase">
-                                <i class="fas fa-truck text-gold-500 mr-2"></i> Vacuum Truck Components
+                            <h3 class="text-3xl font-black text-white mb-4 font-barlow uppercase">
+                                <i class="fas fa-truck text-orange-500 mr-2"></i> Vacuum Truck Components
                             </h3>
-                            <p class="text-gray-600 text-lg leading-relaxed mb-4">
+                            <p class="text-slate-300 text-lg leading-relaxed mb-4">
                                 Track heavy-duty suction components essential for plant cleaning and waste removal operations.
                             </p>
                         </div>
                         <div class="flex-1 w-full">
-                            <img src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&q=80&w=800" class="rounded-xl shadow-md border-4 border-silver-300 w-full object-cover h-64">
+                            <img src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&q=80&w=800" class="rounded-xl shadow-md border-4 border-slate-700 w-full object-cover h-64">
                         </div>
                     </div>
                 </div>
                 <!-- Slide 3 -->
-                <div class="p-8 md:p-12 slide-bg outline-none border-b-8 border-silver-500">
+                <div class="p-8 md:p-12 slide-bg outline-none border-b-8 border-blue-500">
                     <div class="flex flex-col lg:flex-row items-center gap-10">
                         <div class="flex-1 text-left">
-                            <h3 class="text-3xl font-black text-black mb-4 font-barlow uppercase">
-                                <i class="fas fa-water text-silver-700 mr-2"></i> Jet Truck Spares
+                            <h3 class="text-3xl font-black text-white mb-4 font-barlow uppercase">
+                                <i class="fas fa-water text-blue-400 mr-2"></i> Jet Truck Spares
                             </h3>
-                            <p class="text-gray-600 text-lg leading-relaxed mb-4">
+                            <p class="text-slate-300 text-lg leading-relaxed mb-4">
                                 Ensure your high-pressure washing fleet is fully equipped. Log and manage pressure regulators and cleaning accessories.
                             </p>
                         </div>
                         <div class="flex-1 w-full">
-                            <img src="https://images.unsplash.com/photo-1590495861110-6c9abaf7bbac?auto=format&fit=crop&q=80&w=800" class="rounded-xl shadow-md border-4 border-silver-300 w-full object-cover h-64">
+                            <img src="https://images.unsplash.com/photo-1590495861110-6c9abaf7bbac?auto=format&fit=crop&q=80&w=800" class="rounded-xl shadow-md border-4 border-slate-700 w-full object-cover h-64">
                         </div>
                     </div>
                 </div>
@@ -224,171 +234,174 @@
     </section>
 
     <!-- Operational Areas Section (Interactive Portals) -->
-    <section id="areas" class="py-20 bg-white border-b border-silver-300">
+    <section id="areas" class="py-20 bg-dark-700 border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16" data-aos="fade-up">
-                <h3 class="text-sm font-bold tracking-widest text-brown-600 font-sans mb-2">FACILITY MAPPING</h3>
-                <h2 class="text-4xl md:text-5xl font-black text-black">Fleet Depot Areas</h2>
-                <div class="w-24 h-1.5 bg-darkred-600 mx-auto mt-6"></div>
-                <p class="mt-6 text-gray-500 max-w-2xl mx-auto font-sans">
-                    Materials and workflows are categorized seamlessly across different fleet management zones ensuring smooth operations.
+                <h3 class="text-sm font-bold tracking-widest text-royalblue-400 font-sans mb-2 uppercase">Facility Mapping</h3>
+                <h2 class="text-4xl md:text-5xl font-black text-white">MS Section Depot Areas</h2>
+                <div class="w-24 h-1.5 bg-orange-500 mx-auto mt-6"></div>
+                <p class="mt-6 text-slate-400 max-w-2xl mx-auto font-sans">
+                    Materials and workflows are categorized seamlessly across different department zones ensuring smooth operations.
                 </p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                
+
                 <!-- Interactive Fleet Garage Card -->
-                <div onclick="openLoginModal('/html/garage.html')" class="group bg-silver-100 rounded-xl p-6 border-t-4 border-gold-500 shadow hover:-translate-y-2 hover:shadow-lg transition-all cursor-pointer relative overflow-hidden" data-aos="fade-up" data-aos-delay="100">
-                    <div class="absolute inset-0 bg-gold-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                    <div class="w-12 h-12 bg-white group-hover:bg-gold-500 group-hover:text-black transition-colors rounded-full flex items-center justify-center shadow mb-4 text-gold-500 text-xl"><i class="fas fa-warehouse"></i></div>
-                    <h4 class="font-bold text-xl text-black mb-2 font-sans tracking-tight group-hover:text-gold-600 transition-colors">Fleet Garage</h4>
-                    <p class="text-sm text-gray-600 font-sans mb-4">The central storage hub holding the bulk of heavy vehicle spares and tires.</p>
-                    <span class="text-xs font-bold text-gold-600 uppercase tracking-widest flex items-center gap-1 group-hover:text-gold-700"><i class="fas fa-lock"></i> Access Module</span>
+                <div onclick="openLoginModal('/html/garage.html')" class="group bg-dark-500 rounded-xl p-6 border-t-4 border-orange-500 shadow-xl hover:-translate-y-2 hover:shadow-2xl transition-all cursor-pointer relative overflow-hidden border border-slate-800" data-aos="fade-up" data-aos-delay="100">
+                    <div class="absolute inset-0 bg-orange-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="w-12 h-12 bg-dark-700 group-hover:bg-orange-500 group-hover:text-white transition-colors rounded-full flex items-center justify-center shadow mb-4 text-orange-500 text-xl border border-slate-700"><i class="fas fa-warehouse"></i></div>
+                    <h4 class="font-bold text-xl text-white mb-2 font-sans tracking-tight group-hover:text-orange-400 transition-colors">Fleet Garage</h4>
+                    <p class="text-sm text-slate-300 font-sans mb-4">The central storage hub holding the bulk of heavy vehicle spares and tires.</p>
+                    <span class="text-xs font-bold text-orange-400 uppercase tracking-widest flex items-center gap-1 group-hover:text-orange-300"><i class="fas fa-lock"></i> Access Module</span>
                 </div>
-                
+
                 <!-- Interactive Tool Crib Card -->
-                <div onclick="openLoginModal('/html/toolcrib.html')" class="group bg-silver-100 rounded-xl p-6 border-t-4 border-brown-600 shadow hover:-translate-y-2 hover:shadow-lg transition-all cursor-pointer relative overflow-hidden" data-aos="fade-up" data-aos-delay="200">
-                    <div class="absolute inset-0 bg-brown-600 opacity-0 group-hover:opacity-5 transition-opacity"></div>
-                    <div class="w-12 h-12 bg-white group-hover:bg-brown-600 group-hover:text-white transition-colors rounded-full flex items-center justify-center shadow mb-4 text-brown-600 text-xl"><i class="fas fa-toolbox"></i></div>
-                    <h4 class="font-bold text-xl text-black mb-2 font-sans tracking-tight group-hover:text-brown-700 transition-colors">Tool Crib</h4>
-                    <p class="text-sm text-gray-600 font-sans mb-4">Secure area designated for checking out and returning expensive mechanic hand tools.</p>
-                    <span class="text-xs font-bold text-brown-600 uppercase tracking-widest flex items-center gap-1 group-hover:text-brown-800"><i class="fas fa-lock"></i> Access Module</span>
+                <div onclick="openLoginModal('/html/toolcrib.html')" class="group bg-dark-500 rounded-xl p-6 border-t-4 border-royalblue-500 shadow-xl hover:-translate-y-2 hover:shadow-2xl transition-all cursor-pointer relative overflow-hidden border border-slate-800" data-aos="fade-up" data-aos-delay="200">
+                    <div class="absolute inset-0 bg-royalblue-600 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="w-12 h-12 bg-dark-700 group-hover:bg-royalblue-600 group-hover:text-white transition-colors rounded-full flex items-center justify-center shadow mb-4 text-royalblue-400 text-xl border border-slate-700"><i class="fas fa-toolbox"></i></div>
+                    <h4 class="font-bold text-xl text-white mb-2 font-sans tracking-tight group-hover:text-royalblue-400 transition-colors">Tool Crib</h4>
+                    <p class="text-sm text-slate-300 font-sans mb-4">Secure area designated for checking out and returning expensive mechanic hand tools.</p>
+                    <span class="text-xs font-bold text-royalblue-400 uppercase tracking-widest flex items-center gap-1 group-hover:text-royalblue-300"><i class="fas fa-lock"></i> Access Module</span>
                 </div>
 
                 <!-- Interactive Maintenance Bay Card -->
-                <div onclick="openLoginModal('/html/maintenance.html')" class="group bg-silver-100 rounded-xl p-6 border-t-4 border-darkred-600 shadow hover:-translate-y-2 hover:shadow-lg transition-all cursor-pointer relative overflow-hidden" data-aos="fade-up" data-aos-delay="300">
-                    <div class="absolute inset-0 bg-darkred-600 opacity-0 group-hover:opacity-5 transition-opacity"></div>
-                    <div class="w-12 h-12 bg-white group-hover:bg-darkred-600 group-hover:text-white transition-colors rounded-full flex items-center justify-center shadow mb-4 text-darkred-600 text-xl"><i class="fas fa-cogs"></i></div>
-                    <h4 class="font-bold text-xl text-black mb-2 font-sans tracking-tight group-hover:text-darkred-700 transition-colors">Maintenance Bay</h4>
-                    <p class="text-sm text-gray-600 font-sans mb-4">Active repair zone where parts are installed, ODO is tracked, and PMS is logged.</p>
-                    <span class="text-xs font-bold text-darkred-600 uppercase tracking-widest flex items-center gap-1 group-hover:text-darkred-800"><i class="fas fa-lock"></i> Access Module</span>
+                <div onclick="openLoginModal('/html/maintenance.html')" class="group bg-dark-500 rounded-xl p-6 border-t-4 border-blue-400 shadow-xl hover:-translate-y-2 hover:shadow-2xl transition-all cursor-pointer relative overflow-hidden border border-slate-800" data-aos="fade-up" data-aos-delay="300">
+                    <div class="absolute inset-0 bg-blue-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                    <div class="w-12 h-12 bg-dark-700 group-hover:bg-blue-500 group-hover:text-white transition-colors rounded-full flex items-center justify-center shadow mb-4 text-blue-400 text-xl border border-slate-700"><i class="fas fa-cogs"></i></div>
+                    <h4 class="font-bold text-xl text-white mb-2 font-sans tracking-tight group-hover:text-blue-400 transition-colors">Maintenance Bay</h4>
+                    <p class="text-sm text-slate-300 font-sans mb-4">Active repair zone where parts are installed, ODO is tracked, and PMS is logged.</p>
+                    <span class="text-xs font-bold text-blue-400 uppercase tracking-widest flex items-center gap-1 group-hover:text-blue-300"><i class="fas fa-lock"></i> Access Module</span>
                 </div>
 
                 <!-- App Console Access -->
-                <div onclick="openLoginModal('/app')" class="group bg-silver-100 rounded-xl p-6 border-t-4 border-black shadow hover:-translate-y-2 hover:shadow-lg transition-all cursor-pointer relative overflow-hidden" data-aos="fade-up" data-aos-delay="400">
-                    <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-5 transition-opacity"></div>
-                    <div class="w-12 h-12 bg-white group-hover:bg-black group-hover:text-white transition-colors rounded-full flex items-center justify-center shadow mb-4 text-black text-xl"><i class="fas fa-desktop"></i></div>
-                    <h4 class="font-bold text-xl text-black mb-2 font-sans tracking-tight group-hover:text-black transition-colors">Admin Console</h4>
-                    <p class="text-sm text-gray-600 font-sans mb-4">The active staging ground where requested materials are approved and deployed.</p>
-                    <span class="text-xs font-bold text-black uppercase tracking-widest flex items-center gap-1 group-hover:text-slate-800"><i class="fas fa-cogs"></i> Enter Console</span>
+                <div onclick="openLoginModal('/app')" class="group bg-dark-500 rounded-xl p-6 border-t-4 border-white shadow-xl hover:-translate-y-2 hover:shadow-2xl transition-all cursor-pointer relative overflow-hidden border border-slate-800" data-aos="fade-up" data-aos-delay="400">
+                    <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-5 transition-opacity"></div>
+                    <div class="w-12 h-12 bg-dark-700 group-hover:bg-white group-hover:text-dark-900 transition-colors rounded-full flex items-center justify-center shadow mb-4 text-white text-xl border border-slate-700"><i class="fas fa-desktop"></i></div>
+                    <h4 class="font-bold text-xl text-white mb-2 font-sans tracking-tight group-hover:text-slate-200 transition-colors">Admin Console</h4>
+                    <p class="text-sm text-slate-300 font-sans mb-4">The active staging ground where requested materials are approved and deployed.</p>
+                    <span class="text-xs font-bold text-slate-300 uppercase tracking-widest flex items-center gap-1 group-hover:text-white"><i class="fas fa-cogs"></i> Enter Console</span>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Expanded Modules Section -->
-    <section id="modules" class="py-20 bg-silver-100 border-b border-silver-300">
+    <section id="modules" class="py-20 bg-dark-900 border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16" data-aos="fade-up">
-                <h3 class="text-sm font-bold tracking-widest text-brown-600 font-sans mb-2">SYSTEM EXPANSION</h3>
-                <h2 class="text-4xl md:text-5xl font-black text-black">New Core Modules</h2>
-                <div class="w-24 h-1.5 bg-gold-500 mx-auto mt-6"></div>
+                <h3 class="text-sm font-bold tracking-widest text-orange-500 font-sans mb-2 uppercase">System Expansion</h3>
+                <h2 class="text-4xl md:text-5xl font-black text-white">New Core Modules</h2>
+                <div class="w-24 h-1.5 bg-royalblue-500 mx-auto mt-6"></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white rounded-xl p-6 border-t-4 border-darkred-600 shadow-md hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="100">
-                    <div class="w-12 h-12 bg-darkred-50 rounded-full flex items-center justify-center mb-5 text-darkred-600 text-xl border border-darkred-100"><i class="fas fa-recycle"></i></div>
-                    <h4 class="font-bold text-xl text-black mb-3 font-sans tracking-tight">Waste Segregation</h4>
-                    <p class="text-sm text-gray-600 font-sans leading-relaxed">Track and manage MRF (Material Recovery Facility), Scrapyard operations, Secondary Waste Bins, and seamlessly log Items Disposed.</p>
+                <div class="bg-dark-500 rounded-xl p-6 border-t-4 border-orange-500 shadow-xl hover:-translate-y-2 transition-transform duration-300 border border-slate-800" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-12 h-12 bg-dark-700 rounded-full flex items-center justify-center mb-5 text-orange-500 text-xl border border-slate-700"><i class="fas fa-recycle"></i></div>
+                    <h4 class="font-bold text-xl text-white mb-3 font-sans tracking-tight">Waste Segregation</h4>
+                    <p class="text-sm text-slate-300 font-sans leading-relaxed">Track and manage MRF (Material Recovery Facility), Scrapyard operations, Secondary Waste Bins, and seamlessly log Items Disposed.</p>
                 </div>
-                <div class="bg-white rounded-xl p-6 border-t-4 border-brown-600 shadow-md hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="200">
-                    <div class="w-12 h-12 bg-brown-50 rounded-full flex items-center justify-center mb-5 text-brown-600 text-xl border border-brown-100"><i class="fas fa-file-invoice"></i></div>
-                    <h4 class="font-bold text-xl text-black mb-3 font-sans tracking-tight">Custom Documents</h4>
-                    <p class="text-sm text-gray-600 font-sans leading-relaxed">Add dynamic document formats. Create custom forms by defining rows, columns, and labels tailored to your fleet's operational needs.</p>
+                <div class="bg-dark-500 rounded-xl p-6 border-t-4 border-royalblue-500 shadow-xl hover:-translate-y-2 transition-transform duration-300 border border-slate-800" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-12 h-12 bg-dark-700 rounded-full flex items-center justify-center mb-5 text-royalblue-400 text-xl border border-slate-700"><i class="fas fa-file-invoice"></i></div>
+                    <h4 class="font-bold text-xl text-white mb-3 font-sans tracking-tight">Custom Documents</h4>
+                    <p class="text-sm text-slate-300 font-sans leading-relaxed">Add dynamic document formats. Create custom forms by defining rows, columns, and labels tailored to your fleet's operational needs.</p>
                 </div>
-                <div class="bg-white rounded-xl p-6 border-t-4 border-gold-500 shadow-md hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="300">
-                    <div class="w-12 h-12 bg-gold-50 rounded-full flex items-center justify-center mb-5 text-gold-500 text-xl border border-gold-100"><i class="fas fa-users-cog"></i></div>
-                    <h4 class="font-bold text-xl text-black mb-3 font-sans tracking-tight">User Access Control</h4>
-                    <p class="text-sm text-gray-600 font-sans leading-relaxed">Comprehensive Users module to manage roles, permissions, and mechanic tracking across the entire Hpal Fleet system.</p>
+                <div class="bg-dark-500 rounded-xl p-6 border-t-4 border-blue-400 shadow-xl hover:-translate-y-2 transition-transform duration-300 border border-slate-800" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-12 h-12 bg-dark-700 rounded-full flex items-center justify-center mb-5 text-blue-400 text-xl border border-slate-700"><i class="fas fa-users-cog"></i></div>
+                    <h4 class="font-bold text-xl text-white mb-3 font-sans tracking-tight">User Access Control</h4>
+                    <p class="text-sm text-slate-300 font-sans leading-relaxed">Comprehensive Users module to manage roles, permissions, and mechanic tracking across the entire MS Section system.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- About Us Section -->
-    <section id="about" class="py-20 bg-brown-900 text-white relative overflow-hidden">
+    <section id="about" class="py-20 bg-royalblue-900 text-white relative overflow-hidden">
         <div class="absolute inset-0 bg-texture opacity-20"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col md:flex-row items-center gap-12">
             <div class="flex-1 w-full" data-aos="fade-right">
-                <img src="https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&q=80&w=800" class="rounded-2xl shadow-2xl border-4 border-gold-500 w-full object-cover">
+                <img src="https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&q=80&w=800" class="rounded-2xl shadow-2xl border-4 border-orange-500 w-full object-cover">
             </div>
             <div class="flex-1" data-aos="fade-left">
-                <h3 class="text-gold-500 font-bold tracking-widest mb-2 font-sans text-sm">ABOUT US</h3>
-                <h2 class="text-4xl md:text-5xl font-black mb-6">Built for Heavy Fleet Operations</h2>
-                <p class="text-silver-300 text-lg leading-relaxed mb-6 font-sans font-light">The Hpal Fleet Inventory System Framework was developed specifically to address the complex logistical demands of managing industrial vehicles like Forklifts, Vacuum Trucks, and Jet Trucks.</p>
-                <div class="grid grid-cols-2 gap-6 text-center md:text-left border-t border-brown-600 pt-6">
+                <h3 class="text-orange-400 font-bold tracking-widest mb-2 font-sans text-sm uppercase">About Us</h3>
+                <h2 class="text-4xl md:text-5xl font-black mb-6 text-white">Built for Heavy Fleet Operations</h2>
+                <p class="text-slate-200 text-lg leading-relaxed mb-6 font-sans font-light">The Production Department - MS Section Fleet Inventory System Framework was developed specifically to address the complex logistical demands of managing industrial vehicles like Forklifts, Vacuum Trucks, and Jet Trucks.</p>
+                <div class="grid grid-cols-2 gap-6 text-center md:text-left border-t border-royalblue-700 pt-6">
                     <div>
-                        <h4 class="text-4xl font-black text-gold-500 mb-1 tracking-wider">99.9%</h4>
-                        <p class="text-xs text-silver-300 font-sans uppercase tracking-widest font-bold">Tracking Accuracy</p>
+                        <h4 class="text-4xl font-black text-orange-400 mb-1 tracking-wider">99.9%</h4>
+                        <p class="text-xs text-blue-200 font-sans uppercase tracking-widest font-bold">Tracking Accuracy</p>
                     </div>
                     <div>
-                        <h4 class="text-4xl font-black text-gold-500 mb-1 tracking-wider">24/7</h4>
-                        <p class="text-xs text-silver-300 font-sans uppercase tracking-widest font-bold">System Availability</p>
+                        <h4 class="text-4xl font-black text-orange-400 mb-1 tracking-wider">24/7</h4>
+                        <p class="text-xs text-blue-200 font-sans uppercase tracking-widest font-bold">System Availability</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    
+
     <!-- Footer Section -->
-    <footer class="bg-black border-t-4 border-gold-500 pt-16 pb-8 text-silver-300">
+    <footer class="bg-dark-700 border-t-4 border-orange-500 pt-16 pb-8 text-slate-400">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
             <div>
                 <div class="flex items-center gap-3 mb-6">
-                    <i class="fas fa-truck-monster text-gold-500 text-3xl"></i>
-                    <h2 class="text-3xl font-black text-white m-0">Hpal <span class="text-gold-500">Fleet</span></h2>
+                    <i class="fas fa-truck-monster text-orange-500 text-3xl"></i>
+                    <div>
+                        <h2 class="text-2xl font-black text-white m-0 leading-none">PRODUCTION <span class="text-orange-500">DEPT</span></h2>
+                        <span class="block text-xs font-sans tracking-widest text-royalblue-400 mt-0.5 uppercase">MS Section</span>
+                    </div>
                 </div>
-                <p class="text-sm leading-relaxed text-silver-500 font-sans">
+                <p class="text-sm leading-relaxed text-slate-400 font-sans">
                     Premium heavy vehicle asset management and industrial part tracking system. Built for seamless workflow, mechanics, and facility supervisors.
                 </p>
             </div>
             <div>
                 <h4 class="text-white font-bold mb-6 font-sans uppercase tracking-widest text-sm">Quick Links</h4>
                 <ul class="space-y-3 text-sm font-sans">
-                    <li><a href="#inventory" class="hover:text-gold-500 transition"><i class="fas fa-angle-right mr-2 text-gold-500"></i> Fleet Parts Master</a></li>
-                    <li><a onclick="openLoginModal('/html/garage.html')" class="hover:text-gold-500 transition cursor-pointer"><i class="fas fa-angle-right mr-2 text-gold-500"></i> Fleet Garage Hub</a></li>
-                    <li><a onclick="openLoginModal('/html/toolcrib.html')" class="hover:text-gold-500 transition cursor-pointer"><i class="fas fa-angle-right mr-2 text-gold-500"></i> Tool Crib Operations</a></li>
-                    <li><a onclick="openLoginModal('/html/maintenance.html')" class="hover:text-gold-500 transition cursor-pointer"><i class="fas fa-angle-right mr-2 text-gold-500"></i> Maintenance & PMS</a></li>
-                    <li><a onclick="openLoginModal('/app')" class="hover:text-gold-500 transition cursor-pointer"><i class="fas fa-angle-right mr-2 text-gold-500"></i> App Console Login</a></li>
+                    <li><a href="#inventory" class="hover:text-orange-500 transition"><i class="fas fa-angle-right mr-2 text-orange-500"></i> Fleet Parts Master</a></li>
+                    <li><a onclick="openLoginModal('/html/garage.html')" class="hover:text-orange-500 transition cursor-pointer"><i class="fas fa-angle-right mr-2 text-orange-500"></i> Fleet Garage Hub</a></li>
+                    <li><a onclick="openLoginModal('/html/toolcrib.html')" class="hover:text-orange-500 transition cursor-pointer"><i class="fas fa-angle-right mr-2 text-orange-500"></i> Tool Crib Operations</a></li>
+                    <li><a onclick="openLoginModal('/html/maintenance.html')" class="hover:text-orange-500 transition cursor-pointer"><i class="fas fa-angle-right mr-2 text-orange-500"></i> Maintenance & PMS</a></li>
+                    <li><a onclick="openLoginModal('/app')" class="hover:text-orange-500 transition cursor-pointer"><i class="fas fa-angle-right mr-2 text-orange-500"></i> App Console Login</a></li>
                 </ul>
             </div>
             <div>
                 <h4 class="text-white font-bold mb-6 font-sans uppercase tracking-widest text-sm">Depot HQ</h4>
-                <ul class="space-y-4 text-sm text-silver-500 font-sans">
-                    <li class="flex items-start gap-3"><i class="fas fa-map-marker-alt text-gold-500 mt-1"></i> <span>Industrial Zone, Block 4<br/>Davao City, Philippines</span></li>
-                    <li class="flex items-center gap-3"><i class="fas fa-phone text-gold-500"></i> <span>+63 (82) 555-0198</span></li>
+                <ul class="space-y-4 text-sm text-slate-400 font-sans">
+                    <li class="flex items-start gap-3"><i class="fas fa-map-marker-alt text-orange-500 mt-1"></i> <span>Industrial Zone, Block 4<br/>Davao City, Philippines</span></li>
+                    <li class="flex items-center gap-3"><i class="fas fa-phone text-orange-500"></i> <span>+63 (82) 555-0198</span></li>
                 </ul>
             </div>
         </div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-brown-900 pt-8 text-center text-xs text-silver-700 font-sans">
-            <p>&copy; 2026 Hpal Fleet Management System. All rights reserved.</p>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-800 pt-8 text-center text-xs text-slate-500 font-sans">
+            <p>&copy; 2026 Production Department - MS Section. All rights reserved.</p>
         </div>
     </footer>
 
     <!-- Login Modal -->
     <div id="loginModal" class="fixed inset-0 bg-black/80 z-[100] hidden items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-md rounded-xl shadow-2xl border-t-8 border-darkred-600 overflow-hidden transform scale-95 transition-transform duration-300" id="loginContent">
+        <div class="bg-dark-500 w-full max-w-md rounded-xl shadow-2xl border-t-8 border-orange-500 overflow-hidden transform scale-95 transition-transform duration-300 border border-slate-700" id="loginContent">
             <div class="p-8 font-sans">
                 <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-2xl font-black text-black font-barlow uppercase tracking-wide">System Login</h3>
-                    <button type="button" onclick="closeLoginModal()" class="text-gray-400 hover:text-darkred-600 transition">
+                    <h3 class="text-2xl font-black text-white font-barlow uppercase tracking-wide">System Login</h3>
+                    <button type="button" onclick="closeLoginModal()" class="text-slate-400 hover:text-orange-500 transition">
                         <i class="fas fa-times text-xl"></i>
                     </button>
                 </div>
                 <form id="loginForm" onsubmit="submitLogin(event)" class="space-y-5">
                     <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Username / ID</label>
+                        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Username / ID</label>
                         <div class="relative">
-                            <i class="fas fa-user absolute left-3 top-3.5 text-silver-500"></i>
-                            <input type="text" id="loginUser" required placeholder="Enter your username" class="w-full border border-silver-300 pl-10 p-3 rounded-lg bg-silver-100 outline-none focus:border-brown-600 focus:ring-1 focus:ring-brown-600">
+                            <i class="fas fa-user absolute left-3 top-3.5 text-slate-400"></i>
+                            <input type="text" id="loginUser" required placeholder="Enter your username" class="w-full border border-slate-700 pl-10 p-3 rounded-lg bg-dark-700 text-white placeholder-slate-500 outline-none focus:border-royalblue-500 focus:ring-1 focus:ring-royalblue-500">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Password</label>
+                        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Password</label>
                         <div class="relative">
-                            <i class="fas fa-lock absolute left-3 top-3.5 text-silver-500"></i>
-                            <input type="password" id="loginPass" required placeholder="Enter your password" class="w-full border border-silver-300 pl-10 p-3 rounded-lg bg-silver-100 outline-none focus:border-brown-600 focus:ring-1 focus:ring-brown-600">
+                            <i class="fas fa-lock absolute left-3 top-3.5 text-slate-400"></i>
+                            <input type="password" id="loginPass" required placeholder="Enter your password" class="w-full border border-slate-700 pl-10 p-3 rounded-lg bg-dark-700 text-white placeholder-slate-500 outline-none focus:border-royalblue-500 focus:ring-1 focus:ring-royalblue-500">
                         </div>
                     </div>
-                    <button type="submit" id="loginBtn" class="w-full py-3.5 mt-2 bg-black hover:bg-brown-900 text-gold-500 font-black rounded-lg shadow-lg transition-all flex justify-center items-center gap-2">
+                    <button type="submit" id="loginBtn" class="w-full py-3.5 mt-2 bg-royalblue-600 hover:bg-royalblue-700 text-white font-black rounded-lg shadow-[0_0_15px_rgba(65,105,225,0.4)] transition-all flex justify-center items-center gap-2">
                         <span id="loginBtnText">Secure Login</span> <i id="loginIcon" class="fas fa-sign-in-alt"></i>
                     </button>
                 </form>
@@ -399,7 +412,7 @@
     <!-- Scripts -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    
+
     <script>
         // Global Loading Screen Logic
         window.addEventListener('DOMContentLoaded', () => {
@@ -408,14 +421,14 @@
             const text = document.getElementById('loader-text'); 
             const loader = document.getElementById('global-loader'); 
             const bodyWrap = document.getElementById('body-wrap');
-            
+
             const loadInterval = setInterval(() => { 
                 progress += Math.floor(Math.random() * 12) + 4; 
                 if (progress >= 100) progress = 100;
-                
+
                 bar.style.width = progress + '%'; 
                 text.innerText = `BUFFERING DATA... ${progress}%`;
-                
+
                 if (progress === 100) { 
                     clearInterval(loadInterval); 
                     setTimeout(() => { 
@@ -423,7 +436,7 @@
                         setTimeout(() => { 
                             loader.style.display = 'none'; 
                             bodyWrap.classList.remove('overflow-hidden'); 
-                            
+
                             // Initialize AOS Animations
                             AOS.init({ duration: 800, once: true, offset: 100 }); 
                         }, 500); 
@@ -466,13 +479,13 @@
             currentLoginDestination = targetUrl; // Store where the user clicked to go
             const modal = document.getElementById('loginModal'); 
             const content = document.getElementById('loginContent'); 
-            
+
             document.getElementById('loginForm').reset();
             resetLoginBtn();
 
             modal.classList.remove('hidden'); 
             modal.classList.add('flex'); 
-            
+
             setTimeout(() => { 
                 content.classList.remove('scale-95'); 
                 content.classList.add('scale-100'); 
@@ -482,10 +495,10 @@
         function closeLoginModal() { 
             const modal = document.getElementById('loginModal'); 
             const content = document.getElementById('loginContent'); 
-            
+
             content.classList.remove('scale-100'); 
             content.classList.add('scale-95'); 
-            
+
             setTimeout(() => { 
                 modal.classList.add('hidden'); 
                 modal.classList.remove('flex'); 
@@ -496,7 +509,7 @@
             const btnText = document.getElementById('loginBtnText'); 
             const btn = document.getElementById('loginBtn'); 
             const icon = document.getElementById('loginIcon');
-            
+
             btnText.innerText = "Secure Login"; 
             icon.className = "fas fa-sign-in-alt";
             btn.classList.remove('opacity-80', 'cursor-not-allowed');
@@ -507,12 +520,12 @@
             const btnText = document.getElementById('loginBtnText'); 
             const btn = document.getElementById('loginBtn'); 
             const icon = document.getElementById('loginIcon');
-            
+
             // Visual loading state
             btnText.innerText = "Authenticating..."; 
             icon.className = "fas fa-circle-notch fa-spin";
             btn.classList.add('opacity-80', 'cursor-not-allowed'); 
-            
+
             // Simulate network request before redirecting to the requested destination
             setTimeout(() => { 
                 window.location.href = currentLoginDestination; 
