@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* --- CORE CSS VARIABLES (DARK MODE DEFAULT) --- */
         :root {
             --bg-main: #070B14;
             --bg-panel: #101828;
@@ -22,7 +23,28 @@
             --text-main: #F8FAFC;
             --text-muted: #8B98B4;
             --border: rgba(232, 163, 61, 0.15);
+            --nav-bg: rgba(16, 24, 40, 0.85);
             --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* --- LIGHT MODE VARIABLES --- */
+        [data-theme="light"] {
+            --bg-main: #F0F4F8;
+            --bg-panel: #FFFFFF;
+            --bg-panel-hover: #F8FAFC;
+            --bg-card: #E2E8F0;
+            --amber: #D97706;
+            --amber-glow: rgba(217, 119, 6, 0.15);
+            --amber-border: rgba(217, 119, 6, 0.4);
+            --emerald: #059669;
+            --cyan: #0284C7;
+            --rose: #E11D48;
+            --text-main: #0F172A;
+            --text-muted: #475569;
+            --border: rgba(15, 23, 42, 0.12);
+            --nav-bg: rgba(255, 255, 255, 0.85);
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
         }
 
         * {
@@ -38,6 +60,7 @@
             line-height: 1.6;
             min-height: 100vh;
             overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
             background-image: 
                 radial-gradient(at 0% 0%, rgba(232, 163, 61, 0.08) 0px, transparent 50%),
                 radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.05) 0px, transparent 50%);
@@ -48,9 +71,9 @@
             50% { opacity: 0.5; transform: scale(0.98); }
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-5px); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* --- CORNER TICKS DESIGN MOTIF --- */
@@ -73,205 +96,20 @@
             border-radius: 16px;
             padding: 24px;
             position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
         }
         .panel:hover .corner-ticks { border-color: var(--amber); }
 
-        /* --- AUTHENTICATION SCREEN --- */
-        #auth-section {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            position: relative;
-            z-index: 10;
-        }
-
-        .auth-box {
-            width: 100%;
-            max-width: 440px;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 28px;
-        }
-
-        .logo {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 16px;
-            border-radius: 14px;
-            background: var(--bg-card);
-            border: 1px solid var(--amber-border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            box-shadow: 0 0 20px var(--amber-glow);
-        }
-
-        h1 {
-            font-family: 'Oswald', sans-serif;
-            font-size: 28px;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
-
-        .amber { color: var(--amber); }
-
-        .subtitle {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            letter-spacing: 0.15em;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-top: 4px;
-        }
-
-        .mode-tabs {
-            display: flex;
-            gap: 4px;
-            background: var(--bg-card);
-            border-radius: 10px;
-            padding: 4px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .mode-tab {
-            flex: 1;
-            padding: 10px 0;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            background: transparent;
-            color: var(--text-muted);
-            font-weight: 700;
-            transition: var(--transition);
-        }
-
-        .mode-tab.active {
-            background: var(--amber);
-            color: #1A1305;
-            box-shadow: 0 4px 12px var(--amber-glow);
-        }
-
-        .form-group { margin-bottom: 16px; display: block; }
-        .form-label {
-            display: block;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 12px 14px;
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            outline: none;
-            transition: var(--transition);
-        }
-
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--amber);
-            box-shadow: 0 0 0 3px rgba(232, 163, 61, 0.15);
-        }
-
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-        .alert {
-            display: flex;
-            gap: 10px;
-            align-items: flex-start;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 16px;
-            font-size: 12px;
-            line-height: 1.5;
-        }
-
-        .alert-warning {
-            background: rgba(232, 163, 61, 0.12);
-            border: 1px solid rgba(232, 163, 61, 0.3);
-            color: #FFD185;
-        }
-
-        .alert-error {
-            background: rgba(244, 63, 94, 0.12);
-            border: 1px solid rgba(244, 63, 94, 0.3);
-            color: #FDA4AF;
-        }
-
-        .btn {
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 13px;
-            border-radius: 8px;
-            padding: 12px 18px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: var(--transition);
-            border: 1px solid transparent;
-            width: 100%;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .btn-primary {
-            background: var(--amber);
-            color: #1A1305;
-            box-shadow: 0 4px 15px var(--amber-glow);
-        }
-
-        .btn-primary:hover { filter: brightness(1.15); transform: translateY(-1px); }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--amber-border);
-            color: var(--amber);
-            margin-top: 10px;
-        }
-        .btn-outline:hover { background: rgba(232, 163, 61, 0.1); }
-
-        .password-wrapper { position: relative; }
-        .password-toggle {
-            position: absolute;
-            right: 12px;
-            top: 12px;
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        /* --- DASHBOARD WEB APPLICATION --- */
+        /* --- DASHBOARD WEB APPLICATION LAYOUT --- */
         #app-section {
-            display: none;
+            display: flex;
             min-height: 100vh;
             flex-direction: column;
         }
 
         .navbar {
-            background: var(--bg-panel);
+            background: var(--nav-bg);
             border-bottom: 1px solid var(--border);
             padding: 16px 32px;
             display: flex;
@@ -281,6 +119,7 @@
             top: 0;
             z-index: 100;
             backdrop-filter: blur(10px);
+            transition: var(--transition);
         }
 
         .nav-brand {
@@ -290,27 +129,31 @@
         }
 
         .nav-logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
             background: var(--bg-card);
             border: 1px solid var(--amber-border);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 22px;
+            box-shadow: 0 0 15px var(--amber-glow);
         }
 
         .nav-title h2 {
             font-family: 'Oswald', sans-serif;
-            font-size: 18px;
+            font-size: 20px;
             letter-spacing: 0.05em;
             line-height: 1.1;
+            text-transform: uppercase;
         }
+
+        .amber { color: var(--amber); }
 
         .nav-title span {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 10px;
+            font-size: 11px;
             color: var(--text-muted);
             letter-spacing: 0.1em;
             text-transform: uppercase;
@@ -328,6 +171,7 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 11px;
             font-weight: 600;
+            white-space: nowrap;
         }
 
         .status-dot {
@@ -344,18 +188,27 @@
             gap: 16px;
         }
 
-        .btn-logout {
-            background: rgba(244, 63, 94, 0.1);
-            border: 1px solid rgba(244, 63, 94, 0.3);
-            color: #FDA4AF;
+        /* --- THEME TOGGLE BUTTON --- */
+        .btn-theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
             padding: 8px 16px;
-            border-radius: 6px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
-        .btn-logout:hover { background: rgba(244, 63, 94, 0.2); }
+        .btn-theme-toggle:hover {
+            border-color: var(--amber);
+            background: var(--bg-panel-hover);
+            transform: translateY(-1px);
+        }
 
         .dashboard-nav {
             background: var(--bg-card);
@@ -364,10 +217,13 @@
             display: flex;
             gap: 8px;
             overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
         }
+        .dashboard-nav::-webkit-scrollbar { display: none; }
 
         .dash-tab {
-            padding: 14px 20px;
+            padding: 16px 20px;
             background: transparent;
             border: none;
             border-bottom: 2px solid transparent;
@@ -398,11 +254,6 @@
         .tab-pane { display: none; animation: fadeIn 0.3s ease; }
         .tab-pane.active { display: block; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         /* --- STATS GRID --- */
         .stats-grid {
             display: grid;
@@ -417,6 +268,7 @@
             border-radius: 12px;
             padding: 20px;
             position: relative;
+            box-shadow: var(--shadow);
         }
 
         .stat-label {
@@ -436,7 +288,7 @@
             gap: 6px;
         }
 
-        .stat-unit { font-size: 14px; font-family: 'JetBrains Mono', monospace; color: var(--amber); font-weight: 400;}
+        .stat-unit { font-size: 14px; font-family: 'JetBrains Mono', monospace; color: var(--amber); font-weight: 400; }
         .stat-sub { font-size: 11px; color: var(--emerald); margin-top: 6px; font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 4px; }
 
         /* --- CONTENT GRIDS --- */
@@ -445,10 +297,6 @@
             grid-template-columns: 2fr 1fr;
             gap: 24px;
             margin-bottom: 28px;
-        }
-
-        @media(max-width: 992px) {
-            .content-grid-2 { grid-template-columns: 1fr; }
         }
 
         .section-title {
@@ -463,12 +311,10 @@
             letter-spacing: 0.03em;
         }
 
-        .info-list {
-            list-style: none;
-        }
+        .info-list { list-style: none; }
         .info-item {
             padding: 12px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             font-size: 13px;
@@ -483,15 +329,7 @@
             grid-template-columns: repeat(7, 1fr);
             gap: 12px;
             margin-bottom: 24px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-        }
-
-        @media(max-width: 1200px) {
-            .process-grid { grid-template-columns: repeat(4, 1fr); }
-        }
-        @media(max-width: 768px) {
-            .process-grid { grid-template-columns: repeat(2, 1fr); }
+            padding-bottom: 6px;
         }
 
         .process-step {
@@ -502,13 +340,16 @@
             cursor: pointer;
             transition: var(--transition);
             position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .process-step:hover, .process-step.active {
             background: var(--bg-panel-hover);
             border-color: var(--amber);
             transform: translateY(-4px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
         }
 
         .step-num {
@@ -535,6 +376,7 @@
             color: var(--emerald);
             display: inline-block;
             font-family: 'JetBrains Mono', monospace;
+            width: fit-content;
         }
 
         .process-detail-card {
@@ -554,7 +396,7 @@
             border: 1px solid var(--border);
             background: #000;
             height: 440px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            box-shadow: var(--shadow);
         }
 
         .slide {
@@ -571,11 +413,12 @@
         .slide.active { opacity: 1; z-index: 1; }
 
         .slide-overlay {
-            background: linear-gradient(to top, rgba(7, 11, 20, 0.95) 0%, rgba(7, 11, 20, 0.6) 50%, transparent 100%);
+            background: linear-gradient(to top, rgba(7, 11, 20, 0.95) 0%, rgba(7, 11, 20, 0.7) 60%, transparent 100%);
             width: 100%;
             padding: 40px 32px 28px;
             position: relative;
             z-index: 2;
+            color: #F8FAFC; /* Always white on dark slide overlays */
         }
 
         .slide-tag {
@@ -591,8 +434,8 @@
             margin-bottom: 10px;
         }
 
-        .slide-title { font-family: 'Oswald', sans-serif; font-size: 26px; margin-bottom: 6px; }
-        .slide-desc { font-size: 14px; color: var(--text-muted); max-width: 700px; }
+        .slide-title { font-family: 'Oswald', sans-serif; font-size: 26px; margin-bottom: 6px; color: #FFFFFF; }
+        .slide-desc { font-size: 14px; color: #CBD5E1; max-width: 700px; }
 
         .slider-btn {
             position: absolute;
@@ -631,7 +474,39 @@
         }
         .dot.active { background: var(--amber); width: 24px; border-radius: 10px; }
 
-        /* --- INTERACTIVE CHECKLIST --- */
+        /* --- BUTTONS & CHECKLIST --- */
+        .btn {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            border-radius: 8px;
+            padding: 12px 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-primary {
+            background: var(--amber);
+            color: #1A1305;
+            box-shadow: 0 4px 15px var(--amber-glow);
+            width: 100%;
+        }
+        .btn-primary:hover { filter: brightness(1.15); transform: translateY(-1px); }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--amber-border);
+            color: var(--amber);
+        }
+        .btn-outline:hover { background: rgba(232, 163, 61, 0.1); }
+
         .checklist-item {
             display: flex;
             align-items: center;
@@ -678,98 +553,59 @@
             z-index: 1000;
             transform: translateY(150%);
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: var(--text-main);
         }
         #toast.show { transform: translateY(0); }
+
+        /* ==========================================================
+           RESPONSIVE MOBILE DISPLAY ENHANCEMENTS
+           ========================================================== */
+        @media (max-width: 1200px) {
+            .process-grid { grid-template-columns: repeat(4, 1fr); }
+            .content-grid-2 { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 16px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            .nav-brand { justify-content: space-between; }
+            .nav-actions { justify-content: space-between; width: 100%; flex-wrap: wrap; }
+            
+            .dashboard-nav { padding: 0 16px; }
+            .dash-tab { padding: 14px 12px; font-size: 11px; }
+
+            .main-content { padding: 16px; }
+            
+            .process-grid { grid-template-columns: repeat(2, 1fr); }
+            .slider-container { height: 360px; }
+            .slide-overlay { padding: 24px 16px 20px; }
+            .slide-title { font-size: 20px; }
+            .slider-btn { width: 36px; height: 36px; font-size: 14px; }
+            .prev-btn { left: 10px; }
+            .next-btn { right: 10px; }
+            .slider-dots { bottom: 16px; right: 16px; }
+            
+            .stat-value { font-size: 24px; }
+            .panel { padding: 18px; }
+        }
+
+        @media (max-width: 480px) {
+            .process-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .status-badge { font-size: 10px; padding: 4px 8px; }
+            .nav-title h2 { font-size: 18px; }
+            .nav-title span { font-size: 9px; }
+            .btn-theme-toggle { padding: 6px 12px; font-size: 11px; }
+            .info-item { flex-direction: column; gap: 4px; }
+            .info-val { text-align: left; }
+        }
     </style>
 </head>
 <body>
-
-    <!-- ================= AUTHENTICATION PORTAL ================= -->
-    <div id="auth-section">
-        <div class="auth-box">
-            <div class="header">
-                <div class="logo">🛡️</div>
-                <h1>Quality<span class="amber">Group</span></h1>
-                <p class="subtitle">THPAL Operations &amp; Assurance Console</p>
-            </div>
-
-            <div class="panel">
-                <div class="corner-ticks corner-ticks-tl"></div>
-                <div class="corner-ticks corner-ticks-tr"></div>
-                <div class="corner-ticks corner-ticks-bl"></div>
-                <div class="corner-ticks corner-ticks-br"></div>
-
-                <div class="mode-tabs">
-                    <button class="mode-tab active" id="loginTab" onclick="switchAuthMode('login')">Sign In</button>
-                    <button class="mode-tab" id="signupTab" onclick="switchAuthMode('signup')">Register</button>
-                </div>
-
-                <form id="authForm" onsubmit="handleAuthSubmit(event)">
-                    <div id="signupFields" style="display: none;">
-                        <div class="form-group">
-                            <label class="form-label">Full Name</label>
-                            <input type="text" id="fullName" placeholder="Juan Dela Cruz">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Assigned Department / Division</label>
-                            <select id="department">
-                                <option value="HPAL Processing">HPAL (High-Pressure Acid Leach)</option>
-                                <option value="MS Production">MS-Design &amp; Sulfide Production</option>
-                                <option value="CCD & Neutralization">CCD &amp; Pre-Neutralization</option>
-                                <option value="H2S Plant">H2S Gas Facility</option>
-                                <option value="Limestone & Reagents">Limestone &amp; Reagents Prep</option>
-                                <option value="DCS Control Room">DCS Automated Control Room</option>
-                                <option value="Environmental & MMT">Environmental Assurance (MMT/ECC)</option>
-                                <option value="Quality Assurance">Quality Assurance &amp; Lab Testing</option>
-                            </select>
-                        </div>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">Email Address</label>
-                                <input type="email" id="email" placeholder="j.delacruz@thpal.com.ph">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Contact No.</label>
-                                <input type="tel" id="phone" placeholder="0917 xxx xxxx">
-                            </div>
-                        </div>
-                        <div class="alert alert-warning">
-                            <span>👑</span>
-                            <div><strong>Notice:</strong> Account registered will be synced with DENR-EMB Region 13 compliance auditing protocols.</div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Username / Engineer ID</label>
-                        <input type="text" id="username" placeholder="e.g. j.delacruz" value="admin.thpal" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Security Password</label>
-                        <div class="password-wrapper">
-                            <input type="password" id="password" placeholder="••••••••" value="sumitomo2026" required>
-                            <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
-                        </div>
-                    </div>
-
-                    <div id="errorAlert" class="alert alert-error" style="display: none;">
-                        <span>⚠️</span>
-                        <div id="errorMsg"></div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary" id="submitBtn">
-                        <span id="btnText">Sign In To Console</span>
-                    </button>
-                    <button type="button" class="btn btn-outline" onclick="launchDemo()">
-                        🚀 Quick Launch / Demo Console
-                    </button>
-                </form>
-            </div>
-            <p style="text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 16px;">
-                Taganito HPAL Nickel Corporation (THPAL) • Claver, Surigao del Norte
-            </p>
-        </div>
-    </div>
 
     <!-- ================= DASHBOARD WEB APPLICATION ================= -->
     <div id="app-section">
@@ -785,13 +621,16 @@
             <div class="nav-actions">
                 <div class="status-badge">
                     <span class="status-dot"></span>
-                    <span>DCS ONLINE: AUTOCLAVE A/B NORMAL</span>
+                    <span>DCS ONLINE: AUTOCLAVE NORMAL</span>
                 </div>
                 <div style="text-align: right; font-size: 12px; font-family: 'JetBrains Mono', monospace;">
                     <div style="color: var(--amber);" id="userDisplay">Engr. Admin (HPAL Div)</div>
                     <div style="font-size: 10px; color: var(--text-muted);">Claver, Surigao del Norte</div>
                 </div>
-                <button class="btn-logout" onclick="logout()">Sign Out</button>
+                <!-- Dark/Light Mode Toggle Button -->
+                <button class="btn-theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Toggle Display Mode">
+                    🌙 Dark Mode
+                </button>
             </div>
         </nav>
 
@@ -909,7 +748,7 @@
                         <div class="process-step" onclick="selectProcessStep(7, this)">
                             <span class="step-num">STAGE 07</span>
                             <div class="step-title">Final Neutralization &amp; TSF</div>
-                            <span class="step-status">EFFLUVENT CLEAR</span>
+                            <span class="step-status">EFFLUENT CLEAR</span>
                         </div>
                     </div>
 
@@ -917,14 +756,14 @@
                     <div class="process-detail-card" id="processDetailContent">
                         <div class="corner-ticks corner-ticks-bl"></div><div class="corner-ticks corner-ticks-br"></div>
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
-                            <div>
+                            <div style="flex: 1; min-width: 280px;">
                                 <span style="color: var(--amber); font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;">LIVE TELEMETRY • STAGE 01</span>
                                 <h3 style="font-family: 'Oswald', sans-serif; font-size: 24px; margin: 4px 0 10px;">Ore Preparation &amp; Slurry Screening</h3>
                                 <p style="color: var(--text-muted); font-size: 14px; max-width: 800px; line-height: 1.6;">
                                     Low-grade limonite ore delivered by Taganito Mining Corp (TMC) conveyor systems is screened, washed, and mixed with water in ball mills to produce a uniform slurry with optimal solid density (~35-40%) ready for autoclave feeding.
                                 </p>
                             </div>
-                            <div style="background: var(--bg-card); padding: 16px 24px; border-radius: 10px; border: 1px solid var(--border); min-width: 260px;">
+                            <div style="background: var(--bg-card); padding: 16px 24px; border-radius: 10px; border: 1px solid var(--border); min-width: 260px; flex-shrink: 0;">
                                 <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); margin-bottom: 8px;">SIMULATED PARAMETERS</div>
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px;"><span>Slurry Feed Density:</span><strong style="color: var(--cyan);">38.5% Solids</strong></div>
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px;"><span>Conveyor Flow Rate:</span><strong style="color: var(--emerald);">450 Tonnes/hr</strong></div>
@@ -1096,82 +935,30 @@
 
     <!-- ================= JAVASCRIPT LOGIC ================= -->
     <script>
-        /* --- AUTHENTICATION & MODE SWITCHING --- */
-        let currentAuthMode = 'login';
+        /* --- DARK / LIGHT MODE TOGGLE FUNCTION --- */
+        function initTheme() {
+            const savedTheme = localStorage.getItem('thpal-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeButton(savedTheme);
+        }
 
-        function switchAuthMode(mode) {
-            currentAuthMode = mode;
-            const signupFields = document.getElementById('signupFields');
-            const loginTab = document.getElementById('loginTab');
-            const signupTab = document.getElementById('signupTab');
-            const btnText = document.getElementById('btnText');
-            const errorAlert = document.getElementById('errorAlert');
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('thpal-theme', newTheme);
+            updateThemeButton(newTheme);
+            showToast("Display Mode Changed", `Switched to ${newTheme.toUpperCase()} mode.`);
+        }
 
-            if (mode === 'signup') {
-                signupFields.style.display = 'block';
-                loginTab.classList.remove('active');
-                signupTab.classList.add('active');
-                btnText.textContent = 'Register Engineer Account';
+        function updateThemeButton(theme) {
+            const btn = document.getElementById('themeBtn');
+            if (theme === 'light') {
+                btn.innerHTML = '☀️ Light Mode';
             } else {
-                signupFields.style.display = 'none';
-                loginTab.classList.add('active');
-                signupTab.classList.remove('active');
-                btnText.textContent = 'Sign In To Console';
+                btn.innerHTML = '🌙 Dark Mode';
             }
-            errorAlert.style.display = 'none';
-        }
-
-        function togglePassword() {
-            const input = document.getElementById('password');
-            input.type = input.type === 'password' ? 'text' : 'password';
-        }
-
-        function handleAuthSubmit(event) {
-            event.preventDefault();
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
-            const errorAlert = document.getElementById('errorAlert');
-            const errorMsg = document.getElementById('errorMsg');
-
-            if (!username || !password) {
-                errorMsg.textContent = 'Please enter both Username and Password.';
-                errorAlert.style.display = 'flex';
-                return;
-            }
-
-            if (currentAuthMode === 'signup') {
-                const fullName = document.getElementById('fullName').value.trim();
-                const dept = document.getElementById('department').value;
-                if (!fullName) {
-                    errorMsg.textContent = 'Full Name is required for DENR-EMB compliance registration.';
-                    errorAlert.style.display = 'flex';
-                    return;
-                }
-                document.getElementById('userDisplay').textContent = `Engr. ${fullName} (${dept})`;
-            } else {
-                document.getElementById('userDisplay').textContent = `Engr. ${username} (HPAL Div)`;
-            }
-
-            enterDashboard();
-        }
-
-        function launchDemo() {
-            document.getElementById('userDisplay').textContent = 'Engr. Demo User (DCS Control Room)';
-            enterDashboard();
-            showToast("Demo Mode Activated", "Welcome to Taganito HPAL Operations Console.");
-        }
-
-        function enterDashboard() {
-            document.getElementById('auth-section').style.display = 'none';
-            const app = document.getElementById('app-section');
-            app.style.display = 'flex';
-            startTelemetrySimulation();
-        }
-
-        function logout() {
-            document.getElementById('app-section').style.display = 'none';
-            document.getElementById('auth-section').style.display = 'flex';
-            showToast("Signed Out", "You have securely logged out of the THPAL console.");
         }
 
         /* --- TAB SWITCHING --- */
@@ -1246,12 +1033,12 @@
             container.innerHTML = `
                 <div class="corner-ticks corner-ticks-bl"></div><div class="corner-ticks corner-ticks-br"></div>
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; animation: fadeIn 0.3s ease;">
-                    <div>
+                    <div style="flex: 1; min-width: 280px;">
                         <span style="color: var(--amber); font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;">LIVE TELEMETRY • STAGE 0${stepId}</span>
                         <h3 style="font-family: 'Oswald', sans-serif; font-size: 24px; margin: 4px 0 10px;">${data.title}</h3>
                         <p style="color: var(--text-muted); font-size: 14px; max-width: 800px; line-height: 1.6;">${data.desc}</p>
                     </div>
-                    <div style="background: var(--bg-card); padding: 16px 24px; border-radius: 10px; border: 1px solid var(--border); min-width: 260px;">
+                    <div style="background: var(--bg-card); padding: 16px 24px; border-radius: 10px; border: 1px solid var(--border); min-width: 260px; flex-shrink: 0;">
                         <div style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); margin-bottom: 8px;">SIMULATED PARAMETERS</div>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px;"><span>${data.p1Label}</span><strong style="color: ${data.p1Color};">${data.p1Val}</strong></div>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px;"><span>${data.p2Label}</span><strong style="color: ${data.p2Color};">${data.p2Val}</strong></div>
@@ -1302,7 +1089,6 @@
             clearInterval(slideInterval);
             slideInterval = setInterval(() => { changeSlide(1); }, 4500);
         }
-        startSlideTimer();
 
         /* --- CHECKLIST & TOAST NOTIFICATION --- */
         function toggleCheck(item) {
@@ -1331,7 +1117,6 @@
         /* --- LIVE TELEMETRY SIMULATION --- */
         function startTelemetrySimulation() {
             setInterval(() => {
-                // Randomly fluctuate Autoclave Temp slightly
                 const tempEl = document.getElementById('simTemp');
                 if (tempEl) {
                     let currentTemp = parseFloat(tempEl.textContent);
@@ -1340,6 +1125,13 @@
                 }
             }, 3000);
         }
+
+        /* --- INITIALIZATION ON PAGE LOAD --- */
+        window.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            startSlideTimer();
+            startTelemetrySimulation();
+        });
     </script>
 </body>
 </html>
