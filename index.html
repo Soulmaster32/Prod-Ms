@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quality Group | MS Section - Quality by MS Product</title>
 
+    <!-- Tailwind CSS & FontAwesome Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -13,6 +14,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- AOS Animation & jQuery -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
@@ -48,12 +50,13 @@
         .submenu-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
         .submenu-open { max-height: 500px; }
         .tab-btn.active { background: #2563eb; color: #ffffff; border-color: #38bdf8; box-shadow: 0 0 15px rgba(56,189,248,0.4); }
-        /* Custom animation for modal popups */
         @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.96); }
             to { opacity: 1; transform: scale(1); }
         }
         .animate-fadeIn { animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-white bg-dark-900 overflow-x-hidden" id="body-wrap">
@@ -97,7 +100,7 @@
                     </button>
                 </div>
 
-                <!-- Navigation Links with Interactive Accordions -->
+                <!-- Navigation Links -->
                 <div class="px-3 py-6 space-y-4 overflow-y-auto max-h-[calc(100vh-170px)]">
 
                     <!-- 1. QA Dashboard -->
@@ -107,7 +110,7 @@
                         </a>
                     </div>
 
-                    <!-- 2. QA MS Product (Accordion Dropdown connected to qamsproduct.js) -->
+                    <!-- 2. QA MS Product (Connected to qamsproduct.js) -->
                     <div>
                         <button onclick="toggleSubmenu('submenu-msp', 'icon-msp')" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all group">
                             <span class="flex items-center gap-3">
@@ -116,24 +119,24 @@
                             <i id="icon-msp" class="fas fa-chevron-down text-xs text-slate-500 transition-transform duration-300"></i>
                         </button>
                         <div id="submenu-msp" class="submenu-content pl-9 pr-2 space-y-1 mt-1 border-l-2 border-slate-800 ml-4">
-                            <a href="#qamsproduct-portal" onclick="QAMSProduct.open('analysis'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer">
+                            <a href="#qamsproduct-portal" onclick="if(window.QAMSProduct) QAMSProduct.open('analysis'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer">
                                 <i class="fas fa-chart-line mr-2 text-sky-500"></i> QA Analysis
                             </a>
-                            <a href="#qamsproduct-portal" onclick="QAMSProduct.open('document'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer">
+                            <a href="#qamsproduct-portal" onclick="if(window.QAMSProduct) QAMSProduct.open('document'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer">
                                 <i class="fas fa-file-invoice mr-2 text-cyan-500"></i> QA Documents and Report
                             </a>
-                            <a href="#qamsproduct-portal" onclick="QAMSProduct.open('nearmiss'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer">
+                            <a href="#qamsproduct-portal" onclick="if(window.QAMSProduct) QAMSProduct.open('nearmiss'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer">
                                 <i class="fas fa-exclamation-triangle mr-2 text-amber-400"></i> QA Near Miss & Incident
                             </a>
-                            <a href="#qamsproduct-portal" onclick="QAMSProduct.open('improvement'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer">
+                            <a href="#qamsproduct-portal" onclick="if(window.QAMSProduct) QAMSProduct.open('improvement'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer">
                                 <i class="fas fa-lightbulb mr-2 text-emerald-400"></i> For Improvement
                             </a>
                         </div>
                     </div>
 
-                    <!-- 3. QA Calendar (Connected to Near Miss/Accident) -->
+                    <!-- 3. QA Calendar (Connected to qacalendar.js) -->
                     <div>
-                        <a href="#calendar-section" onclick="closeSidebarOnMobile()" class="flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all group">
+                        <a href="#calendar-section" onclick="if(window.QACalendar) QACalendar.open('all'); closeSidebarOnMobile();" class="flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all group">
                             <span class="flex items-center gap-3">
                                 <i class="fas fa-calendar-alt w-5 text-center text-cyan-400 group-hover:scale-110 transition-transform"></i> QA Calendar
                             </span>
@@ -153,7 +156,7 @@
                         </a>
                     </div>
 
-                    <!-- 6. QA Area (Accordion Dropdown) -->
+                    <!-- 6. QA Area -->
                     <div>
                         <button onclick="toggleSubmenu('submenu-area', 'icon-area')" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all group">
                             <span class="flex items-center gap-3">
@@ -177,7 +180,7 @@
                         </div>
                     </div>
 
-                    <!-- 7. Separated DCS Control & Sub DCS Control -->
+                    <!-- 7. DCS Control & Sub DCS Control -->
                     <div>
                         <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-3 mb-2 block">Plant Automation</span>
                         <div class="space-y-1">
@@ -236,8 +239,8 @@
                 </div>
 
                 <div class="flex items-center gap-3 sm:gap-4">
-                    <!-- Quick Incident Log CTA -->
-                    <button onclick="openModal('incidentModal')" class="bg-gradient-to-r from-rose-600 to-amber-500 hover:from-rose-500 hover:to-amber-400 text-white px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-[0_0_15px_rgba(244,63,94,0.3)] transition-all flex items-center gap-2">
+                    <!-- Quick Incident Log CTA (Dynamically uses QACalendar modal if available) -->
+                    <button onclick="if(window.QACalendar){ QACalendar.openAddModal(null, 'nearmiss'); } else { openModal('incidentModal'); }" class="bg-gradient-to-r from-rose-600 to-amber-500 hover:from-rose-500 hover:to-amber-400 text-white px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-[0_0_15px_rgba(244,63,94,0.3)] transition-all flex items-center gap-2">
                         <i class="fas fa-exclamation-triangle"></i>
                         <span>Log Incident / Near Miss</span>
                     </button>
@@ -271,11 +274,11 @@
                     </p>
 
                     <div class="flex flex-wrap justify-center items-center gap-3 sm:gap-4">
-                        <a href="#qamsproduct-portal" onclick="QAMSProduct.open('all');" class="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-royalblue-600 to-sky-500 hover:from-royalblue-500 hover:to-sky-400 text-white font-bold text-sm rounded-xl shadow-[0_0_20px_rgba(14,165,233,0.4)] transition-all flex items-center justify-center gap-2">
+                        <a href="#qamsproduct-portal" onclick="if(window.QAMSProduct) QAMSProduct.open('all');" class="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-royalblue-600 to-sky-500 hover:from-royalblue-500 hover:to-sky-400 text-white font-bold text-sm rounded-xl shadow-[0_0_20px_rgba(14,165,233,0.4)] transition-all flex items-center justify-center gap-2">
                             <span>Interactive QA MS Product</span>
                             <i class="fas fa-microscope text-xs"></i>
                         </a>
-                        <a href="#calendar-section" class="w-full sm:w-auto px-6 py-3.5 bg-dark-500/80 hover:bg-dark-400/80 border border-slate-700 hover:border-slate-500 text-slate-200 hover:text-white font-semibold text-sm rounded-xl transition-all text-center backdrop-blur-sm">
+                        <a href="#calendar-section" onclick="if(window.QACalendar) QACalendar.open('all');" class="w-full sm:w-auto px-6 py-3.5 bg-dark-500/80 hover:bg-dark-400/80 border border-slate-700 hover:border-slate-500 text-slate-200 hover:text-white font-semibold text-sm rounded-xl transition-all text-center backdrop-blur-sm">
                             QA Event Calendar
                         </a>
                         <a href="#area-explorer" class="w-full sm:w-auto px-6 py-3.5 bg-slate-800/80 hover:bg-slate-700/80 border border-cyan-500/30 text-cyan-300 hover:text-white font-semibold text-sm rounded-xl transition-all text-center">
@@ -286,157 +289,18 @@
             </section>
 
             <!-- INTERACTIVE MODULE 1: QA MS PRODUCT PORTAL (Powered by qamsproduct.js) -->
-            <section id="qamsproduct-portal" class="py-16 px-4 sm:px-8 bg-dark-900 border-b border-slate-800/80">
-                <!-- Content is automatically rendered and injected here by qamsproduct.js -->
+            <section id="qamsproduct-portal" class="py-16 px-4 sm:px-8 bg-dark-900 border-b border-slate-800/80 min-h-[400px]">
+                <div class="max-w-7xl mx-auto text-center py-12 text-slate-500">
+                    <i class="fas fa-circle-notch fa-spin text-3xl text-sky-500 mb-3 block"></i>
+                    <span>Loading Interactive QA MS Product Management Hub...</span>
+                </div>
             </section>
 
-            <!-- INTERACTIVE MODULE 2: QA CALENDAR (CONNECTED TO NEAR MISS, INCIDENT & IMPROVEMENT) -->
-            <section id="calendar-section" class="py-16 px-4 sm:px-8 bg-dark-900 border-b border-slate-800/80">
-                <div class="max-w-6xl mx-auto">
-                    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8" data-aos="fade-up">
-                        <div>
-                            <span class="text-xs font-bold tracking-widest text-sky-400 uppercase mb-1.5 block">Live Event Tracking</span>
-                            <h3 class="text-2xl sm:text-4xl font-extrabold text-white">QA Calendar & Incident Analysis</h3>
-                        </div>
-                        <p class="text-xs sm:text-sm text-slate-400 max-w-md mt-2 md:mt-0">
-                            Click on calendar dates or filter buttons below to view interactive incident investigations, Near Miss logs, and Corrective Actions (CAPA) for July 2026.
-                        </p>
-                    </div>
-
-                    <!-- Interactive Filter Pills -->
-                    <div class="flex flex-wrap items-center gap-2 mb-6" data-aos="fade-up">
-                        <button onclick="filterEvents('all')" id="flt-all" class="px-4 py-2 rounded-xl text-xs font-bold bg-royalblue-600 text-white border border-royalblue-400 shadow transition-all">
-                            All QA Events (4)
-                        </button>
-                        <button onclick="filterEvents('nearmiss')" id="flt-nearmiss" class="px-4 py-2 rounded-xl text-xs font-semibold bg-dark-500 text-amber-400 border border-slate-700 hover:border-amber-500/50 transition-all flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-amber-400"></span> Near Misses (2)
-                        </button>
-                        <button onclick="filterEvents('accident')" id="flt-accident" class="px-4 py-2 rounded-xl text-xs font-semibold bg-dark-500 text-rose-400 border border-slate-700 hover:border-rose-500/50 transition-all flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-rose-500"></span> Incidents / Accidents (1)
-                        </button>
-                        <button onclick="filterEvents('improvement')" id="flt-improvement" class="px-4 py-2 rounded-xl text-xs font-semibold bg-dark-500 text-emerald-400 border border-slate-700 hover:border-emerald-500/50 transition-all flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> For Improvement (1)
-                        </button>
-                    </div>
-
-                    <!-- Calendar Grid + Dynamic Details Box -->
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                        <!-- Left: Visual Calendar (July 2026) -->
-                        <div class="lg:col-span-7 bg-dark-500 rounded-2xl p-4 sm:p-6 border border-slate-800 shadow-xl">
-                            <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-800">
-                                <div class="flex items-center gap-2">
-                                    <i class="fas fa-calendar-alt text-sky-400 text-lg"></i>
-                                    <span class="font-bold text-base sm:text-lg text-white">July 2026 &bull; MS Section</span>
-                                </div>
-                                <span class="text-xs font-semibold text-slate-400 bg-slate-800 px-3 py-1 rounded-lg">Real-Time Sync</span>
-                            </div>
-
-                            <!-- Days of Week -->
-                            <div class="grid grid-cols-7 gap-1 sm:gap-2 text-center text-xs font-bold text-slate-400 uppercase mb-2">
-                                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-                            </div>
-
-                            <!-- Interactive Dates Grid -->
-                            <div class="grid grid-cols-7 gap-1 sm:gap-2 text-center text-xs sm:text-sm font-semibold">
-                                <!-- Blank days before July 1 (July 1, 2026 is Wed) -->
-                                <div class="p-2 sm:p-3 opacity-20">28</div>
-                                <div class="p-2 sm:p-3 opacity-20">29</div>
-                                <div class="p-2 sm:p-3 opacity-20">30</div>
-
-                                <div onclick="selectDate(1, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer border border-transparent hover:border-slate-600">1</div>
-                                <div onclick="selectDate(2, 'improvement')" id="cell-2" class="p-2 sm:p-3 rounded-xl bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40 cursor-pointer shadow-[0_0_10px_rgba(16,185,129,0.2)] relative">
-                                    2 <span class="block w-1.5 h-1.5 rounded-full bg-emerald-400 mx-auto mt-1"></span>
-                                </div>
-                                <div onclick="selectDate(3, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">3</div>
-                                <div onclick="selectDate(4, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">4</div>
-
-                                <div onclick="selectDate(5, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">5</div>
-                                <div onclick="selectDate(6, 'nearmiss')" id="cell-6" class="p-2 sm:p-3 rounded-xl bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40 cursor-pointer shadow-[0_0_10px_rgba(245,158,11,0.2)]">
-                                    6 <span class="block w-1.5 h-1.5 rounded-full bg-amber-400 mx-auto mt-1"></span>
-                                </div>
-                                <div onclick="selectDate(7, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">7</div>
-                                <div onclick="selectDate(8, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">8</div>
-                                <div onclick="selectDate(9, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">9</div>
-                                <div onclick="selectDate(10, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">10</div>
-                                <div onclick="selectDate(11, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">11</div>
-
-                                <div onclick="selectDate(12, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">12</div>
-                                <div onclick="selectDate(13, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">13</div>
-                                <div onclick="selectDate(14, 'accident')" id="cell-14" class="p-2 sm:p-3 rounded-xl bg-rose-500/20 text-rose-300 font-bold border border-rose-500/40 cursor-pointer shadow-[0_0_10px_rgba(244,63,94,0.2)]">
-                                    14 <span class="block w-1.5 h-1.5 rounded-full bg-rose-500 mx-auto mt-1 animate-ping"></span>
-                                </div>
-                                <div onclick="selectDate(15, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">15</div>
-                                <div onclick="selectDate(16, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">16</div>
-                                <div onclick="selectDate(17, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">17</div>
-                                <div onclick="selectDate(18, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">18</div>
-
-                                <div onclick="selectDate(19, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">19</div>
-                                <div onclick="selectDate(20, 'nearmiss')" id="cell-20" class="p-2 sm:p-3 rounded-xl bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40 cursor-pointer">
-                                    20 <span class="block w-1.5 h-1.5 rounded-full bg-amber-400 mx-auto mt-1"></span>
-                                </div>
-                                <div onclick="selectDate(21, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">21</div>
-                                <div onclick="selectDate(22, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">22</div>
-                                <div onclick="selectDate(23, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">23</div>
-                                <div onclick="selectDate(24, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">24</div>
-                                <div onclick="selectDate(25, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">25</div>
-
-                                <div onclick="selectDate(26, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">26</div>
-                                <div onclick="selectDate(27, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">27</div>
-                                <div onclick="selectDate(28, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">28</div>
-                                <div onclick="selectDate(29, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">29</div>
-                                <div onclick="selectDate(30, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">30</div>
-                                <div onclick="selectDate(31, 'routine')" class="p-2 sm:p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700 cursor-pointer">31</div>
-                                <div class="p-2 sm:p-3 opacity-20">1</div>
-                            </div>
-                            <div class="mt-4 pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between text-[11px] text-slate-400 gap-2">
-                                <span><i class="fas fa-mouse-pointer text-sky-400 mr-1"></i> Click highlighted dates to inspect root cause</span>
-                                <span class="text-sky-400 font-semibold">Today: July 2, 2026</span>
-                            </div>
-                        </div>
-
-                        <!-- Right: Dynamic Event Detail Panel -->
-                        <div class="lg:col-span-5 bg-dark-500 rounded-2xl p-6 border border-slate-800 shadow-xl flex flex-col justify-between">
-                            <div>
-                                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
-                                    <span id="event-type-badge" class="px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                        For Improvement
-                                    </span>
-                                    <span id="event-date" class="text-xs font-bold text-slate-400">July 2, 2026 &bull; 13:50 PST</span>
-                                </div>
-                                <h4 id="event-title" class="text-lg sm:text-xl font-bold text-white mb-3">
-                                    Limestone Slurry Density Sensor Optimization
-                                </h4>
-                                <p id="event-desc" class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6 bg-dark-700 p-4 rounded-xl border border-slate-800 font-normal">
-                                    QA Analysis identified slight drift (+/- 0.05 g/cm³) in automatic titration feed loop. Recommended proactive recalibration of Sub DCS field sensor #LS-402 during scheduled shift turnover.
-                                </p>
-
-                                <!-- Event Meta -->
-                                <div class="space-y-2.5 text-xs">
-                                    <div class="flex justify-between py-1.5 border-b border-slate-800/60">
-                                        <span class="text-slate-400">Affected Plant Area:</span>
-                                        <span id="event-area" class="font-bold text-sky-400">Limestone Area</span>
-                                    </div>
-                                    <div class="flex justify-between py-1.5 border-b border-slate-800/60">
-                                        <span class="text-slate-400">Reported By:</span>
-                                        <span id="event-reporter" class="font-semibold text-white">Engr. M. Santos (QA Lab)</span>
-                                    </div>
-                                    <div class="flex justify-between py-1.5">
-                                        <span class="text-slate-400">CAPA Resolution Status:</span>
-                                        <span id="event-status" class="font-bold text-emerald-400">In Progress (SOP-409)</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-6 pt-4 border-t border-slate-800 flex gap-3">
-                                <button onclick="openModal('incidentModal')" class="flex-1 py-2.5 bg-royalblue-600 hover:bg-royalblue-500 text-white rounded-xl text-xs font-bold transition-all text-center shadow">
-                                    Update CAPA Action
-                                </button>
-                                <button onclick="alert('Downloading full QA Investigation PDF...')" class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-semibold transition-all border border-slate-700">
-                                    <i class="fas fa-download"></i> PDF
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+            <!-- INTERACTIVE MODULE 2: QA CALENDAR & INCIDENT ANALYSIS (Powered by qacalendar.js) -->
+            <section id="calendar-section" class="py-16 px-4 sm:px-8 bg-dark-900 border-b border-slate-800/80 min-h-[500px]">
+                <div class="max-w-7xl mx-auto text-center py-12 text-slate-500">
+                    <i class="fas fa-circle-notch fa-spin text-3xl text-cyan-500 mb-3 block"></i>
+                    <span>Loading Interactive QA Calendar & Incident Schedule...</span>
                 </div>
             </section>
 
@@ -451,7 +315,7 @@
                         </p>
                     </div>
 
-                    <!-- Interactive Area Switcher Tabs (Mobile Horizontal Scrollable) -->
+                    <!-- Interactive Area Switcher Tabs -->
                     <div class="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar" data-aos="fade-up">
                         <button onclick="switchAreaTab('fntrl')" id="tab-fntrl" class="tab-btn active px-5 py-3 rounded-xl text-xs sm:text-sm font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-2">
                             <i class="fas fa-filter text-sky-400"></i> FNTRL Area
@@ -696,12 +560,12 @@
                     <div>
                         <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-xs">Interactive QA Zones</h4>
                         <ul class="space-y-2 text-xs sm:text-sm font-medium">
-                            <li><a href="#qamsproduct-portal" onclick="QAMSProduct.open('all');" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> QA MS Product Management Hub</a></li>
+                            <li><a href="#qamsproduct-portal" onclick="if(window.QAMSProduct) QAMSProduct.open('all');" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> QA MS Product Management Hub</a></li>
+                            <li><a href="#calendar-section" onclick="if(window.QACalendar) QACalendar.open('all');" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> QA Event Calendar & Schedule</a></li>
                             <li><a href="#area-explorer" onclick="switchAreaTab('fntrl')" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> FNTRL Area Specifications</a></li>
                             <li><a href="#area-explorer" onclick="switchAreaTab('dezinc')" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> MS-Dezinc Area Specifications</a></li>
                             <li><a href="#area-explorer" onclick="switchAreaTab('h2s')" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> H2S Plant Scrubber QA</a></li>
                             <li><a href="#area-explorer" onclick="switchAreaTab('limestone')" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> Limestone Slurry Control</a></li>
-                            <li><a href="#dcs-section" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> DCS vs. Sub DCS Architecture</a></li>
                         </ul>
                     </div>
                     <div>
@@ -726,7 +590,7 @@
         </main>
     </div>
 
-    <!-- MODAL 1: LOG INCIDENT / NEAR MISS -->
+    <!-- MODAL 1: FALLBACK INCIDENT / NEAR MISS MODAL -->
     <div id="incidentModal" class="fixed inset-0 bg-dark-900/85 z-[100] hidden items-center justify-center p-4 backdrop-blur-md">
         <div class="bg-dark-500 w-full max-w-lg rounded-2xl shadow-2xl border border-slate-700/80 overflow-hidden transform scale-95 transition-all duration-300" id="incidentContent">
             <div class="bg-gradient-to-r from-rose-600/20 to-amber-500/10 p-5 border-b border-slate-800 flex justify-between items-center">
@@ -775,7 +639,7 @@
                     </div>
                     <div class="pt-2 flex gap-3">
                         <button type="button" onclick="closeModal('incidentModal')" class="w-1/3 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold">Cancel</button>
-                        <button type="submit" class="w-2/3 py-3 bg-gradient-to-r from-rose-600 to-amber-500 hover:from-rose-500 text-white rounded-xl text-xs font-bold shadow">Submit to QA Calendar</button>
+                        <button type="submit" class="w-2/3 py-3 bg-gradient-to-r from-rose-600 to-amber-500 hover:from-rose-500 text-white rounded-xl text-xs font-bold shadow">Submit to QA Portal</button>
                     </div>
                 </form>
             </div>
@@ -888,48 +752,6 @@
             }
         }
 
-        // Interactive QA Calendar Data & Filter Logic
-        const calendarEvents = {
-            2: { type: 'improvement', title: 'Limestone Slurry Density Sensor Optimization', desc: 'QA Analysis identified slight drift (+/- 0.05 g/cm³) in automatic titration feed loop. Recommended proactive recalibration of Sub DCS field sensor #LS-402 during scheduled shift turnover.', area: 'Limestone Area', reporter: 'Engr. M. Santos (QA Lab)', status: 'In Progress (SOP-409)', badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' },
-            6: { type: 'nearmiss', title: 'Near Miss: H2S Scrubber Line Pressure Fluctuation', desc: 'During routine QA inspection, toxic gas sensor #H2S-109 registered a transient 3-second pressure spike before DCS automated safety interlocks regulated the valve. No gas release occurred.', area: 'H2S Area', reporter: 'J. Reyes (Safety Inspector)', status: 'Resolved & Monitored', badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30' },
-            14: { type: 'accident', title: 'Incident: Flocculant Dosing Pump Overflow', desc: 'Mechanical seal failure on Sub DCS dosing pump #FN-04 resulted in localized slurry overflow in containment basin. QA emergency procedure SOP-FN-104 initiated immediately.', area: 'FNTRL Area', reporter: 'Engr. D. Cruz (Plant Supv)', status: 'CAPA Action Completed', badgeColor: 'bg-rose-500/20 text-rose-300 border-rose-500/30' },
-            20: { type: 'nearmiss', title: 'Near Miss: Zinc Solvent Extraction Phase Separation Delay', desc: 'QA laboratory titration sample showed phase separation taking 45 seconds longer than SOP tolerance. Stirrer impeller speed in MS-Dezinc tank adjusted via Master DCS override.', area: 'MS-Dezinc Area', reporter: 'R. Gomez (Lab Chemist)', status: 'Resolved (SOP-MS-101)', badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30' }
-        };
-
-        function selectDate(day, type) {
-            const data = calendarEvents[day];
-            if (!data) {
-                alert(`No critical Incident or Near Miss logged for July ${day}, 2026. Routine QA IPQC sampling completed successfully.`);
-                return;
-            }
-            document.getElementById('event-type-badge').className = `px-2.5 py-1 rounded-md text-xs font-bold border ${data.badgeColor}`;
-            document.getElementById('event-type-badge').innerText = data.type === 'nearmiss' ? 'Near Miss Logged' : (data.type === 'accident' ? 'Incident / Accident' : 'For Improvement');
-            document.getElementById('event-date').innerText = `July ${day}, 2026 &bull; Logged in QA Calendar`;
-            document.getElementById('event-title').innerText = data.title;
-            document.getElementById('event-desc').innerText = data.desc;
-            document.getElementById('event-area').innerText = data.area;
-            document.getElementById('event-reporter').innerText = data.reporter;
-            document.getElementById('event-status').innerText = data.status;
-        }
-
-        function filterEvents(filterType) {
-            // Highlight active button
-            ['all', 'nearmiss', 'accident', 'improvement'].forEach(t => {
-                const btn = document.getElementById(`flt-${t}`);
-                if (t === filterType) {
-                    btn.classList.add('ring-2', 'ring-sky-400');
-                } else {
-                    btn.classList.remove('ring-2', 'ring-sky-400');
-                }
-            });
-
-            // If a filter is clicked, auto-select a matching sample event to display
-            if (filterType === 'nearmiss') selectDate(6, 'nearmiss');
-            else if (filterType === 'accident') selectDate(14, 'accident');
-            else if (filterType === 'improvement') selectDate(2, 'improvement');
-            else selectDate(2, 'improvement');
-        }
-
         // Interactive QA Area Switcher Logic
         const areaSpecifications = {
             fntrl: {
@@ -971,14 +793,12 @@
         };
 
         function switchAreaTab(areaKey) {
-            // Update buttons
             ['fntrl', 'dezinc', 'h2s', 'limestone'].forEach(k => {
                 const btn = document.getElementById(`tab-${k}`);
                 if (k === areaKey) btn.classList.add('active');
                 else btn.classList.remove('active');
             });
 
-            // Update Content dynamically
             const d = areaSpecifications[areaKey];
             const content = document.getElementById('area-card-content');
             content.style.opacity = '0';
@@ -1075,24 +895,45 @@
             setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 200);
         }
 
+        // Fallback Submit Handler that delegates to both QACalendar and QAMSProduct if loaded
         function submitIncident(e) {
             e.preventDefault();
-            // Optional: You can also push this incident directly into your QAMSProduct database!
-            if (window.QAMSProduct && window.QAMSProduct.openAddModal) {
-                const classification = document.getElementById('inc-class').value;
-                const area = document.getElementById('inc-area').value;
-                const title = document.getElementById('inc-title').value;
-                const desc = document.getElementById('inc-desc').value;
-                alert('QA Incident logged! Opening the interactive QA MS Product record builder to complete CAPA details.');
-                closeModal('incidentModal');
-                QAMSProduct.openAddModal(classification);
-                document.getElementById('form-title').value = title;
-                document.getElementById('form-area').value = area;
-                document.getElementById('form-description').value = desc;
+            const classification = document.getElementById('inc-class').value;
+            const area = document.getElementById('inc-area').value;
+            const title = document.getElementById('inc-title').value;
+            const desc = document.getElementById('inc-desc').value;
+
+            closeModal('incidentModal');
+
+            // If QACalendar is loaded, open its interactive builder pre-filled
+            if (window.QACalendar && window.QACalendar.openAddModal) {
+                QACalendar.openAddModal('2026-07-02', classification);
+                setTimeout(() => {
+                    const titleEl = document.getElementById('form-ev-title');
+                    const areaEl = document.getElementById('form-ev-area');
+                    const descEl = document.getElementById('form-ev-description');
+                    if(titleEl) titleEl.value = title;
+                    if(areaEl) areaEl.value = area;
+                    if(descEl) descEl.value = desc;
+                }, 50);
                 return;
             }
-            alert('QA Incident logged successfully! It has been synced to the interactive July 2026 QA Calendar and assigned an investigation tracking number.');
-            closeModal('incidentModal');
+
+            // Fallback to QAMSProduct if Calendar isn't available
+            if (window.QAMSProduct && window.QAMSProduct.openAddModal) {
+                QAMSProduct.openAddModal(classification);
+                setTimeout(() => {
+                    const titleEl = document.getElementById('form-title');
+                    const areaEl = document.getElementById('form-area');
+                    const descEl = document.getElementById('form-description');
+                    if(titleEl) titleEl.value = title;
+                    if(areaEl) areaEl.value = area;
+                    if(descEl) descEl.value = desc;
+                }, 50);
+                return;
+            }
+
+            alert('QA Incident logged successfully! It has been recorded into system storage.');
         }
 
         function submitLogin(e) {
@@ -1103,9 +944,8 @@
             icon.className = "fas fa-circle-notch fa-spin text-[10px]";
             setTimeout(() => { window.location.href = '/app'; }, 1100);
         }
-    </script>
-
-    <!-- INTEGRATE STANDALONE QA MS PRODUCT DATA & MANAGEMENT MODULE -->
+    </script
     <script src="js/qamsproduct.js"></script>
+    <script src="js/qacalendar.js"></script>
 </body>
 </html>
