@@ -1601,17 +1601,7 @@
                             <button onclick="QAMSProduct.openEditModal('${r.id}')" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl shadow transition-all">
                                 <i class="fas fa-edit mr-1"></i> Edit Record
                             </button>
-                            <button onclick="QAMSProduct.closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all
-error
-An internal error has occurred.
-Model 9:50 AM
-ThinkingThoughts
-Expand to view model thoughts
 
-chevron_right
-Here is the continuation and completion of your js/qamsproduct.js file, picking up right from where it left off inside the viewDetails modal and continuing through all the form handlers, AI upload analysis engine, CSV export tools, and initialization scripts:
-code
-JavaScript
 <button onclick="QAMSProduct.closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">
                                 Close
                             </button>
