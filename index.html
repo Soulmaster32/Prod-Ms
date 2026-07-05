@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -927,19 +928,48 @@
     <!-- SCRIPTS FOR INTERACTIVITY -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // Master Navigation Bridge to seamlessly control qamsproduct.js from anywhere on the page
+        // Master Navigation Bridge: Fully fixed to prevent data from hiding when switching data tabs
         function navigateToQA(tab = 'all', keyword = '', boardTab = null) {
             const portal = document.getElementById('qamsproduct-portal');
             if (portal) portal.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
             if (window.QAMSProduct) {
-                if (boardTab) QAMSProduct.switchBoardTab(boardTab);
+                // 1. Reset stale search queries and filters when switching data tabs without explicit keywords
                 if (keyword !== '') {
                     QAMSProduct.searchQuery = keyword;
-                    QAMSProduct.activeTab = tab;
-                    QAMSProduct.render();
-                } else {
+                } else if (QAMSProduct.searchQuery) {
+                    QAMSProduct.searchQuery = '';
+                }
+
+                if (QAMSProduct.filterArea && keyword === '') {
+                    QAMSProduct.filterArea = 'All Areas';
+                }
+                if (QAMSProduct.filterStatus) {
+                    QAMSProduct.filterStatus = 'all';
+                }
+
+                // 2. Open the requested primary tab/category first
+                if (typeof QAMSProduct.open === 'function') {
                     QAMSProduct.open(tab);
+                } else {
+                    QAMSProduct.activeTab = tab;
+                }
+
+                // 3. Apply specific board / sub-tabs AFTER open() so they don't get overridden or hidden
+                if (boardTab) {
+                    QAMSProduct.activeBoardTab = boardTab;
+                    QAMSProduct.currentBoardTab = boardTab;
+                    QAMSProduct.subTab = boardTab;
+                    if (typeof QAMSProduct.switchBoardTab === 'function') {
+                        QAMSProduct.switchBoardTab(boardTab);
+                    } else if (typeof QAMSProduct.switchTab === 'function') {
+                        QAMSProduct.switchTab(boardTab);
+                    }
+                }
+
+                // 4. Force a clean re-render to ensure all state changes display properly
+                if (typeof QAMSProduct.render === 'function') {
+                    QAMSProduct.render();
                 }
             } else {
                 console.warn('QAMSProduct module not yet ready. Retrying after load...');
@@ -1016,9 +1046,10 @@
             }
         }
 
-        // Interactive QA Area Switcher Logic
+        // Interactive QA Area Switcher Logic (Fixed keyword property to prevent data hiding)
         const areaSpecifications = {
             fntrl: {
+                keyword: 'FNTRL',
                 code: '#FNTRL-01 &bull; Hydrometallurgy',
                 title: 'Final Neutralization & Tailings Recovery (FNTRL)',
                 desc: 'The FNTRL area is critical for environmental compliance and heavy metal recovery. QA inspectors continuously audit discharge slurry pH, residual nickel/cobalt concentrations in tailings, and flocculant dosing efficiency.',
@@ -1028,6 +1059,7 @@
                 incTitle: 'Near Miss: Flocculant Pump Surge', incDate: 'Logged on June 20, 2026 • Resolved via Sub DCS calibration.'
             },
             dezinc: {
+                keyword: 'MS-Dezinc',
                 code: '#DEZINC-02 &bull; Solvent Extraction',
                 title: 'Mixed Sulfide Dezincification (MS-Dezinc)',
                 desc: 'In the MS-Dezinc area, zinc impurities are selectively extracted from nickel-cobalt sulfide solution. QA testing monitors extraction efficiency, organic/aqueous phase separation times, and reagent titration.',
@@ -1037,6 +1069,7 @@
                 incTitle: 'Near Miss: Phase Separation Delay', incDate: 'Logged on July 20, 2026 • Impeller speed adjusted.'
             },
             h2s: {
+                keyword: 'H2S',
                 code: '#H2S-03 &bull; Gas Generation Plant',
                 title: 'Hydrogen Sulfide Gas Scrubber Area (H2S)',
                 desc: 'The H2S area demands maximum QA safety vigilance. Continuous telemetry checks gas purity for metal sulfide precipitation, while calibrating ambient toxic gas sensors and scrubber neutralization loops.',
@@ -1046,6 +1079,7 @@
                 incTitle: 'Near Miss: Line Pressure Fluctuation', incDate: 'Logged on July 6, 2026 • Automated safety interlock acted.'
             },
             limestone: {
+                keyword: 'Limestone',
                 code: '#LS-04 &bull; Reagent Preparation',
                 title: 'Limestone Slurry Preparation Area',
                 desc: 'Limestone is the primary neutralizing reagent in the MS Section. QA laboratory technicians perform daily mesh particle titration, calcium carbonate reactivity assays, and automated slurry density sensor calibration.',
@@ -1090,7 +1124,7 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-3">
-                                <button onclick="navigateToQA('product_quality', '${d.title.split(' ')[0]}', 'matrix')" class="px-4 py-2.5 bg-royalblue-600 hover:bg-royalblue-500 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center gap-1.5">
+                                <button onclick="navigateToQA('product_quality', '${d.keyword}', 'matrix')" class="px-4 py-2.5 bg-royalblue-600 hover:bg-royalblue-500 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center gap-1.5">
                                     <i class="fas fa-chart-bar"></i> View Live Telemetry
                                 </button>
                                 <button onclick="navigateToQA('document', '${d.sop}')" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-all border border-slate-700 flex items-center gap-1.5">
@@ -1173,13 +1207,12 @@
             setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 200);
         }
 
-        // Sync Sidebar Widget with QAMSProduct Defect-Free statistics (Updated to v3 Storage Key)
+        // Sync Sidebar Widget with QAMSProduct Defect-Free statistics
         function syncSidebarComplianceRate() {
             try {
-                // Check v3 first (used by qamsproduct.js), fall back to v2 or v1
                 const stored = localStorage.getItem('QAMS_Product_Records_v3') || localStorage.getItem('QAMS_Product_Records_v2') || localStorage.getItem('QAMS_Product_Records_v1');
                 const records = stored ? JSON.parse(stored) : null;
-                
+
                 const rateEl = document.getElementById('sidebar-compliance-rate');
                 const barEl = document.getElementById('sidebar-compliance-bar');
                 const countEl = document.getElementById('sidebar-records-count');
@@ -1187,7 +1220,7 @@
                 if (records && records.length > 0) {
                     const compliant = records.filter(r => r.isCompliant).length;
                     const rate = ((compliant / records.length) * 100).toFixed(1);
-                    
+
                     if (rateEl && barEl) {
                         rateEl.innerHTML = `<i class="fas fa-check text-[10px]"></i> ${rate}%`;
                         barEl.style.width = `${rate}%`;
@@ -1321,9 +1354,15 @@
 
         let currentUserFilter = 'all';
 
-        function renderUserTable(filter = currentUserFilter, searchTerm = '') {
+        // Fixed renderUserTable to preserve active search term when re-rendering
+        function renderUserTable(filter = currentUserFilter, searchTerm = null) {
             const tbody = document.getElementById('user-table-body');
             if (!tbody) return;
+
+            if (searchTerm === null) {
+                const searchInput = document.getElementById('user-search-input');
+                searchTerm = searchInput ? searchInput.value : '';
+            }
 
             let filtered = qaUsersList.filter(u => {
                 const matchRole = filter === 'all' || u.role.toLowerCase() === filter.toLowerCase();
