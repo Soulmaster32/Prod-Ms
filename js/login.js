@@ -4,14 +4,15 @@
  * ============================================================================
  * Features:
  * - Global Admin Authorization: Admin accounts gain control over all application data
- * - Admin Master Control Hub: Manage users, wipe/restore module databases, export all data
+ * - Executive Custom Prompt Modals: Replaces all native alert()/confirm() with sleek UI dialogs
+ * - Security Hardened: Stripped out quick-login buttons and hardcoded credential hints
+ * - Password Visibility Toggles: Integrated eye-icon reveals for secure data entry
+ * - Admin Master Control Hub: Manage users with real-time search, wipe/restore modules, export data
  * - Deep sec.js Interactivity: Auto-unlocks security interlocks for Admins, locks for regular users
  * - Complete user.js Implementation: Exposes all 12 native profile management functions
  * - Replaced "Place of Birth" with "Residential Address" across all schemas
- * - Fullscreen Gatekeeper Overlay: Restricts dashboard access until authenticated
+ * - Fullscreen Gatekeeper Modal: Restricts dashboard access until authenticated
  * - HTML5 Canvas Avatar Uploader: Compresses profile photos to Base64 safely
- * - Live DOM Integration: Updates Navbar with User Profile, Admin Badge, & Logout button
- * - Syncs with index.html qaUsersList: Auto-adds users to active plant tables
  * ============================================================================
  */
 
@@ -46,7 +47,8 @@
             qaRole: "System Admin",
             avatar: CONFIG.defaultAvatar,
             image: CONFIG.defaultAvatar,
-            joinDate: "2026-01-01T08:00:00.000Z"
+            joinDate: "2026-01-01T08:00:00.000Z",
+            lastLogin: "2026-07-05T08:00:00.000Z"
         },
         {
             username: "QA-MS-001",
@@ -66,11 +68,13 @@
             qaRole: "Lead QA Inspector",
             avatar: CONFIG.defaultAvatar,
             image: CONFIG.defaultAvatar,
-            joinDate: "2026-01-15T08:00:00.000Z"
+            joinDate: "2026-01-15T08:00:00.000Z",
+            lastLogin: "2026-07-05T07:30:00.000Z"
         }
     ];
 
     let currentTempImage = null;
+    let adminUserSearchQuery = '';
 
     // ========================================================================
     // 1. COMPLETE IMPLEMENTATION OF USER.JS PROFILE MANAGEMENT FUNCTIONS
@@ -216,7 +220,7 @@
         return (fullName || '??').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
     }
 
-    // Expose all user.js functions to global window scope so existing scripts work seamlessly
+    // Expose all user.js functions to global window scope
     window.getAllUsers = getAllUsers;
     window.getUserProfile = getUserProfile;
     window.updateUserProfile = updateUserProfile;
@@ -233,7 +237,81 @@
     window.getUserInitials = getUserInitials;
 
     // ========================================================================
-    // 2. INITIALIZATION & GATEKEEPER PORTAL
+    // 2. SLEEK CUSTOM PROMPT MODAL ENGINE (QAAuthModal)
+    // ========================================================================
+
+    const QAAuthModal = {
+        show: function ({ title, message, type = 'info', confirmText = 'Acknowledge', cancelText = 'Cancel', onConfirm = null }) {
+            this.close(); // Clean up existing
+
+            const icons = {
+                success: 'fa-check-circle text-emerald-400 bg-emerald-500/20 border-emerald-500/30',
+                error: 'fa-exclamation-circle text-rose-400 bg-rose-500/20 border-rose-500/30',
+                warning: 'fa-exclamation-triangle text-amber-400 bg-amber-500/20 border-amber-500/30',
+                info: 'fa-info-circle text-sky-400 bg-sky-500/20 border-sky-500/30',
+                confirm: 'fa-question-circle text-amber-400 bg-amber-500/20 border-amber-500/30'
+            };
+
+            const isConfirm = type === 'confirm' || onConfirm !== null;
+
+            const modal = document.createElement('div');
+            modal.id = 'qa-custom-prompt-modal';
+            modal.className = 'fixed inset-0 z-[1000000] bg-dark-900/85 backdrop-blur-md flex items-center justify-center p-4 font-sans animate-fadeIn';
+
+            modal.innerHTML = `
+                <div class="max-w-md w-full bg-dark-500 border border-slate-700/80 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)] p-6 text-center relative overflow-hidden transform scale-95 transition-all duration-200" id="qa-prompt-box">
+                    <div class="w-16 h-16 rounded-2xl border flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner ${icons[type] || icons.info}">
+                        <i class="fas ${icons[type]?.split(' ')[0] || 'fa-info-circle'}"></i>
+                    </div>
+                    <h3 class="text-lg sm:text-xl font-black text-white mb-2">${title}</h3>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6 font-normal">${message}</p>
+                    
+                    <div class="flex items-center justify-center gap-3">
+                        ${isConfirm ? `
+                            <button id="qa-prompt-cancel-btn" class="flex-1 py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all border border-slate-700">
+                                ${cancelText}
+                            </button>
+                        ` : ''}
+                        <button id="qa-prompt-confirm-btn" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r ${type === 'error' ? 'from-rose-600 to-amber-600' : 'from-royalblue-600 to-sky-500'} hover:opacity-90 text-white font-extrabold text-xs shadow-lg transition-all">
+                            ${confirmText}
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+            setTimeout(() => {
+                const box = document.getElementById('qa-prompt-box');
+                if (box) { box.classList.remove('scale-95'); box.classList.add('scale-100'); }
+            }, 10);
+
+            // Bind events
+            const confirmBtn = document.getElementById('qa-prompt-confirm-btn');
+            const cancelBtn = document.getElementById('qa-prompt-cancel-btn');
+
+            if (confirmBtn) {
+                confirmBtn.onclick = () => {
+                    this.close();
+                    if (typeof onConfirm === 'function') onConfirm();
+                };
+            }
+            if (cancelBtn) {
+                cancelBtn.onclick = () => this.close();
+            }
+        },
+
+        close: function () {
+            const modal = document.getElementById('qa-custom-prompt-modal');
+            if (modal) {
+                const box = document.getElementById('qa-prompt-box');
+                if (box) { box.classList.remove('scale-100'); box.classList.add('scale-95'); }
+                setTimeout(() => modal.remove(), 150);
+            }
+        }
+    };
+
+    // ========================================================================
+    // 3. INITIALIZATION & GATEKEEPER PORTAL
     // ========================================================================
 
     function initAuth() {
@@ -356,7 +434,7 @@
                             <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Inspector ID / Username</label>
                             <div class="relative">
                                 <i class="fas fa-id-badge absolute left-4 top-3.5 text-slate-400 text-sm"></i>
-                                <input type="text" id="login-username" required placeholder="e.g., admin or QA-MS-001" 
+                                <input type="text" id="login-username" required placeholder="Enter assigned QA username or ID" 
                                     class="w-full bg-dark-700 border border-slate-700 rounded-xl pl-11 pr-4 py-3 text-xs sm:text-sm text-white placeholder-slate-500 outline-none focus:border-amber-400 transition-all font-semibold">
                             </div>
                         </div>
@@ -364,8 +442,11 @@
                             <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Security Password</label>
                             <div class="relative">
                                 <i class="fas fa-lock absolute left-4 top-3.5 text-slate-400 text-sm"></i>
-                                <input type="password" id="login-password" required placeholder="Enter password (default: admin)" 
-                                    class="w-full bg-dark-700 border border-slate-700 rounded-xl pl-11 pr-4 py-3 text-xs sm:text-sm text-white placeholder-slate-500 outline-none focus:border-amber-400 transition-all">
+                                <input type="password" id="login-password" required placeholder="Enter security password" 
+                                    class="w-full bg-dark-700 border border-slate-700 rounded-xl pl-11 pr-11 py-3 text-xs sm:text-sm text-white placeholder-slate-500 outline-none focus:border-amber-400 transition-all">
+                                <button type="button" onclick="window.QAAuthEngine.togglePasswordVisibility('login-password', 'login-eye-icon')" class="absolute right-3.5 top-3 text-slate-400 hover:text-white p-1">
+                                    <i id="login-eye-icon" class="fas fa-eye text-xs"></i>
+                                </button>
                             </div>
                         </div>
 
@@ -377,20 +458,12 @@
                             <i class="fas fa-arrow-right text-xs"></i>
                         </button>
                     </form>
-                    <div class="mt-6 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-center text-[11px] text-slate-400">
-                        <div>
-                            Admin: <strong class="text-amber-400 font-mono">admin</strong> / <strong class="text-amber-400 font-mono">admin</strong>
-                        </div>
-                        <div>
-                            Inspector: <strong class="text-sky-400 font-mono">QA-MS-001</strong> / <strong class="text-sky-400 font-mono">admin</strong>
-                        </div>
-                        <button onclick="document.getElementById('login-username').value='admin'; document.getElementById('login-password').value='admin'; document.querySelector('#auth-tab-login form').dispatchEvent(new Event('submit'));" class="px-3 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold rounded-lg border border-amber-500/30 transition-all">
-                            👑 Quick Admin Login
-                        </button>
+                    <div class="mt-4 pt-4 border-t border-slate-800/80 text-center text-[11px] text-slate-400">
+                        <i class="fas fa-shield-alt text-sky-400 mr-1"></i> Authorized Quality Group Personnel Only &bull; Plant Telemetry Secured
                     </div>
                 </div>
 
-                <!-- TAB 2: REGISTRATION FORM (With Residential Address) -->
+                <!-- TAB 2: REGISTRATION FORM -->
                 <div id="auth-tab-register" class="p-6 sm:p-8 relative z-10 hidden animate-fadeIn max-h-[70vh] overflow-y-auto no-scrollbar">
                     <form onsubmit="window.QAAuthEngine.handleRegister(event)" class="space-y-4">
                         <div class="flex flex-col sm:flex-row items-center gap-4 p-4 rounded-2xl bg-dark-700/60 border border-slate-800 mb-2">
@@ -467,11 +540,21 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Security Password *</label>
-                                <input type="password" id="reg-password" required placeholder="Create password" minlength="4" class="w-full bg-dark-700 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none focus:border-sky-500">
+                                <div class="relative">
+                                    <input type="password" id="reg-password" required placeholder="Create password" minlength="4" class="w-full bg-dark-700 border border-slate-700 rounded-xl pl-3.5 pr-10 py-2.5 text-xs text-white placeholder-slate-500 outline-none focus:border-sky-500">
+                                    <button type="button" onclick="window.QAAuthEngine.togglePasswordVisibility('reg-password', 'reg-eye-1')" class="absolute right-3 top-2.5 text-slate-400 hover:text-white p-0.5">
+                                        <i id="reg-eye-1" class="fas fa-eye text-xs"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div>
                                 <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Confirm Password *</label>
-                                <input type="password" id="reg-confirm-password" required placeholder="Confirm password" minlength="4" class="w-full bg-dark-700 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none focus:border-sky-500">
+                                <div class="relative">
+                                    <input type="password" id="reg-confirm-password" required placeholder="Confirm password" minlength="4" class="w-full bg-dark-700 border border-slate-700 rounded-xl pl-3.5 pr-10 py-2.5 text-xs text-white placeholder-slate-500 outline-none focus:border-sky-500">
+                                    <button type="button" onclick="window.QAAuthEngine.togglePasswordVisibility('reg-confirm-password', 'reg-eye-2')" class="absolute right-3 top-2.5 text-slate-400 hover:text-white p-0.5">
+                                        <i id="reg-eye-2" class="fas fa-eye text-xs"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -490,7 +573,7 @@
     }
 
     // ========================================================================
-    // 3. NAVBAR PROFILE & GLOBAL ADMIN CONTROL HUB INJECTION
+    // 4. NAVBAR PROFILE & GLOBAL ADMIN CONTROL HUB INJECTION
     // ========================================================================
 
     function updateNavbarProfile(user, isAdmin) {
@@ -632,7 +715,7 @@
     }
 
     // ========================================================================
-    // 4. ADMIN MASTER CONTROL HUB MODAL & MODULE GOVERNANCE
+    // 5. ADMIN MASTER CONTROL HUB MODAL & MODULE GOVERNANCE
     // ========================================================================
 
     function injectAdminMasterModal() {
@@ -683,11 +766,12 @@
                             <span class="text-xs font-bold text-white uppercase tracking-wider block">Registered Personnel Directory</span>
                             <span class="text-[11px] text-slate-400">Promote technicians to Admin, revoke clearances, or inspect user statistics.</span>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-lg border border-amber-500/20">Admins: ${getAllAdmins().length}</span>
-                            <button onclick="window.QAAuthEngine.closeAdminControlHub(); openModal('userModal');" class="px-3.5 py-1.5 bg-royalblue-600 hover:bg-royalblue-500 text-white font-bold text-xs rounded-xl shadow transition-all">
-                                + Add User
-                            </button>
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <div class="relative flex-1 sm:w-64">
+                                <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                                <input type="text" id="adm-user-search" oninput="window.QAAuthEngine.handleAdminUserSearch(this.value)" placeholder="Filter staff by name or ID..." class="w-full bg-dark-900 border border-slate-700 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 outline-none focus:border-amber-400">
+                            </div>
+                            <span class="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20 shrink-0">Admins: ${getAllAdmins().length}</span>
                         </div>
                     </div>
                     
@@ -740,8 +824,8 @@
                                 <span class="text-[11px] text-slate-400">Currently unlocked for your Admin session. Toggle below to test plant security traps.</span>
                             </div>
                             <div class="flex gap-2">
-                                <button onclick="if(window.QASecurityEngine) window.QASecurityEngine.unlock('QA-ADMIN-2026'); alert('sec.js Unlocked!');" class="px-3 py-1.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold text-xs rounded-lg hover:bg-emerald-500/30">Unlock</button>
-                                <button onclick="if(window.QASecurityEngine) window.QASecurityEngine.lock(); alert('sec.js Armed!');" class="px-3 py-1.5 bg-rose-500/20 text-rose-300 border border-rose-500/30 font-bold text-xs rounded-lg hover:bg-rose-500/30">Lock / Arm</button>
+                                <button onclick="if(window.QASecurityEngine) { window.QASecurityEngine.unlock('QA-ADMIN-2026'); window.QAAuthEngine.showPrompt('sec.js Unlocked!', 'Anti-screenshot and debugging restrictions bypassed.', 'success'); }" class="px-3 py-1.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold text-xs rounded-lg hover:bg-emerald-500/30">Unlock</button>
+                                <button onclick="if(window.QASecurityEngine) { window.QASecurityEngine.lock(); window.QAAuthEngine.showPrompt('sec.js Armed!', 'All anti-leak and screenshot defenses re-activated.', 'warning'); }" class="px-3 py-1.5 bg-rose-500/20 text-rose-300 border border-rose-500/30 font-bold text-xs rounded-lg hover:bg-rose-500/30">Lock / Arm</button>
                             </div>
                         </div>
 
@@ -750,7 +834,7 @@
                                 <span class="font-bold text-white text-xs block">Theme & Appearance Studio Engine (style.js)</span>
                                 <span class="text-[11px] text-slate-400">Reset all color palettes, OLED modes, and visual FX back to factory defaults.</span>
                             </div>
-                            <button onclick="if(window.QAThemeEngine) window.QAThemeEngine.resetDefaults(); alert('Theme reset!');" class="px-3.5 py-1.5 bg-royalblue-600 hover:bg-royalblue-500 text-white font-bold text-xs rounded-lg shadow">Reset Theme</button>
+                            <button onclick="if(window.QAThemeEngine) { window.QAThemeEngine.resetDefaults(); window.QAAuthEngine.showPrompt('Theme Reset!', 'Color palettes restored to Royal Sky default.', 'info'); }" class="px-3.5 py-1.5 bg-royalblue-600 hover:bg-royalblue-500 text-white font-bold text-xs rounded-lg shadow">Reset Theme</button>
                         </div>
                     </div>
                 </div>
@@ -770,7 +854,22 @@
         const tbody = document.getElementById('adm-user-table-body');
         if (!tbody) return;
 
-        const users = getAllUsers();
+        let users = getAllUsers();
+        if (adminUserSearchQuery.trim() !== '') {
+            const q = adminUserSearchQuery.toLowerCase();
+            users = users.filter(u => 
+                (u.fullName || u.fullname || '').toLowerCase().includes(q) ||
+                (u.username || '').toLowerCase().includes(q) ||
+                (u.department || u.area || '').toLowerCase().includes(q) ||
+                (u.address || '').toLowerCase().includes(q)
+            );
+        }
+
+        if (users.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-500">No personnel matching search filter.</td></tr>`;
+            return;
+        }
+
         tbody.innerHTML = users.map(u => {
             const isAdmin = u.role === 'admin' || u.qaRole === 'System Admin' || u.username === 'admin';
             const initials = getUserInitials(u.fullName || u.fullname);
@@ -854,9 +953,13 @@
     }
 
     // ========================================================================
-    // 5. PUBLIC API (window.QAAuthEngine)
+    // 6. PUBLIC API (window.QAAuthEngine)
     // ========================================================================
     window.QAAuthEngine = {
+        showPrompt: function (title, message, type = 'info') {
+            QAAuthModal.show({ title, message, type });
+        },
+
         switchTab: function (tab) {
             const btnLogin = document.getElementById('auth-tab-btn-login');
             const btnReg = document.getElementById('auth-tab-btn-register');
@@ -876,6 +979,19 @@
             }
         },
 
+        togglePasswordVisibility: function (inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (!input || !icon) return;
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash text-xs text-sky-400';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye text-xs';
+            }
+        },
+
         handleLogin: function (e) {
             e.preventDefault();
             const usernameInput = document.getElementById('login-username').value.trim();
@@ -890,12 +1006,21 @@
 
             if (user && user.password === passwordInput) {
                 errorMsg.classList.add('hidden');
+                user.lastLogin = new Date().toISOString();
+                updateUserProfile(user.username, { lastLogin: user.lastLogin });
+                
                 localStorage.setItem(CONFIG.sessionKey, JSON.stringify(user));
                 grantDashboardAccess(user);
-                alert(`Welcome back, ${user.fullName || user.fullname}! QA clearance verified.`);
+                
+                QAAuthModal.show({
+                    title: `Welcome Back, ${user.fullName || user.fullname}!`,
+                    message: `QA security clearance verified for area: ${user.department || user.area}. You may now access real-time telemetry controls.`,
+                    type: 'success',
+                    confirmText: 'Enter Dashboard'
+                });
             } else {
                 errorMsg.classList.remove('hidden');
-                errorMsg.innerText = "Invalid Inspector ID or Password. Please try again or register.";
+                errorMsg.innerText = "Invalid Inspector ID or Password. Please verify your credentials or register a new account.";
             }
         },
 
@@ -948,7 +1073,8 @@
                 qaRole: qaRole,
                 avatar: avatarDataUrl,
                 image: avatarDataUrl,
-                joinDate: new Date().toISOString()
+                joinDate: new Date().toISOString(),
+                lastLogin: new Date().toISOString()
             };
 
             users.unshift(newUser);
@@ -962,21 +1088,45 @@
             errorMsg.classList.add('hidden');
 
             grantDashboardAccess(newUser);
-            alert(`Registration successful! Account created for ${fullName} (${username}). You are now logged in.`);
+            
+            QAAuthModal.show({
+                title: "Registration Verified!",
+                message: `Account created successfully for ${fullName} (${username}). You have been granted ${qaRole} clearance for the ${area}.`,
+                type: 'success',
+                confirmText: 'Proceed to Portal'
+            });
+            
             e.target.reset();
             currentTempImage = null;
         },
 
         handleLogout: function () {
-            if (confirm("Are you sure you want to log out of the QA Portal and lock dashboard access?")) {
-                localStorage.removeItem(CONFIG.sessionKey);
-                window.location.reload();
-            }
+            QAAuthModal.show({
+                title: "Confirm System Logout",
+                message: "Are you sure you want to log out of the QA Portal? Real-time dashboard access will be locked and secured until re-authenticated.",
+                type: 'confirm',
+                confirmText: 'Yes, Log Out',
+                cancelText: 'Stay Logged In',
+                onConfirm: () => {
+                    localStorage.removeItem(CONFIG.sessionKey);
+                    window.location.reload();
+                }
+            });
         },
 
         previewImage: function (event) {
             const file = event.target.files[0];
             if (!file) return;
+
+            // Validate file size (< 3 MB)
+            if (file.size > 3 * 1024 * 1024) {
+                QAAuthModal.show({
+                    title: "File Too Large",
+                    message: "Please select a profile photo smaller than 3 MB.",
+                    type: 'warning'
+                });
+                return;
+            }
 
             const reader = new FileReader();
             reader.onload = function (readerEvent) {
@@ -999,7 +1149,7 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
                     currentTempImage = dataUrl;
 
                     const previewBox = document.getElementById('reg-avatar-preview');
@@ -1083,43 +1233,94 @@
             if (tab === 'data') renderAdminModuleGrid();
         },
 
+        handleAdminUserSearch: function (query) {
+            adminUserSearchQuery = query;
+            renderAdminUserTable();
+        },
+
         adminToggleRole: function (username) {
             const res = toggleUserRole(username);
             if (res.success) {
                 renderAdminUserTable();
                 syncWithUserTable(res.user);
-                alert(`👑 User '${username}' role updated to: ${res.user.role === 'admin' ? 'System Admin' : 'Regular Member'}`);
+                QAAuthModal.show({
+                    title: "Role Clearance Updated",
+                    message: `Personnel '${username}' has been updated to: ${res.user.role === 'admin' ? 'System Admin (Level 3)' : 'Regular QA Member (Level 2)'}`,
+                    type: 'info'
+                });
             } else {
-                alert(res.error || 'Failed to toggle role.');
+                QAAuthModal.show({
+                    title: "Role Update Failed",
+                    message: res.error || 'Failed to update user access clearance.',
+                    type: 'error'
+                });
             }
         },
 
         adminDeleteUser: function (username) {
-            if (confirm(`⚠️ Admin Sovereignty Notice:\n\nAre you sure you want to permanently delete user '${username}'?`)) {
-                const res = deleteUserAccount(username);
-                if (res.success) {
-                    renderAdminUserTable();
-                    alert(`User '${username}' account removed.`);
-                } else {
-                    alert(res.error || 'Could not delete account.');
+            QAAuthModal.show({
+                title: "Revoke Clearance & Remove User?",
+                message: `Are you sure you want to permanently delete user '${username}' from the QA database? All attached credentials will be wiped.`,
+                type: 'confirm',
+                confirmText: 'Yes, Delete Account',
+                cancelText: 'Cancel',
+                onConfirm: () => {
+                    const res = deleteUserAccount(username);
+                    if (res.success) {
+                        renderAdminUserTable();
+                        QAAuthModal.show({
+                            title: "Account Deleted",
+                            message: `User '${username}' has been removed from the directory.`,
+                            type: 'success'
+                        });
+                    } else {
+                        QAAuthModal.show({
+                            title: "Deletion Failed",
+                            message: res.error || 'Could not remove account.',
+                            type: 'error'
+                        });
+                    }
                 }
-            }
+            });
         },
 
         adminResetModule: function (storageKey, moduleName) {
-            if (confirm(`⚠️ Reset Module to Factory Defaults?\n\nThis will restore the original seed data for ${moduleName}.`)) {
-                localStorage.removeItem(storageKey);
-                alert(`✅ ${moduleName} storage cleared. The module will restore default seed records upon page reload.`);
-                window.location.reload();
-            }
+            QAAuthModal.show({
+                title: `Reset ${moduleName}?`,
+                message: `This will restore the original factory seed data for ${moduleName}. All custom field telemetry will be replaced.`,
+                type: 'confirm',
+                confirmText: 'Reset to Factory Default',
+                cancelText: 'Cancel',
+                onConfirm: () => {
+                    localStorage.removeItem(storageKey);
+                    QAAuthModal.show({
+                        title: "Module Reset Complete",
+                        message: `${moduleName} storage cleared. Factory seed records will reload automatically upon page refresh.`,
+                        type: 'success',
+                        confirmText: 'Refresh Page Now',
+                        onConfirm: () => window.location.reload()
+                    });
+                }
+            });
         },
 
         adminWipeModule: function (storageKey, moduleName) {
-            if (confirm(`⚠️ WIPE DATABASE WARNING:\n\nYou are about to empty all records for ${moduleName} to an empty array []!`)) {
-                localStorage.setItem(storageKey, JSON.stringify([]));
-                alert(`🗑️ ${moduleName} database wiped clean.`);
-                renderAdminModuleGrid();
-            }
+            QAAuthModal.show({
+                title: `⚠️ WIPE DATABASE: ${moduleName}`,
+                message: `You are about to empty all records for ${moduleName} to a blank array! This action is irreversible.`,
+                type: 'confirm',
+                confirmText: 'Wipe All Data',
+                cancelText: 'Abort Action',
+                onConfirm: () => {
+                    localStorage.setItem(storageKey, JSON.stringify([]));
+                    renderAdminModuleGrid();
+                    QAAuthModal.show({
+                        title: "Database Wiped Clean",
+                        message: `${moduleName} records have been purged from LocalStorage.`,
+                        type: 'warning'
+                    });
+                }
+            });
         },
 
         exportAllSystemData: function () {
@@ -1140,7 +1341,12 @@
             document.body.appendChild(dlAnchor);
             dlAnchor.click();
             dlAnchor.remove();
-            alert('👑 Unified System Master Backup exported successfully!');
+            
+            QAAuthModal.show({
+                title: "Master Backup Exported",
+                message: "Unified system JSON archive containing all personnel profiles, telemetry logs, SOP manuals, and area specifications has downloaded successfully.",
+                type: 'success'
+            });
         }
     };
 
