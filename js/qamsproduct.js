@@ -1,25 +1,4 @@
 
-/**
- * ============================================================================
- * QUALITY GROUP | MS SECTION - PRODUCT QUALITY MODULE (qamsproduct.js)
- * Standalone Interactive Data & Management System
- * ============================================================================
- * Features & Updates:
- * - Integrated 100% of Data from Attached Plant Whiteboards & Scorecards:
- *   * Image 1: Monthly Actual vs Target Tonnage & Compliance Matrix (Jan-Jun)
- *   * Image 2: Objectives and Targets Scorecard (Product Quality & Process Quality)
- *   * Image 3: 106FT02AB Reprocess Bags & 106ML02 Batch Credits per Shift Group
- * - Multi-Tabbed Digital Bulletin Board Widget:
- *   * Tab 1: Monthly Plant Matrix (Jan - Jun)
- *   * Tab 2: Objectives & Targets Scorecard (YES! / OOPS! / In Progress Badges)
- *   * Tab 3: Process Quality & Reprocess Operations (Interactive Counter & Shift Grid)
- * - Deep CRUD & Live Data Interactivity:
- *   * Real-time [+]/[-] adjustment buttons for Reprocess Bag counters with Audit Logging.
- *   * Direct "Log CAPA Investigation" buttons inside out-of-spec metric analysis modals.
- *   * Automated out-of-spec AI analysis, CSV Export, and file upload simulation.
- * ============================================================================
- */
-
 (function (window, document) {
     'use strict';
 
@@ -34,7 +13,7 @@
     const defaultBoardData = {
         monthsAll: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
         monthsActive: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN'],
-        
+
         // Image 1 Data: Incidents & Compliance Matrix
         incidents: {
             nearMiss:      [3, 0, 0, 0, 1, 0, '-', '-', '-', '-', '-', '-'],
@@ -103,7 +82,7 @@
         }
     };
 
-    // Default Seed Records connected to the operational metrics above
+    // 23 Comprehensive Seed Records covering all months (Jan-Jul) and all Plant Areas
     const defaultRecords = [
         {
             id: 'QAMS-2026-JUN01',
@@ -123,10 +102,7 @@
                 { name: 'June_2026_MS_Product_Certificate.pdf', size: '2.1 MB', type: 'application/pdf' },
                 { name: 'June_Daily_Titration_Assays.csv', size: '410 KB', type: 'text/csv' }
             ],
-            history: [
-                { timestamp: '2026-06-30 16:00', action: 'Record Approved', user: 'Lead QA Chief' },
-                { timestamp: '2026-06-30 14:30', action: 'Record Created', user: 'Engr. M. Santos' }
-            ]
+            history: [{ timestamp: '2026-06-30 16:00', action: 'Record Approved', user: 'Lead QA Chief' }]
         },
         {
             id: 'QAMS-2026-JUN02',
@@ -142,12 +118,8 @@
             metricValue: '319 Bags',
             metricLimit: '< 50 Bags Tolerance',
             isCompliant: false,
-            attachments: [
-                { name: 'Mg_Reprocess_Inventory_Log.pdf', size: '1.4 MB', type: 'application/pdf' }
-            ],
-            history: [
-                { timestamp: '2026-06-28 11:20', action: 'CAPA Protocol Initiated', user: 'Chemist K. Lim' }
-            ]
+            attachments: [{ name: 'Mg_Reprocess_Inventory_Log.pdf', size: '1.4 MB', type: 'application/pdf' }],
+            history: [{ timestamp: '2026-06-28 11:20', action: 'CAPA Protocol Initiated', user: 'Chemist K. Lim' }]
         },
         {
             id: 'QAMS-2026-JUN03',
@@ -164,10 +136,41 @@
             metricLimit: '> 98.00% Target',
             isCompliant: false,
             attachments: [],
-            history: [
-                { timestamp: '2026-06-26 09:15', action: 'CAPA Closed & Verified', user: 'Lead QA Chief' },
-                { timestamp: '2026-06-25 14:00', action: 'Record Logged', user: 'Engr. D. Cruz' }
-            ]
+            history: [{ timestamp: '2026-06-26 09:15', action: 'CAPA Closed & Verified', user: 'Lead QA Chief' }]
+        },
+        {
+            id: 'QAMS-2026-JUN04',
+            category: 'product_quality',
+            title: 'FNTRL Area: Actual vs Target dNi Tons Produced',
+            area: 'FNTRL Area',
+            reporter: 'Engr. L. Bautista (Lead QA)',
+            date: '2026-06-20',
+            status: 'Approved',
+            description: 'Actual dry Ni Tons produced in FNTRL achieved 2,718.53 MT, exceeding the monthly target based on the 31,000 dNi annual budget.',
+            capa: 'Standardized neutralization and tailings recovery loops to maintain optimal discharge rates.',
+            metricName: 'dNi Production Output',
+            metricValue: '2718.53 MT',
+            metricLimit: '2673.00 MT Target',
+            isCompliant: true,
+            attachments: [{ name: 'FNTRL_June_Tonnage_Report.pdf', size: '1.8 MB', type: 'application/pdf' }],
+            history: [{ timestamp: '2026-06-20 15:00', action: 'Tonnage Verified', user: 'Engr. L. Bautista' }]
+        },
+        {
+            id: 'QAMS-2026-JUN05',
+            category: 'product_quality',
+            title: 'FNTRL Area: Chromium (Cr) Content Adherence Review',
+            area: 'FNTRL Area',
+            reporter: 'Chemist K. Lim (QA Lab)',
+            date: '2026-06-18',
+            status: 'Approved',
+            description: 'Chromium content adherence recorded at 96.56% for June, successfully passing the >90.00% target specification.',
+            capa: 'Continuous monitoring of flocculant dosing efficiency in neutralization tanks.',
+            metricName: 'Cr Compliance',
+            metricValue: '96.56%',
+            metricLimit: '> 90.00% Target',
+            isCompliant: true,
+            attachments: [],
+            history: [{ timestamp: '2026-06-18 10:30', action: 'Assay Approved', user: 'Lead QA Chief' }]
         },
         {
             id: 'QAMS-2026-MAY01',
@@ -183,12 +186,8 @@
             metricValue: '2.97 Ni-ton',
             metricLimit: '0.50 Ni-ton Target',
             isCompliant: true,
-            attachments: [
-                { name: 'Ground_Scales_Recovery_Report.pdf', size: '3.2 MB', type: 'application/pdf' }
-            ],
-            history: [
-                { timestamp: '2026-05-31 17:00', action: 'Improvement Verified', user: 'Plant Operations Manager' }
-            ]
+            attachments: [{ name: 'Ground_Scales_Recovery_Report.pdf', size: '3.2 MB', type: 'application/pdf' }],
+            history: [{ timestamp: '2026-05-31 17:00', action: 'Improvement Verified', user: 'Plant Operations Manager' }]
         },
         {
             id: 'QAMS-2026-MAY02',
@@ -204,12 +203,127 @@
             metricValue: '98 sec (Spike)',
             metricLimit: '60 - 90 sec',
             isCompliant: false,
-            attachments: [
-                { name: 'DCS_Alarm_Dezinc_May18.json', size: '312 KB', type: 'application/json' }
-            ],
-            history: [
-                { timestamp: '2026-05-18 15:30', action: 'Near Miss CAPA Closed', user: 'Engr. D. Cruz' }
-            ]
+            attachments: [{ name: 'DCS_Alarm_Dezinc_May18.json', size: '312 KB', type: 'application/json' }],
+            history: [{ timestamp: '2026-05-18 15:30', action: 'Near Miss CAPA Closed', user: 'Engr. D. Cruz' }]
+        },
+        {
+            id: 'QAMS-2026-MAY03',
+            category: 'product_quality',
+            title: 'FNTRL Area: May dNi Production & Tailings Recovery',
+            area: 'FNTRL Area',
+            reporter: 'Engr. M. Santos (Lead QA)',
+            date: '2026-05-14',
+            status: 'Approved',
+            description: 'May production output in FNTRL recorded 2,844.44 MT against target of 2,765.00 MT. Excellent discharge slurry pH stability.',
+            capa: 'No CAPA needed. Slurry pH maintained strictly between 8.2 and 8.6 pH.',
+            metricName: 'May Production Output',
+            metricValue: '2844.44 MT',
+            metricLimit: '2765.00 MT Target',
+            isCompliant: true,
+            attachments: [],
+            history: [{ timestamp: '2026-05-14 16:00', action: 'Record Approved', user: 'Engr. M. Santos' }]
+        },
+        {
+            id: 'QAMS-2026-APR01',
+            category: 'product_quality',
+            title: 'Limestone Area: April D50 Particle Size Specification',
+            area: 'Limestone Area',
+            reporter: 'Chemist K. Lim (QA Lab)',
+            date: '2026-04-28',
+            status: 'Approved',
+            description: 'April D50 particle size titration confirmed 100.00% compliance across all reagent preparation loops (PS ≤ 87.5 µm).',
+            capa: 'Daily mesh particle screening maintained at 95% < 325 Mesh.',
+            metricName: 'PS Compliance Rate',
+            metricValue: '100.00%',
+            metricLimit: '> 95.00% Target',
+            isCompliant: true,
+            attachments: [],
+            history: [{ timestamp: '2026-04-28 11:00', action: 'Assay Verified', user: 'Lead QA Chief' }]
+        },
+        {
+            id: 'QAMS-2026-APR02',
+            category: 'improvement',
+            title: 'DCS Control Room: Automated Operating Safety Interlock',
+            area: 'DCS Control',
+            reporter: 'Admin R. Cruz (System Admin)',
+            date: '2026-04-15',
+            status: 'Active',
+            description: 'Plant-wide automated safety interlock testing completed. All telemetry override alarms across Master DCS and Sub DCS nodes verified nominal.',
+            capa: 'Scheduled bi-annual equipment safety audit for August 2026.',
+            metricName: 'DCS Safety Interlocks',
+            metricValue: '100% Sync',
+            metricLimit: 'Nominal Response',
+            isCompliant: true,
+            attachments: [],
+            history: [{ timestamp: '2026-04-15 14:00', action: 'System Audit Passed', user: 'Admin R. Cruz' }]
+        },
+        {
+            id: 'QAMS-2026-MAR01',
+            category: 'product_quality',
+            title: 'MS-Dezinc Area: March Zinc Removal Efficiency Audit',
+            area: 'MS-Dezinc Area',
+            reporter: 'Engr. M. Santos (Lead QA Lab)',
+            date: '2026-03-25',
+            status: 'Approved',
+            description: 'March zinc removal efficiency recorded at 95.76%, maintaining compliance within solvent extraction parameters.',
+            capa: 'Organic phase titration ratio adjusted slightly to prepare for Q2 production surge.',
+            metricName: 'Zn Compliance',
+            metricValue: '95.76%',
+            metricLimit: '> 95.00% Target',
+            isCompliant: true,
+            attachments: [],
+            history: [{ timestamp: '2026-03-25 15:00', action: 'Assay Approved', user: 'Engr. M. Santos' }]
+        },
+        {
+            id: 'QAMS-2026-MAR02',
+            category: 'nearmiss',
+            title: 'FNTRL Area: March Slurry pH & Flocculant Dosing Check',
+            area: 'FNTRL Area',
+            reporter: 'J. Reyes (Field Tech)',
+            date: '2026-03-12',
+            status: 'Resolved',
+            description: 'Transient pressure spike observed in flocculant pump #104 during tailings slurry transfer.',
+            capa: 'Sub DCS valve actuation loop recalibrated. Flocculant dosing surge eliminated without downtime.',
+            metricName: 'Slurry pH Stability',
+            metricValue: '8.4 pH',
+            metricLimit: '8.2 - 8.6 pH Limit',
+            isCompliant: true,
+            attachments: [],
+            history: [{ timestamp: '2026-03-12 09:30', action: 'CAPA Closed', user: 'Engr. L. Bautista' }]
+        },
+        {
+            id: 'QAMS-2026-FEB01',
+            category: 'product_quality',
+            title: 'H2S Area: Feb Magnesium Content Audit & Caustic Dosing',
+            area: 'H2S Area',
+            reporter: 'Chemist K. Lim (QA Lab)',
+            date: '2026-02-20',
+            status: 'Resolved',
+            description: 'February Mg compliance dipped to 77.64% during early winter campaign. Triggered immediate re-blending protocols.',
+            capa: 'Scrubber caustic pH setpoint raised to 10.8 pH. Subsequent March and April campaigns recovered above 89%.',
+            metricName: 'Mg Compliance Rate',
+            metricValue: '77.64%',
+            metricLimit: '> 95.00% Target',
+            isCompliant: false,
+            attachments: [],
+            history: [{ timestamp: '2026-02-22 14:00', action: 'CAPA Verified', user: 'Lead QA Chief' }]
+        },
+        {
+            id: 'QAMS-2026-FEB02',
+            category: 'document',
+            title: 'Limestone Area: Feb Reagent Slurry Density Calibration Log',
+            area: 'Limestone Area',
+            reporter: 'QA Documentation Team',
+            date: '2026-02-10',
+            status: 'Active',
+            description: 'Official verification log for daily slurry density sensor titrations across limestone preparation loops.',
+            capa: 'Density sensor calibration interval standardized to every 72 hours.',
+            metricName: 'Slurry Density Spec',
+            metricValue: '1.35 g/cm³',
+            metricLimit: '1.30 - 1.40 g/cm³',
+            isCompliant: true,
+            attachments: [],
+            history: [{ timestamp: '2026-02-10 11:00', action: 'Log Archived', user: 'QA Documentation Team' }]
         },
         {
             id: 'QAMS-2026-JAN01',
@@ -225,12 +339,25 @@
             metricValue: '90.25%',
             metricLimit: '> 95.00%',
             isCompliant: false,
-            attachments: [
-                { name: 'Internal_Claim_Investigation_Report.pdf', size: '3.4 MB', type: 'application/pdf' }
-            ],
-            history: [
-                { timestamp: '2026-01-25 14:00', action: 'Internal Claim Resolved & Closed', user: 'Lead QA Chief' }
-            ]
+            attachments: [{ name: 'Internal_Claim_Investigation_Report.pdf', size: '3.4 MB', type: 'application/pdf' }],
+            history: [{ timestamp: '2026-01-25 14:00', action: 'Internal Claim Resolved & Closed', user: 'Lead QA Chief' }]
+        },
+        {
+            id: 'QAMS-2026-JAN02',
+            category: 'product_quality',
+            title: 'FNTRL Area: Jan Production Tonnage Verification',
+            area: 'FNTRL Area',
+            reporter: 'Engr. L. Bautista (Lead QA)',
+            date: '2026-01-15',
+            status: 'Approved',
+            description: 'January startup production recorded 2,011.23 MT during initial scheduled maintenance recovery.',
+            capa: 'Plant ramped up successfully in February and March.',
+            metricName: 'Jan Production Output',
+            metricValue: '2011.23 MT',
+            metricLimit: '2765.00 MT Target',
+            isCompliant: true,
+            attachments: [],
+            history: [{ timestamp: '2026-01-15 17:00', action: 'Tonnage Recorded', user: 'Engr. L. Bautista' }]
         },
         {
             id: 'QAMS-2026-SOP01',
@@ -246,12 +373,110 @@
             metricValue: 'Rev 4.3',
             metricLimit: 'Active Status',
             isCompliant: true,
-            attachments: [
-                { name: 'SOP_MS_101_Rev4.3_Official.pdf', size: '4.5 MB', type: 'application/pdf' }
-            ],
-            history: [
-                { timestamp: '2026-06-15 09:00', action: 'Document Revision 4.3 Published', user: 'QA Documentation Team' }
-            ]
+            attachments: [{ name: 'SOP_MS_101_Rev4.3_Official.pdf', size: '4.5 MB', type: 'application/pdf' }],
+            history: [{ timestamp: '2026-06-15 09:00', action: 'Document Revision 4.3 Published', user: 'QA Documentation Team' }]
+        },
+        {
+            id: 'QAMS-2026-SOP02',
+            category: 'document',
+            title: 'SOP-H2S-204: Toxic Gas Scrubber QA & Caustic Interlock Manual',
+            area: 'H2S Area',
+            reporter: 'QA Documentation Team',
+            date: '2026-05-10',
+            status: 'Active',
+            description: 'Standard operating procedure governing hydrogen sulfide gas purity sensors, caustic neutralization loops, and emergency shutdown alarms.',
+            capa: 'Revision 2.0 published with updated sensor titration schedules.',
+            metricName: 'Document Revision',
+            metricValue: 'Rev 2.0',
+            metricLimit: 'Active Status',
+            isCompliant: true,
+            attachments: [],
+            history: [{ timestamp: '2026-05-10 14:00', action: 'Revision 2.0 Approved', user: 'QA Documentation Team' }]
+        },
+        {
+            id: 'QAMS-2026-SOP03',
+            category: 'document',
+            title: 'SOP-FN-104 & SOP-FN-309: Effluent pH Interlock Test Manual',
+            area: 'FNTRL Area',
+            reporter: 'QA Documentation Team',
+            date: '2026-04-05',
+            status: 'Active',
+            description: 'Standard operating procedures governing Final Neutralization & Tailings Recovery discharge slurry pH limits (8.2 - 8.6 pH) and residual nickel assays.',
+            capa: 'Revision 3.1 currently active across all hydrometallurgical discharge stations.',
+            metricName: 'Document Revision',
+            metricValue: 'Rev 3.1',
+            metricLimit: 'Active Status',
+            isCompliant: true,
+            attachments: [],
+            history: [{ timestamp: '2026-04-05 10:00', action: 'SOP Verified', user: 'QA Documentation Team' }]
+        },
+        {
+            id: 'QAMS-2026-SOP04',
+            category: 'document',
+            title: 'SOP-LS-402: Slurry Mesh Particle Titration Manual',
+            area: 'Limestone Area',
+            reporter: 'QA Documentation Team',
+            date: '2026-03-01',
+            status: 'Active',
+            description: 'Standard operating procedure governing limestone slurry particle size distribution (95% < 325 Mesh) and automated density sensor calibration.',
+            capa: 'Revision 1.8 active across reagent preparation facility.',
+            metricName: 'Document Revision',
+            metricValue: 'Rev 1.8',
+            metricLimit: 'Active Status',
+            isCompliant: true,
+            attachments: [],
+            history: [{ timestamp: '2026-03-01 09:00', action: 'Manual Published', user: 'QA Documentation Team' }]
+        },
+        {
+            id: 'QAMS-2026-JUL01',
+            category: 'product_quality',
+            title: 'Scheduled July Limestone Mesh Particle Calibration Audit',
+            area: 'Limestone Area',
+            reporter: 'Engr. M. Santos (Lead QA)',
+            date: '2026-07-03',
+            status: 'Open',
+            description: 'Upcoming routine quality assurance audit for limestone mesh particle titration across 08:00 AM operating shift.',
+            capa: 'Prepare laboratory titration glassware and calibrate Sub DCS density loop.',
+            metricName: 'Particle Size Spec',
+            metricValue: 'Pending Assay',
+            metricLimit: '95% < 325 Mesh',
+            isCompliant: true,
+            attachments: [],
+            history: [{ timestamp: '2026-07-01 08:00', action: 'Audit Scheduled', user: 'Engr. M. Santos' }]
+        },
+        {
+            id: 'QAMS-2026-JUL02',
+            category: 'improvement',
+            title: 'Scheduled July H2S Scrubber Caustic Interlock Safety Test',
+            area: 'H2S Area',
+            reporter: 'Lead Safety Team',
+            date: '2026-07-04',
+            status: 'Open',
+            description: 'Scheduled safety verification of H2S gas scrubber caustic dosing interlock setpoints.',
+            capa: 'Verify automated override alarms in Master DCS control room.',
+            metricName: 'Safety Interlock',
+            metricValue: 'Armed',
+            metricLimit: '100% Reliability',
+            isCompliant: true,
+            attachments: [],
+            history: [{ timestamp: '2026-07-01 08:30', action: 'Safety Test Scheduled', user: 'Lead Safety Team' }]
+        },
+        {
+            id: 'QAMS-2026-JUL03',
+            category: 'product_quality',
+            title: 'Scheduled July FNTRL Effluent Slurry Zero-Defect Review',
+            area: 'FNTRL Area',
+            reporter: 'Environmental QA Team',
+            date: '2026-07-06',
+            status: 'Open',
+            description: 'Scheduled environmental quality compliance audit for FNTRL discharge slurry pH and residual metal losses.',
+            capa: 'Ensure effluent pH remains strictly within 8.2 - 8.6 pH tolerance.',
+            metricName: 'Effluent Slurry pH',
+            metricValue: 'Pending Assay',
+            metricLimit: '8.2 - 8.6 pH Limit',
+            isCompliant: true,
+            attachments: [],
+            history: [{ timestamp: '2026-07-01 09:00', action: 'Environmental Review Scheduled', user: 'Environmental QA Team' }]
         }
     ];
 
@@ -262,7 +487,7 @@
         { id: 'LOG-4', timestamp: '2026-06-15 09:00', action: 'Updated Document QAMS-2026-SOP01', user: 'QA Documentation Team', details: 'Published SOP-MS-101 Revision 4.3.' }
     ];
 
-    // State Management Object with LocalStorage Persistence
+    // State Management Object with LocalStorage Persistence & Automatic Dataset Upgrader
     const Store = {
         getBoardData: () => {
             const stored = localStorage.getItem(BOARD_KEY);
@@ -273,7 +498,13 @@
         },
         getRecords: () => {
             const stored = localStorage.getItem(STORAGE_KEY);
-            return stored ? JSON.parse(stored) : defaultRecords;
+            let records = stored ? JSON.parse(stored) : null;
+            // Upgrade check: If stored records are fewer than 15 (from an older seed version), automatically upgrade to our 23 comprehensive multi-area records!
+            if (!records || !Array.isArray(records) || records.length < 15) {
+                records = defaultRecords;
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+            }
+            return records;
         },
         saveRecords: (records) => {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
@@ -303,25 +534,100 @@
     const QAMSProduct = {
         activeTab: 'all',
         activeBoardTab: 'matrix', // 'matrix' | 'scorecard' | 'reprocess'
+        currentBoardTab: 'matrix',
+        subTab: 'matrix',
         searchQuery: '',
+        filterArea: 'All Areas',
+        filterStatus: 'all',
 
         init: function () {
             this.injectPortalContainer();
             this.render();
-            console.log('✅ MS Section - Product Quality Module (with 100% Whiteboard Data) successfully initialized.');
+            console.log('✅ MS Section - Product Quality Module successfully initialized with 23 multi-area records.');
         },
 
-        open: function (category = 'all') {
+        // Called by external index.html navigation links (preserves keyword/boardTab if passed)
+        open: function (category = 'all', keyword = undefined, boardTab = undefined) {
             if (category === 'analysis') category = 'product_quality';
             this.activeTab = category;
+            
+            if (keyword !== undefined && keyword !== null) {
+                this.searchQuery = keyword;
+            }
+            if (boardTab !== undefined && boardTab !== null) {
+                this.activeBoardTab = boardTab;
+                this.currentBoardTab = boardTab;
+                this.subTab = boardTab;
+            }
+            
             this.render();
             const portal = document.getElementById('qamsproduct-portal');
             if (portal) portal.scrollIntoView({ behavior: 'smooth', block: 'start' });
         },
 
+        // Called when clicking internal category tab buttons or KPI summary boxes (automatically clears search/filters to prevent hidden data)
+        switchCategory: function (category = 'all') {
+            if (category === 'analysis') category = 'product_quality';
+            this.activeTab = category;
+            this.searchQuery = '';
+            this.filterArea = 'All Areas';
+            this.filterStatus = 'all';
+            this.render();
+            const portal = document.getElementById('qamsproduct-portal');
+            if (portal) portal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        },
+
+        // Switch Bulletin Board tabs (Matrix, Scorecard, Reprocess) and reset table filters so all data is visible
         switchBoardTab: function (tab) {
             this.activeBoardTab = tab;
+            this.currentBoardTab = tab;
+            this.subTab = tab;
+            this.searchQuery = '';
+            this.filterArea = 'All Areas';
+            this.filterStatus = 'all';
             this.render();
+        },
+
+        switchTab: function (tab) {
+            this.switchBoardTab(tab);
+        },
+
+        setFilterArea: function (area) {
+            this.filterArea = area;
+            this.render();
+        },
+
+        setFilterStatus: function (status) {
+            this.filterStatus = status;
+            this.render();
+        },
+
+        handleSearch: function (val) {
+            this.searchQuery = val;
+            this.render();
+        },
+
+        clearSearch: function () {
+            this.searchQuery = '';
+            this.render();
+        },
+
+        resetAllFilters: function () {
+            this.activeTab = 'all';
+            this.searchQuery = '';
+            this.filterArea = 'All Areas';
+            this.filterStatus = 'all';
+            this.render();
+        },
+
+        filterFromBoard: function (keyword) {
+            this.searchQuery = keyword;
+            this.activeTab = 'all';
+            this.filterArea = 'All Areas';
+            this.filterStatus = 'all';
+            this.render();
+            const grid = document.getElementById('qams-grid-section');
+            if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
         },
 
         injectPortalContainer: function () {
@@ -338,30 +644,64 @@
             }
         },
 
+        // Robust filter engine with smart month keyword matching
         getFilteredRecords: function () {
             let records = Store.getRecords();
+
             if (this.activeTab !== 'all') {
-                records = records.filter(r => r.category === this.activeTab);
+                records = records.filter(r => r.category === this.activeTab || (this.activeTab === 'product_quality' && r.category === 'analysis'));
             }
-            if (this.searchQuery.trim() !== '') {
-                const q = this.searchQuery.toLowerCase();
+
+            if (this.filterArea && this.filterArea !== 'All Areas') {
+                records = records.filter(r => r.area.toLowerCase() === this.filterArea.toLowerCase() || r.area.toLowerCase().includes(this.filterArea.toLowerCase()));
+            }
+
+            if (this.filterStatus && this.filterStatus !== 'all') {
+                records = records.filter(r => r.status.toLowerCase() === this.filterStatus.toLowerCase());
+            }
+
+            if (this.searchQuery && this.searchQuery.trim() !== '') {
+                const q = this.searchQuery.toLowerCase().trim();
                 records = records.filter(r =>
-                    r.title.toLowerCase().includes(q) ||
-                    r.area.toLowerCase().includes(q) ||
-                    r.reporter.toLowerCase().includes(q) ||
-                    r.description.toLowerCase().includes(q) ||
-                    r.id.toLowerCase().includes(q)
+                    (r.title && r.title.toLowerCase().includes(q)) ||
+                    (r.area && r.area.toLowerCase().includes(q)) ||
+                    (r.reporter && r.reporter.toLowerCase().includes(q)) ||
+                    (r.description && r.description.toLowerCase().includes(q)) ||
+                    (r.id && r.id.toLowerCase().includes(q)) ||
+                    (r.metricName && r.metricName.toLowerCase().includes(q)) ||
+                    (r.metricValue && r.metricValue.toLowerCase().includes(q)) ||
+                    (r.date && r.date.toLowerCase().includes(q)) ||
+                    (r.category && r.category.toLowerCase().includes(q)) ||
+                    this.matchMonthKeyword(r, q)
                 );
             }
             return records;
         },
 
-        filterFromBoard: function(keyword) {
-            this.searchQuery = keyword;
-            this.activeTab = 'all';
-            this.render();
-            const grid = document.getElementById('qams-grid-section');
-            if(grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        matchMonthKeyword: function (record, q) {
+            const monthsMap = {
+                'jan': '01', 'feb': '02', 'mar': '03', 'apr': '04', 'may': '05', 'jun': '06',
+                'jul': '07', 'aug': '08', 'sep': '09', 'oct': '10', 'nov': '11', 'dec': '12'
+            };
+            if (monthsMap[q]) {
+                const monthNum = monthsMap[q];
+                return (record.date && record.date.split('-')[1] === monthNum) ||
+                       (record.title && record.title.toLowerCase().includes(q)) ||
+                       (record.id && record.id.toLowerCase().includes(q));
+            }
+            return false;
+        },
+
+        getCategoryLabel: function (key) {
+            const labels = {
+                all: 'All Categories',
+                product_quality: 'Product Quality',
+                document: 'Documents & SOP',
+                nearmiss: 'Near Miss / Incident',
+                claim: 'Quality Claims',
+                improvement: 'For Improvement'
+            };
+            return labels[key] || key;
         },
 
         render: function () {
@@ -383,6 +723,8 @@
                 compliant: allRecords.filter(r => r.isCompliant).length
             };
             const complianceRate = stats.total > 0 ? ((stats.compliant / stats.total) * 100).toFixed(1) : '100.0';
+
+            const hasActiveFilter = this.activeTab !== 'all' || (this.searchQuery && this.searchQuery.trim() !== '') || (this.filterArea && this.filterArea !== 'All Areas') || (this.filterStatus && this.filterStatus !== 'all');
 
             container.innerHTML = `
                 <div class="max-w-7xl mx-auto">
@@ -416,7 +758,7 @@
                     </div>
 
                     <!-- ================================================================= -->
-                    <!-- THREE-TAB INTERACTIVE DIGITAL BULLETIN BOARD (IMAGES 1, 2, 3)     -->
+                    <!-- THREE-TAB INTERACTIVE DIGITAL BULLETIN BOARD                      -->
                     <!-- ================================================================= -->
                     <div class="mb-10 p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-dark-500 via-dark-700 to-dark-900 border-2 border-amber-500/40 shadow-[0_0_35px_rgba(245,158,11,0.15)] relative overflow-hidden" data-aos="fade-up">
                         <div class="absolute top-0 right-0 w-96 h-96 bg-royalblue-600/10 rounded-full blur-[100px] pointer-events-none"></div>
@@ -452,40 +794,39 @@
 
                         <!-- BOARD CONTENT RENDERING BASED ON ACTIVE TAB -->
                         ${this.renderBoardContent(board)}
-
                     </div>
 
-                    <!-- KPI Statistics Cards -->
+                    <!-- KPI Statistics Cards (Clicking calls switchCategory to show full category data) -->
                     <div id="qams-grid-section" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
-                        <div onclick="QAMSProduct.open('all')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'all' ? 'border-sky-400 ring-1 ring-sky-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
+                        <div onclick="QAMSProduct.switchCategory('all')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'all' ? 'border-sky-400 ring-1 ring-sky-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
                             <span class="text-[11px] font-bold text-slate-400 uppercase block">Total Records</span>
                             <div class="flex items-center justify-between mt-1">
                                 <span class="text-2xl font-extrabold text-white">${stats.total}</span>
                                 <i class="fas fa-folder-open text-sky-400 text-lg"></i>
                             </div>
                         </div>
-                        <div onclick="QAMSProduct.open('product_quality')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'product_quality' ? 'border-sky-400 ring-1 ring-sky-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
+                        <div onclick="QAMSProduct.switchCategory('product_quality')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'product_quality' ? 'border-sky-400 ring-1 ring-sky-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
                             <span class="text-[11px] font-bold text-slate-400 uppercase block">Product Quality</span>
                             <div class="flex items-center justify-between mt-1">
                                 <span class="text-2xl font-extrabold text-sky-400">${stats.quality}</span>
                                 <i class="fas fa-award text-sky-400 text-lg"></i>
                             </div>
                         </div>
-                        <div onclick="QAMSProduct.open('document')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'document' ? 'border-cyan-400 ring-1 ring-cyan-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
+                        <div onclick="QAMSProduct.switchCategory('document')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'document' ? 'border-cyan-400 ring-1 ring-cyan-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
                             <span class="text-[11px] font-bold text-slate-400 uppercase block">Documents & SOP</span>
                             <div class="flex items-center justify-between mt-1">
                                 <span class="text-2xl font-extrabold text-cyan-400">${stats.docs}</span>
                                 <i class="fas fa-file-invoice text-cyan-400 text-lg"></i>
                             </div>
                         </div>
-                        <div onclick="QAMSProduct.open('nearmiss')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'nearmiss' ? 'border-amber-400 ring-1 ring-amber-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
+                        <div onclick="QAMSProduct.switchCategory('nearmiss')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'nearmiss' ? 'border-amber-400 ring-1 ring-amber-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
                             <span class="text-[11px] font-bold text-slate-400 uppercase block">Quality Near Miss</span>
                             <div class="flex items-center justify-between mt-1">
                                 <span class="text-2xl font-extrabold text-amber-400">${stats.nearmiss}</span>
                                 <i class="fas fa-exclamation-triangle text-amber-400 text-lg"></i>
                             </div>
                         </div>
-                        <div onclick="QAMSProduct.open('claim')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'claim' ? 'border-rose-400 ring-1 ring-rose-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
+                        <div onclick="QAMSProduct.switchCategory('claim')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'claim' ? 'border-rose-400 ring-1 ring-rose-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
                             <span class="text-[11px] font-bold text-slate-400 uppercase block">Quality Claims</span>
                             <div class="flex items-center justify-between mt-1">
                                 <span class="text-2xl font-extrabold text-rose-400">${stats.claims}</span>
@@ -501,10 +842,10 @@
                         </div>
                     </div>
 
-                    <!-- Search and Filter Bar -->
-                    <div class="bg-dark-500 p-4 rounded-2xl border border-slate-800 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <!-- Search, Area & Status Filter Bar -->
+                    <div class="bg-dark-500 p-4 rounded-2xl border border-slate-800 mb-6 flex flex-col lg:flex-row items-center justify-between gap-4 shadow-lg">
                         <!-- Category Tabs -->
-                        <div class="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 no-scrollbar">
+                        <div class="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0 no-scrollbar">
                             ${this.renderTabButton('all', 'All Categories', 'fa-layer-group')}
                             ${this.renderTabButton('product_quality', 'Product Quality', 'fa-award', 'text-sky-400')}
                             ${this.renderTabButton('document', 'Documents & SOP', 'fa-file-invoice', 'text-cyan-400')}
@@ -513,13 +854,52 @@
                             ${this.renderTabButton('improvement', 'Improvement', 'fa-lightbulb', 'text-emerald-400')}
                         </div>
 
-                        <!-- Real-time Search Box -->
-                        <div class="relative w-full md:w-80">
-                            <i class="fas fa-search absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                            <input type="text" value="${this.searchQuery}" oninput="QAMSProduct.handleSearch(this.value)" placeholder="Search Product Quality, ID, area..." class="w-full bg-dark-700 border border-slate-700 rounded-xl pl-9 pr-8 py-2 text-xs text-white placeholder-slate-400 outline-none focus:border-sky-500 transition-all">
-                            ${this.searchQuery ? `<button onclick="QAMSProduct.handleSearch('')" class="absolute right-3 top-2.5 text-slate-400 hover:text-white"><i class="fas fa-times text-xs"></i></button>` : ''}
+                        <!-- Area & Status Dropdowns + Real-time Search Box -->
+                        <div class="flex items-center gap-2.5 w-full lg:w-auto overflow-x-auto pb-1 lg:pb-0 no-scrollbar">
+                            <select onchange="QAMSProduct.setFilterArea(this.value)" class="bg-dark-700 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 font-semibold outline-none focus:border-sky-500 transition-all min-w-[130px]">
+                                <option value="All Areas" ${!this.filterArea || this.filterArea === 'All Areas' ? 'selected' : ''}>All Plant Areas</option>
+                                <option value="FNTRL Area" ${this.filterArea === 'FNTRL Area' ? 'selected' : ''}>FNTRL Area</option>
+                                <option value="MS-Dezinc Area" ${this.filterArea === 'MS-Dezinc Area' ? 'selected' : ''}>MS-Dezinc Area</option>
+                                <option value="H2S Area" ${this.filterArea === 'H2S Area' ? 'selected' : ''}>H2S Area</option>
+                                <option value="Limestone Area" ${this.filterArea === 'Limestone Area' ? 'selected' : ''}>Limestone Area</option>
+                                <option value="Re-leach Area" ${this.filterArea === 'Re-leach Area' ? 'selected' : ''}>Re-leach Area</option>
+                                <option value="DCS Control" ${this.filterArea === 'DCS Control' ? 'selected' : ''}>DCS Control Room</option>
+                            </select>
+
+                            <select onchange="QAMSProduct.setFilterStatus(this.value)" class="bg-dark-700 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 font-semibold outline-none focus:border-sky-500 transition-all min-w-[110px]">
+                                <option value="all" ${!this.filterStatus || this.filterStatus === 'all' ? 'selected' : ''}>All Statuses</option>
+                                <option value="Approved" ${this.filterStatus === 'Approved' ? 'selected' : ''}>Approved</option>
+                                <option value="In Progress" ${this.filterStatus === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                                <option value="Resolved" ${this.filterStatus === 'Resolved' ? 'selected' : ''}>Resolved</option>
+                                <option value="Closed" ${this.filterStatus === 'Closed' ? 'selected' : ''}>Closed</option>
+                                <option value="Active" ${this.filterStatus === 'Active' ? 'selected' : ''}>Active</option>
+                            </select>
+
+                            <div class="relative min-w-[220px] flex-1 lg:w-64">
+                                <i class="fas fa-search absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                                <input type="text" value="${this.searchQuery || ''}" oninput="QAMSProduct.handleSearch(this.value)" placeholder="Search Product Quality, ID, area..." class="w-full bg-dark-700 border border-slate-700 rounded-xl pl-9 pr-8 py-2 text-xs text-white placeholder-slate-400 outline-none focus:border-sky-500 transition-all">
+                                ${this.searchQuery ? `<button onclick="QAMSProduct.clearSearch()" class="absolute right-3 top-2.5 text-slate-400 hover:text-white"><i class="fas fa-times text-xs"></i></button>` : ''}
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Active Filter Banner (Prevents any confusion about hidden data!) -->
+                    ${hasActiveFilter ? `
+                        <div class="bg-gradient-to-r from-royalblue-900/60 via-dark-700 to-dark-700 p-3.5 rounded-xl border border-sky-500/40 mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fadeIn shadow-lg">
+                            <div class="flex items-center gap-2 flex-wrap text-xs">
+                                <span class="text-sky-400 font-bold flex items-center gap-1.5">
+                                    <i class="fas fa-filter animate-pulse"></i> Active Filter(s):
+                                </span>
+                                ${this.activeTab !== 'all' ? `<span class="bg-sky-500/20 text-sky-300 border border-sky-500/30 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1">Category: ${this.getCategoryLabel(this.activeTab)} <button onclick="QAMSProduct.switchCategory('all')" class="hover:text-white ml-1">&times;</button></span>` : ''}
+                                ${this.searchQuery ? `<span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1">Keyword / Month: "${this.searchQuery}" <button onclick="QAMSProduct.clearSearch()" class="hover:text-white ml-1">&times;</button></span>` : ''}
+                                ${this.filterArea && this.filterArea !== 'All Areas' ? `<span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1">Area: ${this.filterArea} <button onclick="QAMSProduct.setFilterArea('All Areas')" class="hover:text-white ml-1">&times;</button></span>` : ''}
+                                ${this.filterStatus && this.filterStatus !== 'all' ? `<span class="bg-rose-500/20 text-rose-300 border border-rose-500/30 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1">Status: ${this.filterStatus} <button onclick="QAMSProduct.setFilterStatus('all')" class="hover:text-white ml-1">&times;</button></span>` : ''}
+                            </div>
+                            <button onclick="QAMSProduct.resetAllFilters()" class="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-[11px] rounded-lg transition-all shadow flex items-center gap-1.5 whitespace-nowrap">
+                                <i class="fas fa-undo"></i> Reset All Filters & Show All (${allRecords.length})
+                            </button>
+                        </div>
+                    ` : ''}
 
                     <!-- Interactive Data Grid / Table -->
                     <div class="bg-dark-500 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
@@ -541,7 +921,10 @@
                                         <tr>
                                             <td colspan="7" class="py-12 text-center text-slate-400 font-normal">
                                                 <i class="fas fa-folder-open text-3xl text-slate-600 mb-2 block"></i>
-                                                No Product Quality records found matching your filter or search criteria.
+                                                <span class="block text-sm font-bold text-slate-300 mt-2">No QA records match your current filter or search criteria.</span>
+                                                <button onclick="QAMSProduct.resetAllFilters()" class="mt-3 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-sky-400 font-bold rounded-xl text-xs transition-all border border-slate-700 inline-flex items-center gap-1.5">
+                                                    <i class="fas fa-undo"></i> Reset All Filters & Show All Data (${allRecords.length})
+                                                </button>
                                             </td>
                                         </tr>
                                     `}
@@ -582,21 +965,21 @@
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-slate-800/60 font-semibold text-slate-300">
-                                            <tr class="hover:bg-slate-800/40 transition-colors cursor-pointer" onclick="QAMSProduct.open('nearmiss')">
+                                            <tr class="hover:bg-slate-800/40 transition-colors cursor-pointer" onclick="QAMSProduct.switchCategory('nearmiss')">
                                                 <td class="py-2.5 px-2 text-left font-bold text-rose-400 flex items-center gap-1.5">
                                                     <span class="w-2 h-2 rounded-full bg-rose-500"></span> Quality Near Miss
                                                 </td>
                                                 ${board.incidents.nearMiss.slice(0, 6).map(val => `<td class="py-2.5 px-1 ${val > 0 ? 'text-white font-black bg-rose-500/20 rounded' : 'text-slate-500'}">${val}</td>`).join('')}
                                                 <td class="py-2.5 px-2 bg-amber-500/10 text-amber-400 font-black border-l border-slate-800 text-xs">${board.incidents.nearMissYTD}</td>
                                             </tr>
-                                            <tr class="hover:bg-slate-800/40 transition-colors cursor-pointer" onclick="QAMSProduct.open('claim')">
+                                            <tr class="hover:bg-slate-800/40 transition-colors cursor-pointer" onclick="QAMSProduct.switchCategory('claim')">
                                                 <td class="py-2.5 px-2 text-left font-bold text-amber-400 flex items-center gap-1.5">
                                                     <span class="w-2 h-2 rounded-full bg-amber-500"></span> Internal Claim
                                                 </td>
                                                 ${board.incidents.internalClaim.slice(0, 6).map(val => `<td class="py-2.5 px-1 ${val > 0 ? 'text-white font-black bg-amber-500/20 rounded' : 'text-slate-500'}">${val}</td>`).join('')}
                                                 <td class="py-2.5 px-2 bg-amber-500/10 text-amber-400 font-black border-l border-slate-800 text-xs">${board.incidents.internalYTD}</td>
                                             </tr>
-                                            <tr class="hover:bg-slate-800/40 transition-colors cursor-pointer" onclick="QAMSProduct.open('claim')">
+                                            <tr class="hover:bg-slate-800/40 transition-colors cursor-pointer" onclick="QAMSProduct.switchCategory('claim')">
                                                 <td class="py-2.5 px-2 text-left font-bold text-emerald-400 flex items-center gap-1.5">
                                                     <span class="w-2 h-2 rounded-full bg-emerald-500"></span> External Claim
                                                 </td>
@@ -609,7 +992,7 @@
                             </div>
                             <div class="mt-3 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
                                 <span><i class="fas fa-check-circle text-emerald-400 mr-1"></i> Zero External Customer Claims</span>
-                                <span class="text-sky-400 font-bold cursor-pointer hover:underline" onclick="QAMSProduct.open('nearmiss')">View Incident Logs &rarr;</span>
+                                <span class="text-sky-400 font-bold cursor-pointer hover:underline" onclick="QAMSProduct.switchCategory('nearmiss')">View Incident Logs &rarr;</span>
                             </div>
                         </div>
 
@@ -674,7 +1057,7 @@
                             </div>
                             <div class="mt-3 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
                                 <span><i class="fas fa-chart-line text-amber-400 mr-1"></i> Q2 Production Exceeded Target for Apr, May &amp; Jun</span>
-                                <span class="text-amber-400 font-bold cursor-pointer hover:underline" onclick="QAMSProduct.open('product_quality')">Filter Quality Assays &rarr;</span>
+                                <span class="text-amber-400 font-bold cursor-pointer hover:underline" onclick="QAMSProduct.switchCategory('product_quality')">Filter Quality Assays &rarr;</span>
                             </div>
                         </div>
                     </div>
@@ -698,7 +1081,7 @@
                             <span class="text-[10px] text-slate-200 font-semibold block mt-0.5">${subtitle}</span>
                         </div>
                         <div class="p-4 space-y-3 flex-1 divide-y divide-slate-800/60">
-                            ${items.map((item, idx) => `
+                            ${items.map((item) => `
                                 <div class="pt-3 first:pt-0 flex items-start justify-between gap-3 group cursor-pointer hover:bg-slate-800/30 p-2 rounded-xl transition-all" onclick="QAMSProduct.showScorecardDetail('${item.id}', '${title}')">
                                     <div class="space-y-1">
                                         <span class="text-xs font-bold text-white group-hover:text-sky-400 transition-colors block">${item.name}</span>
@@ -826,7 +1209,7 @@
 
                             <div class="mt-4 pt-3 border-t border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
                                 <span><i class="fas fa-trophy text-amber-400 mr-1"></i> AJL &amp; NJL tied for highest shift credits in June (15.0)</span>
-                                <span class="text-sky-400 font-bold cursor-pointer hover:underline" onclick="QAMSProduct.open('improvement')">View Process Improvements &rarr;</span>
+                                <span class="text-sky-400 font-bold cursor-pointer hover:underline" onclick="QAMSProduct.switchCategory('improvement')">View Process Improvements &rarr;</span>
                             </div>
                         </div>
                     </div>
@@ -838,7 +1221,7 @@
         renderTabButton: function (key, label, icon, color = 'text-white') {
             const isActive = this.activeTab === key || (key === 'product_quality' && this.activeTab === 'analysis');
             return `
-                <button onclick="QAMSProduct.open('${key}')" class="px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${isActive ? 'bg-royalblue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)]' : 'bg-dark-700 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/80'}">
+                <button onclick="QAMSProduct.switchCategory('${key}')" class="px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${isActive ? 'bg-royalblue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)]' : 'bg-dark-700 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/80'}">
                     <i class="fas ${icon} ${isActive ? 'text-white' : color}"></i> ${label}
                 </button>
             `;
@@ -891,7 +1274,7 @@
                         </span>
                     </td>
                     <td class="py-3.5 px-4 max-w-xs">
-                        <div class="font-bold text-white text-sm truncate group-hover:text-sky-300 transition-colors" title="${r.title}">${r.title}</div>
+                        <div class="font-bold text-white text-sm truncate group-hover:text-sky-300 transition-colors cursor-pointer" onclick="QAMSProduct.viewDetails('${r.id}')" title="${r.title}">${r.title}</div>
                         <div class="text-[11px] text-slate-400 truncate mt-0.5" title="${r.description}">${r.description}</div>
                         ${r.attachments && r.attachments.length > 0 ? `<span class="inline-flex items-center gap-1 text-[10px] text-sky-400 mt-1"><i class="fas fa-paperclip"></i> ${r.attachments.length} attachment(s)</span>` : ''}
                     </td>
@@ -930,16 +1313,9 @@
             `;
         },
 
-        handleSearch: function (val) {
-            this.searchQuery = val;
-            this.render();
-        },
-
         // ====================================================================
         // 4. BULLETIN BOARD INTERACTIVITY & LIVE DATA MANIPULATORS
         // ====================================================================
-
-        // Adjust Reprocess Bag count directly from Tab 3
         adjustReprocessBag: function (id, change) {
             const board = Store.getBoardData();
             const idx = board.reprocessBags.items.findIndex(item => item.id === id);
@@ -956,7 +1332,6 @@
             }
         },
 
-        // Drill-down analysis modal for Tab 2 (Objectives & Targets)
         showScorecardDetail: function (id, section) {
             const board = Store.getBoardData();
             let item = null;
@@ -1027,7 +1402,6 @@
             this.showModalHtml(modalHtml);
         },
 
-        // Drill-down analysis for Tab 3 (Shift Group Batch Credits)
         showShiftAnalysis: function (grp, total) {
             const modalHtml = `
                 <div id="qams-modal" class="fixed inset-0 bg-dark-900/85 z-[100] flex items-center justify-center p-4 backdrop-blur-md animate-fadeIn">
@@ -1066,8 +1440,7 @@
             this.showModalHtml(modalHtml);
         },
 
-        // Triggered when clicking any parameter cell inside Tab 1
-        showCellAnalysis: function(param, month, val) {
+        showCellAnalysis: function (param, month, val) {
             const isTonnage = param.includes('Tonnage');
             const is100 = val === '100.00%';
             const isLow = !isTonnage && parseFloat(val) < 85;
@@ -1127,7 +1500,6 @@
             this.showModalHtml(modalHtml);
         },
 
-        // VIEW DETAILS MODAL
         viewDetails: function (id) {
             const r = Store.getRecords().find(item => item.id === id);
             if (!r) return;
@@ -1229,7 +1601,18 @@
                             <button onclick="QAMSProduct.openEditModal('${r.id}')" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl shadow transition-all">
                                 <i class="fas fa-edit mr-1"></i> Edit Record
                             </button>
-                            <button onclick="QAMSProduct.closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">
+                            <button onclick="QAMSProduct.closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all
+error
+An internal error has occurred.
+Model 9:50 AM
+ThinkingThoughts
+Expand to view model thoughts
+
+chevron_right
+Here is the continuation and completion of your js/qamsproduct.js file, picking up right from where it left off inside the viewDetails modal and continuing through all the form handlers, AI upload analysis engine, CSV export tools, and initialization scripts:
+code
+JavaScript
+<button onclick="QAMSProduct.closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">
                                 Close
                             </button>
                         </div>
