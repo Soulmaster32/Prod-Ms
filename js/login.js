@@ -2,17 +2,13 @@
  * ============================================================================
  * QUALITY GROUP | MS SECTION - AUTHENTICATION & GLOBAL ADMIN ENGINE (login.js)
  * ============================================================================
- * Features:
- * - Global Admin Authorization: Admin accounts gain control over all application data
- * - Executive Custom Prompt Modals: Replaces all native alert()/confirm() with sleek UI dialogs
- * - Security Hardened: Stripped out quick-login buttons and hardcoded credential hints
- * - Password Visibility Toggles: Integrated eye-icon reveals for secure data entry
- * - Admin Master Control Hub: Manage users with real-time search, wipe/restore modules, export data
- * - Deep sec.js Interactivity: Auto-unlocks security interlocks for Admins, locks for regular users
- * - Complete user.js Implementation: Exposes all 12 native profile management functions
- * - Replaced "Place of Birth" with "Residential Address" across all schemas
- * - Fullscreen Gatekeeper Modal: Restricts dashboard access until authenticated
- * - HTML5 Canvas Avatar Uploader: Compresses profile photos to Base64 safely
+ * Interactivity & Integration with user.js CRUD Engine:
+ * - Direct CRUD Delegation: Calls window.createUser() for all new registrations
+ * - Event-Driven Reactivity: Listens to 'QAMS_UserListUpdated' to live-refresh tables
+ * - Unified Storage Bridge: Uses shared window.AUTH_DB_KEY ('QAMS_Users_DB_v1')
+ * - Full Profile Sync: Updates index.html tables, navbar widgets, and active sessions
+ * - Admin Master Control Hub: Live user search, role toggling, and data wiping
+ * - Deep sec.js Interactivity: Auto-unlocks security interlocks for System Admins
  * ============================================================================
  */
 
@@ -40,7 +36,7 @@
             gender: "Female",
             birthday: "1991-08-20",
             birthdate: "August 20, 1991",
-            address: "Executive Quarters, Block 4, MS Industrial Hub, Philippines",
+            address: "Executive Quarters, Block 4, MS Industrial Hub, Philippines", // Residential Address
             area: "DCS Control Room",
             department: "DCS Control Room",
             role: "admin",                      // SYSTEM ADMIN ROLE
@@ -48,7 +44,7 @@
             avatar: CONFIG.defaultAvatar,
             image: CONFIG.defaultAvatar,
             joinDate: "2026-01-01T08:00:00.000Z",
-            lastLogin: "2026-07-05T08:00:00.000Z"
+            lastLogin: new Date().toISOString()
         },
         {
             username: "QA-MS-001",
@@ -69,7 +65,7 @@
             avatar: CONFIG.defaultAvatar,
             image: CONFIG.defaultAvatar,
             joinDate: "2026-01-15T08:00:00.000Z",
-            lastLogin: "2026-07-05T07:30:00.000Z"
+            lastLogin: new Date().toISOString()
         }
     ];
 
@@ -77,164 +73,33 @@
     let adminUserSearchQuery = '';
 
     // ========================================================================
-    // 1. COMPLETE IMPLEMENTATION OF USER.JS PROFILE MANAGEMENT FUNCTIONS
+    // 1. DATA ACCESS POLYFILLS (Delegates to user.js CRUD API)
     // ========================================================================
 
-    function getAllUsers() {
+    function safeGetAllUsers() {
+        if (typeof window.getAllUsers === 'function') return window.getAllUsers();
         try {
             const data = localStorage.getItem(window.AUTH_DB_KEY);
             const parsed = data ? JSON.parse(data) : null;
             return parsed && Array.isArray(parsed.users) ? parsed.users : [];
-        } catch (e) {
-            return [];
-        }
+        } catch (e) { return []; }
     }
 
-    function saveAllUsers(usersArray) {
+    function safeSaveAllUsers(usersArray) {
+        if (typeof window.saveAllUsers === 'function') {
+            window.saveAllUsers(usersArray);
+            return;
+        }
         try {
             localStorage.setItem(window.AUTH_DB_KEY, JSON.stringify({ users: usersArray }));
-        } catch (e) {
-            console.warn('Could not save to user.js database:', e);
-        }
+        } catch (e) {}
     }
 
-    function getUserProfile(username) {
-        const users = getAllUsers();
+    function safeGetUserProfile(username) {
+        if (typeof window.getUserProfile === 'function') return window.getUserProfile(username);
+        const users = safeGetAllUsers();
         return users.find(u => u.username.toLowerCase() === (username || '').toLowerCase()) || null;
     }
-
-    function updateUserProfile(username, data) {
-        const users = getAllUsers();
-        const idx = users.findIndex(u => u.username.toLowerCase() === (username || '').toLowerCase());
-        if (idx === -1) return { success: false, error: 'User not found' };
-
-        users[idx] = { ...users[idx], ...data };
-        if (data.avatar) users[idx].image = data.avatar;
-        if (data.fullName) users[idx].fullname = data.fullName;
-        if (data.department) users[idx].area = data.department;
-
-        saveAllUsers(users);
-
-        // If currently logged in user is updated, refresh active session
-        const activeSession = JSON.parse(localStorage.getItem(CONFIG.sessionKey) || '{}');
-        if (activeSession && activeSession.username === username) {
-            localStorage.setItem(CONFIG.sessionKey, JSON.stringify(users[idx]));
-            updateNavbarProfile(users[idx]);
-        }
-        return { success: true, user: users[idx] };
-    }
-
-    function updateUserAvatar(username, imageDataUrl) {
-        return updateUserProfile(username, { avatar: imageDataUrl });
-    }
-
-    function updateUserInfo(username, { fullName, email, phone, department }) {
-        return updateUserProfile(username, { fullName, email, phone, department });
-    }
-
-    function deleteUserAccount(username) {
-        const users = getAllUsers();
-        const userIndex = users.findIndex(u => u.username.toLowerCase() === (username || '').toLowerCase());
-        
-        if (userIndex === -1) {
-            return { success: false, error: 'User not found' };
-        }
-        
-        // Prevent deleting the last admin
-        const admins = users.filter(u => u.role === 'admin');
-        if (users[userIndex].role === 'admin' && admins.length === 1) {
-            return { success: false, error: 'Cannot delete the last administrator' };
-        }
-        
-        const removed = users.splice(userIndex, 1)[0];
-        saveAllUsers(users);
-        
-        // Auto-remove from index.html qaUsersList
-        if (typeof window.qaUsersList !== 'undefined' && Array.isArray(window.qaUsersList)) {
-            window.qaUsersList = window.qaUsersList.filter(u => u.id.toLowerCase() !== username.toLowerCase());
-            if (typeof window.renderUserTable === 'function') window.renderUserTable();
-            if (typeof window.updateUserKPIs === 'function') window.updateUserKPIs();
-        }
-
-        return { success: true, removedUser: removed };
-    }
-
-    function toggleUserRole(username) {
-        const user = getUserProfile(username);
-        if (!user) {
-            return { success: false, error: 'User not found' };
-        }
-        
-        const newRole = user.role === 'admin' ? 'member' : 'admin';
-        const newQaRole = newRole === 'admin' ? 'System Admin' : 'Lead QA Inspector';
-        return updateUserProfile(username, { role: newRole, qaRole: newQaRole });
-    }
-
-    function getUserStats(username) {
-        const user = getUserProfile(username);
-        if (!user) return null;
-        
-        return {
-            username: user.username,
-            fullName: user.fullName || user.fullname,
-            department: user.department || user.area,
-            role: user.role,
-            joinDate: user.joinDate,
-            totalActivities: 12,
-            completedActivities: 10,
-            completionRate: 83.3
-        };
-    }
-
-    function searchUsers(query) {
-        const users = getAllUsers();
-        const lowerQuery = (query || '').toLowerCase();
-        
-        return users.filter(u => 
-            (u.fullName || '').toLowerCase().includes(lowerQuery) ||
-            (u.username || '').toLowerCase().includes(lowerQuery) ||
-            (u.email || '').toLowerCase().includes(lowerQuery) ||
-            (u.address || '').toLowerCase().includes(lowerQuery)
-        );
-    }
-
-    function getUsersByDepartment(department) {
-        const users = getAllUsers();
-        return users.filter(u => u.department === department || u.area === department);
-    }
-
-    function getAllAdmins() {
-        const users = getAllUsers();
-        return users.filter(u => u.role === 'admin' || u.qaRole === 'System Admin');
-    }
-
-    function getUserCount() {
-        return getAllUsers().length;
-    }
-
-    function formatUserDisplayName(user) {
-        return `${user.fullName || user.fullname} (${user.department || user.area})`;
-    }
-
-    function getUserInitials(fullName) {
-        return (fullName || '??').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-    }
-
-    // Expose all user.js functions to global window scope
-    window.getAllUsers = getAllUsers;
-    window.getUserProfile = getUserProfile;
-    window.updateUserProfile = updateUserProfile;
-    window.updateUserAvatar = updateUserAvatar;
-    window.updateUserInfo = updateUserInfo;
-    window.deleteUserAccount = deleteUserAccount;
-    window.toggleUserRole = toggleUserRole;
-    window.getUserStats = getUserStats;
-    window.searchUsers = searchUsers;
-    window.getUsersByDepartment = getUsersByDepartment;
-    window.getAllAdmins = getAllAdmins;
-    window.getUserCount = getUserCount;
-    window.formatUserDisplayName = formatUserDisplayName;
-    window.getUserInitials = getUserInitials;
 
     // ========================================================================
     // 2. SLEEK CUSTOM PROMPT MODAL ENGINE (QAAuthModal)
@@ -318,13 +183,14 @@
         seedDefaultDatabase();
         injectAuthPortal();
         checkActiveSession();
-        console.log('%c👑 QA MS Section Global Auth & Admin Engine Initialized', 'background: #f59e0b; color: #000; font-weight: bold; padding: 4px 8px; border-radius: 4px;');
+        setupRealTimeEventListeners();
+        console.log('%c👑 QA MS Section Global Auth & Admin Engine (login.js) Initialized', 'background: #f59e0b; color: #000; font-weight: bold; padding: 4px 8px; border-radius: 4px;');
     }
 
     function seedDefaultDatabase() {
-        let users = getAllUsers();
+        let users = safeGetAllUsers();
         if (users.length === 0) {
-            saveAllUsers(DEFAULT_USERS);
+            safeSaveAllUsers(DEFAULT_USERS);
         }
     }
 
@@ -333,7 +199,9 @@
             const sessionData = localStorage.getItem(CONFIG.sessionKey);
             if (sessionData) {
                 const user = JSON.parse(sessionData);
-                grantDashboardAccess(user);
+                // Ensure profile is fresh from DB
+                const freshUser = safeGetUserProfile(user.username) || user;
+                grantDashboardAccess(freshUser);
             } else {
                 restrictDashboardAccess();
             }
@@ -389,8 +257,32 @@
         // Update Navbar with logged-in user profile & Admin Controls
         updateNavbarProfile(user, isAdmin);
 
-        // Auto-sync with index.html user table
-        syncWithUserTable(user);
+        // Auto-sync with index.html user table via user.js engine
+        if (typeof window.syncUserDatabaseToUI === 'function') {
+            window.syncUserDatabaseToUI();
+        } else {
+            syncWithUserTableFallback(user);
+        }
+    }
+
+    function setupRealTimeEventListeners() {
+        // Listen to events broadcasted by user.js (e.g. when an Admin deletes or registers a user)
+        window.addEventListener('QAMS_UserListUpdated', function () {
+            // Re-render Admin Hub user table if it is currently open
+            const adminTableBody = document.getElementById('adm-user-table-body');
+            if (adminTableBody && !adminTableBody.closest('.hidden')) {
+                renderAdminUserTable();
+            }
+            // Refresh navbar widget if session user was modified
+            const currentSession = JSON.parse(localStorage.getItem(CONFIG.sessionKey) || 'null');
+            if (currentSession) {
+                const freshProfile = safeGetUserProfile(currentSession.username);
+                if (freshProfile) {
+                    const isAdmin = freshProfile.role === 'admin' || freshProfile.qaRole === 'System Admin';
+                    updateNavbarProfile(freshProfile, isAdmin);
+                }
+            }
+        });
     }
 
     function injectAuthPortal() {
@@ -581,7 +473,9 @@
         if (!loginBtn) return;
 
         const displayName = `${user.fullName || user.fullname} (${user.department || user.area})`;
-        const initials = getUserInitials(user.fullName || user.fullname);
+        const initials = (typeof window.getUserInitials === 'function') 
+            ? window.getUserInitials(user.fullName || user.fullname) 
+            : (user.fullName || 'QA').slice(0, 2).toUpperCase();
         const avatarUrl = user.avatar || user.image;
         const qaRole = user.qaRole || user.role;
 
@@ -685,7 +579,7 @@
         `;
     }
 
-    function syncWithUserTable(user) {
+    function syncWithUserTableFallback(user) {
         if (typeof window.qaUsersList !== 'undefined' && Array.isArray(window.qaUsersList)) {
             const existingIdx = window.qaUsersList.findIndex(u => u.id.toLowerCase() === user.username.toLowerCase());
             const avatarUrl = user.avatar || user.image || CONFIG.defaultAvatar;
@@ -725,6 +619,8 @@
         modal.id = 'qa-admin-master-modal';
         modal.className = 'fixed inset-0 z-[100000] bg-dark-900/90 backdrop-blur-2xl hidden items-center justify-center p-4 overflow-y-auto font-sans transition-all duration-300';
         
+        const totalUsersCount = (typeof window.getUserCount === 'function') ? window.getUserCount() : safeGetAllUsers().length;
+
         modal.innerHTML = `
             <div id="qa-admin-master-box" class="bg-dark-500 w-full max-w-5xl rounded-3xl shadow-[0_0_60px_rgba(245,158,11,0.3)] border-2 border-amber-500/60 overflow-hidden my-8 transform scale-95 transition-all duration-300 flex flex-col max-h-[88vh]">
                 <!-- Header -->
@@ -749,7 +645,7 @@
                 <!-- Admin Tab Switcher -->
                 <div class="flex items-center gap-2 p-3 bg-dark-700/80 border-b border-slate-800 overflow-x-auto no-scrollbar">
                     <button onclick="window.QAAuthEngine.switchAdminTab('users')" id="adm-tab-btn-users" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-amber-500 text-dark-900 shadow transition-all whitespace-nowrap flex items-center gap-2">
-                        <i class="fas fa-users-cog"></i> 1. Personnel & Role Governance (${getUserCount()})
+                        <i class="fas fa-users-cog"></i> 1. Personnel & Role Governance (${totalUsersCount})
                     </button>
                     <button onclick="window.QAAuthEngine.switchAdminTab('data')" id="adm-tab-btn-data" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-dark-900 text-slate-300 hover:text-white border border-slate-800 transition-all whitespace-nowrap flex items-center gap-2">
                         <i class="fas fa-database"></i> 2. Module Database Master Control
@@ -771,7 +667,7 @@
                                 <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-xs"></i>
                                 <input type="text" id="adm-user-search" oninput="window.QAAuthEngine.handleAdminUserSearch(this.value)" placeholder="Filter staff by name or ID..." class="w-full bg-dark-900 border border-slate-700 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 outline-none focus:border-amber-400">
                             </div>
-                            <span class="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20 shrink-0">Admins: ${getAllAdmins().length}</span>
+                            <span id="adm-admin-count-badge" class="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20 shrink-0">Admins: --</span>
                         </div>
                     </div>
                     
@@ -854,8 +750,11 @@
         const tbody = document.getElementById('adm-user-table-body');
         if (!tbody) return;
 
-        let users = getAllUsers();
-        if (adminUserSearchQuery.trim() !== '') {
+        let users = (typeof window.searchUsers === 'function' && adminUserSearchQuery.trim() !== '') 
+            ? window.searchUsers(adminUserSearchQuery)
+            : safeGetAllUsers();
+
+        if (adminUserSearchQuery.trim() !== '' && typeof window.searchUsers !== 'function') {
             const q = adminUserSearchQuery.toLowerCase();
             users = users.filter(u => 
                 (u.fullName || u.fullname || '').toLowerCase().includes(q) ||
@@ -865,6 +764,15 @@
             );
         }
 
+        // Update Admin Counter Badge
+        const adminBadge = document.getElementById('adm-admin-count-badge');
+        if (adminBadge) {
+            const adminCount = (typeof window.getAllAdmins === 'function') 
+                ? window.getAllAdmins().length 
+                : users.filter(u => u.role === 'admin' || u.qaRole === 'System Admin').length;
+            adminBadge.innerText = `Admins: ${adminCount}`;
+        }
+
         if (users.length === 0) {
             tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-500">No personnel matching search filter.</td></tr>`;
             return;
@@ -872,7 +780,9 @@
 
         tbody.innerHTML = users.map(u => {
             const isAdmin = u.role === 'admin' || u.qaRole === 'System Admin' || u.username === 'admin';
-            const initials = getUserInitials(u.fullName || u.fullname);
+            const initials = (typeof window.getUserInitials === 'function') 
+                ? window.getUserInitials(u.fullName || u.fullname) 
+                : (u.fullName || 'QA').slice(0, 2).toUpperCase();
             const avatarUrl = u.avatar || u.image;
 
             return `
@@ -998,16 +908,17 @@
             const passwordInput = document.getElementById('login-password').value;
             const errorMsg = document.getElementById('login-error-msg');
 
-            let user = getUserProfile(usernameInput);
-            if (!user) {
-                const users = getAllUsers();
-                user = users.find(u => u.username.toLowerCase() === usernameInput.toLowerCase());
-            }
+            let user = safeGetUserProfile(usernameInput);
 
             if (user && user.password === passwordInput) {
                 errorMsg.classList.add('hidden');
                 user.lastLogin = new Date().toISOString();
-                updateUserProfile(user.username, { lastLogin: user.lastLogin });
+                
+                if (typeof window.updateUserProfile === 'function') {
+                    window.updateUserProfile(user.username, { lastLogin: user.lastLogin });
+                } else {
+                    safeSaveAllUsers(safeGetAllUsers());
+                }
                 
                 localStorage.setItem(CONFIG.sessionKey, JSON.stringify(user));
                 grantDashboardAccess(user);
@@ -1024,6 +935,9 @@
             }
         },
 
+        /**
+         * DELEGATED REGISTRATION ENGINE: Calls window.createUser() in user.js!
+         */
         handleRegister: function (e) {
             e.preventDefault();
             const fullName = document.getElementById('reg-fullname').value.trim();
@@ -1044,7 +958,50 @@
                 return;
             }
 
-            let users = getAllUsers();
+            const avatarDataUrl = currentTempImage || CONFIG.defaultAvatar;
+
+            // 1. Check if user.js CRUD engine is available
+            if (typeof window.createUser === 'function') {
+                const res = window.createUser({
+                    username: username,
+                    password: password,
+                    fullName: fullName,
+                    email: `${username.toLowerCase()}@qualitygroup.ms`,
+                    phone: "+63 000 000 0000",
+                    age: age,
+                    gender: gender,
+                    birthday: birthday,
+                    address: address, // Residential Address
+                    department: area,
+                    role: qaRole,
+                    avatar: avatarDataUrl
+                });
+
+                if (!res.success) {
+                    errorMsg.classList.remove('hidden');
+                    errorMsg.innerText = res.error;
+                    return;
+                }
+
+                // Complete session login
+                localStorage.setItem(CONFIG.sessionKey, JSON.stringify(res.user));
+                errorMsg.classList.add('hidden');
+                grantDashboardAccess(res.user);
+
+                QAAuthModal.show({
+                    title: "Registration Verified!",
+                    message: `Account created successfully for ${fullName} (${username}). You have been granted ${qaRole} clearance for the ${area}.`,
+                    type: 'success',
+                    confirmText: 'Proceed to Portal'
+                });
+
+                e.target.reset();
+                currentTempImage = null;
+                return;
+            }
+
+            // 2. Fallback if user.js is missing or loading out of order
+            let users = safeGetAllUsers();
             if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
                 errorMsg.classList.remove('hidden');
                 errorMsg.innerText = `Inspector ID '${username}' is already registered in the QA database!`;
@@ -1053,7 +1010,6 @@
 
             const dateObj = new Date(birthday);
             const birthdateFormatted = !isNaN(dateObj.getTime()) ? dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : birthday;
-            const avatarDataUrl = currentTempImage || CONFIG.defaultAvatar;
 
             const newUser = {
                 username: username,
@@ -1078,15 +1034,10 @@
             };
 
             users.unshift(newUser);
-            saveAllUsers(users);
-
-            if (typeof window.updateUserAvatar === 'function') {
-                try { window.updateUserAvatar(username, avatarDataUrl); } catch(err) {}
-            }
+            safeSaveAllUsers(users);
 
             localStorage.setItem(CONFIG.sessionKey, JSON.stringify(newUser));
             errorMsg.classList.add('hidden');
-
             grantDashboardAccess(newUser);
             
             QAAuthModal.show({
@@ -1118,7 +1069,6 @@
             const file = event.target.files[0];
             if (!file) return;
 
-            // Validate file size (< 3 MB)
             if (file.size > 3 * 1024 * 1024) {
                 QAAuthModal.show({
                     title: "File Too Large",
@@ -1239,22 +1189,22 @@
         },
 
         adminToggleRole: function (username) {
-            const res = toggleUserRole(username);
-            if (res.success) {
-                renderAdminUserTable();
-                syncWithUserTable(res.user);
-                QAAuthModal.show({
-                    title: "Role Clearance Updated",
-                    message: `Personnel '${username}' has been updated to: ${res.user.role === 'admin' ? 'System Admin (Level 3)' : 'Regular QA Member (Level 2)'}`,
-                    type: 'info'
-                });
-            } else {
-                QAAuthModal.show({
-                    title: "Role Update Failed",
-                    message: res.error || 'Failed to update user access clearance.',
-                    type: 'error'
-                });
+            // Use user.js CRUD engine
+            if (typeof window.toggleUserRole === 'function') {
+                const res = window.toggleUserRole(username);
+                if (res.success) {
+                    QAAuthModal.show({
+                        title: "Role Clearance Updated",
+                        message: `Personnel '${username}' has been updated to: ${res.user.role === 'admin' ? 'System Admin (Level 3)' : 'Regular QA Member (Level 2)'}`,
+                        type: 'info'
+                    });
+                } else {
+                    QAAuthModal.show({ title: "Role Update Failed", message: res.error || 'Failed to update user access clearance.', type: 'error' });
+                }
+                return;
             }
+            // Fallback
+            QAAuthModal.show({ title: "Engine Missing", message: "user.js CRUD engine is not active.", type: 'warning' });
         },
 
         adminDeleteUser: function (username) {
@@ -1265,20 +1215,18 @@
                 confirmText: 'Yes, Delete Account',
                 cancelText: 'Cancel',
                 onConfirm: () => {
-                    const res = deleteUserAccount(username);
-                    if (res.success) {
-                        renderAdminUserTable();
-                        QAAuthModal.show({
-                            title: "Account Deleted",
-                            message: `User '${username}' has been removed from the directory.`,
-                            type: 'success'
-                        });
-                    } else {
-                        QAAuthModal.show({
-                            title: "Deletion Failed",
-                            message: res.error || 'Could not remove account.',
-                            type: 'error'
-                        });
+                    // Use user.js CRUD engine
+                    if (typeof window.deleteUserAccount === 'function') {
+                        const res = window.deleteUserAccount(username);
+                        if (res.success) {
+                            QAAuthModal.show({
+                                title: "Account Deleted",
+                                message: `User '${username}' has been removed from the directory.`,
+                                type: 'success'
+                            });
+                        } else {
+                            QAAuthModal.show({ title: "Deletion Failed", message: res.error || 'Could not remove account.', type: 'error' });
+                        }
                     }
                 }
             });
@@ -1327,7 +1275,7 @@
             const fullBackup = {
                 timestamp: new Date().toISOString(),
                 version: '3.0.0-ADMIN-BACKUP',
-                users: getAllUsers(),
+                users: safeGetAllUsers(),
                 mspRecords: JSON.parse(localStorage.getItem('QAMS_Product_Records_v3') || '[]'),
                 calEvents: JSON.parse(localStorage.getItem('QAMS_Calendar_Events_v1') || '[]'),
                 sopManuals: JSON.parse(localStorage.getItem('QAGroup_SOP_Manuals_v1') || '[]'),
