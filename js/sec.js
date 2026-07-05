@@ -1,23 +1,3 @@
-/**
- * ============================================================================
- * QUALITY GROUP | MS SECTION - CLIENT-SIDE SECURITY ENGINE (sec.js) v4.0
- * ============================================================================
- * Features:
- * - Mobile iOS & Android Screenshot Defense (Touch Gestures & Hardware Interrupts)
- * - Mobile Task Switcher Defense (Blanks screen in Recent Apps / App Switcher)
- * - Dynamic Forensic Watermarking Overlay (Traceable Session Protection)
- * - Anti-Screenshot Defense: Traps PrintScreen, Win+Shift+S, and Cmd+Shift+3/4/5
- * - Instant Screen Blanking: Obscures DOM for 800ms during capture attempts
- * - Clipboard Poisoning: Overwrites clipboard text on screenshot shortcut press
- * - Privacy Shield Overlay: Blurs dashboard when window loses active focus
- * - Blocks Right-Click Context Menu and iOS/Android Long-Press Callout menus
- * - Prevents Text Selection, Copying, Cutting, and Dragging (except in form inputs)
- * - Traps DevTools Shortcuts (F12, Ctrl+U, Ctrl+Shift+I/J/C, Ctrl+S, Ctrl+P)
- * - Print Protection via @media print CSS Blocker
- * - Custom High-Tech Security Violation Modal with Timer
- * - Audit Trail Logging to System LocalStorage
- * ============================================================================
- */
 
 (function () {
     'use strict';
