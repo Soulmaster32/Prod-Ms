@@ -303,7 +303,7 @@
                         <i class="fas fa-shield-check text-white text-2xl"></i>
                     </div>
                     <span class="text-[11px] font-extrabold tracking-widest text-amber-400 uppercase block mb-1">Quality Group • MS Section</span>
-                    <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">QA PORTAL GATEWAY</h2>
+                    <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Quality Group Login</h2>
                     <p class="text-xs text-slate-400 mt-1">Authenticate inspector credentials or Admin Master access to enter telemetry control.</p>
 
                     <!-- Tab Switcher -->
