@@ -3,86 +3,118 @@
  * QUALITY GROUP | MS SECTION - AUTHENTICATION & USER PORTAL ENGINE (login.js)
  * ============================================================================
  * Features:
+ * - Deeply integrated with user.js (uses AUTH_DB_KEY, getUserProfile, updateUserAvatar, etc.)
+ * - Replaced "Place of Birth" with "Residential Address" across all forms and schemas
  * - Fullscreen Gatekeeper Overlay: Restricts dashboard access until logged in
- * - Complete Registration Form: Fullname, Age, Gender, Birthday, Birthdate, Place of Birth, Area Assign
- * - HTML5 Canvas Image Uploader: Compresses profile pictures to Base64 safely
+ * - Complete Registration Form: FullName, Age, Gender, Birthday, Birthdate, Address, Area Assign
+ * - HTML5 Canvas Image Uploader: Compresses profile avatars to Base64 safely
  * - Live DOM Integration: Updates Navbar with User Profile, Avatar, & Logout button
- * - Syncs with user.js & qaUsersList: Auto-adds registered users to the active table
+ * - Syncs with user.js & index.html qaUsersList: Auto-adds users to active plant tables
  * - LocalStorage Persistence: Keeps users logged in across page reloads
- * - Pre-seeded Default Accounts for instant testing
  * ============================================================================
  */
 
 (function () {
     'use strict';
 
+    // Bridge Database Key with user.js (defaults to QAMS_Users_DB if user.js hasn't loaded yet)
+    window.AUTH_DB_KEY = window.AUTH_DB_KEY || 'QAMS_Users_DB_v1';
+
     const CONFIG = {
         sessionKey: 'QAMS_Active_Session_v1',
-        usersKey: 'QAMS_Registered_Users_v1',
-        defaultImage: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2338bdf8"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>'
+        defaultAvatar: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2338bdf8"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>'
     };
 
-    // Pre-seed default accounts matching index.html table for instant testing
+    // Pre-seed default accounts matching index.html & user.js schemas for instant testing
     const DEFAULT_USERS = [
         {
             username: "QA-MS-001",
             password: "admin",
+            fullName: "Engr. Santos, M.",
             fullname: "Engr. Santos, M.",
+            email: "msantos@qualitygroup.ms",
+            phone: "+63 917 555 0101",
             age: 34,
             gender: "Male",
             birthday: "1992-05-14",
             birthdate: "May 14, 1992",
-            birthplace: "Davao City, Philippines",
+            address: "Block 4, MS Industrial Hub, Davao City, Philippines", // Replaced Place of Birth
             area: "All MS Section Areas",
-            role: "Lead QA Inspector",
-            image: CONFIG.defaultImage
+            department: "All MS Section Areas", // Mapped for user.js
+            role: "admin",                      // Mapped for user.js admin functions
+            qaRole: "Lead QA Inspector",
+            avatar: CONFIG.defaultAvatar,       // Mapped for user.js
+            image: CONFIG.defaultAvatar,        // Mapped for index.html
+            joinDate: "2026-01-15T08:00:00.000Z"
         },
         {
             username: "admin",
             password: "admin",
+            fullName: "Lead System Administrator",
             fullname: "Lead System Administrator",
+            email: "admin@qualitygroup.ms",
+            phone: "+63 82 555 0198",
             age: 30,
             gender: "Female",
             birthday: "1996-08-20",
             birthdate: "August 20, 1996",
-            birthplace: "Manila, Philippines",
+            address: "Executive Quarters, Plant Site, Philippines",
             area: "DCS Control Room",
-            role: "System Admin",
-            image: CONFIG.defaultImage
+            department: "DCS Control Room",
+            role: "admin",
+            qaRole: "System Admin",
+            avatar: CONFIG.defaultAvatar,
+            image: CONFIG.defaultAvatar,
+            joinDate: "2026-01-01T08:00:00.000Z"
         }
     ];
 
     let currentTempImage = null;
 
     /**
-     * Initialize Auth Engine
+     * Initialize Auth & User Engine
      */
     function initAuth() {
-        seedDefaultUsers();
+        seedDefaultDatabase();
         injectAuthPortal();
         checkActiveSession();
-        console.log('%c🔐 QA MS Section Auth & Login Engine Initialized', 'background: #2563eb; color: #fff; font-weight: bold; padding: 4px 8px; border-radius: 4px;');
+        console.log('%c🔐 QA MS Section Auth & user.js Integration Initialized', 'background: #2563eb; color: #fff; font-weight: bold; padding: 4px 8px; border-radius: 4px;');
     }
 
     /**
-     * Pre-seed default accounts into localStorage if empty
+     * Helper: Fetch all users from database (interacts with user.js if loaded)
      */
-    function seedDefaultUsers() {
-        let users = getRegisteredUsers();
-        if (users.length === 0) {
-            localStorage.setItem(CONFIG.usersKey, JSON.stringify(DEFAULT_USERS));
+    function fetchAllUsers() {
+        if (typeof window.getAllUsers === 'function') {
+            return window.getAllUsers();
+        }
+        try {
+            const data = localStorage.getItem(window.AUTH_DB_KEY);
+            const parsed = data ? JSON.parse(data) : null;
+            return parsed && Array.isArray(parsed.users) ? parsed.users : [];
+        } catch (e) {
+            return [];
         }
     }
 
     /**
-     * Get all registered users from storage
+     * Helper: Save users array back to database in user.js format { users: [] }
      */
-    function getRegisteredUsers() {
+    function saveAllUsers(usersArray) {
         try {
-            const data = localStorage.getItem(CONFIG.usersKey);
-            return data ? JSON.parse(data) : [];
+            localStorage.setItem(window.AUTH_DB_KEY, JSON.stringify({ users: usersArray }));
         } catch (e) {
-            return [];
+            console.warn('Could not save to user.js database:', e);
+        }
+    }
+
+    /**
+     * Pre-seed default database if empty
+     */
+    function seedDefaultDatabase() {
+        let users = fetchAllUsers();
+        if (users.length === 0) {
+            saveAllUsers(DEFAULT_USERS);
         }
     }
 
@@ -141,7 +173,7 @@
         // Update Navbar with logged-in user profile
         updateNavbarProfile(user);
 
-        // Auto-sync with index.html / user.js qaUsersList table
+        // Auto-sync with index.html user table (qaUsersList / user.js)
         syncWithUserTable(user);
     }
 
@@ -219,7 +251,7 @@
                     </div>
                 </div>
 
-                <!-- TAB 2: REGISTRATION FORM -->
+                <!-- TAB 2: REGISTRATION FORM (Updated Place of Birth -> Residential Address) -->
                 <div id="auth-tab-register" class="p-6 sm:p-8 relative z-10 hidden animate-fadeIn max-h-[70vh] overflow-y-auto no-scrollbar">
                     <form onsubmit="window.QAAuthEngine.handleRegister(event)" class="space-y-4">
                         
@@ -230,13 +262,13 @@
                             </div>
                             <div class="flex-1 text-center sm:text-left">
                                 <label class="block text-xs font-bold text-white mb-1">Profile Photo / Avatar</label>
-                                <p class="text-[11px] text-slate-400 mb-2">Upload a clear ID photo (Auto-compressed to Base64).</p>
+                                <p class="text-[11px] text-slate-400 mb-2">Upload a clear ID photo (Auto-compressed to Base64 for user.js).</p>
                                 <input type="file" id="reg-image-file" accept="image/*" onchange="window.QAAuthEngine.previewImage(event)" 
                                     class="text-[11px] text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-royalblue-600 file:text-white hover:file:bg-royalblue-500 cursor-pointer w-full">
                             </div>
                         </div>
 
-                        <!-- Row 1: Fullname & Inspector ID -->
+                        <!-- Row 1: FullName & Inspector ID -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Full Name *</label>
@@ -273,10 +305,10 @@
                             </div>
                         </div>
 
-                        <!-- Row 3: Place of Birth -->
+                        <!-- Row 3: Residential Address (REPLACED Place of Birth) -->
                         <div>
-                            <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Place of Birth *</label>
-                            <input type="text" id="reg-birthplace" required placeholder="e.g., Davao City, Philippines" 
+                            <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Residential Address *</label>
+                            <input type="text" id="reg-address" required placeholder="e.g., Block 4, MS Industrial Zone, Davao City, Philippines" 
                                 class="w-full bg-dark-700 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 outline-none focus:border-sky-500">
                         </div>
 
@@ -339,31 +371,35 @@
      * Update Navbar in index.html to show User Profile & Logout Button
      */
     function updateNavbarProfile(user) {
-        // Find existing Portal Login button or header right section
         const loginBtn = document.querySelector('header button[onclick*="loginModal"]');
         if (!loginBtn) return;
 
         const container = loginBtn.parentElement;
         if (!container) return;
 
+        // Use user.js formatting functions if available
+        const displayName = typeof window.formatUserDisplayName === 'function' ? window.formatUserDisplayName(user) : `${user.fullName || user.fullname} (${user.department || user.area})`;
+        const initials = typeof window.getUserInitials === 'function' ? window.getUserInitials(user.fullName || user.fullname) : (user.fullName || '??').slice(0, 2).toUpperCase();
+        const avatarUrl = user.avatar || user.image;
+        const qaRole = user.qaRole || user.role;
+
         // Create Profile Widget
         const profileWidget = document.createElement('div');
         profileWidget.id = 'qa-navbar-user-profile';
         profileWidget.className = 'flex items-center gap-3 bg-dark-700/80 border border-slate-700 px-3.5 py-1.5 rounded-2xl shadow-inner animate-fadeIn';
         
-        // Determine area badge color
-        const badgeColor = user.role.includes('Lead') ? 'text-sky-400 bg-sky-500/10 border-sky-500/20' :
-                           user.role.includes('Admin') ? 'text-amber-400 bg-amber-500/10 border-amber-500/20' :
-                           user.role.includes('Chemist') ? 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20' :
+        const badgeColor = qaRole.includes('Lead') ? 'text-sky-400 bg-sky-500/10 border-sky-500/20' :
+                           qaRole.includes('Admin') || qaRole === 'admin' ? 'text-amber-400 bg-amber-500/10 border-amber-500/20' :
+                           qaRole.includes('Chemist') ? 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20' :
                            'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
 
         profileWidget.innerHTML = `
-            <div class="w-8 h-8 rounded-full overflow-hidden border border-sky-400/50 bg-slate-800 shrink-0 flex items-center justify-center">
-                ${user.image ? `<img src="${user.image}" alt="Avatar" class="w-full h-full object-cover">` : `<span class="text-xs font-bold text-sky-400">${user.fullname.slice(0,2).toUpperCase()}</span>`}
+            <div class="w-8 h-8 rounded-full overflow-hidden border border-sky-400/50 bg-slate-800 shrink-0 flex items-center justify-center font-bold text-xs text-sky-400">
+                ${avatarUrl ? `<img src="${avatarUrl}" alt="${initials}" class="w-full h-full object-cover">` : initials}
             </div>
             <div class="hidden sm:block text-left leading-tight">
-                <span class="text-xs font-bold text-white block truncate max-w-[130px]">${user.fullname}</span>
-                <span class="text-[10px] font-semibold ${badgeColor} px-1.5 py-0.2 rounded border inline-block mt-0.5">${user.role}</span>
+                <span class="text-xs font-bold text-white block truncate max-w-[140px]" title="${displayName}">${user.fullName || user.fullname}</span>
+                <span class="text-[10px] font-semibold ${badgeColor} px-1.5 py-0.2 rounded border inline-block mt-0.5">${qaRole}</span>
             </div>
             <!-- Logout Button -->
             <button onclick="window.QAAuthEngine.handleLogout()" title="Logout of QA Portal" 
@@ -372,19 +408,22 @@
             </button>
         `;
 
-        // Replace login button with profile widget
         loginBtn.replaceWith(profileWidget);
 
-        // Also update existing login modal to act as profile modal if clicked anywhere else
+        // Update existing login modal in index.html to act as profile modal
         overrideExistingLoginModal(user);
     }
 
     /**
-     * Override existing index.html loginModal so it doesn't conflict
+     * Override existing index.html loginModal (Updated to show ADDRESS)
      */
     function overrideExistingLoginModal(user) {
         const modalContent = document.getElementById('loginContent');
         if (!modalContent) return;
+
+        const avatarUrl = user.avatar || user.image || CONFIG.defaultAvatar;
+        const qaRole = user.qaRole || user.role;
+        const areaAssigned = user.department || user.area;
 
         modalContent.innerHTML = `
             <div class="bg-gradient-to-r from-royalblue-600/20 to-sky-500/10 p-5 border-b border-slate-800 flex justify-between items-center">
@@ -401,20 +440,25 @@
                     <i class="fas fa-times text-base"></i>
                 </button>
             </div>
-            <div class="p-6 text-center space-y-4">
+            <div class="p-6 text-center space-y-4 font-sans">
                 <div class="w-20 h-20 rounded-full mx-auto overflow-hidden border-2 border-sky-400 bg-slate-800 shadow-lg">
-                    <img src="${user.image || CONFIG.defaultImage}" alt="Avatar" class="w-full h-full object-cover">
+                    <img src="${avatarUrl}" alt="Avatar" class="w-full h-full object-cover">
                 </div>
                 <div>
-                    <h4 class="text-lg font-black text-white">${user.fullname}</h4>
-                    <span class="text-xs text-sky-400 font-mono block">${user.username} &bull; ${user.role}</span>
+                    <h4 class="text-lg font-black text-white">${user.fullName || user.fullname}</h4>
+                    <span class="text-xs text-sky-400 font-mono block">${user.username} &bull; ${qaRole}</span>
                     <span class="inline-block mt-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-bold">
-                        <i class="fas fa-map-marker-alt mr-1"></i> Assigned: ${user.area}
+                        <i class="fas fa-map-marker-alt mr-1"></i> Assigned: ${areaAssigned}
                     </span>
                 </div>
                 <div class="grid grid-cols-2 gap-2 pt-2 text-left text-xs bg-dark-700 p-3 rounded-xl border border-slate-800 text-slate-300">
                     <div><span class="text-slate-500 block text-[10px]">AGE / GENDER</span><strong>${user.age || 'N/A'} yrs &bull; ${user.gender || 'N/A'}</strong></div>
                     <div><span class="text-slate-500 block text-[10px]">BIRTHDATE</span><strong>${user.birthdate || user.birthday || 'N/A'}</strong></div>
+                </div>
+                <!-- Display Residential Address -->
+                <div class="text-left text-xs bg-dark-700 p-3 rounded-xl border border-slate-800 text-slate-300">
+                    <span class="text-slate-500 block text-[10px]">RESIDENTIAL ADDRESS</span>
+                    <strong class="text-white block mt-0.5">${user.address || 'Executive Quarters, Plant Site, Philippines'}</strong>
                 </div>
                 <button onclick="window.QAAuthEngine.handleLogout()" 
                     class="w-full py-3 bg-gradient-to-r from-rose-600 to-amber-500 hover:from-rose-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2 mt-4">
@@ -426,27 +470,32 @@
     }
 
     /**
-     * Auto-sync registered user with index.html user table (qaUsersList / user.js)
+     * Auto-sync registered user with index.html user table & user.js
      */
     function syncWithUserTable(user) {
         if (typeof window.qaUsersList !== 'undefined' && Array.isArray(window.qaUsersList)) {
             const existingIdx = window.qaUsersList.findIndex(u => u.id.toLowerCase() === user.username.toLowerCase());
+            const avatarUrl = user.avatar || user.image || CONFIG.defaultAvatar;
+            const qaRole = user.qaRole || user.role || "Lead QA Inspector";
+            const areaAssigned = user.department || user.area || "All MS Section Areas";
+
             if (existingIdx > -1) {
                 window.qaUsersList[existingIdx].status = "Active / On-Shift";
-                window.qaUsersList[existingIdx].image = user.image;
+                window.qaUsersList[existingIdx].image = avatarUrl;
+                window.qaUsersList[existingIdx].role = qaRole;
+                window.qaUsersList[existingIdx].area = areaAssigned;
             } else {
                 window.qaUsersList.unshift({
                     id: user.username,
-                    name: user.fullname,
-                    role: user.role || "Lead QA Inspector",
-                    area: user.area || "All MS Section Areas",
+                    name: user.fullName || user.fullname,
+                    role: qaRole,
+                    area: areaAssigned,
                     shift: "Day Shift (08:00 - 17:00)",
                     clearance: "Level 3 (Full DCS & Audit)",
                     status: "Active / On-Shift",
-                    image: user.image || CONFIG.defaultImage
+                    image: avatarUrl
                 });
             }
-            // Trigger table re-render if function exists
             if (typeof window.renderUserTable === 'function') window.renderUserTable();
             if (typeof window.updateUserKPIs === 'function') window.updateUserKPIs();
         }
@@ -481,7 +530,7 @@
         },
 
         /**
-         * Handle Login Form Submission
+         * Handle Login Form Submission (Interacts with user.js getUserProfile)
          */
         handleLogin: function (e) {
             e.preventDefault();
@@ -489,14 +538,22 @@
             const passwordInput = document.getElementById('login-password').value;
             const errorMsg = document.getElementById('login-error-msg');
 
-            const users = getRegisteredUsers();
-            const user = users.find(u => u.username.toLowerCase() === usernameInput.toLowerCase() && u.password === passwordInput);
+            // 1. Check using user.js getUserProfile() if available, else fallback to local fetch
+            let user = null;
+            if (typeof window.getUserProfile === 'function') {
+                user = window.getUserProfile(usernameInput);
+            }
+            if (!user) {
+                const users = fetchAllUsers();
+                user = users.find(u => u.username.toLowerCase() === usernameInput.toLowerCase());
+            }
 
-            if (user) {
+            // Verify password
+            if (user && user.password === passwordInput) {
                 errorMsg.classList.add('hidden');
                 localStorage.setItem(CONFIG.sessionKey, JSON.stringify(user));
                 grantDashboardAccess(user);
-                alert(`Welcome back, ${user.fullname}! QA clearance verified.`);
+                alert(`Welcome back, ${user.fullName || user.fullname}! QA clearance verified.`);
             } else {
                 errorMsg.classList.remove('hidden');
                 errorMsg.innerText = "Invalid Inspector ID or Password. Please try again or register.";
@@ -504,18 +561,18 @@
         },
 
         /**
-         * Handle Registration Form Submission
+         * Handle Registration Form Submission (Saved with ADDRESS and user.js schema)
          */
         handleRegister: function (e) {
             e.preventDefault();
-            const fullname = document.getElementById('reg-fullname').value.trim();
+            const fullName = document.getElementById('reg-fullname').value.trim();
             const username = document.getElementById('reg-username').value.trim();
             const age = parseInt(document.getElementById('reg-age').value, 10);
             const gender = document.getElementById('reg-gender').value;
             const birthday = document.getElementById('reg-birthday').value;
-            const birthplace = document.getElementById('reg-birthplace').value.trim();
+            const address = document.getElementById('reg-address').value.trim(); // REPLACED Place of Birth
             const area = document.getElementById('reg-area').value;
-            const role = document.getElementById('reg-role').value;
+            const qaRole = document.getElementById('reg-role').value;
             const password = document.getElementById('reg-password').value;
             const confirmPass = document.getElementById('reg-confirm-password').value;
             const errorMsg = document.getElementById('reg-error-msg');
@@ -526,41 +583,55 @@
                 return;
             }
 
-            let users = getRegisteredUsers();
+            // Check if username already exists via user.js or local fetch
+            let users = fetchAllUsers();
             if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
                 errorMsg.classList.remove('hidden');
                 errorMsg.innerText = `Inspector ID '${username}' is already registered in the QA database!`;
                 return;
             }
 
-            // Format readable birthdate
             const dateObj = new Date(birthday);
             const birthdateFormatted = !isNaN(dateObj.getTime()) ? dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : birthday;
+            const avatarDataUrl = currentTempImage || CONFIG.defaultAvatar;
 
+            // Build dual-compatible user object (works seamlessly for both login.js, index.html, and user.js)
             const newUser = {
-                username,
-                password,
-                fullname,
-                age,
-                gender,
-                birthday,
+                username: username,
+                password: password,
+                fullName: fullName,          // Required by user.js
+                fullname: fullName,          // Required by index.html legacy
+                email: `${username.toLowerCase()}@qualitygroup.ms`,
+                phone: "+63 000 000 0000",
+                age: age,
+                gender: gender,
+                birthday: birthday,
                 birthdate: birthdateFormatted,
-                birthplace,
-                area,
-                role,
-                image: currentTempImage || CONFIG.defaultImage
+                address: address,            // Replaced Place of Birth
+                area: area,                  // Mapped for index.html
+                department: area,            // Mapped for user.js getUsersByDepartment()
+                role: qaRole === 'System Admin' ? 'admin' : 'member', // Mapped for user.js admin checks
+                qaRole: qaRole,              // Specific QA role
+                avatar: avatarDataUrl,       // Required by user.js updateUserAvatar()
+                image: avatarDataUrl,        // Mapped for index.html
+                joinDate: new Date().toISOString() // Required by user.js getUserStats()
             };
 
-            // Save to registered users array
+            // Save to database
             users.unshift(newUser);
-            localStorage.setItem(CONFIG.usersKey, JSON.stringify(users));
+            saveAllUsers(users);
 
-            // Automatically log in the newly registered user
+            // If user.js has updateUserAvatar, invoke it to ensure deep sync
+            if (typeof window.updateUserAvatar === 'function') {
+                try { window.updateUserAvatar(username, avatarDataUrl); } catch(err) {}
+            }
+
+            // Automatically log in
             localStorage.setItem(CONFIG.sessionKey, JSON.stringify(newUser));
             errorMsg.classList.add('hidden');
 
             grantDashboardAccess(newUser);
-            alert(`Registration successful! Account created for ${fullname} (${username}). You are now logged in.`);
+            alert(`Registration successful! Account created for ${fullName} (${username}). You are now logged in.`);
             e.target.reset();
             currentTempImage = null;
         },
@@ -571,23 +642,21 @@
         handleLogout: function () {
             if (confirm("Are you sure you want to log out of the QA Portal and lock dashboard access?")) {
                 localStorage.removeItem(CONFIG.sessionKey);
-                
-                // Re-inject Portal Login button if needed by reloading or restoring
                 window.location.reload();
             }
         },
 
         /**
-         * Preview & Compress Profile Image using Canvas
+         * Preview & Compress Profile Image using HTML5 Canvas
          */
         previewImage: function (event) {
             const file = event.target.files[0];
             if (!file) return;
-const reader = new FileReader();
+
+            const reader = new FileReader();
             reader.onload = function (readerEvent) {
                 const img = new Image();
                 img.onload = function () {
-                    // HTML5 Canvas compression to resize image to max 200x200
                     const canvas = document.createElement('canvas');
                     const MAX_WIDTH = 200;
                     const MAX_HEIGHT = 200;
@@ -611,11 +680,9 @@ const reader = new FileReader();
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Compress to JPEG Base64 at 80% quality to protect LocalStorage quota
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
                     currentTempImage = dataUrl;
 
-                    // Update DOM Previewer
                     const previewBox = document.getElementById('reg-avatar-preview');
                     if (previewBox) {
                         previewBox.innerHTML = `<img src="${dataUrl}" alt="Avatar Preview" class="w-full h-full object-cover">`;
