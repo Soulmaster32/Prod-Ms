@@ -12,7 +12,7 @@
         enablePrivacyShield: true,          // Blur screen when window loses focus (blocks Snipping Tool & Mobile App Switcher)
         clipboardPoisoning: true,           // Overwrite clipboard text when screenshot key is pressed
         enableForensicWatermark: true,      // Display subtle diagonal watermark across portal (Anti-Leak deterrent)
-        watermarkText: 'CONFIDENTIAL • MS SECTION QA • DO NOT CAPTURE'
+        watermarkText: 'Production / MS Section'
     };
 
     let isUnlocked = false;
