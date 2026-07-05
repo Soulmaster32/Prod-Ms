@@ -1,13 +1,22 @@
 
+/**
+ * ============================================================================
+ * MS SECTION - PRODUCT QUALITY ASSURANCE & SPEC MANAGEMENT MODULE (v3.1)
+ * ============================================================================
+ * Centralized telemetry monitoring, monthly production compliance matrices,
+ * SOP manuals, and YTD incident investigations for Mixed Sulphide operations.
+ */
+
 (function (window, document) {
     'use strict';
 
     // ========================================================================
     // 1. STORAGE KEYS & EXACT BULLETIN BOARD DATA STRUCTURES
     // ========================================================================
-    const STORAGE_KEY = 'QAMS_Product_Records_v3';
-    const HISTORY_KEY = 'QAMS_Product_History_v3';
-    const BOARD_KEY   = 'QAMS_Board_Data_v3';
+    const STORAGE_KEY = 'QAMS_Product_Records_v3_1';
+    const HISTORY_KEY = 'QAMS_Product_History_v3_1';
+    const BOARD_KEY   = 'QAMS_Board_Data_v3_1';
+    const SEED_FLAG   = 'QAMS_Seed_Init_v3_1';
 
     // Default seed data extracted precisely from the attached plant images
     const defaultBoardData = {
@@ -487,7 +496,7 @@
         { id: 'LOG-4', timestamp: '2026-06-15 09:00', action: 'Updated Document QAMS-2026-SOP01', user: 'QA Documentation Team', details: 'Published SOP-MS-101 Revision 4.3.' }
     ];
 
-    // State Management Object with LocalStorage Persistence & Automatic Dataset Upgrader
+    // State Management Object with LocalStorage Persistence & Version-Safe Seed Upgrader
     const Store = {
         getBoardData: () => {
             const stored = localStorage.getItem(BOARD_KEY);
@@ -498,11 +507,15 @@
         },
         getRecords: () => {
             const stored = localStorage.getItem(STORAGE_KEY);
+            const isInitialized = localStorage.getItem(SEED_FLAG) === 'true';
             let records = stored ? JSON.parse(stored) : null;
-            // Upgrade check: If stored records are fewer than 15 (from an older seed version), automatically upgrade to our 23 comprehensive multi-area records!
-            if (!records || !Array.isArray(records) || records.length < 15) {
+
+            // BUG FIX: Only seed if never initialized before or storage is corrupt.
+            // This prevents user-deleted records from being overridden on refresh!
+            if (!isInitialized || !records || !Array.isArray(records)) {
                 records = defaultRecords;
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+                localStorage.setItem(SEED_FLAG, 'true');
             }
             return records;
         },
@@ -539,11 +552,26 @@
         searchQuery: '',
         filterArea: 'All Areas',
         filterStatus: 'all',
+        
+        // Memory states to prevent HTML quotation attribute parsing errors
+        _currentFormAttachments: [],
+        _tempImportDataset: null,
 
         init: function () {
             this.injectPortalContainer();
+            this.setupGlobalListeners();
             this.render();
-            console.log('✅ MS Section - Product Quality Module successfully initialized with 23 multi-area records.');
+            console.log('✅ MS Section - Product Quality Module (v3.1) successfully initialized with 23 multi-area records.');
+        },
+
+        setupGlobalListeners: function () {
+            // Global Escape key listener to close modals gracefully
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    const modal = document.getElementById('qams-modal');
+                    if (modal) this.closeModal();
+                }
+            });
         },
 
         // Called by external index.html navigation links (preserves keyword/boardTab if passed)
@@ -565,7 +593,7 @@
             if (portal) portal.scrollIntoView({ behavior: 'smooth', block: 'start' });
         },
 
-        // Called when clicking internal category tab buttons or KPI summary boxes (automatically clears search/filters to prevent hidden data)
+        // Called when clicking internal category tab buttons or KPI summary boxes
         switchCategory: function (category = 'all') {
             if (category === 'analysis') category = 'product_quality';
             this.activeTab = category;
@@ -577,7 +605,7 @@
             if (portal) portal.scrollIntoView({ behavior: 'smooth', block: 'start' });
         },
 
-        // Switch Bulletin Board tabs (Matrix, Scorecard, Reprocess) and reset table filters so all data is visible
+        // Switch Bulletin Board tabs (Matrix, Scorecard, Reprocess) and reset filters
         switchBoardTab: function (tab) {
             this.activeBoardTab = tab;
             this.currentBoardTab = tab;
@@ -644,7 +672,7 @@
             }
         },
 
-        // Robust filter engine with smart month keyword matching
+        // Robust filter engine with comprehensive text indexing and smart month matching
         getFilteredRecords: function () {
             let records = Store.getRecords();
 
@@ -662,32 +690,45 @@
 
             if (this.searchQuery && this.searchQuery.trim() !== '') {
                 const q = this.searchQuery.toLowerCase().trim();
-                records = records.filter(r =>
-                    (r.title && r.title.toLowerCase().includes(q)) ||
-                    (r.area && r.area.toLowerCase().includes(q)) ||
-                    (r.reporter && r.reporter.toLowerCase().includes(q)) ||
-                    (r.description && r.description.toLowerCase().includes(q)) ||
-                    (r.id && r.id.toLowerCase().includes(q)) ||
-                    (r.metricName && r.metricName.toLowerCase().includes(q)) ||
-                    (r.metricValue && r.metricValue.toLowerCase().includes(q)) ||
-                    (r.date && r.date.toLowerCase().includes(q)) ||
-                    (r.category && r.category.toLowerCase().includes(q)) ||
-                    this.matchMonthKeyword(r, q)
-                );
+                records = records.filter(r => {
+                    const attText = (r.attachments || []).map(a => a.name).join(' ').toLowerCase();
+                    return (r.title && r.title.toLowerCase().includes(q)) ||
+                           (r.area && r.area.toLowerCase().includes(q)) ||
+                           (r.reporter && r.reporter.toLowerCase().includes(q)) ||
+                           (r.description && r.description.toLowerCase().includes(q)) ||
+                           (r.capa && r.capa.toLowerCase().includes(q)) ||
+                           (r.id && r.id.toLowerCase().includes(q)) ||
+                           (r.metricName && r.metricName.toLowerCase().includes(q)) ||
+                           (r.metricValue && r.metricValue.toLowerCase().includes(q)) ||
+                           (r.date && r.date.toLowerCase().includes(q)) ||
+                           (r.category && r.category.toLowerCase().includes(q)) ||
+                           attText.includes(q) ||
+                           this.matchMonthKeyword(r, q);
+                });
             }
             return records;
         },
 
+        // Enhanced month matching supporting full names ("January"), short codes ("JAN"), and years
         matchMonthKeyword: function (record, q) {
             const monthsMap = {
-                'jan': '01', 'feb': '02', 'mar': '03', 'apr': '04', 'may': '05', 'jun': '06',
-                'jul': '07', 'aug': '08', 'sep': '09', 'oct': '10', 'nov': '11', 'dec': '12'
+                'jan': '01', 'january': '01',
+                'feb': '02', 'february': '02',
+                'mar': '03', 'march': '03',
+                'apr': '04', 'april': '04',
+                'may': '05',
+                'jun': '06', 'june': '06',
+                'jul': '07', 'july': '07',
+                'aug': '08', 'august': '08',
+                'sep': '09', 'september': '09',
+                'oct': '10', 'october': '10',
+                'nov': '11', 'november': '11',
+                'dec': '12', 'december': '12'
             };
-            if (monthsMap[q]) {
-                const monthNum = monthsMap[q];
-                return (record.date && record.date.split('-')[1] === monthNum) ||
-                       (record.title && record.title.toLowerCase().includes(q)) ||
-                       (record.id && record.id.toLowerCase().includes(q));
+
+            const monthNum = monthsMap[q];
+            if (monthNum && record.date) {
+                return record.date.split('-')[1] === monthNum;
             }
             return false;
         },
@@ -796,7 +837,7 @@
                         ${this.renderBoardContent(board)}
                     </div>
 
-                    <!-- KPI Statistics Cards (Clicking calls switchCategory to show full category data) -->
+                    <!-- KPI Statistics Cards -->
                     <div id="qams-grid-section" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
                         <div onclick="QAMSProduct.switchCategory('all')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'all' ? 'border-sky-400 ring-1 ring-sky-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
                             <span class="text-[11px] font-bold text-slate-400 uppercase block">Total Records</span>
@@ -883,7 +924,7 @@
                         </div>
                     </div>
 
-                    <!-- Active Filter Banner (Prevents any confusion about hidden data!) -->
+                    <!-- Active Filter Banner -->
                     ${hasActiveFilter ? `
                         <div class="bg-gradient-to-r from-royalblue-900/60 via-dark-700 to-dark-700 p-3.5 rounded-xl border border-sky-500/40 mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fadeIn shadow-lg">
                             <div class="flex items-center gap-2 flex-wrap text-xs">
@@ -1274,8 +1315,8 @@
                         </span>
                     </td>
                     <td class="py-3.5 px-4 max-w-xs">
-                        <div class="font-bold text-white text-sm truncate group-hover:text-sky-300 transition-colors cursor-pointer" onclick="QAMSProduct.viewDetails('${r.id}')" title="${r.title}">${r.title}</div>
-                        <div class="text-[11px] text-slate-400 truncate mt-0.5" title="${r.description}">${r.description}</div>
+                        <div class="font-bold text-white text-sm truncate group-hover:text-sky-300 transition-colors cursor-pointer" onclick="QAMSProduct.viewDetails('${r.id}')" title="${this.escapeHtml(r.title)}">${this.escapeHtml(r.title)}</div>
+                        <div class="text-[11px] text-slate-400 truncate mt-0.5" title="${this.escapeHtml(r.description)}">${this.escapeHtml(r.description)}</div>
                         ${r.attachments && r.attachments.length > 0 ? `<span class="inline-flex items-center gap-1 text-[10px] text-sky-400 mt-1"><i class="fas fa-paperclip"></i> ${r.attachments.length} attachment(s)</span>` : ''}
                     </td>
                     <td class="py-3.5 px-4 whitespace-nowrap">
@@ -1517,7 +1558,7 @@
                                         <span class="text-xs font-bold text-sky-400 uppercase tracking-wider">${r.id}</span>
                                         <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">${(r.category === 'analysis' ? 'product_quality' : r.category).toUpperCase().replace('_', ' ')}</span>
                                     </div>
-                                    <h3 class="text-base sm:text-lg font-bold text-white truncate max-w-md">${r.title}</h3>
+                                    <h3 class="text-base sm:text-lg font-bold text-white truncate max-w-md">${this.escapeHtml(r.title)}</h3>
                                 </div>
                             </div>
                             <button onclick="QAMSProduct.closeModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
@@ -1528,7 +1569,7 @@
                         <div class="p-6 space-y-5 overflow-y-auto font-sans text-xs sm:text-sm">
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 bg-dark-700 rounded-xl border border-slate-800">
                                 <div><span class="text-[11px] text-slate-400 block uppercase font-bold">Plant Area</span><span class="text-white font-semibold">${r.area}</span></div>
-                                <div><span class="text-[11px] text-slate-400 block uppercase font-bold">Reported By</span><span class="text-white font-semibold">${r.reporter}</span></div>
+                                <div><span class="text-[11px] text-slate-400 block uppercase font-bold">Reported By</span><span class="text-white font-semibold">${this.escapeHtml(r.reporter)}</span></div>
                                 <div><span class="text-[11px] text-slate-400 block uppercase font-bold">Log Date</span><span class="text-white font-semibold">${r.date}</span></div>
                                 <div><span class="text-[11px] text-slate-400 block uppercase font-bold">Status</span><span class="text-sky-400 font-bold">${r.status}</span></div>
                             </div>
@@ -1551,12 +1592,12 @@
 
                             <div>
                                 <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5"><i class="fas fa-align-left mr-1.5 text-sky-400"></i>Event Summary / Description</h4>
-                                <p class="text-slate-300 bg-dark-700/60 p-3.5 rounded-xl border border-slate-800/80 leading-relaxed font-normal">${r.description}</p>
+                                <p class="text-slate-300 bg-dark-700/60 p-3.5 rounded-xl border border-slate-800/80 leading-relaxed font-normal">${this.escapeHtml(r.description)}</p>
                             </div>
 
                             <div>
                                 <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5"><i class="fas fa-shield-alt mr-1.5 text-emerald-400"></i>Corrective & Preventive Action (CAPA)</h4>
-                                <p class="text-slate-300 bg-dark-700/60 p-3.5 rounded-xl border border-slate-800/80 leading-relaxed font-normal">${r.capa || 'No CAPA action specified.'}</p>
+                                <p class="text-slate-300 bg-dark-700/60 p-3.5 rounded-xl border border-slate-800/80 leading-relaxed font-normal">${this.escapeHtml(r.capa || 'No CAPA action specified.')}</p>
                             </div>
 
                             <div>
@@ -1568,11 +1609,11 @@
                                                 <div class="flex items-center gap-2.5 truncate">
                                                     <i class="fas ${att.name.endsWith('.pdf') ? 'fa-file-pdf text-rose-400' : 'fa-file-csv text-emerald-400'} text-base"></i>
                                                     <div class="truncate">
-                                                        <span class="text-xs font-semibold text-white block truncate">${att.name}</span>
+                                                        <span class="text-xs font-semibold text-white block truncate">${this.escapeHtml(att.name)}</span>
                                                         <span class="text-[10px] text-slate-400">${att.size}</span>
                                                     </div>
                                                 </div>
-                                                <button onclick="QAMSProduct.downloadAttachment('${att.name}')" class="p-1.5 bg-slate-800 hover:bg-sky-600 text-sky-400 hover:text-white rounded-lg transition-all text-xs" title="Download">
+                                                <button onclick="QAMSProduct.downloadAttachment('${this.escapeHtml(att.name)}')" class="p-1.5 bg-slate-800 hover:bg-sky-600 text-sky-400 hover:text-white rounded-lg transition-all text-xs" title="Download">
                                                     <i class="fas fa-download"></i>
                                                 </button>
                                             </div>
@@ -1588,8 +1629,8 @@
                                         ${r.history.map(h => `
                                             <div class="text-[11px]">
                                                 <span class="text-slate-400 font-semibold">${h.timestamp}</span> &bull; 
-                                                <strong class="text-slate-200">${h.action}</strong> 
-                                                <span class="text-slate-500">by ${h.user}</span>
+                                                <strong class="text-slate-200">${this.escapeHtml(h.action)}</strong> 
+                                                <span class="text-slate-500">by ${this.escapeHtml(h.user)}</span>
                                             </div>
                                         `).join('')}
                                     </div>
@@ -1601,8 +1642,7 @@
                             <button onclick="QAMSProduct.openEditModal('${r.id}')" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl shadow transition-all">
                                 <i class="fas fa-edit mr-1"></i> Edit Record
                             </button>
-
-<button onclick="QAMSProduct.closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">
+                            <button onclick="QAMSProduct.closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">
                                 Close
                             </button>
                         </div>
@@ -1612,7 +1652,7 @@
             this.showModalHtml(modalHtml);
         },
 
-        // ADD / EDIT FORM MODAL WITH PREFILL SUPPORT
+        // ADD / EDIT FORM MODAL WITH CLEAN ATTACHMENT MEMORY STATE
         openAddModal: function (category = 'product_quality', prefill = {}) {
             if (category === 'analysis') category = 'product_quality';
             this.renderFormModal(null, category, prefill);
@@ -1643,6 +1683,9 @@
                 isCompliant: prefill.isCompliant !== undefined ? prefill.isCompliant : true,
                 attachments: []
             };
+
+            // BUG FIX: Store attachments in memory state to avoid quotation parsing errors in HTML attributes
+            this._currentFormAttachments = JSON.parse(JSON.stringify(r.attachments || []));
 
             const modalHtml = `
                 <div id="qams-modal" class="fixed inset-0 bg-dark-900/85 z-[100] flex items-center justify-center p-4 backdrop-blur-md animate-fadeIn">
@@ -1703,11 +1746,11 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Title / Subject <span class="text-rose-400">*</span></label>
-                                    <input type="text" id="form-title" required value="${r.title}" placeholder="e.g., June Zn Product Quality Assurance" class="w-full bg-dark-700 border border-slate-700 rounded-xl p-2.5 text-white placeholder-slate-500 outline-none focus:border-sky-500">
+                                    <input type="text" id="form-title" required value="${this.escapeHtml(r.title)}" placeholder="e.g., June Zn Product Quality Assurance" class="w-full bg-dark-700 border border-slate-700 rounded-xl p-2.5 text-white placeholder-slate-500 outline-none focus:border-sky-500">
                                 </div>
                                 <div>
                                     <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Reported By / Chemist <span class="text-rose-400">*</span></label>
-                                    <input type="text" id="form-reporter" required value="${r.reporter}" placeholder="e.g., Engr. M. Santos" class="w-full bg-dark-700 border border-slate-700 rounded-xl p-2.5 text-white placeholder-slate-500 outline-none focus:border-sky-500">
+                                    <input type="text" id="form-reporter" required value="${this.escapeHtml(r.reporter)}" placeholder="e.g., Engr. M. Santos" class="w-full bg-dark-700 border border-slate-700 rounded-xl p-2.5 text-white placeholder-slate-500 outline-none focus:border-sky-500">
                                 </div>
                             </div>
 
@@ -1717,15 +1760,15 @@
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     <div>
                                         <label class="block text-[10px] text-slate-400 mb-1">Parameter Name</label>
-                                        <input type="text" id="form-metricName" value="${r.metricName || ''}" placeholder="e.g., Zn Purity Rate" class="w-full bg-dark-700 border border-slate-700 rounded-lg p-2 text-white placeholder-slate-500 text-xs outline-none focus:border-sky-500">
+                                        <input type="text" id="form-metricName" value="${this.escapeHtml(r.metricName || '')}" placeholder="e.g., Zn Purity Rate" class="w-full bg-dark-700 border border-slate-700 rounded-lg p-2 text-white placeholder-slate-500 text-xs outline-none focus:border-sky-500">
                                     </div>
                                     <div>
                                         <label class="block text-[10px] text-slate-400 mb-1">Observed Value</label>
-                                        <input type="text" id="form-metricValue" value="${r.metricValue || ''}" placeholder="e.g., 100.00%" class="w-full bg-dark-700 border border-slate-700 rounded-lg p-2 text-white placeholder-slate-500 text-xs outline-none focus:border-sky-500">
+                                        <input type="text" id="form-metricValue" value="${this.escapeHtml(r.metricValue || '')}" placeholder="e.g., 100.00%" class="w-full bg-dark-700 border border-slate-700 rounded-lg p-2 text-white placeholder-slate-500 text-xs outline-none focus:border-sky-500">
                                     </div>
                                     <div>
                                         <label class="block text-[10px] text-slate-400 mb-1">SOP Tolerance / Target</label>
-                                        <input type="text" id="form-metricLimit" value="${r.metricLimit || ''}" placeholder="e.g., > 97.00% Target" class="w-full bg-dark-700 border border-slate-700 rounded-lg p-2 text-white placeholder-slate-500 text-xs outline-none focus:border-sky-500">
+                                        <input type="text" id="form-metricLimit" value="${this.escapeHtml(r.metricLimit || '')}" placeholder="e.g., > 97.00% Target" class="w-full bg-dark-700 border border-slate-700 rounded-lg p-2 text-white placeholder-slate-500 text-xs outline-none focus:border-sky-500">
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2 pt-1">
@@ -1736,15 +1779,15 @@
 
                             <div>
                                 <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Detailed Description <span class="text-rose-400">*</span></label>
-                                <textarea id="form-description" rows="3" required placeholder="Provide full details of the Product Quality assay, document scope, or incident observations..." class="w-full bg-dark-700 border border-slate-700 rounded-xl p-2.5 text-white placeholder-slate-500 outline-none focus:border-sky-500">${r.description}</textarea>
+                                <textarea id="form-description" rows="3" required placeholder="Provide full details of the Product Quality assay, document scope, or incident observations..." class="w-full bg-dark-700 border border-slate-700 rounded-xl p-2.5 text-white placeholder-slate-500 outline-none focus:border-sky-500">${this.escapeHtml(r.description)}</textarea>
                             </div>
 
                             <div>
                                 <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Corrective & Preventive Action (CAPA)</label>
-                                <textarea id="form-capa" rows="2" placeholder="Specify recommended corrective actions, SOP interlocks, or equipment maintenance..." class="w-full bg-dark-700 border border-slate-700 rounded-xl p-2.5 text-white placeholder-slate-500 outline-none focus:border-sky-500">${r.capa}</textarea>
+                                <textarea id="form-capa" rows="2" placeholder="Specify recommended corrective actions, SOP interlocks, or equipment maintenance..." class="w-full bg-dark-700 border border-slate-700 rounded-xl p-2.5 text-white placeholder-slate-500 outline-none focus:border-sky-500">${this.escapeHtml(r.capa)}</textarea>
                             </div>
 
-                            <!-- Attachment Input Simulation -->
+                            <!-- Attachment Input -->
                             <div>
                                 <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Add Attachment (Simulated File Upload)</label>
                                 <div class="flex gap-2">
@@ -1753,14 +1796,7 @@
                                         <i class="fas fa-plus"></i> Attach
                                     </button>
                                 </div>
-                                <div id="form-att-list" class="mt-2 space-y-1">
-                                    ${(r.attachments || []).map((a) => `
-                                        <div class="flex items-center justify-between p-1.5 bg-dark-700 rounded text-[11px] text-slate-300" data-att='${JSON.stringify(a)}'>
-                                            <span><i class="fas fa-paperclip text-sky-400 mr-1.5"></i>${a.name} (${a.size})</span>
-                                            <button type="button" onclick="this.parentElement.remove()" class="text-rose-400 hover:text-white"><i class="fas fa-times"></i></button>
-                                        </div>
-                                    `).join('')}
-                                </div>
+                                <div id="form-att-list" class="mt-2 space-y-1"></div>
                             </div>
 
                             <div class="pt-4 border-t border-slate-800 flex justify-end gap-2">
@@ -1774,6 +1810,19 @@
                 </div>
             `;
             this.showModalHtml(modalHtml);
+            this.renderAttachmentList();
+        },
+
+        // Helper to render form attachment list safely from state
+        renderAttachmentList: function () {
+            const list = document.getElementById('form-att-list');
+            if (!list) return;
+            list.innerHTML = this._currentFormAttachments.map((att, idx) => `
+                <div class="flex items-center justify-between p-1.5 bg-dark-700 rounded text-[11px] text-slate-300">
+                    <span><i class="fas fa-paperclip text-sky-400 mr-1.5"></i>${this.escapeHtml(att.name)} (${att.size})</span>
+                    <button type="button" onclick="QAMSProduct.removeSimulatedAttachment(${idx})" class="text-rose-400 hover:text-white"><i class="fas fa-times"></i></button>
+                </div>
+            `).join('');
         },
 
         addSimulatedAttachment: function () {
@@ -1788,24 +1837,19 @@
                 size: (Math.random() * 3 + 0.5).toFixed(1) + ' MB',
                 type: name.endsWith('.csv') ? 'text/csv' : 'application/pdf'
             };
-            const list = document.getElementById('form-att-list');
-            const div = document.createElement('div');
-            div.className = "flex items-center justify-between p-1.5 bg-dark-700 rounded text-[11px] text-slate-300";
-            div.setAttribute('data-att', JSON.stringify(att));
-            div.innerHTML = `
-                <span><i class="fas fa-paperclip text-sky-400 mr-1.5"></i>${att.name} (${att.size})</span>
-                <button type="button" onclick="this.parentElement.remove()" class="text-rose-400 hover:text-white"><i class="fas fa-times"></i></button>
-            `;
-            list.appendChild(div);
+            this._currentFormAttachments.push(att);
             nameInput.value = '';
+            this.renderAttachmentList();
+        },
+
+        removeSimulatedAttachment: function (index) {
+            this._currentFormAttachments.splice(index, 1);
+            this.renderAttachmentList();
         },
 
         handleSaveRecord: function (event, isEdit) {
             event.preventDefault();
             const id = document.getElementById('form-id').value;
-
-            const attElements = document.querySelectorAll('#form-att-list [data-att]');
-            const attachments = Array.from(attElements).map(el => JSON.parse(el.getAttribute('data-att')));
 
             const recordData = {
                 id: id,
@@ -1821,7 +1865,7 @@
                 metricValue: document.getElementById('form-metricValue').value.trim(),
                 metricLimit: document.getElementById('form-metricLimit').value.trim(),
                 isCompliant: document.getElementById('form-isCompliant').checked,
-                attachments: attachments
+                attachments: [...this._currentFormAttachments]
             };
 
             let records = Store.getRecords();
@@ -1893,13 +1937,13 @@
                                     <div class="flex items-start gap-3">
                                         <i class="fas fa-check-circle text-sky-400 mt-0.5"></i>
                                         <div>
-                                            <div class="font-bold text-white">${h.action}</div>
-                                            <div class="text-[11px] text-slate-400 mt-0.5">${h.details || 'No further details recorded.'}</div>
+                                            <div class="font-bold text-white">${this.escapeHtml(h.action)}</div>
+                                            <div class="text-[11px] text-slate-400 mt-0.5">${this.escapeHtml(h.details || 'No further details recorded.')}</div>
                                         </div>
                                     </div>
                                     <div class="text-right whitespace-nowrap">
                                         <span class="text-[10px] text-slate-500 block font-semibold">${h.timestamp}</span>
-                                        <span class="text-[10px] text-sky-400 font-bold">${h.user}</span>
+                                        <span class="text-[10px] text-sky-400 font-bold">${this.escapeHtml(h.user)}</span>
                                     </div>
                                 </div>
                             `).join('') : '<p class="text-center text-slate-500 py-6">No audit history recorded yet.</p>'}
@@ -1979,10 +2023,11 @@
                         if (!Array.isArray(parsedData)) parsedData = [parsedData];
                     } else if (file.name.endsWith('.csv')) {
                         const lines = content.split('\n');
-                        const headers = lines[0].split(',').map(h => h.trim());
+                        // Clean quotes from CSV headers
+                        const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
                         for (let i = 1; i < lines.length; i++) {
                             if (!lines[i].trim()) continue;
-                            const vals = lines[i].split(',').map(v => v.trim());
+                            const vals = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
                             let obj = {};
                             headers.forEach((h, idx) => obj[h] = vals[idx] || '');
                             parsedData.push(obj);
@@ -2008,6 +2053,9 @@
         },
 
         analyzeAndDisplayReport: function (dataset, filename) {
+            // BUG FIX: Store dataset in memory state to avoid quotation syntax crashes in HTML attributes
+            this._tempImportDataset = dataset;
+
             const total = dataset.length;
             const compliantCount = dataset.filter(d => d.isCompliant === true || d.isCompliant === 'true' || (d.metricLimit && !d.metricValue.includes('Spike') && d.metricValue !== '96.21%')).length;
             const anomalies = dataset.filter(d => d.isCompliant === false || d.isCompliant === 'false' || d.metricValue === '96.21%');
@@ -2053,9 +2101,9 @@
                                         ${anomalies.map(a => `
                                             <div class="p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-xl flex items-start justify-between gap-3">
                                                 <div>
-                                                    <span class="font-bold text-white block">${a.title || 'Unnamed Assay Parameter'} (${a.area || 'Plant Area'})</span>
+                                                    <span class="font-bold text-white block">${this.escapeHtml(a.title || 'Unnamed Assay Parameter')} (${this.escapeHtml(a.area || 'Plant Area')})</span>
                                                     <span class="text-xs text-rose-300 mt-1 block">
-                                                        <strong>Observed:</strong> ${a.metricValue} &bull; <strong>SOP Limit:</strong> ${a.metricLimit}
+                                                        <strong>Observed:</strong> ${this.escapeHtml(a.metricValue)} &bull; <strong>SOP Limit:</strong> ${this.escapeHtml(a.metricLimit)}
                                                     </span>
                                                 </div>
                                                 <span class="px-2 py-0.5 rounded bg-rose-500 text-white font-bold text-[10px] uppercase whitespace-nowrap">Flagged</span>
@@ -2075,7 +2123,7 @@
                         </div>
 
                         <div class="p-4 bg-dark-700/80 border-t border-slate-800 flex justify-end gap-2">
-                            <button onclick="QAMSProduct.importAnalyzedBatch(${JSON.stringify(dataset).replace(/"/g, '&quot;')})" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-cyan-500 hover:from-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5">
+                            <button onclick="QAMSProduct.importAnalyzedBatch()" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-cyan-500 hover:from-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5">
                                 <i class="fas fa-file-import"></i> Import Records into System
                             </button>
                             <button onclick="QAMSProduct.closeModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Discard</button>
@@ -2086,7 +2134,10 @@
             this.showModalHtml(reportHtml);
         },
 
-        importAnalyzedBatch: function (dataset) {
+        importAnalyzedBatch: function () {
+            const dataset = this._tempImportDataset;
+            if (!dataset || !Array.isArray(dataset)) return;
+
             let records = Store.getRecords();
             let count = 0;
             dataset.forEach(d => {
@@ -2112,6 +2163,7 @@
             });
             Store.saveRecords(records);
             Store.addHistory(`Imported Batch of ${count} records`, 'Automated Product Quality Data Analysis tool import.');
+            this._tempImportDataset = null;
             this.closeModal();
             this.render();
             alert(`✅ Successfully imported ${count} analyzed records into the Product Quality database!`);
@@ -2148,6 +2200,17 @@
             Store.addHistory('Downloaded Attachment', `File: ${filename}`);
         },
 
+        // HTML escaping utility to prevent XSS and layout breaking from user quotes
+        escapeHtml: function (str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        },
+
         showModalHtml: function (html) {
             this.closeModal();
             const div = document.createElement('div');
@@ -2166,8 +2229,12 @@
     };
 
     window.QAMSProduct = QAMSProduct;
-    window.addEventListener('DOMContentLoaded', () => {
+    
+    // BUG FIX: Use readyState check to ensure initialization fires reliably
+    if (document.readyState === 'loading') {
+        window.addEventListener('DOMContentLoaded', () => QAMSProduct.init());
+    } else {
         QAMSProduct.init();
-    });
+    }
 
 })(window, document);
