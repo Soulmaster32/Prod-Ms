@@ -10,7 +10,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Friendly User Font: Plus Jakarta Sans -->
+    <!-- Plus Jakarta Sans Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -112,7 +112,7 @@
 
                     <!-- 1. QA Dashboard -->
                     <div>
-                        <a href="#home" onclick="closeSidebarOnMobile()" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-bold bg-royalblue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all">
+                        <a href="#home" onclick="navigateToQA('all'); closeSidebarOnMobile();" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-bold bg-royalblue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all">
                             <i class="fas fa-chart-pie w-5 text-center text-sky-200"></i> QA Dashboard
                         </a>
                     </div>
@@ -152,7 +152,7 @@
 
                     <!-- 3. QA Calendar -->
                     <div>
-                        <a href="#calendar-section" onclick="if(window.QACalendar) QACalendar.open('all'); closeSidebarOnMobile();" class="flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all group">
+                        <a href="#calendar-section" onclick="if(window.QACalendar){ QACalendar.searchQuery=''; QACalendar.open('all'); } closeSidebarOnMobile();" class="flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all group">
                             <span class="flex items-center gap-3">
                                 <i class="fas fa-calendar-alt w-5 text-center text-cyan-400 group-hover:scale-110 transition-transform"></i> QA Calendar
                             </span>
@@ -164,10 +164,10 @@
 
                     <!-- 4. S.O.P & 5. QA Procedure -->
                     <div class="space-y-1">
-                        <a href="#sop-section" onclick="navigateToQA('document'); closeSidebarOnMobile();" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all group">
+                        <a href="#sop-section" onclick="if(window.SOPManual){ SOPManual.handleSearch(''); SOPManual.open('sop'); } closeSidebarOnMobile();" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all group">
                             <i class="fas fa-book w-5 text-center text-sky-400 group-hover:scale-110 transition-transform"></i> S.O.P Manuals
                         </a>
-                        <a href="#sop-section" onclick="navigateToQA('document'); closeSidebarOnMobile();" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all group">
+                        <a href="#sop-section" onclick="if(window.SOPManual){ SOPManual.handleSearch(''); SOPManual.open('procedure'); } closeSidebarOnMobile();" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all group">
                             <i class="fas fa-clipboard-list w-5 text-center text-sky-400 group-hover:scale-110 transition-transform"></i> QA Procedure
                         </a>
                     </div>
@@ -324,7 +324,7 @@
                             <span>Interactive QA MS Product</span>
                             <i class="fas fa-microscope text-xs"></i>
                         </button>
-                        <a href="#calendar-section" onclick="if(window.QACalendar) QACalendar.open('all');" class="w-full sm:w-auto px-6 py-3.5 bg-dark-500/80 hover:bg-dark-400/80 border border-slate-700 hover:border-slate-500 text-slate-200 hover:text-white font-semibold text-sm rounded-xl transition-all text-center backdrop-blur-sm">
+                        <a href="#calendar-section" onclick="if(window.QACalendar){ QACalendar.searchQuery=''; QACalendar.open('all'); }" class="w-full sm:w-auto px-6 py-3.5 bg-dark-500/80 hover:bg-dark-400/80 border border-slate-700 hover:border-slate-500 text-slate-200 hover:text-white font-semibold text-sm rounded-xl transition-all text-center backdrop-blur-sm">
                             QA Event Calendar
                         </a>
                         <a href="#area-explorer" class="w-full sm:w-auto px-6 py-3.5 bg-slate-800/80 hover:bg-slate-700/80 border border-cyan-500/30 text-cyan-300 hover:text-white font-semibold text-sm rounded-xl transition-all text-center">
@@ -722,7 +722,7 @@
                         <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-xs">Interactive QA Zones</h4>
                         <ul class="space-y-2 text-xs sm:text-sm font-medium">
                             <li><a href="javascript:void(0)" onclick="navigateToQA('all')" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> QA MS Product Management Hub</a></li>
-                            <li><a href="#calendar-section" onclick="if(window.QACalendar) QACalendar.open('all');" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> QA Event Calendar & Schedule</a></li>
+                            <li><a href="#calendar-section" onclick="if(window.QACalendar){ QACalendar.searchQuery=''; QACalendar.open('all'); }" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> QA Event Calendar & Schedule</a></li>
                             <li><a href="#area-explorer" onclick="switchAreaTab('fntrl')" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> FNTRL Area Specifications</a></li>
                             <li><a href="#area-explorer" onclick="switchAreaTab('dezinc')" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> MS-Dezinc Area Specifications</a></li>
                             <li><a href="#user-management-section" onclick="filterUsers('all')" class="hover:text-amber-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-amber-500"></i> QA User Management & Access Control</a></li>
@@ -928,29 +928,20 @@
     <!-- SCRIPTS FOR INTERACTIVITY -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // Master Navigation Bridge: Fully fixed to prevent data from hiding when switching data tabs
+        // Master Navigation Bridge: Zero-hidden-data guarantee when switching data tabs
         function navigateToQA(tab = 'all', keyword = '', boardTab = null) {
             const portal = document.getElementById('qamsproduct-portal');
             if (portal) portal.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
             if (window.QAMSProduct) {
-                // 1. Reset stale search queries and filters when switching data tabs without explicit keywords
-                if (keyword !== '') {
-                    QAMSProduct.searchQuery = keyword;
-                } else if (QAMSProduct.searchQuery) {
-                    QAMSProduct.searchQuery = '';
-                }
+                // 1. Force reset of stale search queries and filters when switching tabs without explicit keywords
+                QAMSProduct.searchQuery = keyword || '';
+                QAMSProduct.filterArea = 'All Areas';
+                QAMSProduct.filterStatus = 'all';
 
-                if (QAMSProduct.filterArea && keyword === '') {
-                    QAMSProduct.filterArea = 'All Areas';
-                }
-                if (QAMSProduct.filterStatus) {
-                    QAMSProduct.filterStatus = 'all';
-                }
-
-                // 2. Open the requested primary tab/category first
+                // 2. Open the requested primary tab/category
                 if (typeof QAMSProduct.open === 'function') {
-                    QAMSProduct.open(tab);
+                    QAMSProduct.open(tab, keyword, boardTab);
                 } else {
                     QAMSProduct.activeTab = tab;
                 }
@@ -962,8 +953,6 @@
                     QAMSProduct.subTab = boardTab;
                     if (typeof QAMSProduct.switchBoardTab === 'function') {
                         QAMSProduct.switchBoardTab(boardTab);
-                    } else if (typeof QAMSProduct.switchTab === 'function') {
-                        QAMSProduct.switchTab(boardTab);
                     }
                 }
 
@@ -1046,7 +1035,7 @@
             }
         }
 
-        // Interactive QA Area Switcher Logic (Fixed keyword property to prevent data hiding)
+        // Interactive QA Area Switcher Logic
         const areaSpecifications = {
             fntrl: {
                 keyword: 'FNTRL',
@@ -1093,12 +1082,16 @@
         function switchAreaTab(areaKey) {
             ['fntrl', 'dezinc', 'h2s', 'limestone'].forEach(k => {
                 const btn = document.getElementById(`tab-${k}`);
-                if (k === areaKey) btn.classList.add('active');
-                else btn.classList.remove('active');
+                if (btn) {
+                    if (k === areaKey) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                }
             });
 
             const d = areaSpecifications[areaKey];
             const content = document.getElementById('area-card-content');
+            if (!content || !d) return;
+
             content.style.opacity = '0';
             setTimeout(() => {
                 content.innerHTML = `
@@ -1157,6 +1150,11 @@
                 `;
                 content.style.opacity = '1';
             }, 150);
+
+            // Sync with qaarea.js module if active
+            if (window.QAArea && typeof window.QAArea.switchTab === 'function') {
+                window.QAArea.switchTab(areaKey);
+            }
         }
 
         // DCS Diagnostics Simulation
@@ -1181,10 +1179,10 @@
         function highlightDCS(type) {
             const cardMain = document.getElementById('dcs-card-main');
             const cardSub = document.getElementById('dcs-card-sub');
-            if (type === 'main') {
+            if (type === 'main' && cardMain) {
                 cardMain.classList.add('ring-2', 'ring-cyan-400', 'scale-[1.02]');
                 setTimeout(() => cardMain.classList.remove('ring-2', 'ring-cyan-400', 'scale-[1.02]'), 1500);
-            } else {
+            } else if (cardSub) {
                 cardSub.classList.add('ring-2', 'ring-sky-400', 'scale-[1.02]');
                 setTimeout(() => cardSub.classList.remove('ring-2', 'ring-sky-400', 'scale-[1.02]'), 1500);
             }
@@ -1193,17 +1191,26 @@
         // Modal Handlers
         function openModal(modalId) {
             const modal = document.getElementById(modalId);
+            if (!modal) return;
             const content = modal.children[0];
             modal.classList.remove('hidden');
             modal.classList.add('flex');
-            setTimeout(() => { content.classList.remove('scale-95'); content.classList.add('scale-100'); }, 10);
+            setTimeout(() => { 
+                if (content) {
+                    content.classList.remove('scale-95'); 
+                    content.classList.add('scale-100'); 
+                }
+            }, 10);
         }
 
         function closeModal(modalId) {
             const modal = document.getElementById(modalId);
+            if (!modal) return;
             const content = modal.children[0];
-            content.classList.remove('scale-100');
-            content.classList.add('scale-95');
+            if (content) {
+                content.classList.remove('scale-100');
+                content.classList.add('scale-95');
+            }
             setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 200);
         }
 
@@ -1354,7 +1361,6 @@
 
         let currentUserFilter = 'all';
 
-        // Fixed renderUserTable to preserve active search term when re-rendering
         function renderUserTable(filter = currentUserFilter, searchTerm = null) {
             const tbody = document.getElementById('user-table-body');
             if (!tbody) return;
@@ -1541,17 +1547,189 @@
             e.preventDefault();
             const btnText = document.getElementById('loginBtnText');
             const icon = document.getElementById('loginIcon');
-            btnText.innerText = "Verifying Credentials...";
-            icon.className = "fas fa-circle-notch fa-spin text-[10px]";
-            setTimeout(() => { window.location.href = '/app'; }, 1100);
+            if (btnText) btnText.innerText = "Verifying Credentials...";
+            if (icon) icon.className = "fas fa-circle-notch fa-spin text-[10px]";
+            setTimeout(() => { window.location.reload(); }, 1100);
         }
     </script>
+
+    <!-- EMBEDDED USER.JS PROFILE MANAGEMENT ENGINE -->
+    <script id="user-js-engine">
+        // Bridge Database Key with login.js
+        window.AUTH_DB_KEY = window.AUTH_DB_KEY || 'QAMS_Users_DB_v1';
+
+        // Get all users from storage
+        function getAllUsers() {
+            try {
+                const data = localStorage.getItem(window.AUTH_DB_KEY);
+                const parsed = data ? JSON.parse(data) : null;
+                return parsed && Array.isArray(parsed.users) ? parsed.users : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        // Save all users to storage
+        function saveAllUsers(usersArray) {
+            try {
+                localStorage.setItem(window.AUTH_DB_KEY, JSON.stringify({ users: usersArray }));
+            } catch (e) {
+                console.warn('Could not save to user.js database:', e);
+            }
+        }
+
+        // Get user profile by username
+        function getUserProfile(username) {
+            const users = getAllUsers();
+            return users.find(u => u.username.toLowerCase() === (username || '').toLowerCase()) || null;
+        }
+
+        // Update user profile
+        function updateUserProfile(username, data) {
+            const users = getAllUsers();
+            const idx = users.findIndex(u => u.username.toLowerCase() === (username || '').toLowerCase());
+            if (idx === -1) return { success: false, error: 'User not found' };
+
+            users[idx] = { ...users[idx], ...data };
+            if (data.avatar) users[idx].image = data.avatar;
+            if (data.fullName) users[idx].fullname = data.fullName;
+            if (data.department) users[idx].area = data.department;
+
+            saveAllUsers(users);
+            return { success: true, user: users[idx] };
+        }
+
+        // Update user avatar
+        function updateUserAvatar(username, imageDataUrl) {
+            return updateUserProfile(username, { avatar: imageDataUrl });
+        }
+
+        // Update user info
+        function updateUserInfo(username, { fullName, email, phone, department }) {
+            return updateUserProfile(username, { fullName, email, phone, department });
+        }
+
+        // Delete user account
+        function deleteUserAccount(username) {
+            const users = getAllUsers();
+            const userIndex = users.findIndex(u => u.username.toLowerCase() === (username || '').toLowerCase());
+            
+            if (userIndex === -1) {
+                return { success: false, error: 'User not found' };
+            }
+            
+            // Prevent deleting the last admin
+            const admins = users.filter(u => u.role === 'admin');
+            if (users[userIndex].role === 'admin' && admins.length === 1) {
+                return { success: false, error: 'Cannot delete the last administrator' };
+            }
+            
+            const removed = users.splice(userIndex, 1)[0];
+            saveAllUsers(users);
+            
+            // Auto-remove from user management table
+            if (typeof window.qaUsersList !== 'undefined' && Array.isArray(window.qaUsersList)) {
+                window.qaUsersList = window.qaUsersList.filter(u => u.id.toLowerCase() !== username.toLowerCase());
+                if (typeof window.renderUserTable === 'function') window.renderUserTable();
+                if (typeof window.updateUserKPIs === 'function') window.updateUserKPIs();
+            }
+
+            return { success: true, removedUser: removed };
+        }
+
+        // Toggle user role (admin/member)
+        function toggleUserRole(username) {
+            const user = getUserProfile(username);
+            if (!user) {
+                return { success: false, error: 'User not found' };
+            }
+            
+            const newRole = user.role === 'admin' ? 'member' : 'admin';
+            const newQaRole = newRole === 'admin' ? 'System Admin' : 'Lead QA Inspector';
+            return updateUserProfile(username, { role: newRole, qaRole: newQaRole });
+        }
+
+        // Get user statistics
+        function getUserStats(username) {
+            const user = getUserProfile(username);
+            if (!user) return null;
+            
+            return {
+                username: user.username,
+                fullName: user.fullName || user.fullname,
+                department: user.department || user.area,
+                role: user.role,
+                joinDate: user.joinDate,
+                totalActivities: 12,
+                completedActivities: 10,
+                completionRate: 83.3
+            };
+        }
+
+        // Search users
+        function searchUsers(query) {
+            const users = getAllUsers();
+            const lowerQuery = (query || '').toLowerCase();
+            
+            return users.filter(u => 
+                (u.fullName || '').toLowerCase().includes(lowerQuery) ||
+                (u.username || '').toLowerCase().includes(lowerQuery) ||
+                (u.email || '').toLowerCase().includes(lowerQuery) ||
+                (u.address || '').toLowerCase().includes(lowerQuery)
+            );
+        }
+
+        // Get users by department
+        function getUsersByDepartment(department) {
+            const users = getAllUsers();
+            return users.filter(u => u.department === department || u.area === department);
+        }
+
+        // Get all admins
+        function getAllAdmins() {
+            const users = getAllUsers();
+            return users.filter(u => u.role === 'admin' || u.qaRole === 'System Admin');
+        }
+
+        // Get user count
+        function getUserCount() {
+            return getAllUsers().length;
+        }
+
+        // Format user display name
+        function formatUserDisplayName(user) {
+            return `${user.fullName || user.fullname} (${user.department || user.area})`;
+        }
+
+        // Get user initials for avatar
+        function getUserInitials(fullName) {
+            return (fullName || '??').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+        }
+
+        // Expose all functions globally
+        window.getAllUsers = getAllUsers;
+        window.getUserProfile = getUserProfile;
+        window.updateUserProfile = updateUserProfile;
+        window.updateUserAvatar = updateUserAvatar;
+        window.updateUserInfo = updateUserInfo;
+        window.deleteUserAccount = deleteUserAccount;
+        window.toggleUserRole = toggleUserRole;
+        window.getUserStats = getUserStats;
+        window.searchUsers = searchUsers;
+        window.getUsersByDepartment = getUsersByDepartment;
+        window.getAllAdmins = getAllAdmins;
+        window.getUserCount = getUserCount;
+        window.formatUserDisplayName = formatUserDisplayName;
+        window.getUserInitials = getUserInitials;
+    </script>
+
+    <!-- EXTERNAL JS MODULES -->
     <script src="js/qamsproduct.js"></script>
     <script src="js/qacalendar.js"></script>
     <script src="js/sopmanual.js"></script>
     <script src="js/qaarea.js"></script>
-<script src="js/style.js"></script>
-<script src="js/sec.js"></script>
-<script src="js/login.js"></script>
+    <script src="js/style.js"></script>
+    <script src="js/sec.js"></script>
+    <script src="js/login.js"></script>
 </body>
 </html>
