@@ -1,6 +1,3 @@
-
-
-
 (function (window, document) {
     'use strict';
 
@@ -188,17 +185,70 @@
             this.injectCalendarContainer();
             this.bindSidebarListeners();
             this.render();
+            this.enforceSectionVisibility();
             console.log('✅ QA Calendar & Incident Module successfully initialized.');
         },
 
+        // Built-in safety guard to prevent legacy scripts from hiding top-level sections
+        enforceSectionVisibility: function () {
+            if (typeof window.enforceSectionVisibility === 'function') {
+                window.enforceSectionVisibility();
+            } else {
+                const mainSections = [
+                    'bulletin-board-section',
+                    'quality-spec-section',
+                    'qamsproduct-portal',
+                    'home',
+                    'calendar-section',
+                    'area-explorer',
+                    'dcs-section',
+                    'sop-section',
+                    'user-management-section'
+                ];
+                mainSections.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.style.setProperty('display', 'block', 'important');
+                        el.style.setProperty('opacity', '1', 'important');
+                        el.style.setProperty('visibility', 'visible', 'important');
+                    }
+                });
+            }
+        },
+
+        // Safe Navigation Helper: Jump to Bulletin Board tabs without event bubbling
+        navigateToBulletin: function (e, tab = 'nearmiss') {
+            if (e && typeof e.stopImmediatePropagation === 'function') {
+                e.stopImmediatePropagation();
+                e.stopPropagation();
+            }
+            if (typeof window.switchBulletinTab === 'function') {
+                window.switchBulletinTab(e, tab);
+            }
+            const sec = document.getElementById('bulletin-board-section');
+            if (sec) {
+                sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            this.enforceSectionVisibility();
+        },
+
         // Open specific filter or reset view from sidebar/header links
-        open: function (filter = 'all') {
+        open: function (e, filter = 'all') {
+            if (typeof e === 'string' && !filter || (e && typeof e === 'string')) {
+                filter = e;
+                e = null;
+            }
+            if (e && typeof e.stopImmediatePropagation === 'function') {
+                e.stopImmediatePropagation();
+                e.stopPropagation();
+            }
             this.activeFilter = filter;
             this.render();
             const section = document.getElementById('calendar-section');
             if (section) {
                 section.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
+            this.enforceSectionVisibility();
         },
 
         // Ensure #calendar-section exists in index.html
@@ -217,7 +267,7 @@
         bindSidebarListeners: function () {
             document.querySelectorAll('a[href="#calendar-section"]').forEach(link => {
                 link.addEventListener('click', (e) => {
-                    this.open('all');
+                    this.open(e, 'all');
                 });
             });
         },
@@ -238,6 +288,7 @@
                 this.selectedDate = `${this.currentYear}-${monthStr}-01`;
             }
             this.render();
+            this.enforceSectionVisibility();
         },
 
         // Filter events by category and text search
@@ -318,35 +369,35 @@
 
                     <!-- KPI Statistics Cards -->
                     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
-                        <div onclick="QACalendar.open('all')" class="p-4 rounded-xl bg-dark-500 border ${this.activeFilter === 'all' ? 'border-sky-400 ring-1 ring-sky-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
+                        <div onclick="QACalendar.open(event, 'all')" class="p-4 rounded-xl bg-dark-500 border ${this.activeFilter === 'all' ? 'border-sky-400 ring-1 ring-sky-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
                             <span class="text-[11px] font-bold text-slate-400 uppercase block">Total Logged</span>
                             <div class="flex items-center justify-between mt-1">
                                 <span class="text-2xl font-extrabold text-white">${stats.total}</span>
                                 <i class="fas fa-calendar-check text-sky-400 text-lg"></i>
                             </div>
                         </div>
-                        <div onclick="QACalendar.open('nearmiss')" class="p-4 rounded-xl bg-dark-500 border ${this.activeFilter === 'nearmiss' ? 'border-amber-400 ring-1 ring-amber-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
+                        <div onclick="QACalendar.open(event, 'nearmiss')" class="p-4 rounded-xl bg-dark-500 border ${this.activeFilter === 'nearmiss' ? 'border-amber-400 ring-1 ring-amber-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
                             <span class="text-[11px] font-bold text-slate-400 uppercase block">Near Misses</span>
                             <div class="flex items-center justify-between mt-1">
                                 <span class="text-2xl font-extrabold text-amber-400">${stats.nearmiss}</span>
                                 <i class="fas fa-exclamation-triangle text-amber-400 text-lg"></i>
                             </div>
                         </div>
-                        <div onclick="QACalendar.open('accident')" class="p-4 rounded-xl bg-dark-500 border ${this.activeFilter === 'accident' ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
+                        <div onclick="QACalendar.open(event, 'accident')" class="p-4 rounded-xl bg-dark-500 border ${this.activeFilter === 'accident' ? 'border-rose-500 ring-1 ring-rose-500' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
                             <span class="text-[11px] font-bold text-slate-400 uppercase block">Accidents / Inc.</span>
                             <div class="flex items-center justify-between mt-1">
                                 <span class="text-2xl font-extrabold text-rose-500">${stats.accident}</span>
                                 <i class="fas fa-car-crash text-rose-500 text-lg"></i>
                             </div>
                         </div>
-                        <div onclick="QACalendar.open('improvement')" class="p-4 rounded-xl bg-dark-500 border ${this.activeFilter === 'improvement' ? 'border-emerald-400 ring-1 ring-emerald-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
+                        <div onclick="QACalendar.open(event, 'improvement')" class="p-4 rounded-xl bg-dark-500 border ${this.activeFilter === 'improvement' ? 'border-emerald-400 ring-1 ring-emerald-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
                             <span class="text-[11px] font-bold text-slate-400 uppercase block">Improvement</span>
                             <div class="flex items-center justify-between mt-1">
                                 <span class="text-2xl font-extrabold text-emerald-400">${stats.improvement}</span>
                                 <i class="fas fa-lightbulb text-emerald-400 text-lg"></i>
                             </div>
                         </div>
-                        <div onclick="QACalendar.open('routine')" class="p-4 rounded-xl bg-dark-500 border ${this.activeFilter === 'routine' ? 'border-cyan-400 ring-1 ring-cyan-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
+                        <div onclick="QACalendar.open(event, 'routine')" class="p-4 rounded-xl bg-dark-500 border ${this.activeFilter === 'routine' ? 'border-cyan-400 ring-1 ring-cyan-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
                             <span class="text-[11px] font-bold text-slate-400 uppercase block">Routine / Audit</span>
                             <div class="flex items-center justify-between mt-1">
                                 <span class="text-2xl font-extrabold text-cyan-400">${stats.routine}</span>
@@ -385,12 +436,13 @@
                     ${this.showTableView ? this.renderTableView(filteredEvents) : this.renderSplitCalendarView(currentMonthName, filteredEvents)}
                 </div>
             `;
+            this.enforceSectionVisibility();
         },
 
         renderFilterPill: function (key, label, icon, color = 'text-white') {
             const isActive = this.activeFilter === key;
             return `
-                <button onclick="QACalendar.open('${key}')" class="px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${isActive ? 'bg-royalblue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)]' : 'bg-dark-700 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/80'}">
+                <button onclick="QACalendar.open(event, '${key}')" class="px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${isActive ? 'bg-royalblue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)]' : 'bg-dark-700 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/80'}">
                     <i class="fas ${icon} ${isActive ? 'text-white' : color}"></i> ${label}
                 </button>
             `;
@@ -703,6 +755,7 @@
         selectDate: function (dateStr) {
             this.selectedDate = dateStr;
             this.render();
+            this.enforceSectionVisibility();
         },
 
         // Reset calendar to anchor today date
@@ -711,17 +764,20 @@
             this.currentMonth = 6; // July
             this.selectedDate = '2026-07-02';
             this.render();
+            this.enforceSectionVisibility();
         },
 
         // Toggle between Split Grid and full Table View
         toggleTableView: function () {
             this.showTableView = !this.showTableView;
             this.render();
+            this.enforceSectionVisibility();
         },
 
         handleSearch: function (val) {
             this.searchQuery = val;
             this.render();
+            this.enforceSectionVisibility();
         },
 
         // ====================================================================
@@ -1124,6 +1180,7 @@
             this.selectedDate = eventData.date; // Focus calendar on the saved date
             this.closeModal();
             this.render();
+            this.enforceSectionVisibility();
             alert(`✅ Calendar Event ${id} saved successfully!${shouldSync ? ' A copy has also been synchronized to the QA MS Product portal.' : ''}`);
         },
 
@@ -1135,6 +1192,7 @@
             Store.saveEvents(events);
             Store.addHistory(`Deleted Event ${id}`, 'Removed from calendar storage.');
             this.render();
+            this.enforceSectionVisibility();
             alert(`🗑️ Event ${id} removed from the calendar schedule.`);
         },
 
@@ -1413,6 +1471,7 @@
             Store.addHistory(`Imported Batch of ${count} events`, 'Automated AI Cluster tool import.');
             this.closeModal();
             this.render();
+            this.enforceSectionVisibility();
             alert(`✅ Successfully imported ${count} analyzed events into the QA Calendar schedule!`);
         },
 
@@ -1464,8 +1523,14 @@
         }
     };
 
-    // Export to global window scope and self-initialize
-    window.QACalendar = QACalendar;
+    // Secure global export to prevent legacy script overrides
+    try {
+        window.QACalendar = QACalendar;
+        Object.defineProperty(window, 'QACalendar', { value: QACalendar, writable: false, configurable: false });
+    } catch (err) {
+        window.QACalendar = QACalendar;
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
         QACalendar.init();
     });
