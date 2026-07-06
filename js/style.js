@@ -7,7 +7,8 @@
  * - 6 High-Contrast Accent Palettes (Royal Sky, Emerald Mint, Cyber Violet, etc.)
  * - Hardware-Accelerated Smooth CSS Transition Engine
  * - Interactive Floating Theme Studio Widget with Backdrop Blur
- * - Zero-HTML Modification: Dynamically maps over existing Tailwind utility classes
+ * - Dynamic Tab & Panel Synchronization for MS Section & Spec Management
+ * - Built-in Section Visibility Guard to prevent legacy script interference
  * - LocalStorage Persistence & Alt+T Keyboard Shortcut
  * ============================================================================
  */
@@ -29,9 +30,9 @@
     const PALETTES = {
         royal: {
             name: 'Royal Sky (Default)',
-            primary: '#2563eb',     // royalblue-600
+            primary: '#2563eb',      // royalblue-600
             primaryHover: '#1d4ed8', // royalblue-700
-            accent: '#38bdf8',      // sky-400
+            accent: '#38bdf8',       // sky-400
             accentHover: '#0ea5e9',  // sky-500
             gradientFrom: '#2563eb',
             gradientTo: '#0ea5e9',
@@ -40,9 +41,9 @@
         },
         emerald: {
             name: 'Emerald Mint',
-            primary: '#059669',     // emerald-600
+            primary: '#059669',      // emerald-600
             primaryHover: '#047857', // emerald-700
-            accent: '#34d399',      // emerald-400
+            accent: '#34d399',       // emerald-400
             accentHover: '#10b981',  // emerald-500
             gradientFrom: '#059669',
             gradientTo: '#10b981',
@@ -51,9 +52,9 @@
         },
         violet: {
             name: 'Cyber Violet',
-            primary: '#7c3aed',     // violet-600
+            primary: '#7c3aed',      // violet-600
             primaryHover: '#6d28d9', // violet-700
-            accent: '#c084fc',      // purple-400
+            accent: '#c084fc',       // purple-400
             accentHover: '#a855f7',  // purple-500
             gradientFrom: '#7c3aed',
             gradientTo: '#d946ef',
@@ -62,9 +63,9 @@
         },
         amber: {
             name: 'Sunset Amber',
-            primary: '#d97706',     // amber-600
+            primary: '#d97706',      // amber-600
             primaryHover: '#b45309', // amber-700
-            accent: '#fbbf24',      // amber-400
+            accent: '#fbbf24',       // amber-400
             accentHover: '#f59e0b',  // amber-500
             gradientFrom: '#d97706',
             gradientTo: '#f59e0b',
@@ -73,9 +74,9 @@
         },
         crimson: {
             name: 'Crimson Ruby',
-            primary: '#e11d48',     // rose-600
+            primary: '#e11d48',      // rose-600
             primaryHover: '#be123c', // rose-700
-            accent: '#fb7185',      // rose-400
+            accent: '#fb7185',       // rose-400
             accentHover: '#f43f5e',  // rose-500
             gradientFrom: '#e11d48',
             gradientTo: '#fb7185',
@@ -84,9 +85,9 @@
         },
         teal: {
             name: 'Teal Cyan',
-            primary: '#0d9488',     // teal-600
+            primary: '#0d9488',      // teal-600
             primaryHover: '#0f766e', // teal-700
-            accent: '#22d3ee',      // cyan-400
+            accent: '#22d3ee',       // cyan-400
             accentHover: '#06b6d4',  // cyan-500
             gradientFrom: '#0d9488',
             gradientTo: '#06b6d4',
@@ -215,8 +216,8 @@
                     box-shadow: 0 0 20px ${pal.glow} !important;
                 }
                 
-                /* Tab Active States */
-                .tab-btn.active, .user-tab-btn.active {
+                /* Tab Active States (Updated to support all MS Bulletin & Spec Management tabs) */
+                .tab-btn.active, .user-tab-btn.active, .board-tab.active, .spec-tab.active, .ms-bulletin-tab.active, .ms-spec-tab.active {
                     background-color: ${pal.primary} !important;
                     border-color: ${pal.accent} !important;
                     box-shadow: 0 0 15px ${pal.glow} !important;
@@ -299,6 +300,21 @@
         styleEl.innerHTML = css;
         updateUIControls();
         saveState();
+
+        // Safely enforce section visibility whenever theme changes to prevent any legacy interference
+        if (typeof window.enforceSectionVisibility === 'function') {
+            window.enforceSectionVisibility();
+        } else {
+            const mainSections = ['bulletin-board-section', 'quality-spec-section', 'qamsproduct-portal', 'home', 'calendar-section', 'area-explorer', 'dcs-section', 'sop-section', 'user-management-section'];
+            mainSections.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.style.setProperty('display', 'block', 'important');
+                    el.style.setProperty('opacity', '1', 'important');
+                    el.style.setProperty('visibility', 'visible', 'important');
+                }
+            });
+        }
     }
 
     /**
