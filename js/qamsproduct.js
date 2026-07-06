@@ -1,11 +1,4 @@
 
-/**
- * ============================================================================
- * MS SECTION - PRODUCT QUALITY ASSURANCE & SPEC MANAGEMENT MODULE (v3.1)
- * ============================================================================
- * Centralized telemetry monitoring, monthly production compliance matrices,
- * SOP manuals, and YTD incident investigations for Mixed Sulphide operations.
- */
 
 (function (window, document) {
     'use strict';
@@ -510,8 +503,7 @@
             const isInitialized = localStorage.getItem(SEED_FLAG) === 'true';
             let records = stored ? JSON.parse(stored) : null;
 
-            // BUG FIX: Only seed if never initialized before or storage is corrupt.
-            // This prevents user-deleted records from being overridden on refresh!
+            // Only seed if never initialized before or storage is corrupt
             if (!isInitialized || !records || !Array.isArray(records)) {
                 records = defaultRecords;
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
@@ -561,7 +553,7 @@
             this.injectPortalContainer();
             this.setupGlobalListeners();
             this.render();
-            console.log('✅ MS Section - Product Quality Module (v3.1) successfully initialized with 23 multi-area records.');
+            console.log('✅ MS Section - Product Quality Module (v3.1) successfully initialized with Front-View visibility guarantee.');
         },
 
         setupGlobalListeners: function () {
@@ -572,15 +564,62 @@
                     if (modal) this.closeModal();
                 }
             });
+
+            // Hash navigation listener to ensure front view visibility whenever targeted
+            window.addEventListener('hashchange', () => {
+                if (window.location.hash === '#qamsproduct-portal' || window.location.hash === '#home') {
+                    this.showInFrontView(this.activeTab, this.activeBoardTab);
+                }
+            });
+        },
+
+        /**
+         * FRONT-VIEW VISIBILITY GUARANTEE:
+         * Prevents the .js file data from appearing hidden when clicking tabs for other data in index.html.
+         * Forces container display, removes SPA hiding classes, and scrolls smartly to active data tables.
+         */
+        showInFrontView: function (category = null, boardTab = null) {
+            const portal = document.getElementById('qamsproduct-portal');
+            if (!portal) return;
+
+            // 1. Guarantee visibility against any SPA tab-switching or hiding scripts
+            portal.style.display = 'block';
+            portal.style.visibility = 'visible';
+            portal.style.opacity = '1';
+            portal.classList.remove('hidden', 'opacity-0', 'pointer-events-none', 'max-h-0', 'h-0', 'overflow-hidden', 'scale-95');
+
+            // 2. Also ensure all parent containers (like <main> or wrapper divs) are visible
+            let parent = portal.parentElement;
+            while (parent && parent !== document.body) {
+                if (parent.style.display === 'none') parent.style.display = 'block';
+                parent.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+                parent = parent.parentElement;
+            }
+
+            // 3. Smart Front-View Auto-Scrolling:
+            // If navigating specifically to data categories (Documents, Near Miss, Claims, Improvement),
+            // scroll directly to the interactive data table / grid section so records are immediately visible in front view!
+            setTimeout(() => {
+                if (boardTab && ['matrix', 'scorecard', 'reprocess'].includes(boardTab)) {
+                    portal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else if (category && category !== 'all' && category !== 'product_quality') {
+                    const gridSection = document.getElementById('qams-grid-section') || portal;
+                    gridSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    portal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 30);
         },
 
         // Called by external index.html navigation links (preserves keyword/boardTab if passed)
         open: function (category = 'all', keyword = undefined, boardTab = undefined) {
             if (category === 'analysis') category = 'product_quality';
-            this.activeTab = category;
+            this.activeTab = category || 'all';
             
             if (keyword !== undefined && keyword !== null) {
                 this.searchQuery = keyword;
+            } else if (keyword === '') {
+                this.searchQuery = '';
             }
             if (boardTab !== undefined && boardTab !== null) {
                 this.activeBoardTab = boardTab;
@@ -589,8 +628,7 @@
             }
             
             this.render();
-            const portal = document.getElementById('qamsproduct-portal');
-            if (portal) portal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            this.showInFrontView(this.activeTab, this.activeBoardTab);
         },
 
         // Called when clicking internal category tab buttons or KPI summary boxes
@@ -601,8 +639,7 @@
             this.filterArea = 'All Areas';
             this.filterStatus = 'all';
             this.render();
-            const portal = document.getElementById('qamsproduct-portal');
-            if (portal) portal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            this.showInFrontView(this.activeTab, null);
         },
 
         // Switch Bulletin Board tabs (Matrix, Scorecard, Reprocess) and reset filters
@@ -614,6 +651,7 @@
             this.filterArea = 'All Areas';
             this.filterStatus = 'all';
             this.render();
+            this.showInFrontView(null, tab);
         },
 
         switchTab: function (tab) {
@@ -646,6 +684,7 @@
             this.filterArea = 'All Areas';
             this.filterStatus = 'all';
             this.render();
+            this.showInFrontView('all', this.activeBoardTab);
         },
 
         filterFromBoard: function (keyword) {
@@ -677,7 +716,7 @@
             let records = Store.getRecords();
 
             if (this.activeTab !== 'all') {
-                records = records.filter(r => r.category === this.activeTab || (this.activeTab === 'product_quality' && r.category === 'analysis'));
+                records = records.filter(r => r.category === this.activeTab || (this.activeTab === 'product_quality' && (r.category === 'analysis' || r.category === 'product_quality')));
             }
 
             if (this.filterArea && this.filterArea !== 'All Areas') {
@@ -1260,7 +1299,7 @@
         },
 
         renderTabButton: function (key, label, icon, color = 'text-white') {
-            const isActive = this.activeTab === key || (key === 'product_quality' && this.activeTab === 'analysis');
+            const isActive = this.activeTab === key || (key === 'product_quality' && (this.activeTab === 'analysis' || this.activeTab === 'product_quality'));
             return `
                 <button onclick="QAMSProduct.switchCategory('${key}')" class="px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${isActive ? 'bg-royalblue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)]' : 'bg-dark-700 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/80'}">
                     <i class="fas ${icon} ${isActive ? 'text-white' : color}"></i> ${label}
@@ -1684,7 +1723,7 @@
                 attachments: []
             };
 
-            // BUG FIX: Store attachments in memory state to avoid quotation parsing errors in HTML attributes
+            // Store attachments in memory state to avoid HTML quotation attribute parsing errors
             this._currentFormAttachments = JSON.parse(JSON.stringify(r.attachments || []));
 
             const modalHtml = `
@@ -2023,7 +2062,6 @@
                         if (!Array.isArray(parsedData)) parsedData = [parsedData];
                     } else if (file.name.endsWith('.csv')) {
                         const lines = content.split('\n');
-                        // Clean quotes from CSV headers
                         const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
                         for (let i = 1; i < lines.length; i++) {
                             if (!lines[i].trim()) continue;
@@ -2053,7 +2091,6 @@
         },
 
         analyzeAndDisplayReport: function (dataset, filename) {
-            // BUG FIX: Store dataset in memory state to avoid quotation syntax crashes in HTML attributes
             this._tempImportDataset = dataset;
 
             const total = dataset.length;
@@ -2200,7 +2237,6 @@
             Store.addHistory('Downloaded Attachment', `File: ${filename}`);
         },
 
-        // HTML escaping utility to prevent XSS and layout breaking from user quotes
         escapeHtml: function (str) {
             if (!str) return '';
             return String(str)
@@ -2230,7 +2266,7 @@
 
     window.QAMSProduct = QAMSProduct;
     
-    // BUG FIX: Use readyState check to ensure initialization fires reliably
+    // Ensure initialization fires reliably regardless of DOM load state
     if (document.readyState === 'loading') {
         window.addEventListener('DOMContentLoaded', () => QAMSProduct.init());
     } else {
