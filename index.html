@@ -43,23 +43,50 @@
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
         .submenu-content { max-height: 0; overflow: hidden; transition: max-height 0.35s ease-out; }
         .submenu-open { max-height: 600px; }
+        
+        /* Tab Button Active Styles */
         .tab-btn.active { background: #2563eb !important; color: #ffffff !important; border-color: #38bdf8 !important; box-shadow: 0 0 15px rgba(56,189,248,0.4); }
         .user-tab-btn.active { background: #2563eb !important; color: #ffffff !important; border-color: #38bdf8 !important; }
-        .board-tab.active, .spec-tab.active { background: #2563eb !important; color: #ffffff !important; border-color: #38bdf8 !important; }
+        .board-tab.active, .spec-tab.active, .ms-bulletin-tab.active, .ms-spec-tab.active { background: #2563eb !important; color: #ffffff !important; border-color: #38bdf8 !important; }
         .main-tab.active { background: linear-gradient(135deg, #1d4ed8, #0ea5e9) !important; color: #fff !important; border-color: #38bdf8 !important; box-shadow: 0 0 18px rgba(14,165,233,0.35); }
-        .bulletin-panel, .spec-panel, .data-panel { display: none; }
-        .bulletin-panel.active, .spec-panel.active, .data-panel.active { display: block; }
+        
+        /* Panel Display Rules */
+        .bulletin-panel, .spec-panel, .data-panel, .ms-bulletin-panel, .ms-spec-panel { display: none; }
+        .bulletin-panel.active, .spec-panel.active, .data-panel.active, .ms-bulletin-panel.active, .ms-spec-panel.active { 
+            display: block !important; 
+            opacity: 1 !important; 
+            visibility: visible !important; 
+        }
+        
         @keyframes fadeIn { from { opacity:0; transform: scale(0.98); } to { opacity:1; transform: scale(1); } }
         .animate-fadeIn { animation: fadeIn 0.2s cubic-bezier(0.16,1,0.3,1) forwards; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         @keyframes pulseBorder { 0%,100% { border-color: rgba(56,189,248,0.4); } 50% { border-color: rgba(56,189,248,0.9); } }
         .pulse-border { animation: pulseBorder 2s infinite; }
-        /* Safeguard: Ensure main sections are NEVER accidentally hidden by external scripts */
-        #bulletin-board-section, #quality-spec-section, #qamsproduct-portal {
+        
+        /* ==========================================================================
+           ULTIMATE SAFEGUARD: Prevent legacy external scripts (qamsproduct.js, style.js) 
+           from accidentally hiding or collapsing top-level portal sections.
+           ========================================================================== */
+        #bulletin-board-section, 
+        #quality-spec-section, 
+        #qamsproduct-portal,
+        #home,
+        #calendar-section,
+        #area-explorer,
+        #dcs-section,
+        #sop-section,
+        #user-management-section {
             display: block !important;
             opacity: 1 !important;
             visibility: visible !important;
+            max-height: none !important;
+            height: auto !important;
+            overflow: visible !important;
+            pointer-events: auto !important;
+            position: relative !important;
+            z-index: 10 !important;
         }
     </style>
 </head>
@@ -115,10 +142,10 @@
                         <i id="icon-bulletin" class="fas fa-chevron-down text-xs text-slate-500 transition-transform duration-300"></i>
                     </button>
                     <div id="submenu-bulletin" class="submenu-content pl-9 pr-2 space-y-1 mt-1 border-l-2 border-slate-800 ml-4">
-                        <a href="#bulletin-board-section" onclick="switchBulletinTab('bulletin_home'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"><i class="fas fa-broadcast-tower mr-2 text-amber-400"></i> Live Whiteboard & Notes</a>
-                        <a href="#bulletin-board-section" onclick="switchBulletinTab('scorecard'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"><i class="fas fa-bullseye mr-2 text-sky-400"></i> Objectives & Scorecard</a>
-                        <a href="#bulletin-board-section" onclick="switchBulletinTab('nearmiss'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"><i class="fas fa-exclamation-triangle mr-2 text-rose-400"></i> Near Miss & Incident Log</a>
-                        <a href="#bulletin-board-section" onclick="switchBulletinTab('improvement'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"><i class="fas fa-lightbulb mr-2 text-emerald-400"></i> For Improvement</a>
+                        <a href="#bulletin-board-section" onclick="switchBulletinTab(event, 'bulletin_home'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"><i class="fas fa-broadcast-tower mr-2 text-amber-400"></i> Live Whiteboard & Notes</a>
+                        <a href="#bulletin-board-section" onclick="switchBulletinTab(event, 'scorecard'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"><i class="fas fa-bullseye mr-2 text-sky-400"></i> Objectives & Scorecard</a>
+                        <a href="#bulletin-board-section" onclick="switchBulletinTab(event, 'nearmiss'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"><i class="fas fa-exclamation-triangle mr-2 text-rose-400"></i> Near Miss & Incident Log</a>
+                        <a href="#bulletin-board-section" onclick="switchBulletinTab(event, 'improvement'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"><i class="fas fa-lightbulb mr-2 text-emerald-400"></i> For Improvement</a>
                     </div>
                 </div>
 
@@ -129,10 +156,10 @@
                         <i id="icon-spec" class="fas fa-chevron-down text-xs text-slate-500 transition-transform duration-300"></i>
                     </button>
                     <div id="submenu-spec" class="submenu-content pl-9 pr-2 space-y-1 mt-1 border-l-2 border-slate-800 ml-4">
-                        <a href="#quality-spec-section" onclick="switchSpecTab('matrix'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer"><i class="fas fa-award mr-2 text-sky-500"></i> Product Quality Matrix</a>
-                        <a href="#quality-spec-section" onclick="switchSpecTab('reprocess'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer"><i class="fas fa-recycle mr-2 text-emerald-400"></i> Reprocess & Batch Credits</a>
-                        <a href="#quality-spec-section" onclick="switchSpecTab('claim'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer"><i class="fas fa-clipboard-check mr-2 text-rose-400"></i> Quality Claims Register</a>
-                        <a href="#quality-spec-section" onclick="switchSpecTab('document'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer"><i class="fas fa-file-invoice mr-2 text-cyan-500"></i> QA Documents & Reports</a>
+                        <a href="#quality-spec-section" onclick="switchSpecTab(event, 'matrix'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer"><i class="fas fa-award mr-2 text-sky-500"></i> Product Quality Matrix</a>
+                        <a href="#quality-spec-section" onclick="switchSpecTab(event, 'reprocess'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer"><i class="fas fa-recycle mr-2 text-emerald-400"></i> Reprocess & Batch Credits</a>
+                        <a href="#quality-spec-section" onclick="switchSpecTab(event, 'claim'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer"><i class="fas fa-clipboard-check mr-2 text-rose-400"></i> Quality Claims Register</a>
+                        <a href="#quality-spec-section" onclick="switchSpecTab(event, 'document'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer"><i class="fas fa-file-invoice mr-2 text-cyan-500"></i> QA Documents & Reports</a>
                     </div>
                 </div>
 
@@ -262,10 +289,10 @@
                     Centralized Quality Assurance for Hydrometallurgical & MS Product operations. Monitor real-time telemetry, track Near Misses on our Digital Bulletin Board, and enforce strict Quality Specifications across all processing areas.
                 </p>
                 <div class="flex flex-wrap justify-center items-center gap-3 sm:gap-4">
-                    <button onclick="document.getElementById('bulletin-board-section').scrollIntoView({behavior:'smooth'}); switchBulletinTab('bulletin_home');" class="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-white font-bold text-sm rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-all flex items-center justify-center gap-2">
+                    <button onclick="document.getElementById('bulletin-board-section').scrollIntoView({behavior:'smooth'}); switchBulletinTab(event, 'bulletin_home');" class="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-white font-bold text-sm rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-all flex items-center justify-center gap-2">
                         <span>Digital Bulletin Board</span><i class="fas fa-clipboard-list text-xs"></i>
                     </button>
-                    <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab('matrix');" class="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-royalblue-600 to-sky-500 hover:from-royalblue-500 hover:to-sky-400 text-white font-bold text-sm rounded-xl shadow-[0_0_20px_rgba(14,165,233,0.4)] transition-all flex items-center justify-center gap-2">
+                    <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab(event, 'matrix');" class="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-royalblue-600 to-sky-500 hover:from-royalblue-500 hover:to-sky-400 text-white font-bold text-sm rounded-xl shadow-[0_0_20px_rgba(14,165,233,0.4)] transition-all flex items-center justify-center gap-2">
                         <span>Product Quality & Spec Mgmt</span><i class="fas fa-microscope text-xs"></i>
                     </button>
                     <a href="#calendar-section" class="w-full sm:w-auto px-6 py-3.5 bg-dark-500/80 hover:bg-dark-400/80 border border-slate-700 hover:border-slate-500 text-slate-200 hover:text-white font-semibold text-sm rounded-xl transition-all text-center backdrop-blur-sm">QA Calendar</a>
@@ -315,24 +342,24 @@
                     </div>
                 </div>
 
-                <!-- Bulletin Board Tab Navigation -->
+                <!-- Bulletin Board Tab Navigation (Updated class names and event stopping to prevent external script interference) -->
                 <div class="flex items-center gap-2 overflow-x-auto pb-3 mb-6 no-scrollbar border-b border-slate-800">
-                    <button onclick="switchBulletinTab('bulletin_home')" id="btab-bulletin_home" class="board-tab active px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
+                    <button onclick="switchBulletinTab(event, 'bulletin_home')" id="btab-bulletin_home" class="board-tab ms-bulletin-tab active px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
                         <i class="fas fa-broadcast-tower text-amber-400"></i> Live Whiteboard & Notes
                     </button>
-                    <button onclick="switchBulletinTab('scorecard')" id="btab-scorecard" class="board-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
+                    <button onclick="switchBulletinTab(event, 'scorecard')" id="btab-scorecard" class="board-tab ms-bulletin-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
                         <i class="fas fa-bullseye text-sky-400"></i> Objectives & Scorecard
                     </button>
-                    <button onclick="switchBulletinTab('nearmiss')" id="btab-nearmiss" class="board-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
+                    <button onclick="switchBulletinTab(event, 'nearmiss')" id="btab-nearmiss" class="board-tab ms-bulletin-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
                         <i class="fas fa-exclamation-triangle text-rose-400"></i> Near Miss & Incident Log
                     </button>
-                    <button onclick="switchBulletinTab('improvement')" id="btab-improvement" class="board-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
+                    <button onclick="switchBulletinTab(event, 'improvement')" id="btab-improvement" class="board-tab ms-bulletin-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
                         <i class="fas fa-lightbulb text-emerald-400"></i> For Improvement Proposals
                     </button>
                 </div>
 
                 <!-- ===== BULLETIN PANEL 1: LIVE WHITEBOARD & NOTES ===== -->
-                <div id="panel-bulletin_home" class="bulletin-panel active animate-fadeIn">
+                <div id="panel-bulletin_home" class="bulletin-panel ms-bulletin-panel active animate-fadeIn">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div class="lg:col-span-2 space-y-4">
                             <div class="bg-dark-500 p-6 rounded-2xl border border-amber-500/30 shadow-xl relative overflow-hidden">
@@ -387,10 +414,10 @@
                                     <button onclick="openModal('incidentModal')" class="w-full py-3 bg-gradient-to-r from-rose-600 to-amber-500 hover:from-rose-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2">
                                         <i class="fas fa-exclamation-triangle"></i> Log Near Miss / Incident
                                     </button>
-                                    <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab('matrix');" class="w-full py-3 bg-royalblue-600 hover:bg-royalblue-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2">
+                                    <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab(event, 'matrix');" class="w-full py-3 bg-royalblue-600 hover:bg-royalblue-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2">
                                         <i class="fas fa-table"></i> Open Product Quality Matrix
                                     </button>
-                                    <button onclick="switchBulletinTab('scorecard')" class="w-full py-3 bg-dark-700 hover:bg-dark-400 border border-slate-700 text-slate-200 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2">
+                                    <button onclick="switchBulletinTab(event, 'scorecard')" class="w-full py-3 bg-dark-700 hover:bg-dark-400 border border-slate-700 text-slate-200 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2">
                                         <i class="fas fa-chart-bar text-amber-400"></i> View Monthly Scorecard
                                     </button>
                                 </div>
@@ -403,7 +430,7 @@
                 </div>
 
                 <!-- ===== BULLETIN PANEL 2: OBJECTIVES & SCORECARD ===== -->
-                <div id="panel-scorecard" class="bulletin-panel animate-fadeIn">
+                <div id="panel-scorecard" class="bulletin-panel ms-bulletin-panel animate-fadeIn">
                     <h4 class="text-lg font-extrabold text-white mb-1">Objectives & Scorecard</h4>
                     <p class="text-xs text-slate-400 mb-5">Monthly KPI targets vs. actuals for MS Section quality objectives</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -460,7 +487,7 @@
                 </div>
 
                 <!-- ===== BULLETIN PANEL 3: NEAR MISS & INCIDENT LOG ===== -->
-                <div id="panel-nearmiss" class="bulletin-panel animate-fadeIn">
+                <div id="panel-nearmiss" class="bulletin-panel ms-bulletin-panel animate-fadeIn">
                     <h4 class="text-lg font-extrabold text-white mb-1">QA Near Miss & Incident Log</h4>
                     <p class="text-xs text-slate-400 mb-5">All reported hazard events, near misses, and safety interventions — MS Section 2026</p>
                     <div class="space-y-3">
@@ -501,7 +528,7 @@
                 </div>
 
                 <!-- ===== BULLETIN PANEL 4: FOR IMPROVEMENT ===== -->
-                <div id="panel-improvement" class="bulletin-panel animate-fadeIn">
+                <div id="panel-improvement" class="bulletin-panel ms-bulletin-panel animate-fadeIn">
                     <h4 class="text-lg font-extrabold text-white mb-1">For Improvement — QA Suggestions</h4>
                     <p class="text-xs text-slate-400 mb-5">Continuous improvement proposals submitted by field inspectors and technicians</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -581,24 +608,24 @@
                     </div>
                 </div>
 
-                <!-- Spec Management Tab Navigation -->
+                <!-- Spec Management Tab Navigation (Updated class names and event stopping to prevent external script interference) -->
                 <div class="flex items-center gap-2 overflow-x-auto pb-3 mb-6 no-scrollbar border-b border-slate-800">
-                    <button onclick="switchSpecTab('matrix')" id="stab-matrix" class="spec-tab active px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
+                    <button onclick="switchSpecTab(event, 'matrix')" id="stab-matrix" class="spec-tab ms-spec-tab active px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
                         <i class="fas fa-th-large text-sky-400"></i> Product Quality Matrix & Specs
                     </button>
-                    <button onclick="switchSpecTab('reprocess')" id="stab-reprocess" class="spec-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
+                    <button onclick="switchSpecTab(event, 'reprocess')" id="stab-reprocess" class="spec-tab ms-spec-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
                         <i class="fas fa-recycle text-emerald-400"></i> Reprocess & Batch Credits
                     </button>
-                    <button onclick="switchSpecTab('claim')" id="stab-claim" class="spec-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
+                    <button onclick="switchSpecTab(event, 'claim')" id="stab-claim" class="spec-tab ms-spec-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
                         <i class="fas fa-clipboard-check text-rose-400"></i> Quality Claims Register
                     </button>
-                    <button onclick="switchSpecTab('document')" id="stab-document" class="spec-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
+                    <button onclick="switchSpecTab(event, 'document')" id="stab-document" class="spec-tab ms-spec-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
                         <i class="fas fa-file-invoice text-cyan-400"></i> QA Documents & SOPs
                     </button>
                 </div>
 
                 <!-- ===== SPEC PANEL 1: PRODUCT QUALITY MATRIX ===== -->
-                <div id="spanel-matrix" class="spec-panel active animate-fadeIn">
+                <div id="spanel-matrix" class="spec-panel ms-spec-panel active animate-fadeIn">
                     <div class="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                         <div>
                             <h4 class="text-lg font-extrabold text-white">Product Quality Matrix & Specification Enforcement</h4>
@@ -634,7 +661,7 @@
                 </div>
 
                 <!-- ===== SPEC PANEL 2: REPROCESS & BATCH CREDITS ===== -->
-                <div id="spanel-reprocess" class="spec-panel animate-fadeIn">
+                <div id="spanel-reprocess" class="spec-panel ms-spec-panel animate-fadeIn">
                     <h4 class="text-lg font-extrabold text-white mb-1">Reprocess & Batch Credits</h4>
                     <p class="text-xs text-slate-400 mb-5">Batches flagged for reprocessing and credit adjustments — July 2026</p>
                     <div class="bg-dark-500 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
@@ -704,7 +731,7 @@
                 </div>
 
                 <!-- ===== SPEC PANEL 3: QUALITY CLAIMS REGISTER ===== -->
-                <div id="spanel-claim" class="spec-panel animate-fadeIn">
+                <div id="spanel-claim" class="spec-panel ms-spec-panel animate-fadeIn">
                     <h4 class="text-lg font-extrabold text-white mb-1">Quality Claims Register</h4>
                     <p class="text-xs text-slate-400 mb-5">Formal quality complaints and claims lodged against MS Section products</p>
                     <div class="bg-dark-500 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
@@ -760,7 +787,7 @@
                 </div>
 
                 <!-- ===== SPEC PANEL 4: QA DOCUMENTS & SOPS ===== -->
-                <div id="spanel-document" class="spec-panel animate-fadeIn">
+                <div id="spanel-document" class="spec-panel ms-spec-panel animate-fadeIn">
                     <h4 class="text-lg font-extrabold text-white mb-1">QA Documents & Reports</h4>
                     <p class="text-xs text-slate-400 mb-5">Current revision documents, analytical reports, and compliance certifications</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -880,7 +907,7 @@
                                     <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden"><div class="bg-gradient-to-r from-rose-500 to-emerald-400 h-full" style="width:66.7%"></div></div>
                                 </div>
                             </div>
-                            <button onclick="document.getElementById('bulletin-board-section').scrollIntoView({behavior:'smooth'}); switchBulletinTab('nearmiss');" class="w-full py-3 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold text-xs rounded-xl transition-all shadow flex items-center justify-center gap-2">
+                            <button onclick="document.getElementById('bulletin-board-section').scrollIntoView({behavior:'smooth'}); switchBulletinTab(event, 'nearmiss');" class="w-full py-3 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold text-xs rounded-xl transition-all shadow flex items-center justify-center gap-2">
                                 <span>View Bulletin Near Miss Log</span><i class="fas fa-arrow-right text-[10px] text-sky-400"></i>
                             </button>
                         </div>
@@ -981,19 +1008,19 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     <div class="p-4 bg-dark-500 rounded-xl border border-slate-800 hover:border-sky-400/50 transition-all flex flex-col justify-between h-40 group">
                         <div><span class="text-[10px] font-bold text-sky-400 uppercase">Rev 4.3 &bull; Active</span><h5 class="font-bold text-sm text-white mt-1 group-hover:text-sky-300 transition-colors">SOP-MS-101: Mixed Sulphide Titration Manual</h5></div>
-                        <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab('document');" class="text-xs text-sky-400 font-bold hover:underline flex items-center gap-1 mt-3"><span>Read Procedure</span> <i class="fas fa-arrow-right text-[10px]"></i></button>
+                        <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab(event, 'document');" class="text-xs text-sky-400 font-bold hover:underline flex items-center gap-1 mt-3"><span>Read Procedure</span> <i class="fas fa-arrow-right text-[10px]"></i></button>
                     </div>
                     <div class="p-4 bg-dark-500 rounded-xl border border-slate-800 hover:border-sky-400/50 transition-all flex flex-col justify-between h-40 group">
                         <div><span class="text-[10px] font-bold text-sky-400 uppercase">Rev 2.0 &bull; Active</span><h5 class="font-bold text-sm text-white mt-1 group-hover:text-sky-300 transition-colors">SOP-H2S-204: Toxic Gas Scrubber QA</h5></div>
-                        <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab('document');" class="text-xs text-sky-400 font-bold hover:underline flex items-center gap-1 mt-3"><span>Read Procedure</span> <i class="fas fa-arrow-right text-[10px]"></i></button>
+                        <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab(event, 'document');" class="text-xs text-sky-400 font-bold hover:underline flex items-center gap-1 mt-3"><span>Read Procedure</span> <i class="fas fa-arrow-right text-[10px]"></i></button>
                     </div>
                     <div class="p-4 bg-dark-500 rounded-xl border border-slate-800 hover:border-sky-400/50 transition-all flex flex-col justify-between h-40 group">
                         <div><span class="text-[10px] font-bold text-amber-400 uppercase">Rev 3.1 &bull; Under Review</span><h5 class="font-bold text-sm text-white mt-1 group-hover:text-sky-300 transition-colors">SOP-FN-309: Effluent pH Interlock Test</h5></div>
-                        <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab('document');" class="text-xs text-sky-400 font-bold hover:underline flex items-center gap-1 mt-3"><span>Read Procedure</span> <i class="fas fa-arrow-right text-[10px]"></i></button>
+                        <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab(event, 'document');" class="text-xs text-sky-400 font-bold hover:underline flex items-center gap-1 mt-3"><span>Read Procedure</span> <i class="fas fa-arrow-right text-[10px]"></i></button>
                     </div>
                     <div class="p-4 bg-dark-500 rounded-xl border border-slate-800 hover:border-sky-400/50 transition-all flex flex-col justify-between h-40 group">
                         <div><span class="text-[10px] font-bold text-sky-400 uppercase">Rev 1.8 &bull; Active</span><h5 class="font-bold text-sm text-white mt-1 group-hover:text-sky-300 transition-colors">SOP-LS-402: Slurry Mesh Particle Titration</h5></div>
-                        <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab('document');" class="text-xs text-sky-400 font-bold hover:underline flex items-center gap-1 mt-3"><span>Read Procedure</span> <i class="fas fa-arrow-right text-[10px]"></i></button>
+                        <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab(event, 'document');" class="text-xs text-sky-400 font-bold hover:underline flex items-center gap-1 mt-3"><span>Read Procedure</span> <i class="fas fa-arrow-right text-[10px]"></i></button>
                     </div>
                 </div>
             </div>
@@ -1081,8 +1108,8 @@
                 <div>
                     <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-xs">Interactive QA Modules</h4>
                     <ul class="space-y-2 text-xs sm:text-sm font-medium">
-                        <li><a href="#bulletin-board-section" onclick="switchBulletinTab('bulletin_home')" class="hover:text-amber-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-amber-500"></i> MS Section Digital Bulletin Board</a></li>
-                        <li><a href="#quality-spec-section" onclick="switchSpecTab('matrix')" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> Product Quality & Spec Management</a></li>
+                        <li><a href="#bulletin-board-section" onclick="switchBulletinTab(event, 'bulletin_home')" class="hover:text-amber-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-amber-500"></i> MS Section Digital Bulletin Board</a></li>
+                        <li><a href="#quality-spec-section" onclick="switchSpecTab(event, 'matrix')" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> Product Quality & Spec Management</a></li>
                         <li><a href="#calendar-section" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> QA Event Calendar & Schedule</a></li>
                         <li><a href="#area-explorer" onclick="switchAreaTab('fntrl')" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> FNTRL Area Specifications</a></li>
                         <li><a href="#user-management-section" onclick="filterUsers('all')" class="hover:text-amber-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-amber-500"></i> QA User Management</a></li>
@@ -1297,6 +1324,48 @@ const areaSpecs = {
 };
 
 // ============================================================
+// WATCHDOG: ENFORCE SECTION VISIBILITY AGAINST EXTERNAL SCRIPTS
+// ============================================================
+function enforceSectionVisibility() {
+    const mainSections = [
+        'bulletin-board-section',
+        'quality-spec-section',
+        'qamsproduct-portal',
+        'home',
+        'calendar-section',
+        'area-explorer',
+        'dcs-section',
+        'sop-section',
+        'user-management-section'
+    ];
+    mainSections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (el.style.display === 'none' || el.classList.contains('hidden') || el.style.opacity === '0' || el.style.visibility === 'hidden') {
+                el.style.setProperty('display', 'block', 'important');
+                el.style.setProperty('opacity', '1', 'important');
+                el.style.setProperty('visibility', 'visible', 'important');
+                el.style.setProperty('max-height', 'none', 'important');
+                el.style.setProperty('height', 'auto', 'important');
+                el.classList.remove('hidden', 'd-none', 'opacity-0', 'invisible');
+            }
+        }
+    });
+}
+
+// ============================================================
+// SECURE FUNCTION REGISTRATION (Prevents external script override)
+// ============================================================
+function registerSecureFunction(name, fn) {
+    try {
+        window[name] = fn;
+        Object.defineProperty(window, name, { value: fn, writable: false, configurable: false });
+    } catch (err) {
+        window[name] = fn;
+    }
+}
+
+// ============================================================
 // LOADING SCREEN
 // ============================================================
 window.addEventListener('DOMContentLoaded', () => {
@@ -1304,6 +1373,20 @@ window.addEventListener('DOMContentLoaded', () => {
     const bar = document.getElementById('loader-bar');
     const text = document.getElementById('loader-text');
     const loader = document.getElementById('global-loader');
+
+    // Attach MutationObserver to immediately counter any external script hiding main sections
+    const bodyObserver = new MutationObserver(() => enforceSectionVisibility());
+    const bSection = document.getElementById('bulletin-board-section');
+    const qSection = document.getElementById('quality-spec-section');
+    if (bSection) bodyObserver.observe(bSection, { attributes: true, attributeFilter: ['style', 'class'] });
+    if (qSection) bodyObserver.observe(qSection, { attributes: true, attributeFilter: ['style', 'class'] });
+    
+    // Attach click watchdog
+    window.addEventListener('click', () => {
+        setTimeout(enforceSectionVisibility, 10);
+        setTimeout(enforceSectionVisibility, 50);
+        setTimeout(enforceSectionVisibility, 200);
+    }, true);
 
     const iv = setInterval(() => {
         progress += Math.floor(Math.random() * 16) + 6;
@@ -1320,6 +1403,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     renderMatrixTable(matrixData);
                     renderUserTable();
                     switchAreaTab('fntrl');
+                    enforceSectionVisibility();
                 }, 400);
             }, 300);
         }
@@ -1331,47 +1415,89 @@ window.addEventListener('DOMContentLoaded', () => {
 // ============================================================
 const bulletinTabs = ['bulletin_home', 'scorecard', 'nearmiss', 'improvement'];
 
-function switchBulletinTab(tab) {
+function switchBulletinTab(e, tab) {
+    // If called directly without an event object
+    if (typeof e === 'string' && !tab) {
+        tab = e;
+        e = null;
+    }
+    // Block any external click listeners in qamsproduct.js from receiving this event
+    if (e && typeof e.stopImmediatePropagation === 'function') {
+        e.stopImmediatePropagation();
+        e.stopPropagation();
+    }
     bulletinTabs.forEach(t => {
         const btn = document.getElementById('btab-' + t);
         const panel = document.getElementById('panel-' + t);
         if (btn) btn.classList.toggle('active', t === tab);
         if (panel) {
             panel.classList.toggle('active', t === tab);
-            if (t === tab) panel.classList.add('animate-fadeIn');
+            if (t === tab) {
+                panel.classList.add('animate-fadeIn');
+                panel.style.setProperty('display', 'block', 'important');
+                panel.style.setProperty('opacity', '1', 'important');
+                panel.style.setProperty('visibility', 'visible', 'important');
+            } else {
+                panel.style.setProperty('display', 'none', 'important');
+            }
         }
     });
+    enforceSectionVisibility();
 }
+registerSecureFunction('switchBulletinTab', switchBulletinTab);
 
 // ============================================================
 // TAB SWITCHER 2: PRODUCT QUALITY & SPEC MGMT (Independent System)
 // ============================================================
 const specTabs = ['matrix', 'reprocess', 'claim', 'document'];
 
-function switchSpecTab(tab) {
+function switchSpecTab(e, tab) {
+    if (typeof e === 'string' && !tab) {
+        tab = e;
+        e = null;
+    }
+    if (e && typeof e.stopImmediatePropagation === 'function') {
+        e.stopImmediatePropagation();
+        e.stopPropagation();
+    }
     specTabs.forEach(t => {
         const btn = document.getElementById('stab-' + t);
         const panel = document.getElementById('spanel-' + t);
         if (btn) btn.classList.toggle('active', t === tab);
         if (panel) {
             panel.classList.toggle('active', t === tab);
-            if (t === tab) panel.classList.add('animate-fadeIn');
+            if (t === tab) {
+                panel.classList.add('animate-fadeIn');
+                panel.style.setProperty('display', 'block', 'important');
+                panel.style.setProperty('opacity', '1', 'important');
+                panel.style.setProperty('visibility', 'visible', 'important');
+            } else {
+                panel.style.setProperty('display', 'none', 'important');
+            }
         }
     });
+    enforceSectionVisibility();
 }
+registerSecureFunction('switchSpecTab', switchSpecTab);
 
 // Backwards compatibility safeguard for any old external script calls
-function switchBoardTab(tab) {
+function switchBoardTab(e, tab) {
+    if (typeof e === 'string' && !tab) {
+        tab = e;
+        e = null;
+    }
     if (bulletinTabs.includes(tab)) {
-        switchBulletinTab(tab);
+        switchBulletinTab(e, tab);
         const sec = document.getElementById('bulletin-board-section');
         if (sec) sec.scrollIntoView({ behavior: 'smooth' });
     } else if (specTabs.includes(tab)) {
-        switchSpecTab(tab);
+        switchSpecTab(e, tab);
         const sec = document.getElementById('quality-spec-section');
         if (sec) sec.scrollIntoView({ behavior: 'smooth' });
     }
+    enforceSectionVisibility();
 }
+registerSecureFunction('switchBoardTab', switchBoardTab);
 
 // ============================================================
 // MATRIX TABLE
@@ -1435,8 +1561,8 @@ function switchAreaTab(key) {
                         <div class="bg-dark-700 p-3 rounded-xl border border-slate-800 col-span-2 sm:col-span-1"><span class="text-[10px] text-slate-400 block uppercase">Active SOP</span><span class="text-sm sm:text-base font-bold text-white">${d.sop}</span></div>
                     </div>
                     <div class="flex flex-wrap items-center gap-3">
-                        <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab('matrix');" class="px-4 py-2.5 bg-royalblue-600 hover:bg-royalblue-500 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center gap-1.5"><i class="fas fa-table"></i> Check Area Specs</button>
-                        <button onclick="document.getElementById('bulletin-board-section').scrollIntoView({behavior:'smooth'}); switchBulletinTab('nearmiss');" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-all border border-slate-700 flex items-center gap-1.5"><i class="fas fa-exclamation-triangle"></i> Area Hazards</button>
+                        <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab(event, 'matrix');" class="px-4 py-2.5 bg-royalblue-600 hover:bg-royalblue-500 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center gap-1.5"><i class="fas fa-table"></i> Check Area Specs</button>
+                        <button onclick="document.getElementById('bulletin-board-section').scrollIntoView({behavior:'smooth'}); switchBulletinTab(event, 'nearmiss');" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-all border border-slate-700 flex items-center gap-1.5"><i class="fas fa-exclamation-triangle"></i> Area Hazards</button>
                     </div>
                 </div>
                 <div class="lg:col-span-5">
@@ -1458,6 +1584,7 @@ function switchAreaTab(key) {
         content.style.opacity = '1';
     }, 150);
 }
+registerSecureFunction('switchAreaTab', switchAreaTab);
 
 // ============================================================
 // DCS DIAGNOSTICS
@@ -1485,6 +1612,7 @@ function openModal(id) {
     modal.classList.add('flex');
     setTimeout(() => modal.querySelector('div').classList.replace('scale-95', 'scale-100'), 10);
 }
+registerSecureFunction('openModal', openModal);
 
 function closeModal(id) {
     const modal = document.getElementById(id);
@@ -1492,6 +1620,7 @@ function closeModal(id) {
     modal.querySelector('div').classList.replace('scale-100', 'scale-95');
     setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 200);
 }
+registerSecureFunction('closeModal', closeModal);
 
 // ============================================================
 // SIDEBAR & SUBMENUS
@@ -1510,6 +1639,7 @@ function toggleSidebar() {
         document.body.classList.remove('overflow-hidden');
     }
 }
+registerSecureFunction('toggleSidebar', toggleSidebar);
 
 function closeSidebarOnMobile() {
     if (window.innerWidth < 1024) toggleSidebar();
@@ -1524,14 +1654,6 @@ function toggleSubmenu(menuId, iconId) {
     } else {
         submenu.classList.add('submenu-open');
         icon.style.transform = 'rotate(180deg)';
-    }
-}
-
-function switchMainTab(tab) {
-    if (tab === 'dashboard') {
-        document.getElementById('home').scrollIntoView({ behavior: 'smooth' });
-    } else if (tab === 'product') {
-        document.getElementById('quality-spec-section').scrollIntoView({ behavior: 'smooth' });
     }
 }
 
@@ -1598,6 +1720,7 @@ function filterUsers(role) {
     });
     renderUserTable(role);
 }
+registerSecureFunction('filterUsers', filterUsers);
 
 function handleUserSearch() {
     renderUserTable(currentUserFilter, document.getElementById('user-search-input').value);
