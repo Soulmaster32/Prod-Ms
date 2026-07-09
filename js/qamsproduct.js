@@ -1,5 +1,4 @@
 
-
 (function (window, document) {
     'use strict';
 
@@ -567,7 +566,7 @@
 
             // Hash navigation listener to ensure front view visibility whenever targeted
             window.addEventListener('hashchange', () => {
-                if (window.location.hash === '#qamsproduct-portal' || window.location.hash === '#home') {
+                if (window.location.hash.includes('qamsproduct-portal') || window.location.hash === '#home') {
                     this.showInFrontView(this.activeTab, this.activeBoardTab);
                 }
             });
@@ -575,30 +574,30 @@
 
         /**
          * FRONT-VIEW VISIBILITY GUARANTEE:
-         * Prevents the .js file data from appearing hidden when clicking tabs for other data in index.html.
-         * Forces container display, removes SPA hiding classes, and scrolls smartly to active data tables.
+         * Uses safe CSS overrides (e.g., style.display = '') to clear display nones without
+         * destroying original Flex/Grid parent layout behaviors.
          */
         showInFrontView: function (category = null, boardTab = null) {
             const portal = document.getElementById('qamsproduct-portal');
             if (!portal) return;
 
-            // 1. Guarantee visibility against any SPA tab-switching or hiding scripts
-            portal.style.display = 'block';
+            // 1. Guarantee visibility safely
+            portal.style.display = ''; 
             portal.style.visibility = 'visible';
             portal.style.opacity = '1';
             portal.classList.remove('hidden', 'opacity-0', 'pointer-events-none', 'max-h-0', 'h-0', 'overflow-hidden', 'scale-95');
 
-            // 2. Also ensure all parent containers (like <main> or wrapper divs) are visible
+            // 2. Clear inline blockages in parent elements without overriding flex/grid structure
             let parent = portal.parentElement;
             while (parent && parent !== document.body) {
-                if (parent.style.display === 'none') parent.style.display = 'block';
+                if (parent.style.display === 'none') {
+                    parent.style.display = '';
+                }
                 parent.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
                 parent = parent.parentElement;
             }
 
-            // 3. Smart Front-View Auto-Scrolling:
-            // If navigating specifically to data categories (Documents, Near Miss, Claims, Improvement),
-            // scroll directly to the interactive data table / grid section so records are immediately visible in front view!
+            // 3. Smart Front-View Auto-Scrolling
             setTimeout(() => {
                 if (boardTab && ['matrix', 'scorecard', 'reprocess'].includes(boardTab)) {
                     portal.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -639,7 +638,7 @@
             this.filterArea = 'All Areas';
             this.filterStatus = 'all';
             this.render();
-            this.showInFrontView(this.activeTab, null);
+            // Removed showInFrontView call to prevent jumpy layout behavior on internal interactions
         },
 
         // Switch Bulletin Board tabs (Matrix, Scorecard, Reprocess) and reset filters
@@ -651,7 +650,7 @@
             this.filterArea = 'All Areas';
             this.filterStatus = 'all';
             this.render();
-            this.showInFrontView(null, tab);
+            // Removed showInFrontView call to prevent jumpy layout behavior on internal interactions
         },
 
         switchTab: function (tab) {
@@ -684,7 +683,6 @@
             this.filterArea = 'All Areas';
             this.filterStatus = 'all';
             this.render();
-            this.showInFrontView('all', this.activeBoardTab);
         },
 
         filterFromBoard: function (keyword) {
@@ -748,7 +746,6 @@
             return records;
         },
 
-        // Enhanced month matching supporting full names ("January"), short codes ("JAN"), and years
         matchMonthKeyword: function (record, q) {
             const monthsMap = {
                 'jan': '01', 'january': '01',
@@ -822,16 +819,16 @@
                         
                         <!-- Top Action Buttons -->
                         <div class="flex flex-wrap items-center gap-2.5 mt-4 md:mt-0">
-                            <button onclick="QAMSProduct.openAddModal()" class="px-4 py-2.5 bg-gradient-to-r from-royalblue-600 to-sky-500 hover:from-royalblue-500 hover:to-sky-400 text-white font-bold text-xs sm:text-sm rounded-xl shadow-[0_0_15px_rgba(14,165,233,0.4)] transition-all flex items-center gap-2">
+                            <button onclick="event.stopPropagation(); QAMSProduct.openAddModal()" class="px-4 py-2.5 bg-gradient-to-r from-royalblue-600 to-sky-500 hover:from-royalblue-500 hover:to-sky-400 text-white font-bold text-xs sm:text-sm rounded-xl shadow-[0_0_15px_rgba(14,165,233,0.4)] transition-all flex items-center gap-2">
                                 <i class="fas fa-plus-circle"></i> Add QA Record
                             </button>
-                            <button onclick="QAMSProduct.openUploadModal()" class="px-4 py-2.5 bg-dark-500 hover:bg-dark-400 border border-slate-700 hover:border-emerald-500/50 text-emerald-400 font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center gap-2 shadow">
+                            <button onclick="event.stopPropagation(); QAMSProduct.openUploadModal()" class="px-4 py-2.5 bg-dark-500 hover:bg-dark-400 border border-slate-700 hover:border-emerald-500/50 text-emerald-400 font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center gap-2 shadow">
                                 <i class="fas fa-cloud-upload-alt"></i> Upload & Analyze
                             </button>
-                            <button onclick="QAMSProduct.exportToCSV()" class="px-3.5 py-2.5 bg-dark-500 hover:bg-dark-400 border border-slate-700 text-slate-300 hover:text-white font-semibold text-xs rounded-xl transition-all flex items-center gap-1.5" title="Export CSV">
+                            <button onclick="event.stopPropagation(); QAMSProduct.exportToCSV()" class="px-3.5 py-2.5 bg-dark-500 hover:bg-dark-400 border border-slate-700 text-slate-300 hover:text-white font-semibold text-xs rounded-xl transition-all flex items-center gap-1.5" title="Export CSV">
                                 <i class="fas fa-file-csv text-sky-400"></i> Export
                             </button>
-                            <button onclick="QAMSProduct.openHistoryModal()" class="px-3.5 py-2.5 bg-dark-500 hover:bg-dark-400 border border-slate-700 text-slate-300 hover:text-white font-semibold text-xs rounded-xl transition-all flex items-center gap-1.5" title="Audit Trail">
+                            <button onclick="event.stopPropagation(); QAMSProduct.openHistoryModal()" class="px-3.5 py-2.5 bg-dark-500 hover:bg-dark-400 border border-slate-700 text-slate-300 hover:text-white font-semibold text-xs rounded-xl transition-all flex items-center gap-1.5" title="Audit Trail">
                                 <i class="fas fa-history text-amber-400"></i> Audit Log
                             </button>
                         </div>
@@ -860,13 +857,13 @@
 
                             <!-- Board Tab Switcher -->
                             <div class="flex items-center gap-1.5 bg-dark-900/80 p-1.5 rounded-xl border border-slate-700/80 overflow-x-auto no-scrollbar">
-                                <button onclick="QAMSProduct.switchBoardTab('matrix')" class="px-3 py-2 rounded-lg text-xs font-extrabold transition-all flex items-center gap-1.5 whitespace-nowrap ${this.activeBoardTab === 'matrix' ? 'bg-amber-500 text-dark-900 shadow-md' : 'text-slate-300 hover:text-white hover:bg-slate-800'}">
+                                <button onclick="event.stopPropagation(); QAMSProduct.switchBoardTab('matrix')" class="px-3 py-2 rounded-lg text-xs font-extrabold transition-all flex items-center gap-1.5 whitespace-nowrap ${this.activeBoardTab === 'matrix' ? 'bg-amber-500 text-dark-900 shadow-md' : 'text-slate-300 hover:text-white hover:bg-slate-800'}">
                                     <i class="fas fa-table"></i> 1. Monthly Matrix (Image 1)
                                 </button>
-                                <button onclick="QAMSProduct.switchBoardTab('scorecard')" class="px-3 py-2 rounded-lg text-xs font-extrabold transition-all flex items-center gap-1.5 whitespace-nowrap ${this.activeBoardTab === 'scorecard' ? 'bg-amber-500 text-dark-900 shadow-md' : 'text-slate-300 hover:text-white hover:bg-slate-800'}">
+                                <button onclick="event.stopPropagation(); QAMSProduct.switchBoardTab('scorecard')" class="px-3 py-2 rounded-lg text-xs font-extrabold transition-all flex items-center gap-1.5 whitespace-nowrap ${this.activeBoardTab === 'scorecard' ? 'bg-amber-500 text-dark-900 shadow-md' : 'text-slate-300 hover:text-white hover:bg-slate-800'}">
                                     <i class="fas fa-bullseye"></i> 2. Objectives & Targets (Image 2)
                                 </button>
-                                <button onclick="QAMSProduct.switchBoardTab('reprocess')" class="px-3 py-2 rounded-lg text-xs font-extrabold transition-all flex items-center gap-1.5 whitespace-nowrap ${this.activeBoardTab === 'reprocess' ? 'bg-amber-500 text-dark-900 shadow-md' : 'text-slate-300 hover:text-white hover:bg-slate-800'}">
+                                <button onclick="event.stopPropagation(); QAMSProduct.switchBoardTab('reprocess')" class="px-3 py-2 rounded-lg text-xs font-extrabold transition-all flex items-center gap-1.5 whitespace-nowrap ${this.activeBoardTab === 'reprocess' ? 'bg-amber-500 text-dark-900 shadow-md' : 'text-slate-300 hover:text-white hover:bg-slate-800'}">
                                     <i class="fas fa-recycle"></i> 3. Reprocess & Batch Credits (Image 3)
                                 </button>
                             </div>
@@ -878,35 +875,35 @@
 
                     <!-- KPI Statistics Cards -->
                     <div id="qams-grid-section" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
-                        <div onclick="QAMSProduct.switchCategory('all')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'all' ? 'border-sky-400 ring-1 ring-sky-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
+                        <div onclick="event.stopPropagation(); QAMSProduct.switchCategory('all')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'all' ? 'border-sky-400 ring-1 ring-sky-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
                             <span class="text-[11px] font-bold text-slate-400 uppercase block">Total Records</span>
                             <div class="flex items-center justify-between mt-1">
                                 <span class="text-2xl font-extrabold text-white">${stats.total}</span>
                                 <i class="fas fa-folder-open text-sky-400 text-lg"></i>
                             </div>
                         </div>
-                        <div onclick="QAMSProduct.switchCategory('product_quality')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'product_quality' ? 'border-sky-400 ring-1 ring-sky-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
+                        <div onclick="event.stopPropagation(); QAMSProduct.switchCategory('product_quality')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'product_quality' ? 'border-sky-400 ring-1 ring-sky-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
                             <span class="text-[11px] font-bold text-slate-400 uppercase block">Product Quality</span>
                             <div class="flex items-center justify-between mt-1">
                                 <span class="text-2xl font-extrabold text-sky-400">${stats.quality}</span>
                                 <i class="fas fa-award text-sky-400 text-lg"></i>
                             </div>
                         </div>
-                        <div onclick="QAMSProduct.switchCategory('document')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'document' ? 'border-cyan-400 ring-1 ring-cyan-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
+                        <div onclick="event.stopPropagation(); QAMSProduct.switchCategory('document')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'document' ? 'border-cyan-400 ring-1 ring-cyan-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
                             <span class="text-[11px] font-bold text-slate-400 uppercase block">Documents & SOP</span>
                             <div class="flex items-center justify-between mt-1">
                                 <span class="text-2xl font-extrabold text-cyan-400">${stats.docs}</span>
                                 <i class="fas fa-file-invoice text-cyan-400 text-lg"></i>
                             </div>
                         </div>
-                        <div onclick="QAMSProduct.switchCategory('nearmiss')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'nearmiss' ? 'border-amber-400 ring-1 ring-amber-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
+                        <div onclick="event.stopPropagation(); QAMSProduct.switchCategory('nearmiss')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'nearmiss' ? 'border-amber-400 ring-1 ring-amber-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
                             <span class="text-[11px] font-bold text-slate-400 uppercase block">Quality Near Miss</span>
                             <div class="flex items-center justify-between mt-1">
                                 <span class="text-2xl font-extrabold text-amber-400">${stats.nearmiss}</span>
                                 <i class="fas fa-exclamation-triangle text-amber-400 text-lg"></i>
                             </div>
                         </div>
-                        <div onclick="QAMSProduct.switchCategory('claim')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'claim' ? 'border-rose-400 ring-1 ring-rose-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
+                        <div onclick="event.stopPropagation(); QAMSProduct.switchCategory('claim')" class="p-4 rounded-xl bg-dark-500 border ${this.activeTab === 'claim' ? 'border-rose-400 ring-1 ring-rose-400' : 'border-slate-800'} cursor-pointer hover:border-slate-600 transition-all">
                             <span class="text-[11px] font-bold text-slate-400 uppercase block">Quality Claims</span>
                             <div class="flex items-center justify-between mt-1">
                                 <span class="text-2xl font-extrabold text-rose-400">${stats.claims}</span>
@@ -936,7 +933,7 @@
 
                         <!-- Area & Status Dropdowns + Real-time Search Box -->
                         <div class="flex items-center gap-2.5 w-full lg:w-auto overflow-x-auto pb-1 lg:pb-0 no-scrollbar">
-                            <select onchange="QAMSProduct.setFilterArea(this.value)" class="bg-dark-700 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 font-semibold outline-none focus:border-sky-500 transition-all min-w-[130px]">
+                            <select onchange="event.stopPropagation(); QAMSProduct.setFilterArea(this.value)" class="bg-dark-700 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 font-semibold outline-none focus:border-sky-500 transition-all min-w-[130px]">
                                 <option value="All Areas" ${!this.filterArea || this.filterArea === 'All Areas' ? 'selected' : ''}>All Plant Areas</option>
                                 <option value="FNTRL Area" ${this.filterArea === 'FNTRL Area' ? 'selected' : ''}>FNTRL Area</option>
                                 <option value="MS-Dezinc Area" ${this.filterArea === 'MS-Dezinc Area' ? 'selected' : ''}>MS-Dezinc Area</option>
@@ -946,7 +943,7 @@
                                 <option value="DCS Control" ${this.filterArea === 'DCS Control' ? 'selected' : ''}>DCS Control Room</option>
                             </select>
 
-                            <select onchange="QAMSProduct.setFilterStatus(this.value)" class="bg-dark-700 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 font-semibold outline-none focus:border-sky-500 transition-all min-w-[110px]">
+                            <select onchange="event.stopPropagation(); QAMSProduct.setFilterStatus(this.value)" class="bg-dark-700 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 font-semibold outline-none focus:border-sky-500 transition-all min-w-[110px]">
                                 <option value="all" ${!this.filterStatus || this.filterStatus === 'all' ? 'selected' : ''}>All Statuses</option>
                                 <option value="Approved" ${this.filterStatus === 'Approved' ? 'selected' : ''}>Approved</option>
                                 <option value="In Progress" ${this.filterStatus === 'In Progress' ? 'selected' : ''}>In Progress</option>
@@ -957,8 +954,8 @@
 
                             <div class="relative min-w-[220px] flex-1 lg:w-64">
                                 <i class="fas fa-search absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                                <input type="text" value="${this.searchQuery || ''}" oninput="QAMSProduct.handleSearch(this.value)" placeholder="Search Product Quality, ID, area..." class="w-full bg-dark-700 border border-slate-700 rounded-xl pl-9 pr-8 py-2 text-xs text-white placeholder-slate-400 outline-none focus:border-sky-500 transition-all">
-                                ${this.searchQuery ? `<button onclick="QAMSProduct.clearSearch()" class="absolute right-3 top-2.5 text-slate-400 hover:text-white"><i class="fas fa-times text-xs"></i></button>` : ''}
+                                <input type="text" value="${this.searchQuery || ''}" oninput="event.stopPropagation(); QAMSProduct.handleSearch(this.value)" placeholder="Search Product Quality, ID, area..." class="w-full bg-dark-700 border border-slate-700 rounded-xl pl-9 pr-8 py-2 text-xs text-white placeholder-slate-400 outline-none focus:border-sky-500 transition-all">
+                                ${this.searchQuery ? `<button onclick="event.stopPropagation(); QAMSProduct.clearSearch()" class="absolute right-3 top-2.5 text-slate-400 hover:text-white"><i class="fas fa-times text-xs"></i></button>` : ''}
                             </div>
                         </div>
                     </div>
@@ -970,12 +967,12 @@
                                 <span class="text-sky-400 font-bold flex items-center gap-1.5">
                                     <i class="fas fa-filter animate-pulse"></i> Active Filter(s):
                                 </span>
-                                ${this.activeTab !== 'all' ? `<span class="bg-sky-500/20 text-sky-300 border border-sky-500/30 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1">Category: ${this.getCategoryLabel(this.activeTab)} <button onclick="QAMSProduct.switchCategory('all')" class="hover:text-white ml-1">&times;</button></span>` : ''}
-                                ${this.searchQuery ? `<span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1">Keyword / Month: "${this.searchQuery}" <button onclick="QAMSProduct.clearSearch()" class="hover:text-white ml-1">&times;</button></span>` : ''}
-                                ${this.filterArea && this.filterArea !== 'All Areas' ? `<span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1">Area: ${this.filterArea} <button onclick="QAMSProduct.setFilterArea('All Areas')" class="hover:text-white ml-1">&times;</button></span>` : ''}
-                                ${this.filterStatus && this.filterStatus !== 'all' ? `<span class="bg-rose-500/20 text-rose-300 border border-rose-500/30 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1">Status: ${this.filterStatus} <button onclick="QAMSProduct.setFilterStatus('all')" class="hover:text-white ml-1">&times;</button></span>` : ''}
+                                ${this.activeTab !== 'all' ? `<span class="bg-sky-500/20 text-sky-300 border border-sky-500/30 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1">Category: ${this.getCategoryLabel(this.activeTab)} <button onclick="event.stopPropagation(); QAMSProduct.switchCategory('all')" class="hover:text-white ml-1">&times;</button></span>` : ''}
+                                ${this.searchQuery ? `<span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1">Keyword / Month: "${this.searchQuery}" <button onclick="event.stopPropagation(); QAMSProduct.clearSearch()" class="hover:text-white ml-1">&times;</button></span>` : ''}
+                                ${this.filterArea && this.filterArea !== 'All Areas' ? `<span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1">Area: ${this.filterArea} <button onclick="event.stopPropagation(); QAMSProduct.setFilterArea('All Areas')" class="hover:text-white ml-1">&times;</button></span>` : ''}
+                                ${this.filterStatus && this.filterStatus !== 'all' ? `<span class="bg-rose-500/20 text-rose-300 border border-rose-500/30 px-2.5 py-1 rounded-lg font-bold flex items-center gap-1">Status: ${this.filterStatus} <button onclick="event.stopPropagation(); QAMSProduct.setFilterStatus('all')" class="hover:text-white ml-1">&times;</button></span>` : ''}
                             </div>
-                            <button onclick="QAMSProduct.resetAllFilters()" class="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-[11px] rounded-lg transition-all shadow flex items-center gap-1.5 whitespace-nowrap">
+                            <button onclick="event.stopPropagation(); QAMSProduct.resetAllFilters()" class="px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-[11px] rounded-lg transition-all shadow flex items-center gap-1.5 whitespace-nowrap">
                                 <i class="fas fa-undo"></i> Reset All Filters & Show All (${allRecords.length})
                             </button>
                         </div>
@@ -1002,7 +999,7 @@
                                             <td colspan="7" class="py-12 text-center text-slate-400 font-normal">
                                                 <i class="fas fa-folder-open text-3xl text-slate-600 mb-2 block"></i>
                                                 <span class="block text-sm font-bold text-slate-300 mt-2">No QA records match your current filter or search criteria.</span>
-                                                <button onclick="QAMSProduct.resetAllFilters()" class="mt-3 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-sky-400 font-bold rounded-xl text-xs transition-all border border-slate-700 inline-flex items-center gap-1.5">
+                                                <button onclick="event.stopPropagation(); QAMSProduct.resetAllFilters()" class="mt-3 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-sky-400 font-bold rounded-xl text-xs transition-all border border-slate-700 inline-flex items-center gap-1.5">
                                                     <i class="fas fa-undo"></i> Reset All Filters & Show All Data (${allRecords.length})
                                                 </button>
                                             </td>
@@ -1040,26 +1037,26 @@
                                         <thead>
                                             <tr class="text-slate-400 font-bold border-b border-slate-800">
                                                 <th class="py-2 px-2 text-left text-white font-extrabold">Category</th>
-                                                ${board.monthsAll.slice(0, 6).map(m => `<th class="py-2 px-1 cursor-pointer hover:text-sky-400 transition-colors" onclick="QAMSProduct.filterFromBoard('${m}')">${m}</th>`).join('')}
+                                                ${board.monthsAll.slice(0, 6).map(m => `<th class="py-2 px-1 cursor-pointer hover:text-sky-400 transition-colors" onclick="event.stopPropagation(); QAMSProduct.filterFromBoard('${m}')">${m}</th>`).join('')}
                                                 <th class="py-2 px-2 bg-amber-500/10 text-amber-400 font-black border-l border-slate-800">YTD</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-slate-800/60 font-semibold text-slate-300">
-                                            <tr class="hover:bg-slate-800/40 transition-colors cursor-pointer" onclick="QAMSProduct.switchCategory('nearmiss')">
+                                            <tr class="hover:bg-slate-800/40 transition-colors cursor-pointer" onclick="event.stopPropagation(); QAMSProduct.switchCategory('nearmiss')">
                                                 <td class="py-2.5 px-2 text-left font-bold text-rose-400 flex items-center gap-1.5">
                                                     <span class="w-2 h-2 rounded-full bg-rose-500"></span> Quality Near Miss
                                                 </td>
                                                 ${board.incidents.nearMiss.slice(0, 6).map(val => `<td class="py-2.5 px-1 ${val > 0 ? 'text-white font-black bg-rose-500/20 rounded' : 'text-slate-500'}">${val}</td>`).join('')}
                                                 <td class="py-2.5 px-2 bg-amber-500/10 text-amber-400 font-black border-l border-slate-800 text-xs">${board.incidents.nearMissYTD}</td>
                                             </tr>
-                                            <tr class="hover:bg-slate-800/40 transition-colors cursor-pointer" onclick="QAMSProduct.switchCategory('claim')">
+                                            <tr class="hover:bg-slate-800/40 transition-colors cursor-pointer" onclick="event.stopPropagation(); QAMSProduct.switchCategory('claim')">
                                                 <td class="py-2.5 px-2 text-left font-bold text-amber-400 flex items-center gap-1.5">
                                                     <span class="w-2 h-2 rounded-full bg-amber-500"></span> Internal Claim
                                                 </td>
                                                 ${board.incidents.internalClaim.slice(0, 6).map(val => `<td class="py-2.5 px-1 ${val > 0 ? 'text-white font-black bg-amber-500/20 rounded' : 'text-slate-500'}">${val}</td>`).join('')}
                                                 <td class="py-2.5 px-2 bg-amber-500/10 text-amber-400 font-black border-l border-slate-800 text-xs">${board.incidents.internalYTD}</td>
                                             </tr>
-                                            <tr class="hover:bg-slate-800/40 transition-colors cursor-pointer" onclick="QAMSProduct.switchCategory('claim')">
+                                            <tr class="hover:bg-slate-800/40 transition-colors cursor-pointer" onclick="event.stopPropagation(); QAMSProduct.switchCategory('claim')">
                                                 <td class="py-2.5 px-2 text-left font-bold text-emerald-400 flex items-center gap-1.5">
                                                     <span class="w-2 h-2 rounded-full bg-emerald-500"></span> External Claim
                                                 </td>
@@ -1072,7 +1069,7 @@
                             </div>
                             <div class="mt-3 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
                                 <span><i class="fas fa-check-circle text-emerald-400 mr-1"></i> Zero External Customer Claims</span>
-                                <span class="text-sky-400 font-bold cursor-pointer hover:underline" onclick="QAMSProduct.switchCategory('nearmiss')">View Incident Logs &rarr;</span>
+                                <span class="text-sky-400 font-bold cursor-pointer hover:underline" onclick="event.stopPropagation(); QAMSProduct.switchCategory('nearmiss')">View Incident Logs &rarr;</span>
                             </div>
                         </div>
 
@@ -1088,47 +1085,47 @@
                                         <thead>
                                             <tr class="text-slate-400 font-bold border-b border-slate-800">
                                                 <th class="py-2 px-2 text-left text-white font-extrabold">Parameter</th>
-                                                ${board.monthsActive.map(m => `<th class="py-2 px-2 cursor-pointer hover:text-amber-400 transition-colors font-extrabold text-white bg-slate-800/50 rounded-t" onclick="QAMSProduct.filterFromBoard('${m}')">${m}</th>`).join('')}
+                                                ${board.monthsActive.map(m => `<th class="py-2 px-2 cursor-pointer hover:text-amber-400 transition-colors font-extrabold text-white bg-slate-800/50 rounded-t" onclick="event.stopPropagation(); QAMSProduct.filterFromBoard('${m}')">${m}</th>`).join('')}
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-slate-800/60 font-semibold text-slate-200">
                                             <tr class="bg-amber-500/10 text-amber-300 font-bold border-b-2 border-slate-700">
                                                 <td class="py-2 px-2 text-left font-black text-amber-400 whitespace-nowrap">Actual / Target (MT)</td>
                                                 ${board.production.actual.map((act, idx) => `
-                                                    <td class="py-2 px-1 text-[10px] leading-tight cursor-pointer hover:bg-amber-500/20 transition-colors" title="Actual: ${act} MT | Target: ${board.production.target[idx]} MT" onclick="QAMSProduct.showCellAnalysis('Production Tonnage', '${board.monthsActive[idx]}', '${act} / ${board.production.target[idx]} MT')">
+                                                    <td class="py-2 px-1 text-[10px] leading-tight cursor-pointer hover:bg-amber-500/20 transition-colors" title="Actual: ${act} MT | Target: ${board.production.target[idx]} MT" onclick="event.stopPropagation(); QAMSProduct.showCellAnalysis('Production Tonnage', '${board.monthsActive[idx]}', '${act} / ${board.production.target[idx]} MT')">
                                                         <span class="text-white font-extrabold block">${act}</span>
                                                         <span class="text-slate-400 text-[9px] font-normal">${board.production.target[idx]}</span>
                                                     </td>
                                                 `).join('')}
                                             </tr>
                                             <tr class="hover:bg-slate-800/40 transition-colors">
-                                                <td class="py-2 px-2 text-left font-extrabold text-rose-400 cursor-pointer hover:underline" onclick="QAMSProduct.filterFromBoard('Zn')">Zn (Zinc)</td>
+                                                <td class="py-2 px-2 text-left font-extrabold text-rose-400 cursor-pointer hover:underline" onclick="event.stopPropagation(); QAMSProduct.filterFromBoard('Zn')">Zn (Zinc)</td>
                                                 ${board.compliance.Zn.map((val, idx) => `
-                                                    <td class="py-2 px-1 cursor-pointer hover:bg-slate-800 transition-colors ${val === '100.00%' ? 'text-emerald-400 font-black' : ''}" onclick="QAMSProduct.showCellAnalysis('Zn Compliance', '${board.monthsActive[idx]}', '${val}')">${val}</td>
+                                                    <td class="py-2 px-1 cursor-pointer hover:bg-slate-800 transition-colors ${val === '100.00%' ? 'text-emerald-400 font-black' : ''}" onclick="event.stopPropagation(); QAMSProduct.showCellAnalysis('Zn Compliance', '${board.monthsActive[idx]}', '${val}')">${val}</td>
                                                 `).join('')}
                                             </tr>
                                             <tr class="hover:bg-slate-800/40 transition-colors">
-                                                <td class="py-2 px-2 text-left font-extrabold text-amber-400 cursor-pointer hover:underline" onclick="QAMSProduct.filterFromBoard('Mg')">Mg (Magnesium)</td>
+                                                <td class="py-2 px-2 text-left font-extrabold text-amber-400 cursor-pointer hover:underline" onclick="event.stopPropagation(); QAMSProduct.filterFromBoard('Mg')">Mg (Magnesium)</td>
                                                 ${board.compliance.Mg.map((val, idx) => `
-                                                    <td class="py-2 px-1 cursor-pointer hover:bg-slate-800 transition-colors ${val === '100.00%' ? 'text-emerald-400 font-black' : parseFloat(val) < 85 ? 'text-rose-400 font-bold' : ''}" onclick="QAMSProduct.showCellAnalysis('Mg Compliance', '${board.monthsActive[idx]}', '${val}')">${val}</td>
+                                                    <td class="py-2 px-1 cursor-pointer hover:bg-slate-800 transition-colors ${val === '100.00%' ? 'text-emerald-400 font-black' : parseFloat(val) < 85 ? 'text-rose-400 font-bold' : ''}" onclick="event.stopPropagation(); QAMSProduct.showCellAnalysis('Mg Compliance', '${board.monthsActive[idx]}', '${val}')">${val}</td>
                                                 `).join('')}
                                             </tr>
                                             <tr class="hover:bg-slate-800/40 transition-colors">
-                                                <td class="py-2 px-2 text-left font-extrabold text-cyan-400 cursor-pointer hover:underline" onclick="QAMSProduct.filterFromBoard('Cr')">Cr (Chromium)</td>
+                                                <td class="py-2 px-2 text-left font-extrabold text-cyan-400 cursor-pointer hover:underline" onclick="event.stopPropagation(); QAMSProduct.filterFromBoard('Cr')">Cr (Chromium)</td>
                                                 ${board.compliance.Cr.map((val, idx) => `
-                                                    <td class="py-2 px-1 cursor-pointer hover:bg-slate-800 transition-colors ${parseFloat(val) < 80 ? 'text-rose-400 font-bold' : ''}" onclick="QAMSProduct.showCellAnalysis('Cr Compliance', '${board.monthsActive[idx]}', '${val}')">${val}</td>
+                                                    <td class="py-2 px-1 cursor-pointer hover:bg-slate-800 transition-colors ${parseFloat(val) < 80 ? 'text-rose-400 font-bold' : ''}" onclick="event.stopPropagation(); QAMSProduct.showCellAnalysis('Cr Compliance', '${board.monthsActive[idx]}', '${val}')">${val}</td>
                                                 `).join('')}
                                             </tr>
                                             <tr class="hover:bg-slate-800/40 transition-colors">
-                                                <td class="py-2 px-2 text-left font-extrabold text-emerald-400 cursor-pointer hover:underline" onclick="QAMSProduct.filterFromBoard('PS')">PS (Particle Spec)</td>
+                                                <td class="py-2 px-2 text-left font-extrabold text-emerald-400 cursor-pointer hover:underline" onclick="event.stopPropagation(); QAMSProduct.filterFromBoard('PS')">PS (Particle Spec)</td>
                                                 ${board.compliance.PS.map((val, idx) => `
-                                                    <td class="py-2 px-1 cursor-pointer hover:bg-slate-800 transition-colors ${val === '100.00%' ? 'text-emerald-400 font-black' : ''}" onclick="QAMSProduct.showCellAnalysis('PS Compliance', '${board.monthsActive[idx]}', '${val}')">${val}</td>
+                                                    <td class="py-2 px-1 cursor-pointer hover:bg-slate-800 transition-colors ${val === '100.00%' ? 'text-emerald-400 font-black' : ''}" onclick="event.stopPropagation(); QAMSProduct.showCellAnalysis('PS Compliance', '${board.monthsActive[idx]}', '${val}')">${val}</td>
                                                 `).join('')}
                                             </tr>
                                             <tr class="hover:bg-slate-800/40 transition-colors">
-                                                <td class="py-2 px-2 text-left font-extrabold text-sky-400 cursor-pointer hover:underline" onclick="QAMSProduct.filterFromBoard('H2O')">H2O (Moisture)</td>
+                                                <td class="py-2 px-2 text-left font-extrabold text-sky-400 cursor-pointer hover:underline" onclick="event.stopPropagation(); QAMSProduct.filterFromBoard('H2O')">H2O (Moisture)</td>
                                                 ${board.compliance.H2O.map((val, idx) => `
-                                                    <td class="py-2 px-1 cursor-pointer hover:bg-slate-800 transition-colors ${val === '100.00%' ? 'text-emerald-400 font-black' : ''}" onclick="QAMSProduct.showCellAnalysis('H2O Compliance', '${board.monthsActive[idx]}', '${val}')">${val}</td>
+                                                    <td class="py-2 px-1 cursor-pointer hover:bg-slate-800 transition-colors ${val === '100.00%' ? 'text-emerald-400 font-black' : ''}" onclick="event.stopPropagation(); QAMSProduct.showCellAnalysis('H2O Compliance', '${board.monthsActive[idx]}', '${val}')">${val}</td>
                                                 `).join('')}
                                             </tr>
                                         </tbody>
@@ -1137,7 +1134,7 @@
                             </div>
                             <div class="mt-3 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
                                 <span><i class="fas fa-chart-line text-amber-400 mr-1"></i> Q2 Production Exceeded Target for Apr, May &amp; Jun</span>
-                                <span class="text-amber-400 font-bold cursor-pointer hover:underline" onclick="QAMSProduct.switchCategory('product_quality')">Filter Quality Assays &rarr;</span>
+                                <span class="text-amber-400 font-bold cursor-pointer hover:underline" onclick="event.stopPropagation(); QAMSProduct.switchCategory('product_quality')">Filter Quality Assays &rarr;</span>
                             </div>
                         </div>
                     </div>
@@ -1162,7 +1159,7 @@
                         </div>
                         <div class="p-4 space-y-3 flex-1 divide-y divide-slate-800/60">
                             ${items.map((item) => `
-                                <div class="pt-3 first:pt-0 flex items-start justify-between gap-3 group cursor-pointer hover:bg-slate-800/30 p-2 rounded-xl transition-all" onclick="QAMSProduct.showScorecardDetail('${item.id}', '${title}')">
+                                <div class="pt-3 first:pt-0 flex items-start justify-between gap-3 group cursor-pointer hover:bg-slate-800/30 p-2 rounded-xl transition-all" onclick="event.stopPropagation(); QAMSProduct.showScorecardDetail('${item.id}', '${title}')">
                                     <div class="space-y-1">
                                         <span class="text-xs font-bold text-white group-hover:text-sky-400 transition-colors block">${item.name}</span>
                                         <p class="text-[11px] text-slate-400 leading-normal">${item.desc}</p>
@@ -1223,13 +1220,13 @@
                                             </div>
                                             <!-- Interactive +/- Buttons -->
                                             <div class="flex items-center gap-1.5">
-                                                <button onclick="QAMSProduct.adjustReprocessBag('${item.id}', -1)" class="w-8 h-8 rounded-lg bg-dark-700 hover:bg-slate-700 text-slate-300 font-bold flex items-center justify-center border border-slate-600 transition-all text-xs" title="Decrement Bag Count">
+                                                <button onclick="event.stopPropagation(); QAMSProduct.adjustReprocessBag('${item.id}', -1)" class="w-8 h-8 rounded-lg bg-dark-700 hover:bg-slate-700 text-slate-300 font-bold flex items-center justify-center border border-slate-600 transition-all text-xs" title="Decrement Bag Count">
                                                     <i class="fas fa-minus"></i>
                                                 </button>
-                                                <button onclick="QAMSProduct.adjustReprocessBag('${item.id}', 1)" class="w-8 h-8 rounded-lg bg-dark-700 hover:bg-slate-700 text-slate-300 font-bold flex items-center justify-center border border-slate-600 transition-all text-xs" title="Increment Bag Count">
+                                                <button onclick="event.stopPropagation(); QAMSProduct.adjustReprocessBag('${item.id}', 1)" class="w-8 h-8 rounded-lg bg-dark-700 hover:bg-slate-700 text-slate-300 font-bold flex items-center justify-center border border-slate-600 transition-all text-xs" title="Increment Bag Count">
                                                     <i class="fas fa-plus"></i>
                                                 </button>
-                                                <button onclick="QAMSProduct.openAddModal('nearmiss', { title: 'Reprocess Bag Investigation: ${item.label}', area: 'H2S Area', metricName: '${item.label}', metricValue: '${item.count} Bags' })" class="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500 text-rose-300 hover:text-white font-bold text-[10px] border border-rose-500/30 transition-all ml-1" title="Log CAPA Investigation">
+                                                <button onclick="event.stopPropagation(); QAMSProduct.openAddModal('nearmiss', { title: 'Reprocess Bag Investigation: ${item.label}', area: 'H2S Area', metricName: '${item.label}', metricValue: '${item.count} Bags' })" class="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500 text-rose-300 hover:text-white font-bold text-[10px] border border-rose-500/30 transition-all ml-1" title="Log CAPA Investigation">
                                                     <i class="fas fa-exclamation-triangle"></i> Log CAPA
                                                 </button>
                                             </div>
@@ -1240,7 +1237,7 @@
 
                             <div class="mt-4 pt-3 border-t border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
                                 <span><i class="fas fa-info-circle text-sky-400 mr-1"></i> [+]/[-] adjustments log directly to system audit trail.</span>
-                                <span class="text-sky-400 font-bold cursor-pointer hover:underline" onclick="QAMSProduct.filterFromBoard('Reprocess')">Filter Reprocess Logs &rarr;</span>
+                                <span class="text-sky-400 font-bold cursor-pointer hover:underline" onclick="event.stopPropagation(); QAMSProduct.filterFromBoard('Reprocess')">Filter Reprocess Logs &rarr;</span>
                             </div>
                         </div>
 
@@ -1273,7 +1270,7 @@
                                                 const total = vals.reduce((a, b) => a + b, 0);
                                                 const grpColors = { CLC: 'text-sky-400', AJL: 'text-amber-400', JNY: 'text-rose-400', NJL: 'text-emerald-400' };
                                                 return `
-                                                    <tr class="hover:bg-slate-800/40 transition-colors cursor-pointer group" onclick="QAMSProduct.showShiftAnalysis('${grp}', ${total})">
+                                                    <tr class="hover:bg-slate-800/40 transition-colors cursor-pointer group" onclick="event.stopPropagation(); QAMSProduct.showShiftAnalysis('${grp}', ${total})">
                                                         <td class="py-3 px-3 text-left font-black ${grpColors[grp] || 'text-white'} flex items-center gap-2">
                                                             <i class="fas fa-users text-xs opacity-60"></i> ${grp} Group
                                                         </td>
@@ -1289,7 +1286,7 @@
 
                             <div class="mt-4 pt-3 border-t border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
                                 <span><i class="fas fa-trophy text-amber-400 mr-1"></i> AJL &amp; NJL tied for highest shift credits in June (15.0)</span>
-                                <span class="text-sky-400 font-bold cursor-pointer hover:underline" onclick="QAMSProduct.switchCategory('improvement')">View Process Improvements &rarr;</span>
+                                <span class="text-sky-400 font-bold cursor-pointer hover:underline" onclick="event.stopPropagation(); QAMSProduct.switchCategory('improvement')">View Process Improvements &rarr;</span>
                             </div>
                         </div>
                     </div>
@@ -1301,7 +1298,7 @@
         renderTabButton: function (key, label, icon, color = 'text-white') {
             const isActive = this.activeTab === key || (key === 'product_quality' && (this.activeTab === 'analysis' || this.activeTab === 'product_quality'));
             return `
-                <button onclick="QAMSProduct.switchCategory('${key}')" class="px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${isActive ? 'bg-royalblue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)]' : 'bg-dark-700 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/80'}">
+                <button onclick="event.stopPropagation(); QAMSProduct.switchCategory('${key}')" class="px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${isActive ? 'bg-royalblue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)]' : 'bg-dark-700 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700/80'}">
                     <i class="fas ${icon} ${isActive ? 'text-white' : color}"></i> ${label}
                 </button>
             `;
@@ -1345,7 +1342,7 @@
             return `
                 <tr class="hover:bg-slate-800/40 transition-colors group">
                     <td class="py-3.5 px-4 font-bold text-white whitespace-nowrap">
-                        <span onclick="QAMSProduct.viewDetails('${r.id}')" class="hover:text-sky-400 cursor-pointer underline decoration-slate-600 hover:decoration-sky-400">${r.id}</span>
+                        <span onclick="event.stopPropagation(); QAMSProduct.viewDetails('${r.id}')" class="hover:text-sky-400 cursor-pointer underline decoration-slate-600 hover:decoration-sky-400">${r.id}</span>
                         <span class="block text-[10px] text-slate-500 font-normal mt-0.5"><i class="far fa-calendar mr-1"></i>${r.date}</span>
                     </td>
                     <td class="py-3.5 px-4 whitespace-nowrap">
@@ -1354,7 +1351,7 @@
                         </span>
                     </td>
                     <td class="py-3.5 px-4 max-w-xs">
-                        <div class="font-bold text-white text-sm truncate group-hover:text-sky-300 transition-colors cursor-pointer" onclick="QAMSProduct.viewDetails('${r.id}')" title="${this.escapeHtml(r.title)}">${this.escapeHtml(r.title)}</div>
+                        <div class="font-bold text-white text-sm truncate group-hover:text-sky-300 transition-colors cursor-pointer" onclick="event.stopPropagation(); QAMSProduct.viewDetails('${r.id}')" title="${this.escapeHtml(r.title)}">${this.escapeHtml(r.title)}</div>
                         <div class="text-[11px] text-slate-400 truncate mt-0.5" title="${this.escapeHtml(r.description)}">${this.escapeHtml(r.description)}</div>
                         ${r.attachments && r.attachments.length > 0 ? `<span class="inline-flex items-center gap-1 text-[10px] text-sky-400 mt-1"><i class="fas fa-paperclip"></i> ${r.attachments.length} attachment(s)</span>` : ''}
                     </td>
@@ -1378,13 +1375,13 @@
                     </td>
                     <td class="py-3.5 px-4 text-center whitespace-nowrap">
                         <div class="inline-flex items-center gap-1">
-                            <button onclick="QAMSProduct.viewDetails('${r.id}')" class="p-1.5 bg-slate-800 hover:bg-sky-600 hover:text-white text-sky-400 rounded-lg transition-all" title="View Details">
+                            <button onclick="event.stopPropagation(); QAMSProduct.viewDetails('${r.id}')" class="p-1.5 bg-slate-800 hover:bg-sky-600 hover:text-white text-sky-400 rounded-lg transition-all" title="View Details">
                                 <i class="fas fa-eye text-xs"></i>
                             </button>
-                            <button onclick="QAMSProduct.openEditModal('${r.id}')" class="p-1.5 bg-slate-800 hover:bg-amber-600 hover:text-white text-amber-400 rounded-lg transition-all" title="Edit Record">
+                            <button onclick="event.stopPropagation(); QAMSProduct.openEditModal('${r.id}')" class="p-1.5 bg-slate-800 hover:bg-amber-600 hover:text-white text-amber-400 rounded-lg transition-all" title="Edit Record">
                                 <i class="fas fa-edit text-xs"></i>
                             </button>
-                            <button onclick="QAMSProduct.deleteRecord('${r.id}')" class="p-1.5 bg-slate-800 hover:bg-rose-600 hover:text-white text-rose-400 rounded-lg transition-all" title="Delete Record">
+                            <button onclick="event.stopPropagation(); QAMSProduct.deleteRecord('${r.id}')" class="p-1.5 bg-slate-800 hover:bg-rose-600 hover:text-white text-rose-400 rounded-lg transition-all" title="Delete Record">
                                 <i class="fas fa-trash-alt text-xs"></i>
                             </button>
                         </div>
@@ -1436,7 +1433,7 @@
                                     <span class="text-xs ${isWarning ? 'text-rose-400' : 'text-sky-400'} font-semibold block">${section} &bull; ${item.area}</span>
                                 </div>
                             </div>
-                            <button onclick="QAMSProduct.closeModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
+                            <button onclick="event.stopPropagation(); QAMSProduct.closeModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
                                 <i class="fas fa-times text-base"></i>
                             </button>
                         </div>
@@ -1469,10 +1466,10 @@
                         </div>
 
                         <div class="p-4 bg-dark-700/80 border-t border-slate-800 flex justify-end gap-2">
-                            <button onclick="QAMSProduct.closeModal(); QAMSProduct.openAddModal('${isWarning ? 'nearmiss' : 'product_quality'}', { title: 'Scorecard Review: ${item.name}', area: '${item.area}', metricName: '${item.name}', metricValue: '${item.actual}', metricLimit: '${item.target}', isCompliant: ${!isWarning} });" class="px-4 py-2 bg-gradient-to-r from-royalblue-600 to-sky-500 hover:from-royalblue-500 text-white font-bold text-xs rounded-xl shadow transition-all">
+                            <button onclick="event.stopPropagation(); QAMSProduct.closeModal(); QAMSProduct.openAddModal('${isWarning ? 'nearmiss' : 'product_quality'}', { title: 'Scorecard Review: ${item.name}', area: '${item.area}', metricName: '${item.name}', metricValue: '${item.actual}', metricLimit: '${item.target}', isCompliant: ${!isWarning} });" class="px-4 py-2 bg-gradient-to-r from-royalblue-600 to-sky-500 hover:from-royalblue-500 text-white font-bold text-xs rounded-xl shadow transition-all">
                                 <i class="fas fa-plus-circle mr-1"></i> Log Linked QA Record
                             </button>
-                            <button onclick="QAMSProduct.closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">
+                            <button onclick="event.stopPropagation(); QAMSProduct.closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">
                                 Close
                             </button>
                         </div>
@@ -1496,7 +1493,7 @@
                                     <span class="text-xs text-emerald-400 font-semibold block">106ML02 Shift Batch Credit Summary</span>
                                 </div>
                             </div>
-                            <button onclick="QAMSProduct.closeModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
+                            <button onclick="event.stopPropagation(); QAMSProduct.closeModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
                                 <i class="fas fa-times text-base"></i>
                             </button>
                         </div>
@@ -1512,7 +1509,7 @@
                         </div>
 
                         <div class="p-4 bg-dark-700/80 border-t border-slate-800 flex justify-end">
-                            <button onclick="QAMSProduct.closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Close</button>
+                            <button onclick="event.stopPropagation(); QAMSProduct.closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Close</button>
                         </div>
                     </div>
                 </div>
@@ -1538,7 +1535,7 @@
                                     <span class="text-xs text-amber-400 font-semibold block">Product Quality Bulletin Board Assay</span>
                                 </div>
                             </div>
-                            <button onclick="QAMSProduct.closeModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
+                            <button onclick="event.stopPropagation(); QAMSProduct.closeModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
                                 <i class="fas fa-times text-base"></i>
                             </button>
                         </div>
@@ -1567,10 +1564,10 @@
                         </div>
 
                         <div class="p-4 bg-dark-700/80 border-t border-slate-800 flex justify-end gap-2">
-                            <button onclick="QAMSProduct.closeModal(); QAMSProduct.filterFromBoard('${month}');" class="px-4 py-2 bg-royalblue-600 hover:bg-royalblue-500 text-white font-bold text-xs rounded-xl shadow transition-all">
+                            <button onclick="event.stopPropagation(); QAMSProduct.closeModal(); QAMSProduct.filterFromBoard('${month}');" class="px-4 py-2 bg-royalblue-600 hover:bg-royalblue-500 text-white font-bold text-xs rounded-xl shadow transition-all">
                                 <i class="fas fa-filter mr-1"></i> Filter ${month} Records
                             </button>
-                            <button onclick="QAMSProduct.closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">
+                            <button onclick="event.stopPropagation(); QAMSProduct.closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">
                                 Close
                             </button>
                         </div>
@@ -1600,7 +1597,7 @@
                                     <h3 class="text-base sm:text-lg font-bold text-white truncate max-w-md">${this.escapeHtml(r.title)}</h3>
                                 </div>
                             </div>
-                            <button onclick="QAMSProduct.closeModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
+                            <button onclick="event.stopPropagation(); QAMSProduct.closeModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
                                 <i class="fas fa-times text-base"></i>
                             </button>
                         </div>
@@ -1652,7 +1649,7 @@
                                                         <span class="text-[10px] text-slate-400">${att.size}</span>
                                                     </div>
                                                 </div>
-                                                <button onclick="QAMSProduct.downloadAttachment('${this.escapeHtml(att.name)}')" class="p-1.5 bg-slate-800 hover:bg-sky-600 text-sky-400 hover:text-white rounded-lg transition-all text-xs" title="Download">
+                                                <button onclick="event.stopPropagation(); QAMSProduct.downloadAttachment('${this.escapeHtml(att.name)}')" class="p-1.5 bg-slate-800 hover:bg-sky-600 text-sky-400 hover:text-white rounded-lg transition-all text-xs" title="Download">
                                                     <i class="fas fa-download"></i>
                                                 </button>
                                             </div>
@@ -1678,10 +1675,10 @@
                         </div>
 
                         <div class="p-4 bg-dark-700/80 border-t border-slate-800 flex justify-end gap-2">
-                            <button onclick="QAMSProduct.openEditModal('${r.id}')" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl shadow transition-all">
+                            <button onclick="event.stopPropagation(); QAMSProduct.openEditModal('${r.id}')" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl shadow transition-all">
                                 <i class="fas fa-edit mr-1"></i> Edit Record
                             </button>
-                            <button onclick="QAMSProduct.closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">
+                            <button onclick="event.stopPropagation(); QAMSProduct.closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">
                                 Close
                             </button>
                         </div>
@@ -1739,7 +1736,7 @@
                                     <span class="text-xs text-sky-400 font-semibold block">${r.id} &bull; Product Quality Assurance</span>
                                 </div>
                             </div>
-                            <button type="button" onclick="QAMSProduct.closeModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
+                            <button type="button" onclick="event.stopPropagation(); QAMSProduct.closeModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
                                 <i class="fas fa-times text-base"></i>
                             </button>
                         </div>
@@ -1831,7 +1828,7 @@
                                 <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Add Attachment (Simulated File Upload)</label>
                                 <div class="flex gap-2">
                                     <input type="text" id="form-att-name" placeholder="Filename (e.g., Product_Quality_Certificate.pdf)" class="flex-1 bg-dark-700 border border-slate-700 rounded-xl p-2 text-white placeholder-slate-500 text-xs outline-none">
-                                    <button type="button" onclick="QAMSProduct.addSimulatedAttachment()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-sky-400 font-bold rounded-xl border border-slate-700 text-xs">
+                                    <button type="button" onclick="event.stopPropagation(); QAMSProduct.addSimulatedAttachment()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-sky-400 font-bold rounded-xl border border-slate-700 text-xs">
                                         <i class="fas fa-plus"></i> Attach
                                     </button>
                                 </div>
@@ -1839,7 +1836,7 @@
                             </div>
 
                             <div class="pt-4 border-t border-slate-800 flex justify-end gap-2">
-                                <button type="button" onclick="QAMSProduct.closeModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Cancel</button>
+                                <button type="button" onclick="event.stopPropagation(); QAMSProduct.closeModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Cancel</button>
                                 <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-royalblue-600 to-sky-500 hover:from-royalblue-500 text-white font-bold text-xs rounded-xl shadow-[0_0_15px_rgba(14,165,233,0.3)] transition-all">
                                     <i class="fas fa-save mr-1"></i> Save QA Record
                                 </button>
@@ -1859,7 +1856,7 @@
             list.innerHTML = this._currentFormAttachments.map((att, idx) => `
                 <div class="flex items-center justify-between p-1.5 bg-dark-700 rounded text-[11px] text-slate-300">
                     <span><i class="fas fa-paperclip text-sky-400 mr-1.5"></i>${this.escapeHtml(att.name)} (${att.size})</span>
-                    <button type="button" onclick="QAMSProduct.removeSimulatedAttachment(${idx})" class="text-rose-400 hover:text-white"><i class="fas fa-times"></i></button>
+                    <button type="button" onclick="event.stopPropagation(); QAMSProduct.removeSimulatedAttachment(${idx})" class="text-rose-400 hover:text-white"><i class="fas fa-times"></i></button>
                 </div>
             `).join('');
         },
@@ -1965,7 +1962,7 @@
                                     <span class="text-xs text-amber-300 font-semibold block">Chronological Activity Tracking</span>
                                 </div>
                             </div>
-                            <button onclick="QAMSProduct.closeModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
+                            <button onclick="event.stopPropagation(); QAMSProduct.closeModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
                                 <i class="fas fa-times text-base"></i>
                             </button>
                         </div>
@@ -1989,7 +1986,7 @@
                         </div>
 
                         <div class="p-4 bg-dark-700/80 border-t border-slate-800 flex justify-end">
-                            <button onclick="QAMSProduct.closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Close Log</button>
+                            <button onclick="event.stopPropagation(); QAMSProduct.closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Close Log</button>
                         </div>
                     </div>
                 </div>
@@ -2014,7 +2011,7 @@
                                     <span class="text-xs text-emerald-300 font-semibold block">Automated Out-of-Spec Detection Engine</span>
                                 </div>
                             </div>
-                            <button onclick="QAMSProduct.closeModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
+                            <button onclick="event.stopPropagation(); QAMSProduct.closeModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
                                 <i class="fas fa-times text-base"></i>
                             </button>
                         </div>
@@ -2033,14 +2030,14 @@
 
                             <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between">
                                 <span class="text-[11px] text-slate-400">Don't have a file ready?</span>
-                                <button type="button" onclick="QAMSProduct.runSimulatedAnalysis()" class="px-3.5 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-bold rounded-xl transition-all flex items-center gap-1.5">
+                                <button type="button" onclick="event.stopPropagation(); QAMSProduct.runSimulatedAnalysis()" class="px-3.5 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-bold rounded-xl transition-all flex items-center gap-1.5">
                                     <i class="fas fa-magic"></i> Run Demo AI Analysis
                                 </button>
                             </div>
                         </div>
 
                         <div class="p-4 bg-dark-700/80 border-t border-slate-800 flex justify-end">
-                            <button onclick="QAMSProduct.closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Cancel</button>
+                            <button onclick="event.stopPropagation(); QAMSProduct.closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Cancel</button>
                         </div>
                     </div>
                 </div>
@@ -2111,7 +2108,7 @@
                                     <span class="text-xs text-emerald-300 font-semibold block">File: ${filename}</span>
                                 </div>
                             </div>
-                            <button onclick="QAMSProduct.closeModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
+                            <button onclick="event.stopPropagation(); QAMSProduct.closeModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
                                 <i class="fas fa-times text-base"></i>
                             </button>
                         </div>
@@ -2160,10 +2157,10 @@
                         </div>
 
                         <div class="p-4 bg-dark-700/80 border-t border-slate-800 flex justify-end gap-2">
-                            <button onclick="QAMSProduct.importAnalyzedBatch()" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-cyan-500 hover:from-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5">
+                            <button onclick="event.stopPropagation(); QAMSProduct.importAnalyzedBatch()" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-cyan-500 hover:from-emerald-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-1.5">
                                 <i class="fas fa-file-import"></i> Import Records into System
                             </button>
-                            <button onclick="QAMSProduct.closeModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Discard</button>
+                            <button onclick="event.stopPropagation(); QAMSProduct.closeModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">Discard</button>
                         </div>
                     </div>
                 </div>
