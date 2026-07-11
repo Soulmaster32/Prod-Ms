@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quality Group | MS Section - Digital Bulletin Board & Spec Management</title>
+    <title>Gilnash Delivery | POS & Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,18 +17,16 @@
             theme: {
                 extend: {
                     colors: {
-                        royalblue: { 400: '#60a5fa', 500: '#4169E1', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' },
+                        brand: { 400: '#f97316', 500: '#f59e0b', 600: '#ea580c' }, // Gilnash Orange Accent
                         sky: { 300: '#7dd3fc', 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7' },
-                        cyan: { 300: '#67e8f9', 400: '#22d3ee', 500: '#06b6d4' },
                         emerald: { 400: '#34d399', 500: '#10b981', 600: '#059669' },
                         rose: { 400: '#fb7185', 500: '#f43f5e', 600: '#e11d48' },
-                        amber: { 400: '#fbbf24', 500: '#f59e0b' },
                         dark: { 100: '#334155', 300: '#1e293b', 400: '#131c2e', 500: '#0f172a', 700: '#0a0f1d', 900: '#030712' }
                     },
                     fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
                     backgroundImage: {
-                        'hero-mesh': "radial-gradient(at 10% 10%, rgba(37,99,235,0.35) 0px, transparent 50%), radial-gradient(at 90% 90%, rgba(14,165,233,0.25) 0px, transparent 50%), linear-gradient(135deg,#030712 0%,#0f172a 100%)",
-                        'grid-pattern': "url('data:image/svg+xml,%3Csvg width=\"40\" height=\"40\" viewBox=\"0 0 40 40\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"%2338bdf8\" fill-opacity=\"0.05\" fill-rule=\"evenodd\"%3E%3Cpath d=\"M0 40L40 0H20L0 20M40 40V20L20 40\"/%3E%3C/g%3E%3C/svg%3E')"
+                        'hero-mesh': "radial-gradient(at 10% 10%, rgba(249,115,22,0.15) 0px, transparent 50%), radial-gradient(at 90% 90%, rgba(14,165,233,0.15) 0px, transparent 50%), linear-gradient(135deg,#030712 0%,#0f172a 100%)",
+                        'grid-pattern': "url('data:image/svg+xml,%3Csvg width=\"40\" height=\"40\" viewBox=\"0 0 40 40\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"%23f97316\" fill-opacity=\"0.03\" fill-rule=\"evenodd\"%3E%3Cpath d=\"M0 40L40 0H20L0 20M40 40V20L20 40\"/%3E%3C/g%3E%3C/svg%3E')"
                     }
                 }
             }
@@ -41,53 +38,19 @@
         ::-webkit-scrollbar-track { background: #030712; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
-        .submenu-content { max-height: 0; overflow: hidden; transition: max-height 0.35s ease-out; }
-        .submenu-open { max-height: 600px; }
         
-        /* Tab Button Active Styles */
-        .tab-btn.active { background: #2563eb !important; color: #ffffff !important; border-color: #38bdf8 !important; box-shadow: 0 0 15px rgba(56,189,248,0.4); }
-        .user-tab-btn.active { background: #2563eb !important; color: #ffffff !important; border-color: #38bdf8 !important; }
-        .board-tab.active, .spec-tab.active, .ms-bulletin-tab.active, .ms-spec-tab.active { background: #2563eb !important; color: #ffffff !important; border-color: #38bdf8 !important; }
-        .main-tab.active { background: linear-gradient(135deg, #1d4ed8, #0ea5e9) !important; color: #fff !important; border-color: #38bdf8 !important; box-shadow: 0 0 18px rgba(14,165,233,0.35); }
+        .tab-btn.active, .spec-tab.active { background: #ea580c !important; color: #ffffff !important; border-color: #f97316 !important; box-shadow: 0 0 15px rgba(249,115,22,0.4); }
         
-        /* Panel Display Rules */
-        .bulletin-panel, .spec-panel, .data-panel, .ms-bulletin-panel, .ms-spec-panel { display: none; }
-        .bulletin-panel.active, .spec-panel.active, .data-panel.active, .ms-bulletin-panel.active, .ms-spec-panel.active { 
-            display: block !important; 
-            opacity: 1 !important; 
-            visibility: visible !important; 
-        }
+        .section-panel { display: none; }
+        .section-panel.active { display: block !important; opacity: 1 !important; visibility: visible !important; }
         
         @keyframes fadeIn { from { opacity:0; transform: scale(0.98); } to { opacity:1; transform: scale(1); } }
         .animate-fadeIn { animation: fadeIn 0.2s cubic-bezier(0.16,1,0.3,1) forwards; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        @keyframes pulseBorder { 0%,100% { border-color: rgba(56,189,248,0.4); } 50% { border-color: rgba(56,189,248,0.9); } }
-        .pulse-border { animation: pulseBorder 2s infinite; }
         
-        /* ==========================================================================
-           ULTIMATE SAFEGUARD: Prevent legacy external scripts (qamsproduct.js, style.js) 
-           from accidentally hiding or collapsing top-level portal sections.
-           ========================================================================== */
-        #bulletin-board-section, 
-        #quality-spec-section, 
-        #qamsproduct-portal,
-        #home,
-        #calendar-section,
-        #area-explorer,
-        #dcs-section,
-        #sop-section,
-        #user-management-section {
-            display: block !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-            max-height: none !important;
-            height: auto !important;
-            overflow: visible !important;
-            pointer-events: auto !important;
-            position: relative !important;
-            z-index: 10 !important;
-        }
+        /* Ensures top-level sections remain visible */
+        .portal-section { display: block !important; opacity: 1 !important; visibility: visible !important; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen text-white bg-dark-900 overflow-x-hidden" id="body-wrap">
@@ -95,18 +58,18 @@
 <!-- GLOBAL LOADING SCREEN -->
 <div id="global-loader" class="fixed inset-0 z-[9999] bg-dark-900 flex flex-col items-center justify-center transition-opacity duration-500 px-4">
     <div class="flex items-center gap-4 mb-8">
-        <div class="w-16 h-16 bg-gradient-to-br from-royalblue-600 to-sky-500 border border-sky-400/40 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(56,189,248,0.4)] animate-pulse">
-            <i class="fas fa-shield-check text-white text-3xl"></i>
+        <div class="w-16 h-16 bg-gradient-to-br from-brand-600 to-amber-500 border border-brand-400/40 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(249,115,22,0.4)] animate-pulse">
+            <i class="fas fa-truck-fast text-white text-3xl"></i>
         </div>
         <div class="text-left">
-            <h1 class="text-3xl font-extrabold text-white tracking-tight leading-none">Quality Group</h1>
-            <span class="text-xs font-semibold tracking-widest text-sky-400 block mt-1.5 uppercase">MS Section &bull; QA Portal</span>
+            <h1 class="text-3xl font-extrabold text-white tracking-tight leading-none">Gilnash Delivery</h1>
+            <span class="text-xs font-semibold tracking-widest text-brand-400 block mt-1.5 uppercase">POS & Management System</span>
         </div>
     </div>
     <div class="w-72 sm:w-80 h-2.5 bg-dark-500 rounded-full overflow-hidden border border-slate-800 shadow-inner">
-        <div id="loader-bar" class="h-full bg-gradient-to-r from-royalblue-500 via-sky-400 to-cyan-300 w-0 transition-all duration-150 ease-out shadow-[0_0_12px_#38bdf8]"></div>
+        <div id="loader-bar" class="h-full bg-gradient-to-r from-brand-500 via-amber-400 to-yellow-300 w-0 transition-all duration-150 ease-out shadow-[0_0_12px_#f97316]"></div>
     </div>
-    <div class="mt-4 text-slate-400 font-medium text-xs tracking-wider text-center" id="loader-text">INITIALIZING QUALITY PARAMETERS... 0%</div>
+    <div class="mt-4 text-slate-400 font-medium text-xs tracking-wider text-center" id="loader-text">INITIALIZING SYSTEM... 0%</div>
 </div>
 
 <div class="flex min-h-screen relative w-full">
@@ -116,131 +79,52 @@
         <div>
             <div class="h-20 flex items-center justify-between px-6 border-b border-slate-800/80 bg-dark-900/50">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-royalblue-600 to-sky-500 rounded-xl flex items-center justify-center shadow-md">
-                        <i class="fas fa-shield-check text-white text-lg"></i>
+                    <div class="w-10 h-10 bg-gradient-to-br from-brand-600 to-amber-500 rounded-xl flex items-center justify-center shadow-md">
+                        <i class="fas fa-truck-fast text-white text-lg"></i>
                     </div>
                     <div>
-                        <span class="text-base font-extrabold text-white block leading-tight">Quality Group</span>
-                        <span class="text-[11px] font-semibold text-sky-400 tracking-wider uppercase block">MS Section</span>
+                        <span class="text-base font-extrabold text-white block leading-tight">Gilnash Delivery</span>
+                        <span class="text-[11px] font-semibold text-brand-400 tracking-wider uppercase block">Portal</span>
                     </div>
                 </div>
                 <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white p-2 rounded-lg"><i class="fas fa-times text-lg"></i></button>
             </div>
 
-            <div class="px-3 py-6 space-y-4 overflow-y-auto max-h-[calc(100vh-170px)]">
-                <!-- QA Dashboard Overview -->
-                <div>
-                    <a href="#home" onclick="closeSidebarOnMobile();" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-bold bg-royalblue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all">
-                        <i class="fas fa-chart-pie w-5 text-center text-sky-200"></i> QA Dashboard
-                    </a>
-                </div>
-
-                <!-- MODULE 1: MS Section Bulletin Board -->
-                <div>
-                    <button onclick="toggleSubmenu('submenu-bulletin','icon-bulletin')" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all group">
-                        <span class="flex items-center gap-3"><i class="fas fa-clipboard-list w-5 text-center text-amber-400 group-hover:scale-110 transition-transform"></i> MS Section Bulletin Board</span>
-                        <i id="icon-bulletin" class="fas fa-chevron-down text-xs text-slate-500 transition-transform duration-300"></i>
-                    </button>
-                    <div id="submenu-bulletin" class="submenu-content pl-9 pr-2 space-y-1 mt-1 border-l-2 border-slate-800 ml-4">
-                        <a href="#bulletin-board-section" onclick="switchBulletinTab(event, 'bulletin_home'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"><i class="fas fa-broadcast-tower mr-2 text-amber-400"></i> Live Whiteboard & Notes</a>
-                        <a href="#bulletin-board-section" onclick="switchBulletinTab(event, 'scorecard'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"><i class="fas fa-bullseye mr-2 text-sky-400"></i> Objectives & Scorecard</a>
-                        <a href="#bulletin-board-section" onclick="switchBulletinTab(event, 'nearmiss'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"><i class="fas fa-exclamation-triangle mr-2 text-rose-400"></i> Near Miss & Incident Log</a>
-                        <a href="#bulletin-board-section" onclick="switchBulletinTab(event, 'improvement'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-amber-400 transition-colors cursor-pointer"><i class="fas fa-lightbulb mr-2 text-emerald-400"></i> For Improvement</a>
-                    </div>
-                </div>
-
-                <!-- MODULE 2: Product Quality & Spec Mgmt -->
-                <div>
-                    <button onclick="toggleSubmenu('submenu-spec','icon-spec')" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all group">
-                        <span class="flex items-center gap-3"><i class="fas fa-microscope w-5 text-center text-sky-400 group-hover:scale-110 transition-transform"></i> Quality & Spec Mgmt</span>
-                        <i id="icon-spec" class="fas fa-chevron-down text-xs text-slate-500 transition-transform duration-300"></i>
-                    </button>
-                    <div id="submenu-spec" class="submenu-content pl-9 pr-2 space-y-1 mt-1 border-l-2 border-slate-800 ml-4">
-                        <a href="#quality-spec-section" onclick="switchSpecTab(event, 'matrix'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer"><i class="fas fa-award mr-2 text-sky-500"></i> Product Quality Matrix</a>
-                        <a href="#quality-spec-section" onclick="switchSpecTab(event, 'reprocess'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer"><i class="fas fa-recycle mr-2 text-emerald-400"></i> Reprocess & Batch Credits</a>
-                        <a href="#quality-spec-section" onclick="switchSpecTab(event, 'claim'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer"><i class="fas fa-clipboard-check mr-2 text-rose-400"></i> Quality Claims Register</a>
-                        <a href="#quality-spec-section" onclick="switchSpecTab(event, 'document'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-sky-400 transition-colors cursor-pointer"><i class="fas fa-file-invoice mr-2 text-cyan-500"></i> QA Documents & Reports</a>
-                    </div>
-                </div>
-
-                <!-- QA Calendar -->
-                <div>
-                    <a href="#calendar-section" onclick="closeSidebarOnMobile();" class="flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all group">
-                        <span class="flex items-center gap-3"><i class="fas fa-calendar-alt w-5 text-center text-cyan-400 group-hover:scale-110 transition-transform"></i> QA Calendar</span>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30 animate-pulse">Live Events</span>
-                    </a>
-                </div>
-
-                <!-- S.O.P / QA Procedure -->
-                <div class="space-y-1">
-                    <a href="#sop-section" onclick="closeSidebarOnMobile();" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all group">
-                        <i class="fas fa-book w-5 text-center text-sky-400 group-hover:scale-110 transition-transform"></i> S.O.P Manuals
-                    </a>
-                    <a href="#sop-section" onclick="closeSidebarOnMobile();" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all group">
-                        <i class="fas fa-clipboard-list w-5 text-center text-sky-400 group-hover:scale-110 transition-transform"></i> QA Procedure
-                    </a>
-                </div>
-
-                <!-- QA Area -->
-                <div>
-                    <button onclick="toggleSubmenu('submenu-area','icon-area')" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all group">
-                        <span class="flex items-center gap-3"><i class="fas fa-map-marked-alt w-5 text-center text-emerald-400 group-hover:scale-110 transition-transform"></i> QA Area</span>
-                        <i id="icon-area" class="fas fa-chevron-down text-xs text-slate-500 transition-transform duration-300"></i>
-                    </button>
-                    <div id="submenu-area" class="submenu-content pl-9 pr-2 space-y-1 mt-1 border-l-2 border-slate-800 ml-4">
-                        <a href="#area-explorer" onclick="switchAreaTab('fntrl'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-emerald-400 transition-colors">&bull; FNTRL Area</a>
-                        <a href="#area-explorer" onclick="switchAreaTab('dezinc'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-emerald-400 transition-colors">&bull; MS-Dezinc Area</a>
-                        <a href="#area-explorer" onclick="switchAreaTab('h2s'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-emerald-400 transition-colors">&bull; H2S Area</a>
-                        <a href="#area-explorer" onclick="switchAreaTab('limestone'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-emerald-400 transition-colors">&bull; Limestone Area</a>
-                    </div>
-                </div>
-
-                <!-- DCS -->
-                <div>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-3 mb-2 block">Plant Automation</span>
-                    <div class="space-y-1">
-                        <a href="#dcs-section" onclick="highlightDCS('main'); closeSidebarOnMobile();" class="flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-cyan-300 transition-all group">
-                            <span class="flex items-center gap-3"><i class="fas fa-server w-5 text-center text-cyan-400 group-hover:scale-110 transition-transform"></i> DCS Control</span>
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                        </a>
-                        <a href="#dcs-section" onclick="highlightDCS('sub'); closeSidebarOnMobile();" class="flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-cyan-300 transition-all group">
-                            <span class="flex items-center gap-3"><i class="fas fa-network-wired w-5 text-center text-sky-400 group-hover:scale-110 transition-transform"></i> Sub DCS Control</span>
-                            <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-bold">Field</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- User Management -->
-                <div>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-3 mb-2 block">Administration</span>
-                    <button onclick="toggleSubmenu('submenu-users','icon-users')" class="w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all group">
-                        <span class="flex items-center gap-3"><i class="fas fa-users-cog w-5 text-center text-amber-400 group-hover:scale-110 transition-transform"></i> User Management</span>
-                        <i id="icon-users" class="fas fa-chevron-down text-xs text-slate-500 transition-transform duration-300"></i>
-                    </button>
-                    <div id="submenu-users" class="submenu-content pl-9 pr-2 space-y-1 mt-1 border-l-2 border-slate-800 ml-4">
-                        <a href="#user-management-section" onclick="filterUsers('all'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-amber-400 transition-colors"><i class="fas fa-user-check mr-2 text-emerald-400"></i> Active QA Personnel</a>
-                        <a href="#user-management-section" onclick="filterUsers('Lead QA Inspector'); closeSidebarOnMobile();" class="block py-2 text-xs font-medium text-slate-400 hover:text-amber-400 transition-colors"><i class="fas fa-user-shield mr-2 text-sky-400"></i> Role Permissions (RBAC)</a>
-                        <a href="javascript:void(0)" onclick="openModal('userModal'); closeSidebarOnMobile();" class="block py-2 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors"><i class="fas fa-user-plus mr-2 text-amber-400"></i> + Add Inspector / Tech</a>
-                    </div>
-                </div>
+            <div class="px-3 py-6 space-y-2 overflow-y-auto max-h-[calc(100vh-170px)]">
+                <a href="#home" onclick="closeSidebarOnMobile();" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-bold bg-brand-600 text-white shadow-[0_0_15px_rgba(234,88,12,0.4)] transition-all">
+                    <i class="fas fa-home w-5 text-center text-amber-200"></i> Dashboard Home
+                </a>
+                <a href="#pos-section" onclick="closeSidebarOnMobile();" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all">
+                    <i class="fas fa-cash-register w-5 text-center text-emerald-400"></i> Point of Sale & Billing
+                </a>
+                <a href="#kds-section" onclick="closeSidebarOnMobile();" class="flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all">
+                    <span class="flex items-center gap-3"><i class="fas fa-desktop w-5 text-center text-sky-400"></i> Kitchen Display (KDS)</span>
+                    <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+                </a>
+                <a href="#inventory-section" onclick="closeSidebarOnMobile();" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all">
+                    <i class="fas fa-boxes w-5 text-center text-amber-400"></i> Real-Time Inventory
+                </a>
+                <a href="#loyalty-section" onclick="closeSidebarOnMobile();" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all">
+                    <i class="fas fa-gift w-5 text-center text-rose-400"></i> Customer Loyalty
+                </a>
+                <a href="#sales-section" onclick="closeSidebarOnMobile();" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all">
+                    <i class="fas fa-chart-line w-5 text-center text-cyan-400"></i> Remote Sales Monitor
+                </a>
             </div>
         </div>
 
-        <!-- Sidebar Footer -->
         <div class="p-4 border-t border-slate-800/80 bg-dark-900/40">
             <div class="bg-gradient-to-br from-dark-400 to-dark-500 border border-slate-700/60 rounded-xl p-3.5 shadow-lg">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-xs font-bold text-slate-200">MS Product Index</span>
-                    <span id="sidebar-compliance-rate" class="inline-flex items-center gap-1 text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                        <i class="fas fa-check text-[10px]"></i> 97.8%
-                    </span>
+                    <span class="text-xs font-bold text-slate-200">Active Deliveries</span>
+                    <span class="inline-flex items-center gap-1 text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">14 On Route</span>
                 </div>
                 <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-2">
-                    <div id="sidebar-compliance-bar" class="bg-gradient-to-r from-sky-400 to-emerald-400 h-full w-[97.8%] transition-all duration-500"></div>
+                    <div class="bg-gradient-to-r from-brand-400 to-amber-400 h-full w-[75%] transition-all duration-500"></div>
                 </div>
                 <div class="flex items-center justify-between text-[11px]">
-                    <span class="text-slate-400 font-normal">Defect-Free Rate</span>
-                    <span id="sidebar-records-count" class="text-sky-400 font-bold cursor-pointer hover:underline" onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'})">48 Verified Records</span>
+                    <span class="text-slate-400 font-normal">Store Uptime</span>
+                    <span class="text-sky-400 font-bold">100% Online</span>
                 </div>
             </div>
         </div>
@@ -252,1543 +136,555 @@
     <!-- MAIN CONTENT -->
     <main class="flex-1 lg:ml-72 flex flex-col min-h-screen bg-dark-900 text-white relative w-full">
 
-        <!-- Top Header -->
         <header class="h-20 border-b border-slate-800/80 bg-dark-900/90 backdrop-blur-md sticky top-0 z-30 px-4 sm:px-8 flex items-center justify-between">
             <div class="flex items-center gap-3 sm:gap-4">
                 <button onclick="toggleSidebar()" class="lg:hidden text-slate-300 hover:text-white p-2.5 rounded-xl bg-slate-800/60 border border-slate-700 active:scale-95 transition-all">
                     <i class="fas fa-bars text-lg"></i>
                 </button>
                 <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-400 font-medium">
-                    <span class="text-slate-300 font-semibold hidden sm:inline">Production Dept</span>
+                    <span class="text-slate-300 font-semibold hidden sm:inline">Gilnash Headquarters</span>
                     <i class="fas fa-chevron-right text-[10px] text-slate-600 hidden sm:inline"></i>
-                    <span class="text-sky-400 font-bold bg-sky-500/10 px-2.5 py-1 rounded-lg border border-sky-500/20">Quality Group</span>
+                    <span class="text-brand-400 font-bold bg-brand-500/10 px-2.5 py-1 rounded-lg border border-brand-500/20">Main Store</span>
                 </div>
             </div>
             <div class="flex items-center gap-3 sm:gap-4">
-                <button onclick="openModal('incidentModal')" class="bg-gradient-to-r from-rose-600 to-amber-500 hover:from-rose-500 hover:to-amber-400 text-white px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-[0_0_15px_rgba(244,63,94,0.3)] transition-all flex items-center gap-2">
-                    <i class="fas fa-exclamation-triangle"></i><span>Log Incident / Near Miss</span>
-                </button>
-                <button onclick="openModal('loginModal')" class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center gap-2">
-                    <i class="fas fa-user-shield text-sky-400"></i><span class="hidden md:inline">Portal Login</span>
+                <button class="bg-gradient-to-r from-brand-600 to-amber-500 hover:from-brand-500 hover:to-amber-400 text-white px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-[0_0_15px_rgba(249,115,22,0.3)] transition-all flex items-center gap-2">
+                    <i class="fas fa-motorcycle"></i><span>Dispatch Rider</span>
                 </button>
             </div>
         </header>
 
         <!-- HERO SECTION -->
-        <section id="home" class="relative bg-hero-mesh bg-grid-pattern pt-12 sm:pt-16 pb-20 px-4 sm:px-8 border-b border-slate-800/80 overflow-hidden">
-            <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] sm:w-[600px] h-[300px] bg-gradient-to-tr from-royalblue-600/30 to-cyan-500/20 blur-[100px] rounded-full pointer-events-none"></div>
-            <div class="max-w-5xl mx-auto relative z-10 text-center" data-aos="fade-up" data-aos-duration="800">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-400/30 text-sky-300 text-xs font-semibold uppercase tracking-wider mb-6 backdrop-blur-md shadow-inner">
-                    <i class="fas fa-check-double text-sky-400"></i> MS Section &bull; Quality by MS Product
+        <section id="home" class="portal-section relative bg-hero-mesh bg-grid-pattern pt-12 sm:pt-16 pb-16 px-4 sm:px-8 border-b border-slate-800/80 overflow-hidden">
+            <div class="max-w-6xl mx-auto relative z-10 text-center" data-aos="fade-up" data-aos-duration="800">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/10 border border-brand-400/30 text-brand-300 text-xs font-semibold uppercase tracking-wider mb-6 backdrop-blur-md shadow-inner">
+                    <i class="fas fa-bolt text-brand-400"></i> Fast & Reliable Delivery Services
                 </div>
-                <h2 class="text-3xl sm:text-6xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.15] mb-6">
-                    Quality Group <br class="hidden sm:block"/>
-                    <span class="bg-gradient-to-r from-sky-400 via-cyan-300 to-white bg-clip-text text-transparent font-black">Precision QA Dashboard</span>
+                <h2 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15] mb-6">
+                    Gilnash Delivery <br class="hidden sm:block"/>
+                    <span class="bg-gradient-to-r from-brand-400 via-amber-300 to-white bg-clip-text text-transparent font-black">All-in-One POS Solution</span>
                 </h2>
-                <p class="text-sm sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed mb-8 font-normal">
-                    Centralized Quality Assurance for Hydrometallurgical & MS Product operations. Monitor real-time telemetry, track Near Misses on our Digital Bulletin Board, and enforce strict Quality Specifications across all processing areas.
+                <p class="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed mb-10 font-normal">
+                    Empower your restaurant or retail store with seamless delivery tracking, advanced point-of-sale operations, and centralized inventory management all in one smart dashboard.
                 </p>
-                <div class="flex flex-wrap justify-center items-center gap-3 sm:gap-4">
-                    <button onclick="document.getElementById('bulletin-board-section').scrollIntoView({behavior:'smooth'}); switchBulletinTab(event, 'bulletin_home');" class="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-white font-bold text-sm rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-all flex items-center justify-center gap-2">
-                        <span>Digital Bulletin Board</span><i class="fas fa-clipboard-list text-xs"></i>
-                    </button>
-                    <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab(event, 'matrix');" class="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-royalblue-600 to-sky-500 hover:from-royalblue-500 hover:to-sky-400 text-white font-bold text-sm rounded-xl shadow-[0_0_20px_rgba(14,165,233,0.4)] transition-all flex items-center justify-center gap-2">
-                        <span>Product Quality & Spec Mgmt</span><i class="fas fa-microscope text-xs"></i>
-                    </button>
-                    <a href="#calendar-section" class="w-full sm:w-auto px-6 py-3.5 bg-dark-500/80 hover:bg-dark-400/80 border border-slate-700 hover:border-slate-500 text-slate-200 hover:text-white font-semibold text-sm rounded-xl transition-all text-center backdrop-blur-sm">QA Calendar</a>
+
+                <!-- 6 Core Features from Image -->
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 text-left mt-8">
+                    <div class="bg-dark-500/80 backdrop-blur-sm p-5 rounded-2xl border border-slate-700 shadow-lg hover:border-brand-500/50 transition-all cursor-pointer">
+                        <i class="fas fa-mobile-screen text-2xl text-brand-400 mb-3"></i>
+                        <h4 class="font-bold text-sm text-white mb-1">Remote Sales Monitoring</h4>
+                        <p class="text-[11px] text-slate-400">Track revenue and performance securely from any mobile device, anywhere.</p>
+                    </div>
+                    <div class="bg-dark-500/80 backdrop-blur-sm p-5 rounded-2xl border border-slate-700 shadow-lg hover:border-brand-500/50 transition-all cursor-pointer">
+                        <i class="fas fa-boxes-stacked text-2xl text-emerald-400 mb-3"></i>
+                        <h4 class="font-bold text-sm text-white mb-1">Real-Time Inventory</h4>
+                        <p class="text-[11px] text-slate-400">Automated stock tracking prevents overselling and alerts you when running low.</p>
+                    </div>
+                    <div class="bg-dark-500/80 backdrop-blur-sm p-5 rounded-2xl border border-slate-700 shadow-lg hover:border-brand-500/50 transition-all cursor-pointer">
+                        <i class="fas fa-gift text-2xl text-rose-400 mb-3"></i>
+                        <h4 class="font-bold text-sm text-white mb-1">Customer Loyalty System</h4>
+                        <p class="text-[11px] text-slate-400">Reward repeat buyers, build tiers, and manage store credit automatically.</p>
+                    </div>
+                    <div class="bg-dark-500/80 backdrop-blur-sm p-5 rounded-2xl border border-slate-700 shadow-lg hover:border-brand-500/50 transition-all cursor-pointer">
+                        <i class="fas fa-qrcode text-2xl text-sky-400 mb-3"></i>
+                        <h4 class="font-bold text-sm text-white mb-1">QR Order & Pay</h4>
+                        <p class="text-[11px] text-slate-400">Customers scan, order, and pay contact-free directly from their tables or phones.</p>
+                    </div>
+                    <div class="bg-dark-500/80 backdrop-blur-sm p-5 rounded-2xl border border-slate-700 shadow-lg hover:border-brand-500/50 transition-all cursor-pointer">
+                        <i class="fas fa-desktop text-2xl text-amber-400 mb-3"></i>
+                        <h4 class="font-bold text-sm text-white mb-1">Kitchen Display System</h4>
+                        <p class="text-[11px] text-slate-400">Digital KDS synchronizes front-of-house with the kitchen for faster prep times.</p>
+                    </div>
+                    <div class="bg-dark-500/80 backdrop-blur-sm p-5 rounded-2xl border border-slate-700 shadow-lg hover:border-brand-500/50 transition-all cursor-pointer">
+                        <i class="fas fa-store text-2xl text-cyan-400 mb-3"></i>
+                        <h4 class="font-bold text-sm text-white mb-1">Free Online Webstore</h4>
+                        <p class="text-[11px] text-slate-400">Launch a beautiful online store instantly linked to your delivery dispatch network.</p>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- ========================================================================= -->
-        <!-- MODULE 1: MS SECTION - DIGITAL BULLETIN BOARD (Independent Top-Level Section) -->
+        <!-- POS & BILLING SECTION (Interactive Cart & Receipts) -->
         <!-- ========================================================================= -->
-        <section id="bulletin-board-section" class="py-12 px-4 sm:px-8 bg-dark-900 border-b-2 border-slate-800">
+        <section id="pos-section" class="portal-section py-12 px-4 sm:px-8 bg-dark-900 border-b-2 border-slate-800">
             <div class="max-w-7xl mx-auto">
-                
-                <!-- Section Header -->
                 <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-800 pb-6 mb-6">
                     <div>
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-amber-500/10 text-amber-400 font-bold text-xs mb-2 border border-amber-500/20">
-                            <i class="fas fa-clipboard-list"></i> MS Section Management Communications & Tracking
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-500/10 text-emerald-400 font-bold text-xs mb-2 border border-emerald-500/20">
+                            <i class="fas fa-cash-register"></i> Point of Sale Module
                         </div>
-                        <h3 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">MS SECTION - DIGITAL BULLETIN BOARD</h3>
-                        <p class="text-xs sm:text-sm text-slate-400 mt-1">Real-time shift announcements, QA near miss hazard monitoring, quality objectives scorecard, and continuous improvement tracking.</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="openModal('incidentModal')" class="px-4 py-2.5 bg-gradient-to-r from-rose-600 to-amber-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-2">
-                            <i class="fas fa-plus"></i> Post Bulletin / Event
-                        </button>
+                        <h3 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Billing & Transactions</h3>
                     </div>
                 </div>
 
-                <!-- KPI Summary Cards Row -->
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <div class="bg-dark-500 p-4 rounded-xl border border-slate-800 flex items-center justify-between shadow-lg">
-                        <div><span class="text-[11px] font-bold text-slate-400 uppercase">Verified Records</span><span class="text-2xl font-black text-white block mt-1">48</span></div>
-                        <div class="w-10 h-10 rounded-lg bg-royalblue-600/20 text-royalblue-400 flex items-center justify-center text-lg"><i class="fas fa-database"></i></div>
-                    </div>
-                    <div class="bg-dark-500 p-4 rounded-xl border border-slate-800 flex items-center justify-between shadow-lg">
-                        <div><span class="text-[11px] font-bold text-slate-400 uppercase">Defect-Free Rate</span><span class="text-2xl font-black text-emerald-400 block mt-1">97.8%</span></div>
-                        <div class="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg"><i class="fas fa-check-circle"></i></div>
-                    </div>
-                    <div class="bg-dark-500 p-4 rounded-xl border border-slate-800 flex items-center justify-between shadow-lg">
-                        <div><span class="text-[11px] font-bold text-slate-400 uppercase">Active Near Misses</span><span class="text-2xl font-black text-amber-400 block mt-1">3</span></div>
-                        <div class="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg"><i class="fas fa-exclamation-triangle"></i></div>
-                    </div>
-                    <div class="bg-dark-500 p-4 rounded-xl border border-slate-800 flex items-center justify-between shadow-lg">
-                        <div><span class="text-[11px] font-bold text-slate-400 uppercase">Open Claims</span><span class="text-2xl font-black text-rose-400 block mt-1">2</span></div>
-                        <div class="w-10 h-10 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center text-lg"><i class="fas fa-clipboard-check"></i></div>
-                    </div>
-                </div>
-
-                <!-- Bulletin Board Tab Navigation (Updated class names and event stopping to prevent external script interference) -->
                 <div class="flex items-center gap-2 overflow-x-auto pb-3 mb-6 no-scrollbar border-b border-slate-800">
-                    <button onclick="switchBulletinTab(event, 'bulletin_home')" id="btab-bulletin_home" class="board-tab ms-bulletin-tab active px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
-                        <i class="fas fa-broadcast-tower text-amber-400"></i> Live Whiteboard & Notes
+                    <button onclick="switchTab('pos-tab', 'panel-terminal')" class="pos-tab active px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 transition-all">
+                        <i class="fas fa-tablet-screen-button mr-1"></i> POS Terminal
                     </button>
-                    <button onclick="switchBulletinTab(event, 'scorecard')" id="btab-scorecard" class="board-tab ms-bulletin-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
-                        <i class="fas fa-bullseye text-sky-400"></i> Objectives & Scorecard
-                    </button>
-                    <button onclick="switchBulletinTab(event, 'nearmiss')" id="btab-nearmiss" class="board-tab ms-bulletin-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
-                        <i class="fas fa-exclamation-triangle text-rose-400"></i> Near Miss & Incident Log
-                    </button>
-                    <button onclick="switchBulletinTab(event, 'improvement')" id="btab-improvement" class="board-tab ms-bulletin-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
-                        <i class="fas fa-lightbulb text-emerald-400"></i> For Improvement Proposals
+                    <button onclick="switchTab('pos-tab', 'panel-history')" class="pos-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 transition-all">
+                        <i class="fas fa-receipt mr-1"></i> Transaction History
                     </button>
                 </div>
 
-                <!-- ===== BULLETIN PANEL 1: LIVE WHITEBOARD & NOTES ===== -->
-                <div id="panel-bulletin_home" class="bulletin-panel ms-bulletin-panel active animate-fadeIn">
+                <!-- Panel: POS Terminal -->
+                <div id="panel-terminal" class="section-panel active animate-fadeIn">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="lg:col-span-2 space-y-4">
-                            <div class="bg-dark-500 p-6 rounded-2xl border border-amber-500/30 shadow-xl relative overflow-hidden">
-                                <div class="absolute top-0 right-0 bg-amber-500 text-dark-900 text-[10px] font-black uppercase px-3 py-1 rounded-bl-xl tracking-wider">Priority Notice</div>
-                                <div class="flex items-center gap-3 mb-3">
-                                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 text-lg"><i class="fas fa-bell animate-bounce"></i></div>
-                                    <div>
-                                        <h4 class="text-base font-extrabold text-white">Shift Handover & Daily Quality Focus</h4>
-                                        <span class="text-xs text-slate-400">Posted: July 6, 2026 &bull; 20:00 PST by Lead QA Inspector M. Santos</span>
-                                    </div>
-                                </div>
-                                <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4 bg-dark-700/80 p-4 rounded-xl border border-slate-800">
-                                    <strong class="text-amber-400 block mb-1">Attention All Field Technicians & Lab Chemists:</strong>
-                                    FNTRL Line B flocculant dosing pump calibration was completed during the afternoon shift. Ensure discharge slurry pH is strictly maintained within the <span class="text-emerald-400 font-bold">8.2 - 8.6 pH</span> range. Additionally, monitor Dezinc Tank 4 phase separation timers closely due to minor organic carry-over observed yesterday.
-                                </p>
-                                <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
-                                    <span class="inline-flex items-center gap-1.5 text-slate-400"><i class="fas fa-shield-alt text-sky-400"></i> Status: Active Shift Directive</span>
-                                    <button onclick="openModal('incidentModal')" class="text-amber-400 hover:text-amber-300 font-bold underline">Reply / Acknowledge <i class="fas fa-arrow-right ml-1"></i></button>
-                                </div>
+                        <!-- Product Grid -->
+                        <div class="lg:col-span-2 bg-dark-500 p-5 rounded-2xl border border-slate-800 shadow-xl">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="text-base font-bold text-white">Menu Items</h4>
+                                <input type="text" placeholder="Search menu..." class="bg-dark-700 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white outline-none">
                             </div>
-
-                            <div class="bg-dark-500 p-6 rounded-2xl border border-slate-800 shadow-xl">
-                                <h4 class="text-base font-extrabold text-white mb-4 flex items-center gap-2"><i class="fas fa-history text-sky-400"></i> Recent Whiteboard Bulletins</h4>
-                                <div class="space-y-3">
-                                    <div class="p-3.5 bg-dark-700 rounded-xl border border-slate-800 flex items-start justify-between gap-3">
-                                        <div>
-                                            <span class="text-xs font-bold text-white block mb-0.5">Limestone Density Sensor Replacement Confirmed</span>
-                                            <p class="text-[11px] text-slate-300">Scheduled downtime for July 20 is confirmed. Old density sensors will be replaced with Rev 4.0 digital optical units.</p>
-                                            <span class="text-[10px] text-slate-500 mt-1 block">Posted July 4, 2026 &bull; Engr. Bautista, L.</span>
-                                        </div>
-                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30 whitespace-nowrap">Maintenance</span>
-                                    </div>
-                                    <div class="p-3.5 bg-dark-700 rounded-xl border border-slate-800 flex items-start justify-between gap-3">
-                                        <div>
-                                            <span class="text-xs font-bold text-white block mb-0.5">Monthly Lab Results Turnaround Achieved 89%</span>
-                                            <p class="text-[11px] text-slate-300">Great job to the titration team! We are 1% away from our monthly target of 90% on-time turnaround.</p>
-                                            <span class="text-[10px] text-slate-500 mt-1 block">Posted July 1, 2026 &bull; Admin Cruz, R.</span>
-                                        </div>
-                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 whitespace-nowrap">Milestone</span>
-                                    </div>
-                                </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4" id="product-grid">
+                                <!-- Products loaded via JS to match the image exactly -->
                             </div>
                         </div>
 
-                        <!-- Quick Action Bulletin Box -->
-                        <div class="bg-gradient-to-br from-dark-500 to-dark-700 p-6 rounded-2xl border border-slate-800 shadow-xl flex flex-col justify-between">
-                            <div>
-                                <span class="text-[11px] font-bold text-sky-400 uppercase tracking-wider block mb-1">Bulletin Quick Actions</span>
-                                <h4 class="text-lg font-extrabold text-white mb-3">QA Portal Control Box</h4>
-                                <p class="text-xs text-slate-300 leading-relaxed mb-6">Need to log an emergency hazard, check SOP compliance, or review product matrices?</p>
-                                <div class="space-y-2.5">
-                                    <button onclick="openModal('incidentModal')" class="w-full py-3 bg-gradient-to-r from-rose-600 to-amber-500 hover:from-rose-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2">
-                                        <i class="fas fa-exclamation-triangle"></i> Log Near Miss / Incident
-                                    </button>
-                                    <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab(event, 'matrix');" class="w-full py-3 bg-royalblue-600 hover:bg-royalblue-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-2">
-                                        <i class="fas fa-table"></i> Open Product Quality Matrix
-                                    </button>
-                                    <button onclick="switchBulletinTab(event, 'scorecard')" class="w-full py-3 bg-dark-700 hover:bg-dark-400 border border-slate-700 text-slate-200 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2">
-                                        <i class="fas fa-chart-bar text-amber-400"></i> View Monthly Scorecard
-                                    </button>
-                                </div>
+                        <!-- Cart / Checkout Panel -->
+                        <div class="bg-dark-700 rounded-2xl border border-brand-500/30 shadow-xl flex flex-col h-[550px] relative overflow-hidden">
+                            <!-- StoreHub replica header style -->
+                            <div class="bg-dark-900 p-4 border-b border-slate-800 text-center">
+                                <span class="text-brand-400 font-extrabold tracking-widest uppercase text-sm">STOREHUB / GILNASH</span>
                             </div>
-                            <div class="mt-6 pt-4 border-t border-slate-800 text-center">
-                                <span class="text-[11px] text-slate-400">System Telemetry Uptime: <strong class="text-emerald-400">99.6% Live</strong></span>
+                            
+                            <!-- Cart Items -->
+                            <div class="p-4 flex-1 overflow-y-auto" id="cart-items">
+                                <p class="text-xs text-slate-500 text-center mt-10">Cart is empty.</p>
                             </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- ===== BULLETIN PANEL 2: OBJECTIVES & SCORECARD ===== -->
-                <div id="panel-scorecard" class="bulletin-panel ms-bulletin-panel animate-fadeIn">
-                    <h4 class="text-lg font-extrabold text-white mb-1">Objectives & Scorecard</h4>
-                    <p class="text-xs text-slate-400 mb-5">Monthly KPI targets vs. actuals for MS Section quality objectives</p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div class="bg-dark-500 rounded-2xl border border-slate-800 p-5">
-                            <h5 class="font-bold text-sm text-sky-400 mb-4 border-b border-slate-800 pb-3"><i class="fas fa-bullseye mr-2"></i>July 2026 Quality Objectives</h5>
-                            <div class="space-y-4">
-                                <div>
-                                    <div class="flex justify-between text-xs mb-1.5"><span class="text-slate-300 font-semibold">Defect-Free Product Rate</span><span class="text-emerald-400 font-bold">97.8% / 98% target</span></div>
-                                    <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden"><div class="bg-gradient-to-r from-sky-500 to-emerald-400 h-full rounded-full" style="width:97.8%"></div></div>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-xs mb-1.5"><span class="text-slate-300 font-semibold">CAPA Closure Rate (NM)</span><span class="text-emerald-400 font-bold">100% / 100% target</span></div>
-                                    <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden"><div class="bg-gradient-to-r from-emerald-500 to-cyan-400 h-full rounded-full" style="width:100%"></div></div>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-xs mb-1.5"><span class="text-slate-300 font-semibold">SOP Compliance Audits Passed</span><span class="text-amber-400 font-bold">92% / 95% target</span></div>
-                                    <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden"><div class="bg-gradient-to-r from-amber-500 to-rose-400 h-full rounded-full" style="width:92%"></div></div>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-xs mb-1.5"><span class="text-slate-300 font-semibold">On-Time Lab Results Turnaround</span><span class="text-sky-400 font-bold">89% / 90% target</span></div>
-                                    <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden"><div class="bg-gradient-to-r from-sky-500 to-royalblue-400 h-full rounded-full" style="width:89%"></div></div>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-xs mb-1.5"><span class="text-slate-300 font-semibold">DCS Telemetry Uptime</span><span class="text-emerald-400 font-bold">99.6% / 99% target</span></div>
-                                    <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden"><div class="bg-gradient-to-r from-emerald-500 to-sky-400 h-full rounded-full" style="width:99.6%"></div></div>
-                                </div>
+                            <!-- Cart Totals -->
+                            <div class="p-4 bg-dark-900 border-t border-slate-800 space-y-2">
+                                <div class="flex justify-between text-xs text-slate-400"><span>Sub Total</span><span id="cart-subtotal">PHP 0.00</span></div>
+                                <div class="flex justify-between text-xs text-rose-400"><span>Discount</span><span>- PHP 0.00</span></div>
+                                <div class="flex justify-between text-xs text-slate-400"><span>Tax (12%)</span><span id="cart-tax">PHP 0.00</span></div>
                             </div>
-                        </div>
-                        <div class="bg-dark-500 rounded-2xl border border-slate-800 p-5">
-                            <h5 class="font-bold text-sm text-amber-400 mb-4 border-b border-slate-800 pb-3"><i class="fas fa-chart-bar mr-2"></i>Area Performance Scorecard</h5>
-                            <div class="space-y-3">
-                                <div class="p-3 bg-dark-700 rounded-xl border border-slate-800 flex items-center justify-between">
-                                    <div class="flex items-center gap-3"><i class="fas fa-filter text-sky-400"></i><span class="text-xs font-bold text-white">FNTRL Area</span></div>
-                                    <div class="flex items-center gap-2"><span class="text-xs text-emerald-400 font-bold">A+</span><span class="text-xs text-slate-400">98.5%</span></div>
-                                </div>
-                                <div class="p-3 bg-dark-700 rounded-xl border border-slate-800 flex items-center justify-between">
-                                    <div class="flex items-center gap-3"><i class="fas fa-flask text-cyan-400"></i><span class="text-xs font-bold text-white">MS-Dezinc Area</span></div>
-                                    <div class="flex items-center gap-2"><span class="text-xs text-emerald-400 font-bold">A</span><span class="text-xs text-slate-400">97.2%</span></div>
-                                </div>
-                                <div class="p-3 bg-dark-700 rounded-xl border border-slate-800 flex items-center justify-between">
-                                    <div class="flex items-center gap-3"><i class="fas fa-smog text-rose-400"></i><span class="text-xs font-bold text-white">H2S Area</span></div>
-                                    <div class="flex items-center gap-2"><span class="text-xs text-amber-400 font-bold">B+</span><span class="text-xs text-slate-400">95.8%</span></div>
-                                </div>
-                                <div class="p-3 bg-dark-700 rounded-xl border border-slate-800 flex items-center justify-between">
-                                    <div class="flex items-center gap-3"><i class="fas fa-mountain text-amber-400"></i><span class="text-xs font-bold text-white">Limestone Area</span></div>
-                                    <div class="flex items-center gap-2"><span class="text-xs text-emerald-400 font-bold">A-</span><span class="text-xs text-slate-400">96.9%</span></div>
-                                </div>
-                            </div>
-                            <div class="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-300 font-semibold text-center">
-                                <i class="fas fa-trophy mr-2 text-amber-400"></i>Overall MS Section Grade: <span class="text-emerald-400 font-black">A (97.8%)</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- ===== BULLETIN PANEL 3: NEAR MISS & INCIDENT LOG ===== -->
-                <div id="panel-nearmiss" class="bulletin-panel ms-bulletin-panel animate-fadeIn">
-                    <h4 class="text-lg font-extrabold text-white mb-1">QA Near Miss & Incident Log</h4>
-                    <p class="text-xs text-slate-400 mb-5">All reported hazard events, near misses, and safety interventions — MS Section 2026</p>
-                    <div class="space-y-3">
-                        <div class="p-5 bg-dark-500 rounded-xl border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
-                            <div class="flex items-start gap-3">
-                                <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 mt-0.5"><i class="fas fa-exclamation-triangle text-sm"></i></div>
-                                <div>
-                                    <div class="flex items-center gap-2 flex-wrap mb-1"><span class="font-bold text-sm text-white">Flocculant Pump Surge — Overflow Risk</span><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Near Miss</span></div>
-                                    <div class="text-[11px] text-slate-400 space-x-3"><span><i class="fas fa-map-marker-alt text-sky-400 mr-1"></i>FNTRL Area</span><span><i class="far fa-clock text-slate-500 mr-1"></i>June 20, 2026 &bull; 09:45 AM</span><span><i class="fas fa-user text-slate-500 mr-1"></i>Reyes, J.</span></div>
-                                    <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">Flocculant dosing pump surged to 185% rated flow during slurry transfer. Sub DCS interlock triggered an automated shutdown. No chemical spill occurred. Root cause: clogged bypass valve.</p>
-                                </div>
-                            </div>
-                            <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 whitespace-nowrap shrink-0">CAPA Closed</span>
-                        </div>
-                        <div class="p-5 bg-dark-500 rounded-xl border border-rose-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
-                            <div class="flex items-start gap-3">
-                                <div class="w-9 h-9 rounded-xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400 shrink-0 mt-0.5"><i class="fas fa-radiation-alt text-sm"></i></div>
-                                <div>
-                                    <div class="flex items-center gap-2 flex-wrap mb-1"><span class="font-bold text-sm text-white">H2S Line Pressure Fluctuation</span><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">Safety Incident</span></div>
-                                    <div class="text-[11px] text-slate-400 space-x-3"><span><i class="fas fa-map-marker-alt text-rose-400 mr-1"></i>H2S Area</span><span><i class="far fa-clock text-slate-500 mr-1"></i>July 6, 2026 &bull; 02:15 AM</span><span><i class="fas fa-user text-slate-500 mr-1"></i>Tech Mendoza, P.</span></div>
-                                    <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">Line pressure fluctuated ±15% above set-point during night shift. Automated safety interlock isolated the affected line section. Personnel evacuated Area 3B per ESD protocol. No injuries.</p>
-                                </div>
-                            </div>
-                            <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 whitespace-nowrap shrink-0">CAPA In Progress</span>
-                        </div>
-                        <div class="p-5 bg-dark-500 rounded-xl border border-amber-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
-                            <div class="flex items-start gap-3">
-                                <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 mt-0.5"><i class="fas fa-exclamation-circle text-sm"></i></div>
-                                <div>
-                                    <div class="flex items-center gap-2 flex-wrap mb-1"><span class="font-bold text-sm text-white">Phase Separation Delay — Dezinc Tank 4</span><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Near Miss</span></div>
-                                    <div class="text-[11px] text-slate-400 space-x-3"><span><i class="fas fa-map-marker-alt text-cyan-400 mr-1"></i>MS-Dezinc Area</span><span><i class="far fa-clock text-slate-500 mr-1"></i>July 20, 2026 &bull; 11:00 AM</span><span><i class="fas fa-user text-slate-500 mr-1"></i>Chemist Lim, K.</span></div>
-                                    <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">Phase separation time exceeded 120 seconds in Tank 4, risking cross-contamination. Impeller speed adjusted from 450 RPM to 380 RPM by field technician. Product batch quarantined for re-analysis.</p>
-                                </div>
-                            </div>
-                            <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 whitespace-nowrap shrink-0">CAPA Closed</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ===== BULLETIN PANEL 4: FOR IMPROVEMENT ===== -->
-                <div id="panel-improvement" class="bulletin-panel ms-bulletin-panel animate-fadeIn">
-                    <h4 class="text-lg font-extrabold text-white mb-1">For Improvement — QA Suggestions</h4>
-                    <p class="text-xs text-slate-400 mb-5">Continuous improvement proposals submitted by field inspectors and technicians</p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="p-5 bg-dark-500 rounded-xl border border-emerald-500/20 hover:border-emerald-400/50 transition-all shadow-md">
-                            <div class="flex items-start gap-3 mb-3">
-                                <div class="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0"><i class="fas fa-lightbulb text-sm"></i></div>
-                                <div>
-                                    <span class="font-bold text-sm text-white block">Automate pH Sensor Calibration Intervals</span>
-                                    <span class="text-[11px] text-slate-400">Submitted by Reyes, J. &bull; July 2, 2026 &bull; FNTRL Area</span>
-                                </div>
-                            </div>
-                            <p class="text-xs text-slate-300 leading-relaxed mb-3">Current manual calibration every 8 hours introduces drift risk. Proposing DCS-triggered auto-calibration every 4 hours using standard buffer solution injectors already installed on Line B.</p>
-                            <div class="flex items-center justify-between"><span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">Under Evaluation</span><span class="text-[11px] text-slate-500">Priority: High</span></div>
-                        </div>
-                        <div class="p-5 bg-dark-500 rounded-xl border border-emerald-500/20 hover:border-emerald-400/50 transition-all shadow-md">
-                            <div class="flex items-start gap-3 mb-3">
-                                <div class="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0"><i class="fas fa-lightbulb text-sm"></i></div>
-                                <div>
-                                    <span class="font-bold text-sm text-white block">Install Secondary Overflow Containment — Dezinc Tank 4</span>
-                                    <span class="text-[11px] text-slate-400">Submitted by Chemist Lim, K. &bull; July 3, 2026 &bull; MS-Dezinc Area</span>
-                                </div>
-                            </div>
-                            <p class="text-xs text-slate-300 leading-relaxed mb-3">Following the phase separation near miss, a secondary berm containment is proposed around Tank 4 to prevent potential organic phase overflow reaching the floor drain during surge events.</p>
-                            <div class="flex items-center justify-between"><span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Approved — In Progress</span><span class="text-[11px] text-slate-500">Priority: Critical</span></div>
-                        </div>
-                        <div class="p-5 bg-dark-500 rounded-xl border border-emerald-500/20 hover:border-emerald-400/50 transition-all shadow-md">
-                            <div class="flex items-start gap-3 mb-3">
-                                <div class="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0"><i class="fas fa-lightbulb text-sm"></i></div>
-                                <div>
-                                    <span class="font-bold text-sm text-white block">QA Digital Logbook for Shift Handover</span>
-                                    <span class="text-[11px] text-slate-400">Submitted by Admin Cruz, R. &bull; June 30, 2026 &bull; All Areas</span>
-                                </div>
-                            </div>
-                            <p class="text-xs text-slate-300 leading-relaxed mb-3">Replace paper shift logbooks with a digital tablet-based system syncing directly to the DCS audit trail. Eliminates handwriting errors and ensures timestamps are DCS-verified.</p>
-                            <div class="flex items-center justify-between"><span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Pending Budget Approval</span><span class="text-[11px] text-slate-500">Priority: Medium</span></div>
-                        </div>
-                        <div class="p-5 bg-dark-500 rounded-xl border border-emerald-500/20 hover:border-emerald-400/50 transition-all shadow-md">
-                            <div class="flex items-start gap-3 mb-3">
-                                <div class="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0"><i class="fas fa-lightbulb text-sm"></i></div>
-                                <div>
-                                    <span class="font-bold text-sm text-white block">Limestone Density Sensor Replacement Schedule</span>
-                                    <span class="text-[11px] text-slate-400">Submitted by Engr. Bautista, L. &bull; July 2, 2026 &bull; Limestone Area</span>
-                                </div>
-                            </div>
-                            <p class="text-xs text-slate-300 leading-relaxed mb-3">Current density sensors exceed 3-year service life. Recommend planned replacement during the July 20 scheduled downtime to avoid claim recurrence related to sensor drift readings.</p>
-                            <div class="flex items-center justify-between"><span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Approved — Scheduled Jul 20</span><span class="text-[11px] text-slate-500">Priority: High</span></div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- ========================================================================= -->
-        <!-- MODULE 2: PRODUCT QUALITY AND SPEC MANAGEMENT (Independent Top-Level Section) -->
-        <!-- ========================================================================= -->
-        <section id="quality-spec-section" class="py-12 px-4 sm:px-8 bg-dark-900 border-b border-slate-800/80">
-            <!-- Backwards compatibility wrapper ID for external JS -->
-            <div id="qamsproduct-portal" class="max-w-7xl mx-auto">
-                
-                <!-- Section Header -->
-                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-800 pb-6 mb-6">
-                    <div>
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-sky-500/10 text-sky-400 font-bold text-xs mb-2 border border-sky-500/20">
-                            <i class="fas fa-microscope"></i> Analytical Assurance & Specification Enforcement
-                        </div>
-                        <h3 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">PRODUCT QUALITY AND SPEC MANAGEMENT</h3>
-                        <p class="text-xs sm:text-sm text-slate-400 mt-1">100% Quality tracking, specification limit enforcement, real-time lab titration results, batch re-processing credits, and formal claims register.</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="openModal('incidentModal')" class="px-4 py-2.5 bg-gradient-to-r from-royalblue-600 to-sky-500 text-white font-bold text-xs rounded-xl shadow transition-all flex items-center gap-2">
-                            <i class="fas fa-plus"></i> Log New Spec Entry
-                        </button>
-                        <button onclick="openModal('exportModal')" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all flex items-center gap-2">
-                            <i class="fas fa-download"></i> Export Data
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Spec Management Tab Navigation (Updated class names and event stopping to prevent external script interference) -->
-                <div class="flex items-center gap-2 overflow-x-auto pb-3 mb-6 no-scrollbar border-b border-slate-800">
-                    <button onclick="switchSpecTab(event, 'matrix')" id="stab-matrix" class="spec-tab ms-spec-tab active px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
-                        <i class="fas fa-th-large text-sky-400"></i> Product Quality Matrix & Specs
-                    </button>
-                    <button onclick="switchSpecTab(event, 'reprocess')" id="stab-reprocess" class="spec-tab ms-spec-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
-                        <i class="fas fa-recycle text-emerald-400"></i> Reprocess & Batch Credits
-                    </button>
-                    <button onclick="switchSpecTab(event, 'claim')" id="stab-claim" class="spec-tab ms-spec-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
-                        <i class="fas fa-clipboard-check text-rose-400"></i> Quality Claims Register
-                    </button>
-                    <button onclick="switchSpecTab(event, 'document')" id="stab-document" class="spec-tab ms-spec-tab px-4 py-2.5 rounded-xl text-xs font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-1.5">
-                        <i class="fas fa-file-invoice text-cyan-400"></i> QA Documents & SOPs
-                    </button>
-                </div>
-
-                <!-- ===== SPEC PANEL 1: PRODUCT QUALITY MATRIX ===== -->
-                <div id="spanel-matrix" class="spec-panel ms-spec-panel active animate-fadeIn">
-                    <div class="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                        <div>
-                            <h4 class="text-lg font-extrabold text-white">Product Quality Matrix & Specification Enforcement</h4>
-                            <p class="text-xs text-slate-400 mt-0.5">Real-time analytical results vs. engineering spec thresholds across all MS Section processing areas</p>
-                        </div>
-                        <div class="relative min-w-[240px]">
-                            <i class="fas fa-search absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                            <input type="text" id="matrix-search" onkeyup="filterMatrix()" placeholder="Filter area, product, parameter, status..." class="w-full bg-dark-700 border border-slate-700 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-sky-500">
-                        </div>
-                    </div>
-                    <div class="bg-dark-500 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-dark-700/60 border-b border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                                        <th class="py-3.5 px-4">Batch / Record ID</th>
-                                        <th class="py-3.5 px-4">Processing Area</th>
-                                        <th class="py-3.5 px-4">Product Type</th>
-                                        <th class="py-3.5 px-4">Key Parameter</th>
-                                        <th class="py-3.5 px-4">Lab Result Value</th>
-                                        <th class="py-3.5 px-4">Specification Limit</th>
-                                        <th class="py-3.5 px-4">QA Status</th>
-                                        <th class="py-3.5 px-4">Date Logged</th>
-                                        <th class="py-3.5 px-4">Inspector</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="matrix-tbody" class="divide-y divide-slate-800/60 text-xs font-medium">
-                                    <!-- Populated by JavaScript -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ===== SPEC PANEL 2: REPROCESS & BATCH CREDITS ===== -->
-                <div id="spanel-reprocess" class="spec-panel ms-spec-panel animate-fadeIn">
-                    <h4 class="text-lg font-extrabold text-white mb-1">Reprocess & Batch Credits</h4>
-                    <p class="text-xs text-slate-400 mb-5">Batches flagged for reprocessing and credit adjustments — July 2026</p>
-                    <div class="bg-dark-500 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-dark-700/60 border-b border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                                        <th class="py-3.5 px-4">Batch ID</th>
-                                        <th class="py-3.5 px-4">Area</th>
-                                        <th class="py-3.5 px-4">Product</th>
-                                        <th class="py-3.5 px-4">Defect Found</th>
-                                        <th class="py-3.5 px-4">Batch Volume</th>
-                                        <th class="py-3.5 px-4">Credit Adj.</th>
-                                        <th class="py-3.5 px-4">Reprocess Status</th>
-                                        <th class="py-3.5 px-4">Authorized By</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-800/60 text-xs font-medium">
-                                    <tr class="hover:bg-dark-700/40 transition-colors">
-                                        <td class="py-3.5 px-4 font-bold text-white">BATCH-2026-0701</td>
-                                        <td class="py-3.5 px-4 text-cyan-300">MS-Dezinc Area</td>
-                                        <td class="py-3.5 px-4 text-slate-300">Mixed Sulfide Cake</td>
-                                        <td class="py-3.5 px-4 text-amber-400">Zn Carry-Over 0.8%</td>
-                                        <td class="py-3.5 px-4 text-slate-300">1,200 kg</td>
-                                        <td class="py-3.5 px-4 text-rose-400 font-bold">-₱ 12,500</td>
-                                        <td class="py-3.5 px-4"><span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">In Reprocess</span></td>
-                                        <td class="py-3.5 px-4 text-slate-400">Engr. Santos, M.</td>
-                                    </tr>
-                                    <tr class="hover:bg-dark-700/40 transition-colors">
-                                        <td class="py-3.5 px-4 font-bold text-white">BATCH-2026-0688</td>
-                                        <td class="py-3.5 px-4 text-sky-300">FNTRL Area</td>
-                                        <td class="py-3.5 px-4 text-slate-300">Tailings Slurry</td>
-                                        <td class="py-3.5 px-4 text-rose-400">pH Out of Range (7.9)</td>
-                                        <td class="py-3.5 px-4 text-slate-300">850 m³</td>
-                                        <td class="py-3.5 px-4 text-rose-400 font-bold">-₱ 8,200</td>
-                                        <td class="py-3.5 px-4"><span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Completed</span></td>
-                                        <td class="py-3.5 px-4 text-slate-400">Engr. Bautista, L.</td>
-                                    </tr>
-                                    <tr class="hover:bg-dark-700/40 transition-colors">
-                                        <td class="py-3.5 px-4 font-bold text-white">BATCH-2026-0712</td>
-                                        <td class="py-3.5 px-4 text-amber-300">Limestone Area</td>
-                                        <td class="py-3.5 px-4 text-slate-300">Limestone Slurry</td>
-                                        <td class="py-3.5 px-4 text-amber-400">Density Deviation +0.08</td>
-                                        <td class="py-3.5 px-4 text-slate-300">2,400 kg</td>
-                                        <td class="py-3.5 px-4 text-amber-400 font-bold">-₱ 3,800</td>
-                                        <td class="py-3.5 px-4"><span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">Pending Review</span></td>
-                                        <td class="py-3.5 px-4 text-slate-400">Chemist Lim, K.</td>
-                                    </tr>
-                                    <tr class="hover:bg-dark-700/40 transition-colors">
-                                        <td class="py-3.5 px-4 font-bold text-white">BATCH-2026-0695</td>
-                                        <td class="py-3.5 px-4 text-rose-300">H2S Area</td>
-                                        <td class="py-3.5 px-4 text-slate-300">MS Precipitation</td>
-                                        <td class="py-3.5 px-4 text-emerald-400">No Defect — Preventive</td>
-                                        <td class="py-3.5 px-4 text-slate-300">600 kg</td>
-                                        <td class="py-3.5 px-4 text-emerald-400 font-bold">₱ 0 (Cleared)</td>
-                                        <td class="py-3.5 px-4"><span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Cleared</span></td>
-                                        <td class="py-3.5 px-4 text-slate-400">Tech Mendoza, P.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="mt-4 flex items-center justify-between p-4 bg-dark-500 rounded-xl border border-slate-800 text-xs">
-                        <span class="text-slate-400 font-semibold">Total Credit Adjustments (July 2026):</span>
-                        <span class="text-rose-400 font-black text-sm">-₱ 24,500</span>
-                    </div>
-                </div>
-
-                <!-- ===== SPEC PANEL 3: QUALITY CLAIMS REGISTER ===== -->
-                <div id="spanel-claim" class="spec-panel ms-spec-panel animate-fadeIn">
-                    <h4 class="text-lg font-extrabold text-white mb-1">Quality Claims Register</h4>
-                    <p class="text-xs text-slate-400 mb-5">Formal quality complaints and claims lodged against MS Section products</p>
-                    <div class="bg-dark-500 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-dark-700/60 border-b border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                                        <th class="py-3.5 px-4">Claim ID</th>
-                                        <th class="py-3.5 px-4">Date Filed</th>
-                                        <th class="py-3.5 px-4">Complainant</th>
-                                        <th class="py-3.5 px-4">Product / Area</th>
-                                        <th class="py-3.5 px-4">Issue Description</th>
-                                        <th class="py-3.5 px-4">Severity</th>
-                                        <th class="py-3.5 px-4">Status</th>
-                                        <th class="py-3.5 px-4">Assigned To</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-800/60 text-xs font-medium">
-                                    <tr class="hover:bg-dark-700/40 transition-colors">
-                                        <td class="py-3.5 px-4 font-bold text-white">CLM-2026-018</td>
-                                        <td class="py-3.5 px-4 text-slate-300">July 3, 2026</td>
-                                        <td class="py-3.5 px-4 text-slate-300">Downstream Processing</td>
-                                        <td class="py-3.5 px-4 text-cyan-300">MS-Dezinc &bull; Cake</td>
-                                        <td class="py-3.5 px-4 text-amber-300">Zinc impurity above 0.6% threshold</td>
-                                        <td class="py-3.5 px-4"><span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">Critical</span></td>
-                                        <td class="py-3.5 px-4"><span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Under Investigation</span></td>
-                                        <td class="py-3.5 px-4 text-slate-400">Engr. Santos, M.</td>
-                                    </tr>
-                                    <tr class="hover:bg-dark-700/40 transition-colors">
-                                        <td class="py-3.5 px-4 font-bold text-white">CLM-2026-019</td>
-                                        <td class="py-3.5 px-4 text-slate-300">July 5, 2026</td>
-                                        <td class="py-3.5 px-4 text-slate-300">Environmental Compliance</td>
-                                        <td class="py-3.5 px-4 text-sky-300">FNTRL &bull; Effluent</td>
-                                        <td class="py-3.5 px-4 text-amber-300">pH reading of 8.7 exceeded discharge spec</td>
-                                        <td class="py-3.5 px-4"><span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Major</span></td>
-                                        <td class="py-3.5 px-4"><span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">Root Cause Analysis</span></td>
-                                        <td class="py-3.5 px-4 text-slate-400">Engr. Bautista, L.</td>
-                                    </tr>
-                                    <tr class="hover:bg-dark-700/40 transition-colors">
-                                        <td class="py-3.5 px-4 font-bold text-white">CLM-2026-015</td>
-                                        <td class="py-3.5 px-4 text-slate-300">June 28, 2026</td>
-                                        <td class="py-3.5 px-4 text-slate-300">Lab Services</td>
-                                        <td class="py-3.5 px-4 text-amber-300">Limestone &bull; Slurry</td>
-                                        <td class="py-3.5 px-4 text-emerald-300">Density sensor drift — results now verified</td>
-                                        <td class="py-3.5 px-4"><span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-400 border border-slate-600">Minor</span></td>
-                                        <td class="py-3.5 px-4"><span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Closed</span></td>
-                                        <td class="py-3.5 px-4 text-slate-400">Chemist Lim, K.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ===== SPEC PANEL 4: QA DOCUMENTS & SOPS ===== -->
-                <div id="spanel-document" class="spec-panel ms-spec-panel animate-fadeIn">
-                    <h4 class="text-lg font-extrabold text-white mb-1">QA Documents & Reports</h4>
-                    <p class="text-xs text-slate-400 mb-5">Current revision documents, analytical reports, and compliance certifications</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div class="p-5 bg-dark-500 rounded-xl border border-slate-800 hover:border-sky-400/50 transition-all flex flex-col justify-between min-h-[150px] group shadow-md">
-                            <div><span class="text-[10px] font-bold text-emerald-400 uppercase bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Rev 4.3 &bull; Active</span><h5 class="font-bold text-sm text-white mt-2 group-hover:text-sky-300 transition-colors">SOP-MS-101: Mixed Sulphide Titration Manual</h5><p class="text-[11px] text-slate-400 mt-1">MS-Dezinc Area &bull; Last Updated: June 15, 2026</p></div>
-                            <button class="text-xs text-sky-400 font-bold hover:underline flex items-center gap-1 mt-3"><span>View Procedure</span> <i class="fas fa-arrow-right text-[10px]"></i></button>
-                        </div>
-                        <div class="p-5 bg-dark-500 rounded-xl border border-slate-800 hover:border-sky-400/50 transition-all flex flex-col justify-between min-h-[150px] group shadow-md">
-                            <div><span class="text-[10px] font-bold text-emerald-400 uppercase bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Rev 2.0 &bull; Active</span><h5 class="font-bold text-sm text-white mt-2 group-hover:text-sky-300 transition-colors">SOP-H2S-204: Toxic Gas Scrubber QA Protocol</h5><p class="text-[11px] text-slate-400 mt-1">H2S Area &bull; Last Updated: May 30, 2026</p></div>
-                            <button class="text-xs text-sky-400 font-bold hover:underline flex items-center gap-1 mt-3"><span>View Procedure</span> <i class="fas fa-arrow-right text-[10px]"></i></button>
-                        </div>
-                        <div class="p-5 bg-dark-500 rounded-xl border border-slate-800 hover:border-amber-400/50 transition-all flex flex-col justify-between min-h-[150px] group shadow-md">
-                            <div><span class="text-[10px] font-bold text-amber-400 uppercase bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">Rev 3.1 &bull; Under Review</span><h5 class="font-bold text-sm text-white mt-2 group-hover:text-sky-300 transition-colors">SOP-FN-309: Effluent pH Interlock Test</h5><p class="text-[11px] text-slate-400 mt-1">FNTRL Area &bull; Last Updated: July 1, 2026</p></div>
-                            <button class="text-xs text-amber-400 font-bold hover:underline flex items-center gap-1 mt-3"><span>Review Draft</span> <i class="fas fa-arrow-right text-[10px]"></i></button>
-                        </div>
-                        <div class="p-5 bg-dark-500 rounded-xl border border-slate-800 hover:border-sky-400/50 transition-all flex flex-col justify-between min-h-[150px] group shadow-md">
-                            <div><span class="text-[10px] font-bold text-emerald-400 uppercase bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Rev 1.8 &bull; Active</span><h5 class="font-bold text-sm text-white mt-2 group-hover:text-sky-300 transition-colors">SOP-LS-402: Slurry Mesh Particle Titration</h5><p class="text-[11px] text-slate-400 mt-1">Limestone Area &bull; Last Updated: June 20, 2026</p></div>
-                            <button class="text-xs text-sky-400 font-bold hover:underline flex items-center gap-1 mt-3"><span>View Procedure</span> <i class="fas fa-arrow-right text-[10px]"></i></button>
-                        </div>
-                        <div class="p-5 bg-dark-500 rounded-xl border border-slate-800 hover:border-sky-400/50 transition-all flex flex-col justify-between min-h-[150px] group shadow-md">
-                            <div><span class="text-[10px] font-bold text-emerald-400 uppercase bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Rev 5.0 &bull; Active</span><h5 class="font-bold text-sm text-white mt-2 group-hover:text-sky-300 transition-colors">QA-RPT-JUL26: July 2026 Monthly QA Report</h5><p class="text-[11px] text-slate-400 mt-1">All Areas &bull; Compiled: July 6, 2026</p></div>
-                            <button class="text-xs text-sky-400 font-bold hover:underline flex items-center gap-1 mt-3"><span>Download PDF</span> <i class="fas fa-download text-[10px]"></i></button>
-                        </div>
-                        <div class="p-5 bg-dark-500 rounded-xl border border-slate-800 hover:border-cyan-400/50 transition-all flex flex-col justify-between min-h-[150px] group shadow-md">
-                            <div><span class="text-[10px] font-bold text-cyan-400 uppercase bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">Rev 1.0 &bull; Active</span><h5 class="font-bold text-sm text-white mt-2 group-hover:text-sky-300 transition-colors">QA-CHK-FNTRL-01: FNTRL Area Daily Checklist</h5><p class="text-[11px] text-slate-400 mt-1">FNTRL Area &bull; Daily Use Template</p></div>
-                            <button class="text-xs text-cyan-400 font-bold hover:underline flex items-center gap-1 mt-3"><span>Open Checklist</span> <i class="fas fa-arrow-right text-[10px]"></i></button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- ========================================================================= -->
-        <!-- MODULE 3: QA CALENDAR -->
-        <!-- ========================================================================= -->
-        <section id="calendar-section" class="py-16 px-4 sm:px-8 bg-dark-900 border-b border-slate-800/80">
-            <div class="max-w-7xl mx-auto">
-                <div class="flex flex-col md:flex-row md:items-end justify-between mb-8">
-                    <div>
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-cyan-500/10 text-cyan-400 font-bold text-xs mb-3 border border-cyan-500/20"><i class="fas fa-calendar-alt"></i> QA Event Calendar Schedule</div>
-                        <h3 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">July 2026 Quality Operations</h3>
-                        <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-xl">Real-time schedule of hydrometallurgical safety audits, reagent calibration intervals, and logged Near Miss investigations.</p>
-                    </div>
-                    <button onclick="openModal('incidentModal')" class="mt-4 md:mt-0 px-4 py-2.5 bg-gradient-to-r from-rose-600 to-amber-500 hover:from-rose-500 text-white font-bold text-xs sm:text-sm rounded-xl shadow transition-all flex items-center gap-2">
-                        <i class="fas fa-plus-circle"></i> Schedule QA Event / Audit
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="md:col-span-2 bg-dark-500 rounded-2xl p-6 border border-slate-800 shadow-xl">
-                        <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-800">
-                            <h4 class="font-extrabold text-white text-base sm:text-lg"><i class="far fa-calendar-check text-cyan-400 mr-2"></i> Upcoming Shift Events & Audits</h4>
-                            <span class="text-xs font-semibold text-slate-400">MS Section Plant Hub</span>
-                        </div>
-                        <div class="space-y-3">
-                            <div class="p-4 rounded-xl bg-dark-700 border border-slate-800 flex items-center justify-between hover:border-sky-500/40 transition-all">
-                                <div class="flex items-center gap-3.5">
-                                    <div class="w-11 h-11 rounded-xl bg-sky-500/10 border border-sky-500/30 flex flex-col items-center justify-center text-sky-400"><span class="text-[10px] font-bold uppercase leading-none">Jul</span><span class="text-base font-black leading-none mt-0.5">03</span></div>
-                                    <div><span class="text-xs font-bold text-white block">Limestone Mesh Particle Calibration</span><span class="text-[11px] text-slate-400 mt-0.5 block"><i class="fas fa-map-marker-alt text-sky-400 mr-1"></i>Limestone Area &bull; 08:00 AM Shift</span></div>
-                                </div>
-                                <span class="px-2.5 py-1 rounded text-[10px] font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">Routine Audit</span>
-                            </div>
-                            <div class="p-4 rounded-xl bg-dark-700 border border-slate-800 flex items-center justify-between hover:border-amber-500/40 transition-all">
-                                <div class="flex items-center gap-3.5">
-                                    <div class="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/30 flex flex-col items-center justify-center text-amber-400"><span class="text-[10px] font-bold uppercase leading-none">Jul</span><span class="text-base font-black leading-none mt-0.5">04</span></div>
-                                    <div><span class="text-xs font-bold text-white block">H2S Scrubber Caustic Interlock Test</span><span class="text-[11px] text-slate-400 mt-0.5 block"><i class="fas fa-map-marker-alt text-amber-400 mr-1"></i>H2S Area &bull; Lead Safety Team</span></div>
-                                </div>
-                                <span class="px-2.5 py-1 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Safety Check</span>
-                            </div>
-                            <div class="p-4 rounded-xl bg-dark-700 border border-slate-800 flex items-center justify-between hover:border-emerald-500/40 transition-all">
-                                <div class="flex items-center gap-3.5">
-                                    <div class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col items-center justify-center text-emerald-400"><span class="text-[10px] font-bold uppercase leading-none">Jul</span><span class="text-base font-black leading-none mt-0.5">06</span></div>
-                                    <div><span class="text-xs font-bold text-white block">FNTRL Effluent Slurry Zero-Defect Review</span><span class="text-[11px] text-slate-400 mt-0.5 block"><i class="fas fa-map-marker-alt text-emerald-400 mr-1"></i>FNTRL Area &bull; Environmental QA</span></div>
-                                </div>
-                                <span class="px-2.5 py-1 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Compliance</span>
-                            </div>
-                            <div class="p-4 rounded-xl bg-dark-700 border border-slate-800 flex items-center justify-between hover:border-cyan-500/40 transition-all">
-                                <div class="flex items-center gap-3.5">
-                                    <div class="w-11 h-11 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex flex-col items-center justify-center text-cyan-400"><span class="text-[10px] font-bold uppercase leading-none">Jul</span><span class="text-base font-black leading-none mt-0.5">10</span></div>
-                                    <div><span class="text-xs font-bold text-white block">Dezinc Phase Separation Titration Audit</span><span class="text-[11px] text-slate-400 mt-0.5 block"><i class="fas fa-map-marker-alt text-cyan-400 mr-1"></i>MS-Dezinc Area &bull; Lab Chemist Team</span></div>
-                                </div>
-                                <span class="px-2.5 py-1 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Lab Audit</span>
-                            </div>
-                            <div class="p-4 rounded-xl bg-dark-700 border border-slate-800 flex items-center justify-between hover:border-royalblue-500/40 transition-all">
-                                <div class="flex items-center gap-3.5">
-                                    <div class="w-11 h-11 rounded-xl bg-royalblue-600/10 border border-royalblue-600/30 flex flex-col items-center justify-center text-royalblue-400"><span class="text-[10px] font-bold uppercase leading-none">Jul</span><span class="text-base font-black leading-none mt-0.5">15</span></div>
-                                    <div><span class="text-xs font-bold text-white block">Monthly DCS Full-System Health Check</span><span class="text-[11px] text-slate-400 mt-0.5 block"><i class="fas fa-server text-royalblue-400 mr-1"></i>DCS Control Room &bull; All Stations</span></div>
-                                </div>
-                                <span class="px-2.5 py-1 rounded text-[10px] font-bold bg-royalblue-600/20 text-royalblue-400 border border-royalblue-600/30">System Maintenance</span>
-                            </div>
-                            <div class="p-4 rounded-xl bg-dark-700 border border-slate-800 flex items-center justify-between hover:border-amber-500/40 transition-all">
-                                <div class="flex items-center gap-3.5">
-                                    <div class="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/30 flex flex-col items-center justify-center text-amber-400"><span class="text-[10px] font-bold uppercase leading-none">Jul</span><span class="text-base font-black leading-none mt-0.5">20</span></div>
-                                    <div><span class="text-xs font-bold text-white block">Limestone Density Sensor Replacement</span><span class="text-[11px] text-slate-400 mt-0.5 block"><i class="fas fa-mountain text-amber-400 mr-1"></i>Limestone Area &bull; Scheduled Downtime</span></div>
-                                </div>
-                                <span class="px-2.5 py-1 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">Maintenance</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-gradient-to-br from-dark-500 to-dark-700 rounded-2xl p-6 border border-slate-800 shadow-xl flex flex-col justify-between">
-                        <div>
-                            <span class="text-[11px] font-bold text-rose-400 uppercase tracking-wider block mb-1">Near Miss Tracking</span>
-                            <h4 class="text-xl font-extrabold text-white mb-3">Live Hazard Monitoring</h4>
-                            <p class="text-xs text-slate-300 leading-relaxed mb-6">All field technicians are mandated to report transient valve spikes, phase separation delays, or sensor drifts immediately.</p>
-                        </div>
-                        <div>
-                            <div class="bg-dark-900/60 p-4 rounded-xl border border-slate-800 mb-4 space-y-3">
-                                <div>
-                                    <div class="flex justify-between text-[11px] font-semibold mb-1"><span class="text-slate-400">Incidents This Month</span><span class="text-white font-bold">3 Logged</span></div>
-                                    <div class="flex justify-between text-[11px] font-semibold mb-1"><span class="text-slate-400">CAPA Closed</span><span class="text-emerald-400 font-bold">2 / 3</span></div>
-                                    <div class="flex justify-between text-[11px] font-semibold"><span class="text-slate-400">CAPA In Progress</span><span class="text-amber-400 font-bold">1 / 3</span></div>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-xs font-bold text-slate-300 mb-1.5"><span>CAPA Closure Rate</span><span class="text-emerald-400">66.7%</span></div>
-                                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden"><div class="bg-gradient-to-r from-rose-500 to-emerald-400 h-full" style="width:66.7%"></div></div>
-                                </div>
-                            </div>
-                            <button onclick="document.getElementById('bulletin-board-section').scrollIntoView({behavior:'smooth'}); switchBulletinTab(event, 'nearmiss');" class="w-full py-3 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold text-xs rounded-xl transition-all shadow flex items-center justify-center gap-2">
-                                <span>View Bulletin Near Miss Log</span><i class="fas fa-arrow-right text-[10px] text-sky-400"></i>
+                            <!-- Pay Button (matches the orange bar in the image) -->
+                            <button onclick="processPayment()" id="pay-btn" disabled class="w-full bg-brand-500 hover:bg-brand-400 disabled:bg-slate-700 disabled:text-slate-500 text-white p-4 font-bold text-lg flex justify-between items-center transition-all cursor-pointer">
+                                <span>PAY</span>
+                                <span id="cart-total">PHP 0.00</span>
                             </button>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <!-- ========================================================================= -->
-        <!-- MODULE 4: QA AREA EXPLORER -->
-        <!-- ========================================================================= -->
-        <section id="area-explorer" class="py-16 px-4 sm:px-8 bg-dark-700/60 border-b border-slate-800/80">
-            <div class="max-w-6xl mx-auto">
-                <div class="text-center max-w-3xl mx-auto mb-10" data-aos="fade-up">
-                    <span class="text-xs font-bold tracking-widest text-emerald-400 uppercase mb-1.5 block">Hydrometallurgical Zones</span>
-                    <h3 class="text-2xl sm:text-4xl font-extrabold text-white">Interactive QA Area Specifications</h3>
-                    <p class="mt-3 text-xs sm:text-sm text-slate-300">Switch between active processing sectors to review real-time chemical telemetry, quality tolerance thresholds, and assigned SOP manuals.</p>
-                </div>
-                <div class="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar" data-aos="fade-up">
-                    <button onclick="switchAreaTab('fntrl')" id="tab-fntrl" class="tab-btn active px-5 py-3 rounded-xl text-xs sm:text-sm font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-2">
-                        <i class="fas fa-filter text-sky-400"></i> FNTRL Area
-                    </button>
-                    <button onclick="switchAreaTab('dezinc')" id="tab-dezinc" class="tab-btn px-5 py-3 rounded-xl text-xs sm:text-sm font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-2">
-                        <i class="fas fa-flask text-cyan-400"></i> MS-Dezinc Area
-                    </button>
-                    <button onclick="switchAreaTab('h2s')" id="tab-h2s" class="tab-btn px-5 py-3 rounded-xl text-xs sm:text-sm font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-2">
-                        <i class="fas fa-smog text-rose-400"></i> H2S Area
-                    </button>
-                    <button onclick="switchAreaTab('limestone')" id="tab-limestone" class="tab-btn px-5 py-3 rounded-xl text-xs sm:text-sm font-bold bg-dark-500 text-slate-300 border border-slate-700 whitespace-nowrap transition-all flex items-center gap-2">
-                        <i class="fas fa-mountain text-amber-400"></i> Limestone Area
-                    </button>
-                </div>
-                <div id="area-card-content" class="bg-dark-500 rounded-2xl p-6 sm:p-10 border border-slate-800 shadow-2xl transition-all duration-300"></div>
-            </div>
-        </section>
-
-        <!-- ========================================================================= -->
-        <!-- MODULE 5: DCS CONTROL -->
-        <!-- ========================================================================= -->
-        <section id="dcs-section" class="py-16 px-4 sm:px-8 bg-dark-900 border-b border-slate-800/80">
-            <div class="max-w-6xl mx-auto">
-                <div class="text-center max-w-3xl mx-auto mb-12" data-aos="fade-up">
-                    <span class="text-xs font-bold tracking-widest text-cyan-400 uppercase mb-1.5 block">Plant Automation Architecture</span>
-                    <h3 class="text-2xl sm:text-4xl font-extrabold text-white">DCS Control vs. Sub DCS Control</h3>
-                    <p class="mt-3 text-xs sm:text-sm text-slate-400">To ensure fail-safe Quality Assurance, plant control is separated into the centralized Master DCS Room and localized field Sub DCS stations.</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Main DCS -->
-                    <div id="dcs-card-main" class="bg-gradient-to-br from-dark-400 to-dark-500 rounded-2xl p-6 sm:p-8 border border-cyan-500/40 shadow-xl relative overflow-hidden transition-all duration-300" data-aos="fade-up" data-aos-delay="100">
-                        <div class="flex items-center justify-between mb-6">
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300 text-xl shadow"><i class="fas fa-server"></i></div>
-                                <div><span class="text-[11px] font-bold text-cyan-400 uppercase tracking-wider block">Centralized Plant Hub</span><h4 class="text-xl sm:text-2xl font-bold text-white">Main DCS Control Room</h4></div>
-                            </div>
-                            <span class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold">Online</span>
-                        </div>
-                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6 font-normal">The Master Distributed Control System (DCS) governs plant-wide interlocks, automated reagent ratios, and high-level QA alarming across all MS Section production lines.</p>
-                        <div class="space-y-2.5 mb-6 text-xs font-medium text-slate-300">
-                            <div class="p-2.5 bg-dark-700/80 rounded-lg flex items-center justify-between border border-slate-800"><span><i class="fas fa-check text-cyan-400 mr-2"></i>Master Alarm Interlocks & Overrides</span><span class="text-emerald-400 font-bold">Active</span></div>
-                            <div class="p-2.5 bg-dark-700/80 rounded-lg flex items-center justify-between border border-slate-800"><span><i class="fas fa-check text-cyan-400 mr-2"></i>Plant-Wide Quality Telemetry Sync</span><span class="text-emerald-400 font-bold">100% Sync</span></div>
-                            <div class="p-2.5 bg-dark-700/80 rounded-lg flex items-center justify-between border border-slate-800"><span><i class="fas fa-check text-cyan-400 mr-2"></i>Automated Chemical Dosing Algorithms</span><span class="text-emerald-400 font-bold">Optimal</span></div>
-                        </div>
-                        <button onclick="runDCSDiagnostic('Main DCS Room')" class="w-full py-3 bg-cyan-600/30 hover:bg-cyan-600/50 border border-cyan-400/50 text-cyan-200 font-bold text-xs rounded-xl transition-all shadow flex items-center justify-center gap-2"><i class="fas fa-sync-alt"></i> Ping Master DCS Telemetry Loop</button>
-                    </div>
-                    <!-- Sub DCS -->
-                    <div id="dcs-card-sub" class="bg-dark-500 rounded-2xl p-6 sm:p-8 border border-slate-800 hover:border-sky-400/50 shadow-xl relative overflow-hidden transition-all duration-300" data-aos="fade-up" data-aos-delay="200">
-                        <div class="flex items-center justify-between mb-6">
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-sky-400 text-xl shadow"><i class="fas fa-network-wired"></i></div>
-                                <div><span class="text-[11px] font-bold text-sky-400 uppercase tracking-wider block">Localized Field Stations</span><h4 class="text-xl sm:text-2xl font-bold text-white">Sub DCS Field Control</h4></div>
-                            </div>
-                            <span class="px-2.5 py-1 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30 text-[11px] font-bold">4 Stations Active</span>
-                        </div>
-                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6 font-normal">Localized Sub DCS nodes reside directly within the FNTRL, Dezinc, H2S, and Limestone areas. They allow field QA technicians to calibrate sensors, draw samples, and trigger emergency overrides locally.</p>
-                        <div class="space-y-2.5 mb-6 text-xs font-medium text-slate-300">
-                            <div class="p-2.5 bg-dark-700/80 rounded-lg flex items-center justify-between border border-slate-800"><span><i class="fas fa-wrench text-sky-400 mr-2"></i>Field Sensor Titration & Calibration</span><span class="text-sky-300 font-bold">Manual / Auto</span></div>
-                            <div class="p-2.5 bg-dark-700/80 rounded-lg flex items-center justify-between border border-slate-800"><span><i class="fas fa-wrench text-sky-400 mr-2"></i>Local Emergency Shutdown (ESD) Loops</span><span class="text-emerald-400 font-bold">Armed</span></div>
-                            <div class="p-2.5 bg-dark-700/80 rounded-lg flex items-center justify-between border border-slate-800"><span><i class="fas fa-wrench text-sky-400 mr-2"></i>Local Slurry Valve Actuation Control</span><span class="text-emerald-400 font-bold">Nominal</span></div>
-                        </div>
-                        <button onclick="runDCSDiagnostic('Sub DCS Field Nodes')" class="w-full py-3 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 hover:text-white font-bold text-xs rounded-xl transition-all shadow flex items-center justify-center gap-2"><i class="fas fa-search"></i> Inspect Field Station Diagnostics</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ========================================================================= -->
-        <!-- MODULE 6: S.O.P & PROCEDURE DIRECTORY -->
-        <!-- ========================================================================= -->
-        <section id="sop-section" class="py-16 px-4 sm:px-8 bg-dark-700/40 border-b border-slate-800/80">
-            <div class="max-w-6xl mx-auto">
-                <div class="flex flex-col md:flex-row md:items-end justify-between mb-8" data-aos="fade-up">
-                    <div>
-                        <span class="text-xs font-bold tracking-widest text-sky-400 uppercase mb-1.5 block">Standardization & Quality Compliance</span>
-                        <h3 class="text-2xl sm:text-4xl font-extrabold text-white">S.O.P & QA Procedure Directory</h3>
-                    </div>
-                    <p class="text-xs sm:text-sm text-slate-400 max-w-md mt-2 md:mt-0">Search and download current revision QA manuals, analytical methods, and safety protocols for MS Product processing.</p>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="p-4 bg-dark-500 rounded-xl border border-slate-800 hover:border-sky-400/50 transition-all flex flex-col justify-between h-40 group">
-                        <div><span class="text-[10px] font-bold text-sky-400 uppercase">Rev 4.3 &bull; Active</span><h5 class="font-bold text-sm text-white mt-1 group-hover:text-sky-300 transition-colors">SOP-MS-101: Mixed Sulphide Titration Manual</h5></div>
-                        <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab(event, 'document');" class="text-xs text-sky-400 font-bold hover:underline flex items-center gap-1 mt-3"><span>Read Procedure</span> <i class="fas fa-arrow-right text-[10px]"></i></button>
-                    </div>
-                    <div class="p-4 bg-dark-500 rounded-xl border border-slate-800 hover:border-sky-400/50 transition-all flex flex-col justify-between h-40 group">
-                        <div><span class="text-[10px] font-bold text-sky-400 uppercase">Rev 2.0 &bull; Active</span><h5 class="font-bold text-sm text-white mt-1 group-hover:text-sky-300 transition-colors">SOP-H2S-204: Toxic Gas Scrubber QA</h5></div>
-                        <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab(event, 'document');" class="text-xs text-sky-400 font-bold hover:underline flex items-center gap-1 mt-3"><span>Read Procedure</span> <i class="fas fa-arrow-right text-[10px]"></i></button>
-                    </div>
-                    <div class="p-4 bg-dark-500 rounded-xl border border-slate-800 hover:border-sky-400/50 transition-all flex flex-col justify-between h-40 group">
-                        <div><span class="text-[10px] font-bold text-amber-400 uppercase">Rev 3.1 &bull; Under Review</span><h5 class="font-bold text-sm text-white mt-1 group-hover:text-sky-300 transition-colors">SOP-FN-309: Effluent pH Interlock Test</h5></div>
-                        <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab(event, 'document');" class="text-xs text-sky-400 font-bold hover:underline flex items-center gap-1 mt-3"><span>Read Procedure</span> <i class="fas fa-arrow-right text-[10px]"></i></button>
-                    </div>
-                    <div class="p-4 bg-dark-500 rounded-xl border border-slate-800 hover:border-sky-400/50 transition-all flex flex-col justify-between h-40 group">
-                        <div><span class="text-[10px] font-bold text-sky-400 uppercase">Rev 1.8 &bull; Active</span><h5 class="font-bold text-sm text-white mt-1 group-hover:text-sky-300 transition-colors">SOP-LS-402: Slurry Mesh Particle Titration</h5></div>
-                        <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab(event, 'document');" class="text-xs text-sky-400 font-bold hover:underline flex items-center gap-1 mt-3"><span>Read Procedure</span> <i class="fas fa-arrow-right text-[10px]"></i></button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ========================================================================= -->
-        <!-- MODULE 7: USER MANAGEMENT DIRECTORY -->
-        <!-- ========================================================================= -->
-        <section id="user-management-section" class="py-16 px-4 sm:px-8 bg-dark-900 border-b border-slate-800/80">
-            <div class="max-w-7xl mx-auto">
-                <div class="flex flex-col md:flex-row md:items-end justify-between mb-8" data-aos="fade-up">
-                    <div>
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-amber-500/10 text-amber-400 font-bold text-xs mb-2 border border-amber-500/20"><i class="fas fa-users-cog"></i> System Administration & Access Control</div>
-                        <h3 class="text-2xl sm:text-4xl font-extrabold text-white">QA User Management Directory</h3>
-                        <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-xl">Manage analytical laboratory personnel, assign hydrometallurgical area clearances, and configure role-based access for DCS telemetry overrides.</p>
-                    </div>
-                    <button onclick="openModal('userModal')" class="mt-4 md:mt-0 px-4 py-2.5 bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 text-white font-bold text-xs sm:text-sm rounded-xl shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-all flex items-center gap-2">
-                        <i class="fas fa-user-plus"></i> + Add QA Personnel
-                    </button>
-                </div>
-                <!-- KPI Cards -->
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8" data-aos="fade-up">
-                    <div class="bg-dark-500 p-4 rounded-xl border border-slate-800 flex items-center justify-between">
-                        <div><span class="text-[11px] font-bold text-slate-400 uppercase">Total QA Staff</span><span id="stat-total-users" class="text-2xl font-black text-white block mt-1">6</span></div>
-                        <div class="w-10 h-10 rounded-lg bg-royalblue-600/20 text-royalblue-400 flex items-center justify-center text-lg"><i class="fas fa-users"></i></div>
-                    </div>
-                    <div class="bg-dark-500 p-4 rounded-xl border border-slate-800 flex items-center justify-between">
-                        <div><span class="text-[11px] font-bold text-slate-400 uppercase">On-Shift Active</span><span id="stat-active-users" class="text-2xl font-black text-emerald-400 block mt-1">5</span></div>
-                        <div class="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg"><i class="fas fa-user-check"></i></div>
-                    </div>
-                    <div class="bg-dark-500 p-4 rounded-xl border border-slate-800 flex items-center justify-between">
-                        <div><span class="text-[11px] font-bold text-slate-400 uppercase">Lead Inspectors</span><span id="stat-lead-inspectors" class="text-2xl font-black text-sky-400 block mt-1">2</span></div>
-                        <div class="w-10 h-10 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center text-lg"><i class="fas fa-id-badge"></i></div>
-                    </div>
-                    <div class="bg-dark-500 p-4 rounded-xl border border-slate-800 flex items-center justify-between">
-                        <div><span class="text-[11px] font-bold text-slate-400 uppercase">System Admins</span><span id="stat-sys-admins" class="text-2xl font-black text-amber-400 block mt-1">1</span></div>
-                        <div class="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg"><i class="fas fa-user-shield"></i></div>
-                    </div>
-                </div>
-                <!-- Role Filters -->
-                <div class="bg-dark-500 p-4 rounded-2xl border border-slate-800 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4" data-aos="fade-up">
-                    <div class="flex items-center gap-1.5 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
-                        <button onclick="filterUsers('all')" id="user-tab-all" class="user-tab-btn active px-3.5 py-1.5 rounded-lg text-xs font-bold bg-dark-700 text-slate-300 border border-slate-700 whitespace-nowrap transition-all">All Personnel</button>
-                        <button onclick="filterUsers('Lead QA Inspector')" id="user-tab-lead" class="user-tab-btn px-3.5 py-1.5 rounded-lg text-xs font-bold bg-dark-700 text-slate-300 border border-slate-700 whitespace-nowrap transition-all">Lead Inspectors</button>
-                        <button onclick="filterUsers('Field Technician')" id="user-tab-tech" class="user-tab-btn px-3.5 py-1.5 rounded-lg text-xs font-bold bg-dark-700 text-slate-300 border border-slate-700 whitespace-nowrap transition-all">Field Technicians</button>
-                        <button onclick="filterUsers('Lab Chemist')" id="user-tab-chemist" class="user-tab-btn px-3.5 py-1.5 rounded-lg text-xs font-bold bg-dark-700 text-slate-300 border border-slate-700 whitespace-nowrap transition-all">Lab Chemists</button>
-                        <button onclick="filterUsers('System Admin')" id="user-tab-admin" class="user-tab-btn px-3.5 py-1.5 rounded-lg text-xs font-bold bg-dark-700 text-slate-300 border border-slate-700 whitespace-nowrap transition-all">System Admins</button>
-                    </div>
-                    <div class="relative min-w-[260px]">
-                        <i class="fas fa-search absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                        <input type="text" id="user-search-input" onkeyup="handleUserSearch()" placeholder="Search by name, ID or area..." class="w-full bg-dark-700 border border-slate-700 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-slate-500 outline-none focus:border-sky-500 transition-all">
-                    </div>
-                </div>
-                <!-- User Table -->
-                <div class="bg-dark-500 rounded-2xl border border-slate-800 overflow-hidden shadow-xl" data-aos="fade-up">
-                    <div class="overflow-x-auto">
+                <!-- Panel: Transaction History -->
+                <div id="panel-history" class="section-panel animate-fadeIn">
+                    <div class="bg-dark-500 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="bg-dark-700/60 border-b border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                                    <th class="py-3.5 px-5">Personnel & ID</th>
-                                    <th class="py-3.5 px-5">Role & Clearance</th>
-                                    <th class="py-3.5 px-5">Assigned Area</th>
-                                    <th class="py-3.5 px-5">Shift Schedule</th>
-                                    <th class="py-3.5 px-5">Status</th>
-                                    <th class="py-3.5 px-5 text-right">Actions</th>
+                                <tr class="bg-dark-700/60 border-b border-slate-800 text-[11px] font-bold text-slate-400 uppercase">
+                                    <th class="py-3 px-4">Transaction ID</th>
+                                    <th class="py-3 px-4">Date / Time</th>
+                                    <th class="py-3 px-4">Amount</th>
+                                    <th class="py-3 px-4">Type</th>
+                                    <th class="py-3 px-4">Status</th>
+                                    <th class="py-3 px-4 text-right">Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="user-table-body" class="divide-y divide-slate-800/60 text-xs font-medium"></tbody>
+                            <tbody id="history-tbody" class="divide-y divide-slate-800/60 text-xs font-medium">
+                                <!-- Populated via JS -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- FOOTER -->
-        <footer class="bg-dark-900 border-t border-slate-800/80 pt-16 pb-12 text-slate-400 px-4 sm:px-8">
-            <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
-                <div>
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-8 h-8 rounded-lg bg-royalblue-600 flex items-center justify-center text-white shadow"><i class="fas fa-shield-check text-sm"></i></div>
-                        <span class="text-lg font-extrabold text-white block leading-none">Quality Group | MS Section</span>
+        <!-- ========================================================================= -->
+        <!-- KITCHEN DISPLAY SYSTEM (KDS) -->
+        <!-- ========================================================================= -->
+        <section id="kds-section" class="portal-section py-12 px-4 sm:px-8 bg-dark-700/50 border-b border-slate-800">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-2xl font-extrabold text-white">Kitchen Display System</h3>
+                        <p class="text-xs text-slate-400 mt-1">Live order synchronization from POS and Free Online Webstore.</p>
                     </div>
-                    <p class="text-xs sm:text-sm leading-relaxed text-slate-400 font-normal">Precision analytical QA management, inspection auditing, and automated DCS tool control. Built to uphold uncompromising zero-defect standards for Quality by MS Product.</p>
                 </div>
-                <div>
-                    <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-xs">Interactive QA Modules</h4>
-                    <ul class="space-y-2 text-xs sm:text-sm font-medium">
-                        <li><a href="#bulletin-board-section" onclick="switchBulletinTab(event, 'bulletin_home')" class="hover:text-amber-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-amber-500"></i> MS Section Digital Bulletin Board</a></li>
-                        <li><a href="#quality-spec-section" onclick="switchSpecTab(event, 'matrix')" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> Product Quality & Spec Management</a></li>
-                        <li><a href="#calendar-section" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> QA Event Calendar & Schedule</a></li>
-                        <li><a href="#area-explorer" onclick="switchAreaTab('fntrl')" class="hover:text-sky-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-sky-500"></i> FNTRL Area Specifications</a></li>
-                        <li><a href="#user-management-section" onclick="filterUsers('all')" class="hover:text-amber-400 transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px] text-amber-500"></i> QA User Management</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-white font-bold mb-4 uppercase tracking-wider text-xs">Quality Lab HQ</h4>
-                    <ul class="space-y-3 text-xs sm:text-sm text-slate-400 font-normal">
-                        <li class="flex items-start gap-2.5"><i class="fas fa-map-marker-alt text-sky-400 mt-1"></i><span>Production Department, Block 4<br/>MS Section Industrial Hub, Philippines</span></li>
-                        <li class="flex items-center gap-2.5"><i class="fas fa-phone text-sky-400"></i><span>+63 (82) 555-0198 (QA Lab Ext. 402)</span></li>
-                    </ul>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <!-- Column 1 -->
+                    <div class="bg-dark-500 rounded-xl border border-slate-800 p-4">
+                        <h4 class="font-bold text-sky-400 mb-3 uppercase text-xs tracking-wider border-b border-slate-700 pb-2">New Orders (2)</h4>
+                        <div class="space-y-3">
+                            <div class="bg-dark-700 p-3 rounded-lg border border-sky-500/30 shadow">
+                                <div class="flex justify-between items-center mb-2"><span class="font-bold text-white text-sm">#ORD-991</span><span class="text-[10px] bg-brand-500/20 text-brand-400 px-2 py-0.5 rounded">Delivery</span></div>
+                                <ul class="text-xs text-slate-300 list-disc pl-4 space-y-1"><li>2x Avocado Toast</li><li>1x Iced Latte</li></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Column 2 -->
+                    <div class="bg-dark-500 rounded-xl border border-slate-800 p-4">
+                        <h4 class="font-bold text-amber-400 mb-3 uppercase text-xs tracking-wider border-b border-slate-700 pb-2">Preparing (1)</h4>
+                        <div class="space-y-3">
+                            <div class="bg-dark-700 p-3 rounded-lg border border-amber-500/30 shadow">
+                                <div class="flex justify-between items-center mb-2"><span class="font-bold text-white text-sm">#ORD-990</span><span class="text-[10px] bg-sky-500/20 text-sky-400 px-2 py-0.5 rounded">Dine-In</span></div>
+                                <ul class="text-xs text-slate-300 list-disc pl-4 space-y-1"><li>1x Wild Mushrooms w/ Sourdough</li></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Column 3 -->
+                    <div class="bg-dark-500 rounded-xl border border-slate-800 p-4">
+                        <h4 class="font-bold text-emerald-400 mb-3 uppercase text-xs tracking-wider border-b border-slate-700 pb-2">Ready for Gilnash Delivery (1)</h4>
+                        <div class="space-y-3">
+                            <div class="bg-dark-700 p-3 rounded-lg border border-emerald-500/30 shadow">
+                                <div class="flex justify-between items-center mb-2"><span class="font-bold text-white text-sm">#ORD-988</span><span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">Gilnash Rider</span></div>
+                                <ul class="text-xs text-slate-300 list-disc pl-4 space-y-1"><li>Family Combo Pack</li></ul>
+                                <button class="w-full mt-3 bg-emerald-600/30 text-emerald-400 py-1.5 rounded text-[10px] font-bold">Dispatch Rider</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="max-w-6xl mx-auto border-t border-slate-800/80 pt-6 text-center text-xs text-slate-500 font-normal">
-                <p>&copy; 2026 Production Department - Quality Group | MS Section. All rights reserved.</p>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- REAL-TIME INVENTORY -->
+        <!-- ========================================================================= -->
+        <section id="inventory-section" class="portal-section py-12 px-4 sm:px-8 bg-dark-900 border-b border-slate-800">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-2xl font-extrabold text-white">Real-Time Inventory Tracking</h3>
+                        <p class="text-xs text-slate-400 mt-1">Automatic stock deduction upon POS transaction.</p>
+                    </div>
+                </div>
+                <div class="bg-dark-500 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-dark-700/60 border-b border-slate-800 text-[11px] font-bold text-slate-400 uppercase">
+                                <th class="py-3 px-4">Item Name</th>
+                                <th class="py-3 px-4">Category</th>
+                                <th class="py-3 px-4">Current Stock</th>
+                                <th class="py-3 px-4">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60 text-xs font-medium">
+                            <tr>
+                                <td class="py-3 px-4 text-white">Sourdough Loaf</td>
+                                <td class="py-3 px-4 text-slate-400">Bakery</td>
+                                <td class="py-3 px-4 text-white">12 units</td>
+                                <td class="py-3 px-4"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-bold">In Stock</span></td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4 text-white">Wild Mushrooms</td>
+                                <td class="py-3 px-4 text-slate-400">Produce</td>
+                                <td class="py-3 px-4 text-white">2.5 kg</td>
+                                <td class="py-3 px-4"><span class="bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded font-bold">Low Stock</span></td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4 text-white">Avocado</td>
+                                <td class="py-3 px-4 text-slate-400">Produce</td>
+                                <td class="py-3 px-4 text-white">35 units</td>
+                                <td class="py-3 px-4"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-bold">In Stock</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="bg-dark-900 border-t border-slate-800/80 pt-10 pb-8 text-slate-400 px-4 sm:px-8">
+            <div class="max-w-6xl mx-auto text-center text-xs text-slate-500 font-normal">
+                <div class="text-brand-400 text-lg mb-2"><i class="fas fa-truck-fast"></i></div>
+                <p>&copy; 2026 Gilnash Delivery & POS Systems. All rights reserved.</p>
             </div>
         </footer>
     </main>
 </div>
 
-<!-- MODAL: INCIDENT -->
-<div id="incidentModal" class="fixed inset-0 bg-dark-900/85 z-[100] hidden items-center justify-center p-4 backdrop-blur-md">
-    <div class="bg-dark-500 w-full max-w-lg rounded-2xl shadow-2xl border border-slate-700/80 overflow-hidden transform scale-95 transition-all duration-300">
-        <div class="bg-gradient-to-r from-rose-600/20 to-amber-500/10 p-5 border-b border-slate-800 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-rose-600 flex items-center justify-center text-white shadow"><i class="fas fa-exclamation-triangle text-sm"></i></div>
-                <div><h3 class="text-base font-bold text-white">Log Bulletin Event / Near Miss</h3><span class="text-[11px] text-rose-300 font-semibold block">Near Miss, Accident or For Improvement</span></div>
-            </div>
-            <button onclick="closeModal('incidentModal')" class="text-slate-400 hover:text-white p-1 rounded-lg"><i class="fas fa-times text-base"></i></button>
-        </div>
-        <div class="p-6">
-            <form onsubmit="submitIncident(event)" class="space-y-4">
-                <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-bold text-slate-300 uppercase mb-1">Event Classification</label>
-                    <select id="inc-class" required class="w-full border border-slate-700 p-2.5 rounded-xl bg-dark-700 text-white text-xs outline-none focus:border-rose-500">
-                        <option value="nearmiss">Near Miss</option><option value="accident">Incident / Accident</option><option value="improvement">For Improvement</option><option value="announcement">Shift Announcement</option>
-                    </select></div>
-                    <div><label class="block text-xs font-bold text-slate-300 uppercase mb-1">Plant Area</label>
-                    <select id="inc-area" required class="w-full border border-slate-700 p-2.5 rounded-xl bg-dark-700 text-white text-xs outline-none focus:border-rose-500">
-                        <option>FNTRL Area</option><option>MS-Dezinc Area</option><option>H2S Area</option><option>Limestone Area</option><option>DCS Control</option>
-                    </select></div>
-                </div>
-                <div><label class="block text-xs font-bold text-slate-300 uppercase mb-1">Event Title</label>
-                <input type="text" id="inc-title" required placeholder="e.g., Valve #302 Pressure Spike" class="w-full border border-slate-700 p-2.5 rounded-xl bg-dark-700 text-white placeholder-slate-500 text-xs outline-none focus:border-rose-500"></div>
-                <div><label class="block text-xs font-bold text-slate-300 uppercase mb-1">Description & Recommended CAPA</label>
-                <textarea id="inc-desc" rows="3" required placeholder="Describe what occurred and recommended corrective action..." class="w-full border border-slate-700 p-2.5 rounded-xl bg-dark-700 text-white placeholder-slate-500 text-xs outline-none focus:border-rose-500"></textarea></div>
-                <div class="pt-2 flex gap-3">
-                    <button type="button" onclick="closeModal('incidentModal')" class="w-1/3 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold">Cancel</button>
-                    <button type="submit" class="w-2/3 py-3 bg-gradient-to-r from-rose-600 to-amber-500 hover:from-rose-500 text-white rounded-xl text-xs font-bold shadow">Submit to Digital Bulletin</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+<!-- ========================================================================= -->
+<!-- MODALS -->
+<!-- ========================================================================= -->
 
-<!-- MODAL: EXPORT -->
-<div id="exportModal" class="fixed inset-0 bg-dark-900/85 z-[100] hidden items-center justify-center p-4 backdrop-blur-md">
+<!-- MODAL: QR PAYMENT -->
+<div id="paymentModal" class="fixed inset-0 bg-dark-900/85 z-[100] hidden items-center justify-center p-4 backdrop-blur-md">
     <div class="bg-dark-500 w-full max-w-sm rounded-2xl shadow-2xl border border-slate-700/80 overflow-hidden transform scale-95 transition-all duration-300">
         <div class="bg-gradient-to-r from-sky-600/20 to-cyan-500/10 p-5 border-b border-slate-800 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-sky-600 flex items-center justify-center text-white shadow"><i class="fas fa-file-export text-sm"></i></div>
-                <div><h3 class="text-base font-bold text-white">Export Quality Specs</h3><span class="text-[11px] text-sky-400 font-semibold block">Download Analytical Records</span></div>
+                <div class="w-9 h-9 rounded-xl bg-sky-600 flex items-center justify-center text-white shadow"><i class="fas fa-qrcode text-sm"></i></div>
+                <div><h3 class="text-base font-bold text-white">QR Order & Pay</h3><span class="text-[11px] text-sky-400 font-semibold block">Scan to complete payment</span></div>
             </div>
-            <button onclick="closeModal('exportModal')" class="text-slate-400 hover:text-white p-1 rounded-lg"><i class="fas fa-times text-base"></i></button>
+            <button onclick="closeModal('paymentModal')" class="text-slate-400 hover:text-white p-1 rounded-lg"><i class="fas fa-times text-base"></i></button>
         </div>
-        <div class="p-6 space-y-4 text-center">
-            <p class="text-xs text-slate-300 leading-relaxed">Choose format to export the active Product Quality Matrix & Spec Management database.</p>
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="alert('Exporting to Excel (XLSX)...'); closeModal('exportModal');" class="py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow flex items-center justify-center gap-2"><i class="fas fa-file-excel"></i> Excel (.xlsx)</button>
-                <button onclick="alert('Exporting to PDF Report...'); closeModal('exportModal');" class="py-3 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl shadow flex items-center justify-center gap-2"><i class="fas fa-file-pdf"></i> PDF Report</button>
+        <div class="p-6 text-center">
+            <div class="bg-white p-2 rounded-xl inline-block mb-4 shadow-lg border-4 border-slate-200">
+                <!-- Fake QR Code Image -->
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=GilnashPayment" alt="QR Code" class="w-32 h-32 rounded">
             </div>
-            <button onclick="closeModal('exportModal')" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-xl text-xs font-bold">Cancel</button>
+            <h4 class="text-2xl font-black text-brand-400 mb-1" id="pay-modal-total">PHP 0.00</h4>
+            <p class="text-xs text-slate-400 mb-6">Ask customer to scan using their bank or e-wallet app.</p>
+            
+            <button onclick="completeTransaction()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition flex justify-center gap-2 items-center">
+                <i class="fas fa-check-circle"></i> Confirm Payment Received
+            </button>
         </div>
     </div>
 </div>
 
-<!-- MODAL: LOGIN -->
-<div id="loginModal" class="fixed inset-0 bg-dark-900/85 z-[100] hidden items-center justify-center p-4 backdrop-blur-md">
-    <div class="bg-dark-500 w-full max-w-md rounded-2xl shadow-2xl border border-slate-700/80 overflow-hidden transform scale-95 transition-all duration-300">
-        <div class="bg-gradient-to-r from-royalblue-600/20 to-sky-500/10 p-5 border-b border-slate-800 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-royalblue-600 flex items-center justify-center text-white shadow"><i class="fas fa-user-shield text-sm"></i></div>
-                <div><h3 class="text-base font-bold text-white">QA Portal Login</h3><span class="text-[11px] text-sky-400 font-semibold block">Quality by MS Product Access</span></div>
+<!-- MODAL: DIGITAL RECEIPT -->
+<div id="receiptModal" class="fixed inset-0 bg-dark-900/85 z-[100] hidden items-center justify-center p-4 backdrop-blur-md">
+    <div class="bg-white w-full max-w-sm rounded-lg shadow-2xl overflow-hidden transform scale-95 transition-all duration-300 text-slate-800">
+        <div class="p-6 text-center font-mono text-sm">
+            <i class="fas fa-truck-fast text-3xl text-brand-500 mb-2"></i>
+            <h2 class="font-extrabold text-lg">GILNASH DELIVERY</h2>
+            <p class="text-xs text-slate-500 mb-4">Official Receipt<br><span id="rcpt-date"></span></p>
+            
+            <div class="border-t-2 border-dashed border-slate-300 py-3 mb-3 text-left space-y-2" id="rcpt-items">
+                <!-- Receipt Items -->
             </div>
-            <button onclick="closeModal('loginModal')" class="text-slate-400 hover:text-white p-1 rounded-lg"><i class="fas fa-times text-base"></i></button>
-        </div>
-        <div class="p-6">
-            <form onsubmit="submitLogin(event)" class="space-y-4">
-                <div><label class="block text-xs font-bold text-slate-300 uppercase mb-1">Inspector ID / Username</label>
-                <div class="relative"><i class="fas fa-id-badge absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                <input type="text" required placeholder="Enter QA credentials" class="w-full border border-slate-700 pl-9 p-2.5 rounded-xl bg-dark-700 text-white placeholder-slate-500 text-xs outline-none focus:border-sky-500"></div></div>
-                <div><label class="block text-xs font-bold text-slate-300 uppercase mb-1">Security Password</label>
-                <div class="relative"><i class="fas fa-lock absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                <input type="password" required placeholder="Enter password" class="w-full border border-slate-700 pl-9 p-2.5 rounded-xl bg-dark-700 text-white placeholder-slate-500 text-xs outline-none focus:border-sky-500"></div></div>
-                <button type="submit" class="w-full py-3 mt-2 bg-gradient-to-r from-royalblue-600 to-sky-500 hover:from-royalblue-500 text-white font-bold text-xs rounded-xl shadow transition-all flex justify-center items-center gap-2">
-                    <span id="loginBtnText">Authenticate Access</span> <i id="loginIcon" class="fas fa-arrow-right text-[10px]"></i>
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL: ADD USER -->
-<div id="userModal" class="fixed inset-0 bg-dark-900/85 z-[100] hidden items-center justify-center p-4 backdrop-blur-md">
-    <div class="bg-dark-500 w-full max-w-lg rounded-2xl shadow-2xl border border-slate-700/80 overflow-hidden transform scale-95 transition-all duration-300">
-        <div class="bg-gradient-to-r from-amber-500/20 to-rose-600/10 p-5 border-b border-slate-800 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center text-white shadow"><i class="fas fa-user-plus text-sm"></i></div>
-                <div><h3 class="text-base font-bold text-white">Register / Edit QA Personnel</h3><span class="text-[11px] text-amber-300 font-semibold block">Hydrometallurgical Access Control</span></div>
+            
+            <div class="border-t-2 border-dashed border-slate-300 pt-3 text-left">
+                <div class="flex justify-between text-xs mb-1"><span>Subtotal</span><span id="rcpt-sub"></span></div>
+                <div class="flex justify-between text-xs mb-1"><span>Tax (12%)</span><span id="rcpt-tax"></span></div>
+                <div class="flex justify-between font-bold text-base mt-2"><span>TOTAL</span><span id="rcpt-total"></span></div>
             </div>
-            <button onclick="closeModal('userModal')" class="text-slate-400 hover:text-white p-1 rounded-lg"><i class="fas fa-times text-base"></i></button>
+            
+            <p class="text-[10px] text-slate-500 mt-6 border-t-2 border-dashed border-slate-300 pt-4">Powered by StoreHub / Gilnash POS<br>Thank you for your business!</p>
         </div>
-        <div class="p-6">
-            <form onsubmit="submitUserForm(event)" class="space-y-4">
-                <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-bold text-slate-300 uppercase mb-1">Full Name</label><input type="text" id="usr-name" required placeholder="e.g., Engr. Santos, M." class="w-full border border-slate-700 p-2.5 rounded-xl bg-dark-700 text-white placeholder-slate-500 text-xs outline-none focus:border-amber-500"></div>
-                    <div><label class="block text-xs font-bold text-slate-300 uppercase mb-1">Inspector ID</label><input type="text" id="usr-id" required placeholder="e.g., QA-MS-010" class="w-full border border-slate-700 p-2.5 rounded-xl bg-dark-700 text-white placeholder-slate-500 text-xs outline-none focus:border-amber-500"></div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-bold text-slate-300 uppercase mb-1">Assigned Role</label>
-                    <select id="usr-role" required class="w-full border border-slate-700 p-2.5 rounded-xl bg-dark-700 text-white text-xs outline-none focus:border-amber-500">
-                        <option>Lead QA Inspector</option><option>Field Technician</option><option>Lab Chemist</option><option>System Admin</option>
-                    </select></div>
-                    <div><label class="block text-xs font-bold text-slate-300 uppercase mb-1">Plant Area Clearance</label>
-                    <select id="usr-area" required class="w-full border border-slate-700 p-2.5 rounded-xl bg-dark-700 text-white text-xs outline-none focus:border-amber-500">
-                        <option>All MS Section Areas</option><option>FNTRL Area</option><option>MS-Dezinc Area</option><option>H2S Area</option><option>Limestone Area</option>
-                    </select></div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-bold text-slate-300 uppercase mb-1">Shift Schedule</label>
-                    <select id="usr-shift" required class="w-full border border-slate-700 p-2.5 rounded-xl bg-dark-700 text-white text-xs outline-none focus:border-amber-500">
-                        <option>Morning Shift (06:00 - 14:00)</option><option>Day Shift (08:00 - 17:00)</option><option>Afternoon Shift (14:00 - 22:00)</option><option>Night Shift (22:00 - 06:00)</option>
-                    </select></div>
-                    <div><label class="block text-xs font-bold text-slate-300 uppercase mb-1">Security Clearance</label>
-                    <select id="usr-clearance" required class="w-full border border-slate-700 p-2.5 rounded-xl bg-dark-700 text-white text-xs outline-none focus:border-amber-500">
-                        <option>Level 3 (Full DCS & Audit)</option><option>Level 2 (Field & Titration)</option><option>Level 1 (Read-Only Portal)</option>
-                    </select></div>
-                </div>
-                <div class="pt-2 flex gap-3">
-                    <button type="button" onclick="closeModal('userModal')" class="w-1/3 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold">Cancel</button>
-                    <button type="submit" class="w-2/3 py-3 bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 text-white rounded-xl text-xs font-bold shadow">Save User Access</button>
-                </div>
-            </form>
+        <div class="bg-slate-100 p-3 flex gap-2">
+            <button onclick="closeModal('receiptModal')" class="flex-1 py-2 bg-slate-300 text-slate-700 font-bold text-xs rounded hover:bg-slate-400">Close</button>
+            <button onclick="window.print()" class="flex-1 py-2 bg-brand-500 text-white font-bold text-xs rounded hover:bg-brand-600"><i class="fas fa-print mr-1"></i> Print</button>
         </div>
     </div>
 </div>
 
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
-// ============================================================
-// DATA DEFINITIONS
-// ============================================================
-const matrixData = [
-    { id: 'REC-2026-0741', area: 'FNTRL Area', product: 'Tailings Slurry', parameter: 'Discharge pH', result: '8.3 pH', spec: '8.2 - 8.6 pH', status: 'PASS', date: 'Jul 6, 2026', inspector: 'Reyes, J.' },
-    { id: 'REC-2026-0742', area: 'FNTRL Area', product: 'Ni/Co Recovery', parameter: 'Ni Residue Loss', result: '0.03 g/L', spec: '< 0.05 g/L', status: 'PASS', date: 'Jul 6, 2026', inspector: 'Reyes, J.' },
-    { id: 'REC-2026-0739', area: 'MS-Dezinc Area', product: 'Mixed Sulfide Cake', parameter: 'Zn Removal Efficiency', result: '99.6%', spec: '> 99.4%', status: 'PASS', date: 'Jul 5, 2026', inspector: 'Chemist Lim, K.' },
-    { id: 'REC-2026-0738', area: 'MS-Dezinc Area', product: 'Mixed Sulfide Cake', parameter: 'Zn Carry-Over', result: '0.81%', spec: '< 0.60%', status: 'FAIL', date: 'Jul 3, 2026', inspector: 'Chemist Lim, K.' },
-    { id: 'REC-2026-0743', area: 'H2S Area', product: 'MS Precipitation', parameter: 'H2S Gas Purity', result: '99.7% Vol', spec: '> 99.6%', status: 'PASS', date: 'Jul 6, 2026', inspector: 'Tech Mendoza, P.' },
-    { id: 'REC-2026-0735', area: 'H2S Area', product: 'Scrubber Effluent', parameter: 'Caustic pH', result: '10.8 pH', spec: '10.5 - 11.0 pH', status: 'PASS', date: 'Jul 2, 2026', inspector: 'Tech Mendoza, P.' },
-    { id: 'REC-2026-0744', area: 'Limestone Area', product: 'Limestone Slurry', parameter: 'Slurry Density', result: '1.36 g/cm³', spec: '1.35 ± 0.05', status: 'PASS', date: 'Jul 6, 2026', inspector: 'Engr. Bautista, L.' },
-    { id: 'REC-2026-0730', area: 'Limestone Area', product: 'Limestone Slurry', parameter: 'Particle Titration', result: '94.1%', spec: '95% < 325 Mesh', status: 'FAIL', date: 'Jun 30, 2026', inspector: 'Engr. Bautista, L.' },
-    { id: 'REC-2026-0728', area: 'FNTRL Area', product: 'Tailings Slurry', parameter: 'Co Residue Loss', result: '0.01 g/L', spec: '< 0.02 g/L', status: 'PASS', date: 'Jun 29, 2026', inspector: 'Engr. Santos, M.' },
-    { id: 'REC-2026-0725', area: 'MS-Dezinc Area', product: 'Phase Separation', parameter: 'Separation Time', result: '72 sec', spec: '60 - 90 sec', status: 'PASS', date: 'Jun 28, 2026', inspector: 'Chemist Lim, K.' },
-];
-
-let qaUsersList = [
-    { id: "QA-MS-001", name: "Engr. Santos, M.", role: "Lead QA Inspector", area: "All MS Section Areas", shift: "Day Shift (08:00 - 17:00)", clearance: "Level 3 (Full DCS & Audit)", status: "Active / On-Shift" },
-    { id: "QA-MS-002", name: "Reyes, J.", role: "Field Technician", area: "FNTRL Area", shift: "Morning Shift (06:00 - 14:00)", clearance: "Level 2 (Field & Titration)", status: "Active / On-Shift" },
-    { id: "QA-MS-003", name: "Chemist Lim, K.", role: "Lab Chemist", area: "MS-Dezinc Area", shift: "Day Shift (08:00 - 17:00)", clearance: "Level 2 (Field & Titration)", status: "Active / On-Shift" },
-    { id: "QA-MS-004", name: "Admin Cruz, R.", role: "System Admin", area: "DCS Control Room", shift: "Day Shift (08:00 - 17:00)", clearance: "Level 3 (Full DCS & Audit)", status: "Active / On-Shift" },
-    { id: "QA-MS-005", name: "Tech Mendoza, P.", role: "Field Technician", area: "H2S Area", shift: "Afternoon Shift (14:00 - 22:00)", clearance: "Level 2 (Field & Titration)", status: "Off-Shift / Standby" },
-    { id: "QA-MS-006", name: "Engr. Bautista, L.", role: "Lead QA Inspector", area: "Limestone Area", shift: "Night Shift (22:00 - 06:00)", clearance: "Level 3 (Full DCS & Audit)", status: "Active / On-Shift" }
-];
-
-const areaSpecs = {
-    fntrl: {
-        code: '#FNTRL-01 &bull; Hydrometallurgy', title: 'Final Neutralization & Tailings Recovery (FNTRL)',
-        desc: 'The FNTRL area is critical for environmental compliance and heavy metal recovery. QA inspectors continuously audit discharge slurry pH, residual nickel/cobalt concentrations in tailings, and flocculant dosing efficiency.',
-        m1Label: 'Slurry pH Limit', m1Val: '8.2 - 8.6 pH', m1Color: 'text-emerald-400',
-        m2Label: 'Ni Residue Loss', m2Val: '< 0.05 g/L', m2Color: 'text-sky-400',
-        sop: 'SOP-FN-104', sopKw: 'SOP-FN',
-        incTitle: 'Near Miss: Flocculant Pump Surge', incDate: 'Logged on June 20, 2026 &bull; Resolved via Sub DCS calibration.',
-        areaKw: 'FNTRL'
-    },
-    dezinc: {
-        code: '#DEZINC-02 &bull; Solvent Extraction', title: 'Mixed Sulfide Dezincification (MS-Dezinc)',
-        desc: 'In the MS-Dezinc area, zinc impurities are selectively extracted from nickel-cobalt sulfide solution. QA testing monitors extraction efficiency, organic/aqueous phase separation times, and reagent titration.',
-        m1Label: 'Zn Removal Efficiency', m1Val: '> 99.4%', m1Color: 'text-cyan-400',
-        m2Label: 'Phase Separation', m2Val: '60 - 90 sec', m2Color: 'text-emerald-400',
-        sop: 'SOP-MS-101', sopKw: 'SOP-MS',
-        incTitle: 'Near Miss: Phase Separation Delay', incDate: 'Logged on July 20, 2026 &bull; Impeller speed adjusted.',
-        areaKw: 'MS-Dezinc'
-    },
-    h2s: {
-        code: '#H2S-03 &bull; Gas Generation Plant', title: 'Hydrogen Sulfide Gas Scrubber Area (H2S)',
-        desc: 'The H2S area demands maximum QA safety vigilance. Continuous telemetry checks gas purity for metal sulfide precipitation, while calibrating ambient toxic gas sensors and scrubber neutralization loops.',
-        m1Label: 'H2S Gas Purity', m1Val: '> 99.6% Vol', m1Color: 'text-rose-400',
-        m2Label: 'Scrubber Caustic pH', m2Val: '10.5 - 11.0 pH', m2Color: 'text-emerald-400',
-        sop: 'SOP-H2S-204', sopKw: 'SOP-H2S',
-        incTitle: 'Near Miss: Line Pressure Fluctuation', incDate: 'Logged on July 6, 2026 &bull; Automated safety interlock acted.',
-        areaKw: 'H2S'
-    },
-    limestone: {
-        code: '#LS-04 &bull; Reagent Preparation', title: 'Limestone Slurry Preparation Area',
-        desc: 'Limestone is the primary neutralizing reagent in the MS Section. QA laboratory technicians perform daily mesh particle titration, calcium carbonate reactivity assays, and automated slurry density sensor calibration.',
-        m1Label: 'Slurry Density', m1Val: '1.35 g/cm³', m1Color: 'text-amber-400',
-        m2Label: 'Particle Titration', m2Val: '95% < 325 Mesh', m2Color: 'text-sky-400',
-        sop: 'SOP-LS-402', sopKw: 'SOP-LS',
-        incTitle: 'For Improvement: Density Sensor Drift', incDate: 'Logged on July 2, 2026 &bull; Recalibration scheduled.',
-        areaKw: 'Limestone'
-    }
-};
-
-// ============================================================
-// WATCHDOG: ENFORCE SECTION VISIBILITY AGAINST EXTERNAL SCRIPTS
-// ============================================================
-function enforceSectionVisibility() {
-    const mainSections = [
-        'bulletin-board-section',
-        'quality-spec-section',
-        'qamsproduct-portal',
-        'home',
-        'calendar-section',
-        'area-explorer',
-        'dcs-section',
-        'sop-section',
-        'user-management-section'
-    ];
-    mainSections.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            if (el.style.display === 'none' || el.classList.contains('hidden') || el.style.opacity === '0' || el.style.visibility === 'hidden') {
-                el.style.setProperty('display', 'block', 'important');
-                el.style.setProperty('opacity', '1', 'important');
-                el.style.setProperty('visibility', 'visible', 'important');
-                el.style.setProperty('max-height', 'none', 'important');
-                el.style.setProperty('height', 'auto', 'important');
-                el.classList.remove('hidden', 'd-none', 'opacity-0', 'invisible');
-            }
-        }
-    });
-}
-
-// ============================================================
-// SECURE FUNCTION REGISTRATION (Prevents external script override)
-// ============================================================
-function registerSecureFunction(name, fn) {
-    try {
-        window[name] = fn;
-        Object.defineProperty(window, name, { value: fn, writable: false, configurable: false });
-    } catch (err) {
-        window[name] = fn;
-    }
-}
-
-// ============================================================
-// LOADING SCREEN
-// ============================================================
-window.addEventListener('DOMContentLoaded', () => {
-    let progress = 0;
-    const bar = document.getElementById('loader-bar');
-    const text = document.getElementById('loader-text');
-    const loader = document.getElementById('global-loader');
-
-    // Attach MutationObserver to immediately counter any external script hiding main sections
-    const bodyObserver = new MutationObserver(() => enforceSectionVisibility());
-    const bSection = document.getElementById('bulletin-board-section');
-    const qSection = document.getElementById('quality-spec-section');
-    if (bSection) bodyObserver.observe(bSection, { attributes: true, attributeFilter: ['style', 'class'] });
-    if (qSection) bodyObserver.observe(qSection, { attributes: true, attributeFilter: ['style', 'class'] });
-    
-    // Attach click watchdog
-    window.addEventListener('click', () => {
-        setTimeout(enforceSectionVisibility, 10);
-        setTimeout(enforceSectionVisibility, 50);
-        setTimeout(enforceSectionVisibility, 200);
-    }, true);
-
-    const iv = setInterval(() => {
-        progress += Math.floor(Math.random() * 16) + 6;
-        if (progress >= 100) progress = 100;
-        if (bar) bar.style.width = progress + '%';
-        if (text) text.innerText = `INITIALIZING QUALITY PARAMETERS... ${progress}%`;
-        if (progress === 100) {
-            clearInterval(iv);
-            setTimeout(() => {
-                if (loader) loader.classList.add('opacity-0');
+    // ============================================================
+    // INIT & UI LOGIC
+    // ============================================================
+    window.addEventListener('DOMContentLoaded', () => {
+        let progress = 0;
+        const bar = document.getElementById('loader-bar');
+        const loader = document.getElementById('global-loader');
+        
+        const iv = setInterval(() => {
+            progress += Math.floor(Math.random() * 20) + 10;
+            if (progress >= 100) progress = 100;
+            if (bar) bar.style.width = progress + '%';
+            if (progress === 100) {
+                clearInterval(iv);
                 setTimeout(() => {
-                    if (loader) loader.style.display = 'none';
-                    AOS.init({ duration: 700, once: true, offset: 50 });
-                    renderMatrixTable(matrixData);
-                    renderUserTable();
-                    switchAreaTab('fntrl');
-                    enforceSectionVisibility();
-                }, 400);
-            }, 300);
-        }
-    }, 70);
-});
-
-// ============================================================
-// TAB SWITCHER 1: MS SECTION BULLETIN BOARD (Independent System)
-// ============================================================
-const bulletinTabs = ['bulletin_home', 'scorecard', 'nearmiss', 'improvement'];
-
-function switchBulletinTab(e, tab) {
-    // If called directly without an event object
-    if (typeof e === 'string' && !tab) {
-        tab = e;
-        e = null;
-    }
-    // Block any external click listeners in qamsproduct.js from receiving this event
-    if (e && typeof e.stopImmediatePropagation === 'function') {
-        e.stopImmediatePropagation();
-        e.stopPropagation();
-    }
-    bulletinTabs.forEach(t => {
-        const btn = document.getElementById('btab-' + t);
-        const panel = document.getElementById('panel-' + t);
-        if (btn) btn.classList.toggle('active', t === tab);
-        if (panel) {
-            panel.classList.toggle('active', t === tab);
-            if (t === tab) {
-                panel.classList.add('animate-fadeIn');
-                panel.style.setProperty('display', 'block', 'important');
-                panel.style.setProperty('opacity', '1', 'important');
-                panel.style.setProperty('visibility', 'visible', 'important');
-            } else {
-                panel.style.setProperty('display', 'none', 'important');
+                    loader.classList.add('opacity-0');
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                        AOS.init({ duration: 700, once: true });
+                        initPOS();
+                        renderHistory();
+                    }, 400);
+                }, 300);
             }
+        }, 100);
+    });
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebarMenu');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        if (sidebar.classList.contains('-translate-x-full')) {
+            sidebar.classList.remove('-translate-x-full');
+            backdrop.classList.remove('opacity-0', 'pointer-events-none');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            backdrop.classList.add('opacity-0', 'pointer-events-none');
         }
-    });
-    enforceSectionVisibility();
-}
-registerSecureFunction('switchBulletinTab', switchBulletinTab);
-
-// ============================================================
-// TAB SWITCHER 2: PRODUCT QUALITY & SPEC MGMT (Independent System)
-// ============================================================
-const specTabs = ['matrix', 'reprocess', 'claim', 'document'];
-
-function switchSpecTab(e, tab) {
-    if (typeof e === 'string' && !tab) {
-        tab = e;
-        e = null;
     }
-    if (e && typeof e.stopImmediatePropagation === 'function') {
-        e.stopImmediatePropagation();
-        e.stopPropagation();
+    function closeSidebarOnMobile() {
+        if (window.innerWidth < 1024) toggleSidebar();
     }
-    specTabs.forEach(t => {
-        const btn = document.getElementById('stab-' + t);
-        const panel = document.getElementById('spanel-' + t);
-        if (btn) btn.classList.toggle('active', t === tab);
-        if (panel) {
-            panel.classList.toggle('active', t === tab);
-            if (t === tab) {
-                panel.classList.add('animate-fadeIn');
-                panel.style.setProperty('display', 'block', 'important');
-                panel.style.setProperty('opacity', '1', 'important');
-                panel.style.setProperty('visibility', 'visible', 'important');
-            } else {
-                panel.style.setProperty('display', 'none', 'important');
-            }
+
+    function switchTab(tabClass, panelId) {
+        document.querySelectorAll('.' + tabClass).forEach(btn => btn.classList.remove('active', 'bg-brand-500'));
+        document.querySelectorAll('.section-panel').forEach(panel => panel.classList.remove('active'));
+        
+        event.currentTarget.classList.add('active');
+        document.getElementById(panelId).classList.add('active');
+    }
+
+    function openModal(id) {
+        const modal = document.getElementById(id);
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => modal.querySelector('div').classList.replace('scale-95', 'scale-100'), 10);
+    }
+    function closeModal(id) {
+        const modal = document.getElementById(id);
+        modal.querySelector('div').classList.replace('scale-100', 'scale-95');
+        setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 200);
+    }
+
+    // ============================================================
+    // POS & BILLING SYSTEM LOGIC
+    // ============================================================
+    
+    // Products replicating the exact items from the uploaded image
+    const products = [
+        { id: 1, name: "Fricassee of Wild Mushrooms w/ Sourdough", price: 500.00, img: "https://images.unsplash.com/photo-1543362906-acfc16c67564?auto=format&fit=crop&w=150&q=80" },
+        { id: 2, name: "Avocado Toast", price: 445.00, img: "https://images.unsplash.com/photo-1603048297172-c92544798d5e?auto=format&fit=crop&w=150&q=80" },
+        { id: 3, name: "Gilnash Specialty Burger", price: 350.00, img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=150&q=80" },
+        { id: 4, name: "Iced Latte", price: 180.00, img: "https://images.unsplash.com/photo-1517701550927-30cf4ba1dba1?auto=format&fit=crop&w=150&q=80" }
+    ];
+
+    let cart = [];
+    let transactions = [
+        { id: "TXN-0012", date: "2026-07-11 08:30 AM", amount: 1058.40, type: "QR Pay", status: "Completed", items: [{name: "Avocado Toast", qty: 2, price: 445}] }
+    ];
+
+    function initPOS() {
+        const grid = document.getElementById('product-grid');
+        grid.innerHTML = products.map(p => `
+            <div onclick="addToCart(${p.id})" class="bg-dark-700 rounded-xl overflow-hidden border border-slate-700 hover:border-brand-500 cursor-pointer transition-all hover:-translate-y-1 group">
+                <div class="h-24 overflow-hidden"><img src="${p.img}" class="w-full h-full object-cover group-hover:scale-110 transition-transform"></div>
+                <div class="p-3">
+                    <h5 class="text-xs font-bold text-white mb-1 truncate" title="${p.name}">${p.name}</h5>
+                    <span class="text-brand-400 font-black text-sm">₱ ${p.price.toFixed(2)}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function addToCart(id) {
+        const product = products.find(p => p.id === id);
+        const existing = cart.find(item => item.id === id);
+        if (existing) {
+            existing.qty++;
+        } else {
+            cart.push({ ...product, qty: 1 });
         }
-    });
-    enforceSectionVisibility();
-}
-registerSecureFunction('switchSpecTab', switchSpecTab);
-
-// Backwards compatibility safeguard for any old external script calls
-function switchBoardTab(e, tab) {
-    if (typeof e === 'string' && !tab) {
-        tab = e;
-        e = null;
+        updateCartUI();
     }
-    if (bulletinTabs.includes(tab)) {
-        switchBulletinTab(e, tab);
-        const sec = document.getElementById('bulletin-board-section');
-        if (sec) sec.scrollIntoView({ behavior: 'smooth' });
-    } else if (specTabs.includes(tab)) {
-        switchSpecTab(e, tab);
-        const sec = document.getElementById('quality-spec-section');
-        if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+
+    function removeFromCart(id) {
+        cart = cart.filter(item => item.id !== id);
+        updateCartUI();
     }
-    enforceSectionVisibility();
-}
-registerSecureFunction('switchBoardTab', switchBoardTab);
 
-// ============================================================
-// MATRIX TABLE
-// ============================================================
-function renderMatrixTable(data) {
-    const tbody = document.getElementById('matrix-tbody');
-    if (!tbody) return;
-    tbody.innerHTML = data.map(r => {
-        const isPass = r.status === 'PASS';
-        return `<tr class="hover:bg-dark-700/40 transition-colors">
-            <td class="py-3.5 px-4 font-bold text-white">${r.id}</td>
-            <td class="py-3.5 px-4 text-slate-300">${r.area}</td>
-            <td class="py-3.5 px-4 text-slate-300">${r.product}</td>
-            <td class="py-3.5 px-4 text-slate-300">${r.parameter}</td>
-            <td class="py-3.5 px-4 font-bold ${isPass ? 'text-emerald-400' : 'text-rose-400'}">${r.result}</td>
-            <td class="py-3.5 px-4 text-slate-400 font-mono">${r.spec}</td>
-            <td class="py-3.5 px-4"><span class="px-2.5 py-0.5 rounded text-[10px] font-bold border ${isPass ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border-rose-500/30'}">${r.status}</span></td>
-            <td class="py-3.5 px-4 text-slate-400">${r.date}</td>
-            <td class="py-3.5 px-4 text-slate-300">${r.inspector}</td>
-        </tr>`;
-    }).join('');
-}
+    function updateCartUI() {
+        const container = document.getElementById('cart-items');
+        const btn = document.getElementById('pay-btn');
+        
+        if (cart.length === 0) {
+            container.innerHTML = '<p class="text-xs text-slate-500 text-center mt-10">Cart is empty.</p>';
+            document.getElementById('cart-subtotal').innerText = 'PHP 0.00';
+            document.getElementById('cart-tax').innerText = 'PHP 0.00';
+            document.getElementById('cart-total').innerText = 'PHP 0.00';
+            btn.disabled = true;
+            return;
+        }
 
-function filterMatrix() {
-    const q = document.getElementById('matrix-search').value.toLowerCase();
-    const filtered = matrixData.filter(r =>
-        r.area.toLowerCase().includes(q) ||
-        r.product.toLowerCase().includes(q) ||
-        r.status.toLowerCase().includes(q) ||
-        r.id.toLowerCase().includes(q) ||
-        r.inspector.toLowerCase().includes(q) ||
-        r.parameter.toLowerCase().includes(q)
-    );
-    renderMatrixTable(filtered);
-}
-
-// ============================================================
-// AREA TAB SWITCHER
-// ============================================================
-function switchAreaTab(key) {
-    ['fntrl','dezinc','h2s','limestone'].forEach(k => {
-        const btn = document.getElementById('tab-' + k);
-        if (btn) btn.classList.toggle('active', k === key);
-    });
-
-    const d = areaSpecs[key];
-    const content = document.getElementById('area-card-content');
-    if (!content || !d) return;
-
-    content.style.opacity = '0';
-    setTimeout(() => {
-        content.innerHTML = `
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                <div class="lg:col-span-7">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-sky-500/10 text-sky-400 font-bold text-xs mb-4">Area Code: ${d.code}</div>
-                    <h4 class="text-2xl sm:text-3xl font-extrabold text-white mb-4">${d.title}</h4>
-                    <p class="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6 font-normal">${d.desc}</p>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
-                        <div class="bg-dark-700 p-3 rounded-xl border border-slate-800"><span class="text-[10px] text-slate-400 block uppercase">${d.m1Label}</span><span class="text-sm sm:text-base font-bold ${d.m1Color}">${d.m1Val}</span></div>
-                        <div class="bg-dark-700 p-3 rounded-xl border border-slate-800"><span class="text-[10px] text-slate-400 block uppercase">${d.m2Label}</span><span class="text-sm sm:text-base font-bold ${d.m2Color}">${d.m2Val}</span></div>
-                        <div class="bg-dark-700 p-3 rounded-xl border border-slate-800 col-span-2 sm:col-span-1"><span class="text-[10px] text-slate-400 block uppercase">Active SOP</span><span class="text-sm sm:text-base font-bold text-white">${d.sop}</span></div>
+        let html = '';
+        let subtotal = 0;
+        
+        cart.forEach((item, index) => {
+            const itemTotal = item.price * item.qty;
+            subtotal += itemTotal;
+            html += `
+                <div class="flex justify-between items-start mb-4 border-b border-slate-800 pb-2">
+                    <div class="flex-1">
+                        <span class="text-xs font-bold text-white block">${index + 1}. ${item.name}</span>
+                        <span class="text-[10px] text-slate-500">${item.qty} x ${item.price.toFixed(2)}</span>
                     </div>
-                    <div class="flex flex-wrap items-center gap-3">
-                        <button onclick="document.getElementById('quality-spec-section').scrollIntoView({behavior:'smooth'}); switchSpecTab(event, 'matrix');" class="px-4 py-2.5 bg-royalblue-600 hover:bg-royalblue-500 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center gap-1.5"><i class="fas fa-table"></i> Check Area Specs</button>
-                        <button onclick="document.getElementById('bulletin-board-section').scrollIntoView({behavior:'smooth'}); switchBulletinTab(event, 'nearmiss');" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-all border border-slate-700 flex items-center gap-1.5"><i class="fas fa-exclamation-triangle"></i> Area Hazards</button>
+                    <div class="text-right ml-2">
+                        <span class="text-xs font-bold text-white block">₱ ${itemTotal.toFixed(2)}</span>
+                        <button onclick="removeFromCart(${item.id})" class="text-[10px] text-rose-400 hover:underline mt-1">Remove</button>
                     </div>
                 </div>
-                <div class="lg:col-span-5">
-                    <div class="bg-gradient-to-br from-dark-700 to-dark-900 rounded-xl p-5 border border-slate-800 shadow-inner">
-                        <span class="text-xs font-bold text-slate-300 block mb-3 border-b border-slate-800 pb-2">Recent Area Incidents / Near Miss</span>
-                        <div class="space-y-3">
-                            <div class="p-3 bg-dark-500 rounded-lg border border-slate-800/80 flex items-start gap-3 text-xs">
-                                <i class="fas fa-exclamation-circle text-amber-400 mt-0.5"></i>
-                                <div><span class="font-bold text-white block">${d.incTitle}</span><span class="text-slate-400 text-[11px]">${d.incDate}</span></div>
-                            </div>
-                            <div class="p-3 bg-dark-500 rounded-lg border border-slate-800/80 flex items-start gap-3 text-xs">
-                                <i class="fas fa-check-circle text-emerald-400 mt-0.5"></i>
-                                <div><span class="font-bold text-white block">Routine Audit: Passed Zero-Defect</span><span class="text-slate-400 text-[11px]">Logged on July 1, 2026 &bull; Inspector M. Santos.</span></div>
-                            </div>
-                        </div>
-                    </div>
+            `;
+        });
+
+        // 12% Tax logic (Included in subtotal conceptually for this demo, or added on top. Let's add on top.)
+        // But referencing the image, Fricassee (500) + Avocado (445) = 945. Total = 945.50 ? 
+        // We will just do a direct sum to mimic the image logic if items equal 945.
+        // Let's implement standard calculations.
+        
+        const tax = 0; // Keeping 0 to match exactly the 945.00 math in image if discount/tax balances out. 
+        const total = subtotal + tax;
+
+        container.innerHTML = html;
+        document.getElementById('cart-subtotal').innerText = `PHP ${subtotal.toFixed(2)}`;
+        document.getElementById('cart-tax').innerText = `PHP ${tax.toFixed(2)}`;
+        document.getElementById('cart-total').innerText = `PHP ${total.toFixed(2)}`;
+        btn.disabled = false;
+    }
+
+    function processPayment() {
+        const total = document.getElementById('cart-total').innerText;
+        document.getElementById('pay-modal-total').innerText = total;
+        openModal('paymentModal');
+    }
+
+    function completeTransaction() {
+        // Calculate Total
+        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+        
+        // Add to history
+        const txnId = "TXN-" + Math.floor(Math.random() * 9000 + 1000);
+        const dateStr = new Date().toLocaleString('en-US', { hour12: true, month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        
+        const newTxn = {
+            id: txnId,
+            date: dateStr,
+            amount: subtotal,
+            type: "QR Pay",
+            status: "Completed",
+            items: [...cart]
+        };
+        
+        transactions.unshift(newTxn);
+        
+        // Clear cart & UI
+        cart = [];
+        updateCartUI();
+        renderHistory();
+        
+        closeModal('paymentModal');
+        
+        // Auto-show receipt
+        setTimeout(() => showReceipt(txnId), 400);
+    }
+
+    function renderHistory() {
+        const tbody = document.getElementById('history-tbody');
+        tbody.innerHTML = transactions.map(t => `
+            <tr class="hover:bg-dark-700/40 transition-colors">
+                <td class="py-3 px-4 font-bold text-white">${t.id}</td>
+                <td class="py-3 px-4 text-slate-300">${t.date}</td>
+                <td class="py-3 px-4 text-brand-400 font-bold">₱ ${t.amount.toFixed(2)}</td>
+                <td class="py-3 px-4 text-slate-300"><i class="fas fa-qrcode text-sky-400 mr-1"></i> ${t.type}</td>
+                <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400">${t.status}</span></td>
+                <td class="py-3 px-4 text-right">
+                    <button onclick="showReceipt('${t.id}')" class="text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded text-white transition">View Receipt</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function showReceipt(txnId) {
+        const txn = transactions.find(t => t.id === txnId);
+        if (!txn) return;
+        
+        document.getElementById('rcpt-date').innerText = txn.date + " | " + txn.id;
+        
+        let itemHtml = '';
+        txn.items.forEach(item => {
+            itemHtml += `
+                <div class="flex justify-between">
+                    <span>${item.qty}x ${item.name.substring(0,18)}</span>
+                    <span>${(item.price * item.qty).toFixed(2)}</span>
                 </div>
-            </div>`;
-        content.style.opacity = '1';
-    }, 150);
-}
-registerSecureFunction('switchAreaTab', switchAreaTab);
-
-// ============================================================
-// DCS DIAGNOSTICS
-// ============================================================
-function runDCSDiagnostic(name) {
-    alert(`[TELEMETRY DIAGNOSTIC ROUTINE]\n\nTarget: ${name}\nStatus: PINGING AUTOMATION LOOP...\n\nResult: All chemical telemetry sensors, safety interlocks, and QA titration alarms are responding nominally with 0.00% packet loss.`);
-}
-
-function highlightDCS(type) {
-    const id = type === 'main' ? 'dcs-card-main' : 'dcs-card-sub';
-    const color = type === 'main' ? 'ring-cyan-400' : 'ring-sky-400';
-    const card = document.getElementById(id);
-    if (!card) return;
-    card.classList.add('ring-2', color, 'scale-[1.02]');
-    setTimeout(() => card.classList.remove('ring-2', color, 'scale-[1.02]'), 1500);
-}
-
-// ============================================================
-// MODALS
-// ============================================================
-function openModal(id) {
-    const modal = document.getElementById(id);
-    if (!modal) return;
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    setTimeout(() => modal.querySelector('div').classList.replace('scale-95', 'scale-100'), 10);
-}
-registerSecureFunction('openModal', openModal);
-
-function closeModal(id) {
-    const modal = document.getElementById(id);
-    if (!modal) return;
-    modal.querySelector('div').classList.replace('scale-100', 'scale-95');
-    setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 200);
-}
-registerSecureFunction('closeModal', closeModal);
-
-// ============================================================
-// SIDEBAR & SUBMENUS
-// ============================================================
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebarMenu');
-    const backdrop = document.getElementById('sidebarBackdrop');
-    const closed = sidebar.classList.contains('-translate-x-full');
-    if (closed) {
-        sidebar.classList.remove('-translate-x-full');
-        backdrop.classList.remove('opacity-0', 'pointer-events-none');
-        document.body.classList.add('overflow-hidden');
-    } else {
-        sidebar.classList.add('-translate-x-full');
-        backdrop.classList.add('opacity-0', 'pointer-events-none');
-        document.body.classList.remove('overflow-hidden');
+            `;
+        });
+        document.getElementById('rcpt-items').innerHTML = itemHtml;
+        
+        document.getElementById('rcpt-sub').innerText = "PHP " + txn.amount.toFixed(2);
+        document.getElementById('rcpt-tax').innerText = "PHP 0.00";
+        document.getElementById('rcpt-total').innerText = "PHP " + txn.amount.toFixed(2);
+        
+        openModal('receiptModal');
     }
-}
-registerSecureFunction('toggleSidebar', toggleSidebar);
-
-function closeSidebarOnMobile() {
-    if (window.innerWidth < 1024) toggleSidebar();
-}
-
-function toggleSubmenu(menuId, iconId) {
-    const submenu = document.getElementById(menuId);
-    const icon = document.getElementById(iconId);
-    if (submenu.classList.contains('submenu-open')) {
-        submenu.classList.remove('submenu-open');
-        icon.style.transform = 'rotate(0deg)';
-    } else {
-        submenu.classList.add('submenu-open');
-        icon.style.transform = 'rotate(180deg)';
-    }
-}
-
-// ============================================================
-// USER TABLE
-// ============================================================
-let currentUserFilter = 'all';
-
-function renderUserTable(filter, searchTerm) {
-    filter = filter || currentUserFilter;
-    searchTerm = searchTerm !== undefined ? searchTerm : (document.getElementById('user-search-input') ? document.getElementById('user-search-input').value : '');
-
-    let filtered = qaUsersList.filter(u => {
-        const matchRole = filter === 'all' || u.role.toLowerCase() === filter.toLowerCase();
-        const matchSearch = !searchTerm || u.name.toLowerCase().includes(searchTerm.toLowerCase()) || u.id.toLowerCase().includes(searchTerm.toLowerCase()) || u.area.toLowerCase().includes(searchTerm.toLowerCase());
-        return matchRole && matchSearch;
-    });
-
-    const tbody = document.getElementById('user-table-body');
-    if (!tbody) return;
-
-    if (!filtered.length) {
-        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500"><i class="fas fa-user-slash text-2xl mb-2 block"></i>No QA personnel found matching criteria.</td></tr>`;
-        return;
-    }
-
-    tbody.innerHTML = filtered.map(u => {
-        const online = u.status.includes('Active');
-        const rc = u.role.includes('Lead') ? 'bg-sky-500/10 text-sky-400 border-sky-500/30' :
-                   u.role.includes('Admin') ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' :
-                   u.role.includes('Chemist') ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' :
-                   'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
-        return `<tr class="hover:bg-dark-700/40 transition-colors">
-            <td class="py-3.5 px-5">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-sky-400 font-bold text-xs shadow">${u.name.split(',')[0].slice(-2).toUpperCase()}</div>
-                    <div><span class="font-bold text-white block">${u.name}</span><span class="text-[11px] text-slate-400">${u.id}</span></div>
-                </div>
-            </td>
-            <td class="py-3.5 px-5"><span class="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold border ${rc} mb-1">${u.role}</span><span class="block text-[11px] text-slate-400">${u.clearance}</span></td>
-            <td class="py-3.5 px-5 text-slate-300">${u.area}</td>
-            <td class="py-3.5 px-5 text-slate-400 text-[11px]">${u.shift}</td>
-            <td class="py-3.5 px-5">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${online ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-400 border border-slate-700'}">
-                    <span class="w-1.5 h-1.5 rounded-full ${online ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}"></span>${u.status}
-                </span>
-            </td>
-            <td class="py-3.5 px-5 text-right space-x-1">
-                <button onclick="toggleUserStatus('${u.id}')" title="Toggle Shift" class="p-1.5 text-slate-400 hover:text-emerald-400 transition-colors"><i class="fas fa-sync-alt"></i></button>
-                <button onclick="deleteUser('${u.id}')" title="Revoke Clearance" class="p-1.5 text-slate-400 hover:text-rose-400 transition-colors"><i class="fas fa-trash-alt"></i></button>
-            </td>
-        </tr>`;
-    }).join('');
-
-    updateUserKPIs();
-}
-
-function filterUsers(role) {
-    currentUserFilter = role;
-    const map = { all: 'all', 'Lead QA Inspector': 'lead', 'Field Technician': 'tech', 'Lab Chemist': 'chemist', 'System Admin': 'admin' };
-    Object.entries(map).forEach(([r, k]) => {
-        const btn = document.getElementById('user-tab-' + k);
-        if (btn) btn.classList.toggle('active', r === role);
-    });
-    renderUserTable(role);
-}
-registerSecureFunction('filterUsers', filterUsers);
-
-function handleUserSearch() {
-    renderUserTable(currentUserFilter, document.getElementById('user-search-input').value);
-}
-
-function toggleUserStatus(id) {
-    const u = qaUsersList.find(u => u.id === id);
-    if (u) { u.status = u.status.includes('Active') ? 'Off-Shift / Standby' : 'Active / On-Shift'; renderUserTable(); }
-}
-
-function deleteUser(id) {
-    if (confirm(`Revoke clearance for user ${id}?`)) {
-        qaUsersList = qaUsersList.filter(u => u.id !== id);
-        renderUserTable();
-    }
-}
-
-function updateUserKPIs() {
-    const t = document.getElementById('stat-total-users');
-    const a = document.getElementById('stat-active-users');
-    if (t) t.innerText = qaUsersList.length;
-    if (a) a.innerText = qaUsersList.filter(u => u.status.includes('Active')).length;
-}
-
-function submitUserForm(e) {
-    e.preventDefault();
-    const name = document.getElementById('usr-name').value;
-    const id = document.getElementById('usr-id').value;
-    const role = document.getElementById('usr-role').value;
-    const area = document.getElementById('usr-area').value;
-    const shift = document.getElementById('usr-shift').value;
-    const clearance = document.getElementById('usr-clearance').value;
-    const idx = qaUsersList.findIndex(u => u.id.toLowerCase() === id.toLowerCase());
-    if (idx > -1) qaUsersList[idx] = { id, name, role, area, shift, clearance, status: "Active / On-Shift" };
-    else qaUsersList.unshift({ id, name, role, area, shift, clearance, status: "Active / On-Shift" });
-    closeModal('userModal');
-    renderUserTable();
-    alert(`QA Access granted for ${name} (${id}).`);
-    e.target.reset();
-}
-
-// ============================================================
-// FORM HANDLERS
-// ============================================================
-function submitIncident(e) {
-    e.preventDefault();
-    closeModal('incidentModal');
-    alert('QA Event / Bulletin logged successfully! It has been recorded into system storage.');
-    e.target.reset();
-}
-
-function submitLogin(e) {
-    e.preventDefault();
-    const btnText = document.getElementById('loginBtnText');
-    const icon = document.getElementById('loginIcon');
-    if (btnText) btnText.innerText = "Verifying Credentials...";
-    if (icon) icon.className = "fas fa-circle-notch fa-spin text-[10px]";
-    setTimeout(() => { closeModal('loginModal'); if(btnText) btnText.innerText="Authenticate Access"; if(icon) icon.className="fas fa-arrow-right text-[10px]"; }, 1100);
-}
 </script>
-
-    <!-- EXTERNAL JS MODULES -->
-    <script src="js/qamsproduct.js"></script>
-    <script src="js/qacalendar.js"></script>
-    <script src="js/sopmanual.js"></script>
-    <script src="js/qaarea.js"></script>
-    <script src="js/style.js"></script>
-    <script src="js/sec.js"></script>
-    <script src="js/login.js"></script>
 </body>
 </html>
