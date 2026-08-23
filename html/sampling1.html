@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Sampling 1 Analysis</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0a0f1c; --panel: #131b2e; --panel-2: #1c2740; --line: #2a3752;
+      --text: #f1f5f9; --muted: #8b98b3; --accent: #22d3ee; --accent-2: #0891b2;
+      --violet: #a78bfa; --amber: #fbbf24; --ok: #34d399; --danger: #f87171;
+      --shadow: 0 24px 48px -18px rgba(0, 0, 0, 0.6);
+      --glass: rgba(19, 27, 46, 0.72);
+      --radius-lg: 18px; --radius-md: 12px; --radius-sm: 8px;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(ellipse 900px 500px at 10% -5%, rgba(34,211,238,0.14), transparent 55%),
+                  radial-gradient(ellipse 700px 500px at 95% 15%, rgba(167,139,250,0.08), transparent 55%),
+                  radial-gradient(ellipse 800px 600px at 50% 100%, rgba(52,211,153,0.05), transparent 55%), var(--bg);
+      background-attachment: fixed; color: var(--text); min-height: 100vh; padding-bottom: 96px; -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 1240px; margin: 0 auto; padding: 32px 20px; }
+    
+    .status-strip { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 18px; padding: 8px 14px; background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(148,163,184,0.12); border-radius: 999px; width: fit-content; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 4px rgba(52,211,153,0.15); flex-shrink:0; }
+    .status-dot.offline { background: var(--amber); box-shadow: 0 0 0 4px rgba(251,191,36,0.15); }
+    .status-dot.syncing { background: var(--accent); box-shadow: 0 0 0 4px rgba(34,211,238,0.15); animation: pulse-dot 1.2s ease-in-out infinite; }
+    @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    header.page-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
+    .title-block { display: flex; align-items: center; gap: 14px; }
+    .title-icon { width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0; background: linear-gradient(135deg, rgba(34,211,238,0.18), rgba(8,145,178,0.1)); border: 1px solid rgba(34,211,238,0.25); display: grid; place-items: center; box-shadow: 0 8px 20px -6px rgba(34,211,238,0.3); }
+    .title-icon i { font-size: 22px; color: var(--accent); }
+    h1 { margin: 0 0 4px; font-size: 27px; font-weight: 800; letter-spacing: -0.6px; }
+    .sub { color: var(--muted); font-size: 14px; line-height: 1.5; }
+
+    .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    select.sort-dropdown { padding: 10px 16px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.25); background: rgba(15, 23, 42, 0.75); color: var(--text); outline: none; font-size: 13.5px; font-weight: 500; cursor: pointer; transition: all 0.2s; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 34px; -webkit-appearance: none; appearance: none; }
+    
+    button { border: 0; border-radius: 10px; padding: 10px 16px; font-size: 13.5px; font-weight: 600; cursor: pointer; color: white; background: var(--panel-2); transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; font-family: inherit; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: 0 6px 16px -4px rgba(34, 211, 238, 0.4); color: #04212b; }
+    .btn-edit { background: rgba(34, 211, 238, 0.12); color: #67e8f9; border: 1px solid rgba(34, 211, 238, 0.28); }
+    .btn-edit:hover:not(:disabled) { background: var(--accent); color: #04212b; }
+    .btn-danger { background: rgba(248, 113, 113, 0.12); color: #fca5a5; border: 1px solid rgba(248, 113, 113, 0.28); }
+    .btn-danger:hover:not(:disabled) { background: var(--danger); color: #2b0a0a; }
+    .btn-ghost { background: rgba(255,255,255,0.04); border: 1px solid rgba(148,163,184,0.25); color: var(--text); }
+    .btn-ghost:hover:not(:disabled) { background: rgba(255,255,255,0.08); }
+    button:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.08); }
+    button:active:not(:disabled) { transform: scale(0.97); }
+
+    .card { background: var(--glass); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(148,163,184,0.14); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 22px; }
+    .chart-card-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px 4px; flex-wrap: wrap; gap: 10px; }
+    .chart-card-header h3 { margin: 0; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .chart-card-header h3 i { color: var(--accent); font-size: 14px; }
+    .chart-legend-note { font-size: 12px; color: var(--muted); }
+    .chart-container { padding: 8px 20px 22px; width: 100%; height: 340px; }
+    
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+    .stat-chip { background: var(--glass); border: 1px solid rgba(148,163,184,0.14); border-radius: var(--radius-md); padding: 16px 18px; display: flex; align-items: center; gap: 12px; backdrop-filter: blur(10px); }
+    .stat-chip .icon-box { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; flex-shrink: 0; font-size: 15px; }
+    .stat-chip .val { font-size: 19px; font-weight: 800; line-height: 1.1; }
+    .stat-chip .lbl { font-size: 11.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; margin-top: 2px; }
+    
+    .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; max-height: 700px; overflow-y: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+    th, td { padding: 15px 20px; border-bottom: 1px solid rgba(148,163,184,0.08); text-align: left; vertical-align: middle; white-space: nowrap; }
+    th { background: rgba(10, 15, 28, 0.96); color: #8b98b3; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; position: sticky; top: 0; z-index: 10; box-shadow: 0 1px 0 rgba(148,163,184,0.1); }
+    th i { font-size: 13px; margin-right: 6px; color: var(--accent); }
+    td { font-size: 14px; transition: background 0.15s; }
+    tbody tr:hover td { background: rgba(34, 211, 238, 0.06); }
+    .badge-shift { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.3px; }
+    .shift-1 { background: rgba(167, 139, 250, 0.15); color: #c4b5fd; border: 1px solid rgba(167, 139, 250, 0.3); }
+    .shift-2 { background: rgba(251, 191, 36, 0.15); color: #fde68a; border: 1px solid rgba(251, 191, 36, 0.3); }
+    .shift-3 { background: rgba(251, 146, 60, 0.15); color: #fdba74; border: 1px solid rgba(251, 146, 60, 0.3); }
+    
+    .group-header-row td { padding: 10px 20px; background: rgba(15, 23, 42, 0.65) !important; border-bottom: 1px solid rgba(148,163,184,0.12); }
+    .group-header { display: flex; align-items: center; gap: 10px; }
+    .group-count { font-size: 12px; color: var(--muted); font-weight: 600; }
+    
+    .time-cell { display: flex; flex-direction: column; gap: 1px; }
+    .time-cell .t-main { font-weight: 600; }
+    .time-cell .t-sub { font-size: 11.5px; color: var(--muted); }
+    
+    .actions { display: flex; gap: 8px; }
+    .actions button { padding: 8px 12px; font-size: 12.5px; border-radius: 8px; }
+    
+    .modal-bg { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 100; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .modal-bg.show { opacity: 1; pointer-events: auto; }
+    .modal { width: min(860px, 100%); background: var(--panel); border: 1px solid rgba(148,163,184,0.16); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); max-height: 92vh; overflow: hidden; display: flex; flex-direction: column; transform: translateY(20px) scale(0.97); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    .modal-bg.show .modal { transform: translateY(0) scale(1); }
+    
+    .modal header { padding: 20px 24px; border-bottom: 1px solid rgba(148,163,184,0.1); display: flex; align-items: center; gap: 12px; }
+    .modal header h2 { margin: 0; font-size: 20px; font-weight: 700; }
+    .modal header i { font-size: 20px; color: var(--accent); }
+    .modal .body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+    .modal footer { padding: 16px 24px; border-top: 1px solid rgba(148,163,184,0.1); display: flex; justify-content: flex-end; gap: 12px; background: rgba(10, 15, 28, 0.4); }
+    
+    .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .full { grid-column: 1 / -1; }
+    .section-title { font-size: 13.5px; font-weight: 700; color: var(--accent); border-bottom: 1px solid rgba(34,211,238,0.2); padding-bottom: 6px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
+    input, textarea { width: 100%; padding: 11px 14px; border-radius: 8px; border: 1px solid rgba(148,163,184,0.25); background: rgba(10, 15, 28, 0.8); color: white; font-family: inherit; font-size: 14px; outline: none; transition: all 0.2s; }
+    input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.14); }
+    textarea { min-height: 80px; resize: vertical; }
+    
+    .file-upload-wrapper { position: relative; margin-bottom: 8px; }
+    .file-upload-wrapper input[type="file"] { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+    .file-upload-ui { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: 2px dashed rgba(148,163,184,0.28); border-radius: 8px; background: rgba(10, 15, 28, 0.5); color: var(--muted); font-weight: 500; font-size: 13px; transition: all 0.2s; }
+    .file-upload-wrapper:hover .file-upload-ui { border-color: var(--accent); color: var(--accent); background: rgba(34, 211, 238, 0.05); }
+    .preview { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
+    .preview img { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(148,163,184,0.28); cursor: pointer; }
+    
+    .kv { margin-bottom: 12px; background: rgba(10, 15, 28, 0.45); padding: 12px 15px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.09); }
+    .kv label { margin-bottom: 4px; font-size: 11px; }
+    .kv b { display: block; color: white; font-size: 15.5px; font-weight: 700; }
+    
+    .toast-container { position: fixed; bottom: 32px; right: 32px; display: flex; flex-direction: column; gap: 12px; z-index: 9999; pointer-events: none; }
+    .toast { background: #131b2e; color: white; padding: 15px 22px; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); font-size: 13.5px; font-weight: 500; border-left: 4px solid var(--accent); opacity: 0; transform: translateY(20px) scale(0.95); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 12px; }
+    .toast.show { opacity: 1; transform: translateY(0) scale(1); }
+    .toast.success { border-left-color: var(--ok); }
+    .toast.error { border-left-color: var(--danger); }
+    
+    .fab { display: none; }
+
+    /* Custom Sub-Tabs */
+    .tab-bar { display: flex; gap: 6px; border-bottom: 1px solid rgba(148,163,184,0.1); margin-bottom: 16px; padding-bottom: 8px; overflow-x: auto; scrollbar-width: none; }
+    .tab-bar::-webkit-scrollbar { display: none; }
+    .tab-btn { padding: 10px 16px; background: rgba(255,255,255,0.03); color: var(--muted); border: 1px solid rgba(148,163,184,0.15); border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+    .tab-btn.active { background: var(--accent); color: #04212b; border-color: transparent; }
+
+    @media (max-width: 768px) {
+      .wrap { padding: 16px; }
+      header.page-header { flex-direction: column; align-items: flex-start; gap: 16px; margin-bottom: 20px;}
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .toolbar { width: 100%; justify-content: stretch; }
+      .toolbar > * { flex: 1; text-align: center; justify-content: center; }
+      .toolbar .btn-primary { display: none; }
+      .fab { display: flex; position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; border-radius: 30px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: 0 10px 25px rgba(34, 211, 238, 0.4); align-items: center; justify-content: center; z-index: 90; }
+      .fab i { font-size: 22px; color: #04212b; }
+      .grid, .grid-2 { grid-template-columns: 1fr; }
+      .modal-bg { align-items: flex-end; padding: 0; }
+      .modal { border-radius: 24px 24px 0 0; max-height: 90vh; transform: translateY(100%); width: 100%; }
+      .modal header { justify-content: center;}
+      .modal footer { flex-direction: column-reverse; padding: 20px; }
+      .modal footer button { width: 100%; padding: 16px; font-size: 16px; }
+      .toast-container { bottom: 16px; left: 16px; right: 16px; align-items: center; }
+      .toast { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="status-strip">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">Checking connection…</span>
+    </div>
+
+    <header class="page-header">
+      <div class="title-block">
+        <div class="title-icon"><i class="fa-solid fa-vial"></i></div>
+        <div>
+          <h1>Sampling 1 Division</h1>
+          <div class="sub">Track pH, ORP, Density, and NTU across tanks and scrubbers.</div>
+        </div>
+      </div>
+      <div class="toolbar">
+        <select id="shiftFilter" class="sort-dropdown" onchange="changeShiftFilter()">
+          <option value="all">All Shifts</option>
+          <option value="1st Shift">1st Shift</option>
+          <option value="2nd Shift">2nd Shift</option>
+          <option value="3rd Shift">3rd Shift</option>
+        </select>
+        <button class="btn-ghost" type="button" onclick="exportXls()">
+          <i class="fa-solid fa-download"></i> Export XLS
+        </button>
+        <button class="btn-ghost" type="button" onclick="window.history.back()">
+          <i class="fa-solid fa-arrow-left"></i> Back to O₂
+        </button>
+        <button class="btn-primary" type="button" onclick="openForm()">
+          <i class="fa-solid fa-circle-plus"></i> Add Reading
+        </button>
+      </div>
+    </header>
+
+    <!-- Quick Stats -->
+    <div class="stats-row" id="statsRow" style="display:none;">
+      <div class="stat-chip">
+        <div class="icon-box" style="background:rgba(34,211,238,0.14); color:var(--accent)"><i class="fa-solid fa-vial"></i></div>
+        <div><div class="val" id="statTk08">–</div><div class="lbl">Latest 105TK08 pH</div></div>
+      </div>
+      <div class="stat-chip">
+        <div class="icon-box" style="background:rgba(251,191,36,0.14); color:var(--amber)"><i class="fa-solid fa-droplet"></i></div>
+        <div><div class="val" id="statNtu">–</div><div class="lbl">Avg NTU (1A-1F)</div></div>
+      </div>
+      <div class="stat-chip">
+        <div class="icon-box" style="background:rgba(167,139,250,0.14); color:var(--violet)"><i class="fa-solid fa-flask"></i></div>
+        <div><div class="val" id="statScrubpH">–</div><div class="lbl">Avg Scrubber pH</div></div>
+      </div>
+      <div class="stat-chip">
+        <div class="icon-box" style="background:rgba(52,211,153,0.14); color:var(--ok)"><i class="fa-solid fa-list-ol"></i></div>
+        <div><div class="val" id="statCount">–</div><div class="lbl">Total Readings</div></div>
+      </div>
+    </div>
+
+    <!-- Trend Graph Card -->
+    <div class="card" id="chartCard" style="display: none;">
+      <div class="chart-card-header">
+        <h3><i class="fa-solid fa-chart-line"></i> Trend Analysis</h3>
+        <span class="chart-legend-note" id="chartNote">Hover a point to see the exact reading time</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="trendChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Data Table Card -->
+    <div class="card">
+      <div class="chart-card-header">
+        <h3><i class="fa-solid fa-table-list"></i> Sampling Log</h3>
+        <span class="chart-legend-note" id="tableSubtitle"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th><i class="fa-regular fa-clock"></i> Reading Time</th>
+              <th><i class="fa-solid fa-cloud-sun"></i> Shift</th>
+              <th><i class="fa-solid fa-vial"></i> 105TK08 (pH/ORP/Den)</th>
+              <th><i class="fa-solid fa-droplet"></i> 106FT01A NTU</th>
+              <th><i class="fa-solid fa-flask"></i> Scrubber 2 (pH/ORP)</th>
+              <th style="text-align: center;"><i class="fa-solid fa-wrench"></i> Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr><td colspan="6" style="text-align: center; padding: 60px; color: var(--muted);"><i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 12px; display: block;"></i>Loading records...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <button class="fab" onclick="openForm()" aria-label="Add reading"><i class="fa-solid fa-plus"></i></button>
+
+  <!-- ADD / EDIT FORM MODAL -->
+  <div class="modal-bg" id="formModal">
+    <div class="modal">
+      <header>
+        <i class="fa-solid fa-pen-to-square"></i>
+        <h2 id="formTitle">Add Sampling Reading</h2>
+      </header>
+      <div class="body">
+        <form id="recordForm">
+          <input type="hidden" id="recordId" />
+          
+          <div style="margin-bottom: 16px;">
+            <label for="readingTime"><i class="fa-regular fa-clock"></i> Time of Reading</label>
+            <input id="readingTime" type="datetime-local" required />
+          </div>
+
+          <!-- Tabs for Sections -->
+          <div class="tab-bar">
+            <button type="button" class="tab-btn active" id="add-tab-btn-1" onclick="switchAddTab(1)">105 Tanks</button>
+            <button type="button" class="tab-btn" id="add-tab-btn-2" onclick="switchAddTab(2)">106 Tanks & TH01</button>
+            <button type="button" class="tab-btn" id="add-tab-btn-3" onclick="switchAddTab(3)">106FT01 Filters</button>
+            <button type="button" class="tab-btn" id="add-tab-btn-4" onclick="switchAddTab(4)">Scrubbers</button>
+          </div>
+
+          <!-- TAB 1: 105 Tanks -->
+          <div id="add-tab-1" style="display:block;">
+            <div class="grid">
+              <div class="full section-title">105TK02</div>
+              <div><label>pH</label><input type="number" step="any" id="tk105_02_ph"></div>
+              <div><label>ORP</label><input type="number" step="any" id="tk105_02_orp"></div>
+              <div></div>
+
+              <div class="full section-title">105TK03</div>
+              <div><label>pH</label><input type="number" step="any" id="tk105_03_ph"></div>
+              <div><label>ORP</label><input type="number" step="any" id="tk105_03_orp"></div>
+              <div></div>
+
+              <div class="full section-title">105TK05</div>
+              <div><label>pH</label><input type="number" step="any" id="tk105_05_ph"></div>
+              <div><label>ORP</label><input type="number" step="any" id="tk105_05_orp"></div>
+              <div></div>
+
+              <div class="full section-title">105TK08</div>
+              <div><label>pH</label><input type="number" step="any" id="tk105_08_ph"></div>
+              <div><label>ORP</label><input type="number" step="any" id="tk105_08_orp"></div>
+              <div><label>Density</label><input type="number" step="any" id="tk105_08_den"></div>
+
+              <div class="full section-title">105TK13</div>
+              <div><label>pH</label><input type="number" step="any" id="tk105_13_ph"></div>
+              <div><label>ORP</label><input type="number" step="any" id="tk105_13_orp"></div>
+              <div><label>Density</label><input type="number" step="any" id="tk105_13_den"></div>
+            </div>
+          </div>
+
+          <!-- TAB 2: 106 Tanks & TH01 -->
+          <div id="add-tab-2" style="display:none;">
+            <div class="grid">
+              <div class="full section-title">106TK14</div>
+              <div><label>pH</label><input type="number" step="any" id="tk106_14_ph"></div>
+              <div><label>ORP</label><input type="number" step="any" id="tk106_14_orp"></div>
+              <div></div>
+
+              <div class="full section-title">106TK18</div>
+              <div><label>Density</label><input type="number" step="any" id="tk106_18_den"></div>
+              <div class="full"></div>
+
+              <div class="full section-title">106TH01</div>
+              <div><label>pH</label><input type="number" step="any" id="th106_01_ph"></div>
+              <div><label>ORP</label><input type="number" step="any" id="th106_01_orp"></div>
+              <div><label>Density</label><input type="number" step="any" id="th106_01_den"></div>
+            </div>
+          </div>
+
+          <!-- TAB 3: Filters A-F -->
+          <div id="add-tab-3" style="display:none;">
+            <div class="grid-2">
+              <div>
+                <div class="section-title">106FT01A</div>
+                <label>NTU Reading</label><input type="number" step="any" id="ft106_1a_ntu">
+                <div class="file-upload-wrapper" style="margin-top:8px;">
+                  <input type="file" accept="image/*" onchange="handlePhoto(event, 'a')" />
+                  <div class="file-upload-ui"><i class="fa-solid fa-camera"></i> Attach Photo</div>
+                </div>
+                <div class="preview" id="prev-a" hidden><img id="img-a"><button type="button" class="btn-ghost" style="padding:4px 8px;" onclick="removePhoto('a')"><i class="fa-solid fa-xmark"></i></button></div>
+              </div>
+              
+              <div>
+                <div class="section-title">106FT01B</div>
+                <label>NTU Reading</label><input type="number" step="any" id="ft106_1b_ntu">
+                <div class="file-upload-wrapper" style="margin-top:8px;">
+                  <input type="file" accept="image/*" onchange="handlePhoto(event, 'b')" />
+                  <div class="file-upload-ui"><i class="fa-solid fa-camera"></i> Attach Photo</div>
+                </div>
+                <div class="preview" id="prev-b" hidden><img id="img-b"><button type="button" class="btn-ghost" style="padding:4px 8px;" onclick="removePhoto('b')"><i class="fa-solid fa-xmark"></i></button></div>
+              </div>
+
+              <div>
+                <div class="section-title">106FT01C</div>
+                <label>NTU Reading</label><input type="number" step="any" id="ft106_1c_ntu">
+                <div class="file-upload-wrapper" style="margin-top:8px;">
+                  <input type="file" accept="image/*" onchange="handlePhoto(event, 'c')" />
+                  <div class="file-upload-ui"><i class="fa-solid fa-camera"></i> Attach Photo</div>
+                </div>
+                <div class="preview" id="prev-c" hidden><img id="img-c"><button type="button" class="btn-ghost" style="padding:4px 8px;" onclick="removePhoto('c')"><i class="fa-solid fa-xmark"></i></button></div>
+              </div>
+
+              <div>
+                <div class="section-title">106FT01D</div>
+                <label>NTU Reading</label><input type="number" step="any" id="ft106_1d_ntu">
+                <div class="file-upload-wrapper" style="margin-top:8px;">
+                  <input type="file" accept="image/*" onchange="handlePhoto(event, 'd')" />
+                  <div class="file-upload-ui"><i class="fa-solid fa-camera"></i> Attach Photo</div>
+                </div>
+                <div class="preview" id="prev-d" hidden><img id="img-d"><button type="button" class="btn-ghost" style="padding:4px 8px;" onclick="removePhoto('d')"><i class="fa-solid fa-xmark"></i></button></div>
+              </div>
+
+              <div>
+                <div class="section-title">106FT01E</div>
+                <label>NTU Reading</label><input type="number" step="any" id="ft106_1e_ntu">
+                <div class="file-upload-wrapper" style="margin-top:8px;">
+                  <input type="file" accept="image/*" onchange="handlePhoto(event, 'e')" />
+                  <div class="file-upload-ui"><i class="fa-solid fa-camera"></i> Attach Photo</div>
+                </div>
+                <div class="preview" id="prev-e" hidden><img id="img-e"><button type="button" class="btn-ghost" style="padding:4px 8px;" onclick="removePhoto('e')"><i class="fa-solid fa-xmark"></i></button></div>
+              </div>
+
+              <div>
+                <div class="section-title">106FT01F</div>
+                <label>NTU Reading</label><input type="number" step="any" id="ft106_1f_ntu">
+                <div class="file-upload-wrapper" style="margin-top:8px;">
+                  <input type="file" accept="image/*" onchange="handlePhoto(event, 'f')" />
+                  <div class="file-upload-ui"><i class="fa-solid fa-camera"></i> Attach Photo</div>
+                </div>
+                <div class="preview" id="prev-f" hidden><img id="img-f"><button type="button" class="btn-ghost" style="padding:4px 8px;" onclick="removePhoto('f')"><i class="fa-solid fa-xmark"></i></button></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 4: Scrubbers -->
+          <div id="add-tab-4" style="display:none;">
+            <div class="grid">
+              <div class="full section-title">Scrubber 2</div>
+              <div><label>Lab pH</label><input type="number" step="any" id="scrub2_ph"></div>
+              <div><label>Lab ORP</label><input type="number" step="any" id="scrub2_orp"></div>
+              <div class="full" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div><label>Field pH</label><input type="number" step="any" id="scrub2_fph"></div>
+                <div><label>Field ORP</label><input type="number" step="any" id="scrub2_forp"></div>
+              </div>
+
+              <div class="full section-title">Scrubber 3</div>
+              <div><label>Lab pH</label><input type="number" step="any" id="scrub3_ph"></div>
+              <div><label>Lab ORP</label><input type="number" step="any" id="scrub3_orp"></div>
+              <div class="full" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div><label>Field pH</label><input type="number" step="any" id="scrub3_fph"></div>
+                <div><label>Field ORP</label><input type="number" step="any" id="scrub3_forp"></div>
+              </div>
+
+              <div class="full section-title">Scrubber 4</div>
+              <div><label>Lab pH</label><input type="number" step="any" id="scrub4_ph"></div>
+              <div><label>Lab ORP</label><input type="number" step="any" id="scrub4_orp"></div>
+              <div class="full" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div><label>Field pH</label><input type="number" step="any" id="scrub4_fph"></div>
+                <div><label>Field ORP</label><input type="number" step="any" id="scrub4_forp"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div style="margin-top: 16px;">
+            <label for="notes"><i class="fa-solid fa-align-left"></i> Additional Notes</label>
+            <textarea id="notes" placeholder="Any anomalies or remarks..."></textarea>
+          </div>
+        </form>
+      </div>
+      <footer>
+        <button class="btn-ghost" type="button" onclick="closeModals()">Cancel</button>
+        <button id="saveBtn" class="btn-primary" type="button" onclick="saveRecord()"><i class="fa-solid fa-floppy-disk"></i> Save Reading</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- VIEW DETAILS MODAL -->
+  <div class="modal-bg" id="viewModal">
+    <div class="modal">
+      <header>
+        <i class="fa-regular fa-file-lines"></i>
+        <h2>Reading Details</h2>
+      </header>
+      <div class="body" id="viewBody"></div>
+      <footer>
+        <button class="btn-ghost" type="button" onclick="closeModals()">Close Window</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script>
+    const API_ENDPOINT = "https://ep-fancy-dust-ay2kj4fo.apirest.c-5.us-east-2.aws.neon.tech/neondb/rest/v1/sampling1_records";
+    const STORAGE_KEY = "sampling1_records_v1";
+    const PENDING_KEY = "sampling1_pending_ops_v1";
+
+    let records = loadLocal();
+    let pendingOps = loadPending();
+    
+    // Hold up to 6 base64 photos
+    let photos = { a:null, b:null, c:null, d:null, e:null, f:null };
+    
+    let chartInstance = null;
+    let currentSort = "desc";
+    let currentShiftFilter = "all";
+
+    // Tab Logic
+    function switchAddTab(tabId) {
+      for(let i=1; i<=4; i++) {
+        document.getElementById(`add-tab-${i}`).style.display = i === tabId ? 'block' : 'none';
+        document.getElementById(`add-tab-btn-${i}`).className = i === tabId ? 'tab-btn active' : 'tab-btn';
+      }
+    }
+    window.switchViewTab = function(tabId) {
+      for(let i=1; i<=4; i++) {
+        document.getElementById(`view-tab-${i}`).style.display = i === tabId ? 'block' : 'none';
+        document.getElementById(`view-tab-btn-${i}`).className = i === tabId ? 'tab-btn active' : 'tab-btn';
+      }
+    };
+
+    function calculateShift(dateString) {
+      const h = new Date(dateString).getHours();
+      if (h >= 7 && h < 15) return '2nd Shift';
+      if (h >= 15 && h < 23) return '3rd Shift';
+      return '1st Shift';
+    }
+
+    function getShiftClass(shiftStr) {
+      if (shiftStr === '1st Shift') return 'shift-1';
+      if (shiftStr === '2nd Shift') return 'shift-2';
+      return 'shift-3';
+    }
+
+    function changeSort() { currentSort = document.getElementById("sortToggle").value; render(); }
+    function changeShiftFilter() { currentShiftFilter = document.getElementById("shiftFilter").value; render(); }
+
+    function getFilteredRecords() {
+      if (currentShiftFilter === "all") return records.slice();
+      return records.filter(r => (r.shift || calculateShift(r.readingTime)) === currentShiftFilter);
+    }
+
+    function showToast(message, type = "info") {
+      const container = document.getElementById("toastContainer");
+      const toast = document.createElement("div");
+      toast.className = `toast ${type}`;
+      toast.innerHTML = type === 'success' ? `<i class="fa-regular fa-circle-check" style="font-size:20px; color:var(--ok)"></i> ${message}` : type === 'error' ? `<i class="fa-solid fa-triangle-exclamation" style="font-size:20px; color:var(--danger)"></i> ${message}` : `<i class="fa-solid fa-circle-info" style="font-size:20px; color:var(--accent)"></i> ${message}`;
+      container.appendChild(toast);
+      requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add("show")));
+      setTimeout(() => { toast.classList.remove("show"); setTimeout(() => toast.remove(), 400); }, 3500);
+    }
+
+    function setStatus(state, text) {
+      const dot = document.getElementById("statusDot");
+      const label = document.getElementById("statusText");
+      dot.className = "status-dot" + (state === "offline" ? " offline" : state === "syncing" ? " syncing" : "");
+      label.textContent = text;
+    }
+
+    function loadLocal() { try { const stored = localStorage.getItem(STORAGE_KEY); return stored ? JSON.parse(stored) : []; } catch { return []; } }
+    function persistLocal() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); } catch (e) { console.warn("Local persist failed", e); } }
+    function loadPending() { try { const stored = localStorage.getItem(PENDING_KEY); return stored ? JSON.parse(stored) : []; } catch { return []; } }
+    function persistPending() { try { localStorage.setItem(PENDING_KEY, JSON.stringify(pendingOps)); } catch (e) { console.warn("Pending queue persist failed", e); } }
+    function queueOp(op) { pendingOps = pendingOps.filter(o => o.id !== op.id); pendingOps.push(op); persistPending(); }
+
+    async function syncRecords() {
+      setStatus("syncing", "Syncing…");
+      try {
+        await flushPendingOps();
+        const res = await fetch(API_ENDPOINT);
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          const merged = new Map();
+          data.forEach(r => merged.set(r.id, r));
+          records.forEach(r => { if (!merged.has(r.id)) merged.set(r.id, r); });
+          pendingOps.forEach(op => { if (op.type === 'delete') merged.delete(op.id); });
+          pendingOps.forEach(op => { if (op.type === 'upsert') merged.set(op.id, op.payload); });
+          records = Array.from(merged.values());
+          persistLocal();
+        }
+        setStatus("online", pendingOps.length ? `Online · ${pendingOps.length} change(s) pending` : "Online · data saved to server");
+      } catch (err) {
+        setStatus("offline", "Offline · working from local data");
+      } finally {
+        render();
+      }
+    }
+
+    async function flushPendingOps() {
+      if (!pendingOps.length) return;
+      const remaining = [];
+      for (const op of pendingOps) {
+        try {
+          if (op.type === 'upsert') {
+            const url = op.isEdit ? `${API_ENDPOINT}?id=eq.${op.id}` : API_ENDPOINT;
+            const res = await fetch(url, { method: op.isEdit ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json', 'Prefer': 'return=representation' }, body: JSON.stringify(op.isEdit ? op.payload : [op.payload]) });
+            if (!res.ok) throw new Error("sync failed");
+          } else if (op.type === 'delete') {
+            const res = await fetch(`${API_ENDPOINT}?id=eq.${op.id}`, { method: 'DELETE' });
+            if (!res.ok) throw new Error("sync failed");
+          }
+        } catch { remaining.push(op); }
+      }
+      pendingOps = remaining;
+      persistPending();
+    }
+
+    window.addEventListener('online', syncRecords);
+    window.addEventListener('offline', () => setStatus("offline", "Offline · working from local data"));
+    setInterval(() => { if (pendingOps.length) syncRecords(); }, 30000);
+    syncRecords();
+
+    function compressImage(file, maxSize = 600) { // Reduced max size since we have 6 images
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            try {
+              const canvas = document.createElement("canvas");
+              let { width, height } = img;
+              if (width > height && width > maxSize) { height *= maxSize / width; width = maxSize; }
+              else if (height > maxSize) { width *= maxSize / height; height = maxSize; }
+              canvas.width = width; canvas.height = height;
+              canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+              resolve(canvas.toDataURL("image/jpeg", 0.6));
+            } catch (err) { reject(err); }
+          };
+          img.onerror = reject; img.src = e.target.result;
+        };
+        reader.onerror = reject; reader.readAsDataURL(file);
+      });
+    }
+
+    async function handlePhoto(e, filterLetter) {
+      const file = e.target.files[0];
+      if (!file) return;
+      showToast("Optimizing image...", "info");
+      try {
+        const compressed = await compressImage(file);
+        photos[filterLetter] = compressed;
+        document.getElementById(`img-${filterLetter}`).src = compressed;
+        document.getElementById(`prev-${filterLetter}`).hidden = false;
+        showToast("Image attached", "success");
+      } catch (err) { showToast("Error processing image", "error"); }
+    }
+
+    function removePhoto(filterLetter) { 
+      photos[filterLetter] = null; 
+      // Need to find the input sibling. The structure is fixed so we can cheat:
+      const container = document.getElementById(`prev-${filterLetter}`).previousElementSibling;
+      container.querySelector('input[type="file"]').value = "";
+      document.getElementById(`prev-${filterLetter}`).hidden = true; 
+    }
+
+    function formatTime(val) { const d = new Date(val); return Number.isNaN(d.getTime()) ? val : d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    function formatTimeShort(val) { const d = new Date(val); return Number.isNaN(d.getTime()) ? val : d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }); }
+    function formatDateShort(val) { const d = new Date(val); return Number.isNaN(d.getTime()) ? val : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); }
+    function escapeHtml(val) { return val === null || val === undefined || val === "" ? "-" : String(val).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;"); }
+
+    function updateStats(sortedRecords) {
+      const statsRow = document.getElementById("statsRow");
+      if (!sortedRecords.length) { statsRow.style.display = "none"; return; }
+      statsRow.style.display = "grid";
+      
+      const latest = sortedRecords.slice().sort((a, b) => new Date(b.readingTime) - new Date(a.readingTime))[0];
+      
+      // Calculate averages from latest
+      const ntus = [latest.ft106_1a_ntu, latest.ft106_1b_ntu, latest.ft106_1c_ntu, latest.ft106_1d_ntu, latest.ft106_1e_ntu, latest.ft106_1f_ntu].filter(v => v !== null && v !== undefined);
+      const avgNtu = ntus.length ? (ntus.reduce((a,b)=>a+b,0)/ntus.length).toFixed(2) : '-';
+      
+      const scrubPHs = [latest.scrub2_ph, latest.scrub3_ph, latest.scrub4_ph].filter(v => v !== null && v !== undefined);
+      const avgScrubPh = scrubPHs.length ? (scrubPHs.reduce((a,b)=>a+b,0)/scrubPHs.length).toFixed(2) : '-';
+
+      document.getElementById("statTk08").textContent = latest.tk105_08_ph ?? '-';
+      document.getElementById("statNtu").textContent = avgNtu;
+      document.getElementById("statScrubpH").textContent = avgScrubPh;
+      document.getElementById("statCount").textContent = sortedRecords.length;
+    }
+
+    function renderChart(sortedData) {
+      const chartCard = document.getElementById("chartCard");
+      if (sortedData.length === 0) { chartCard.style.display = "none"; return; }
+      chartCard.style.display = "block";
+
+      const chronData = [...sortedData].sort((a, b) => new Date(a.readingTime) - new Date(b.readingTime));
+      const labels = chronData.map(r => [formatDateShort(r.readingTime), formatTimeShort(r.readingTime)]);
+      const fullTimes = chronData.map(r => formatTime(r.readingTime));
+
+      const datasets = [
+        { label: '105TK08 pH', data: chronData.map(r => r.tk105_08_ph || null), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true },
+        { label: '106FT01A NTU', data: chronData.map(r => r.ft106_1a_ntu || null), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true },
+        { label: 'Scrubber 2 pH', data: chronData.map(r => r.scrub2_ph || null), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true },
+        { label: 'Scrubber 3 pH', data: chronData.map(r => r.scrub3_ph || null), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true }
+      ];
+
+      const ctx = document.getElementById('trendChart').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: { labels: labels, datasets: datasets },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { labels: { color: '#e2e8f0', font: { family: 'Inter', size: 12, weight: '600' }, usePointStyle: true, padding: 16 } },
+            tooltip: { backgroundColor: 'rgba(10,15,28,0.95)', titleColor: '#fff', bodyColor: '#cbd5e1', padding: 12, borderRadius: 10, borderColor: 'rgba(148,163,184,0.2)', borderWidth: 1, callbacks: { title: (items) => fullTimes[items[0].dataIndex] } }
+          },
+          scales: {
+            x: { ticks: { color: '#8b98b3', font: { size: 11 } }, grid: { color: 'rgba(148, 163, 184, 0.04)' } },
+            y: { ticks: { color: '#8b98b3', font: { size: 11 } }, grid: { color: 'rgba(148, 163, 184, 0.08)' } }
+          }
+        }
+      });
+    }
+
+    function render() {
+      const tbody = document.getElementById("tbody");
+      const tableSubtitle = document.getElementById("tableSubtitle");
+      tbody.innerHTML = "";
+
+      const filteredRecords = getFilteredRecords();
+      if (!filteredRecords.length) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 60px; color: var(--muted);"><i class="fa-regular fa-folder-open" style="font-size:30px; margin-bottom:10px; display:block"></i>No records found</td></tr>`;
+        tableSubtitle.textContent = "0 readings"; document.getElementById("chartCard").style.display = "none"; document.getElementById("statsRow").style.display = "none";
+        return;
+      }
+
+      const sortedRecords = filteredRecords.slice().sort((a, b) => {
+        const ta = new Date(a.readingTime).getTime(), tb = new Date(b.readingTime).getTime();
+        return currentSort === "desc" ? tb - ta : ta - tb;
+      });
+
+      tableSubtitle.textContent = `${sortedRecords.length} reading${sortedRecords.length !== 1 ? 's' : ''} · ${currentShiftFilter === "all" ? "all shifts" : currentShiftFilter}`;
+      renderChart(sortedRecords);
+      updateStats(sortedRecords);
+
+      function buildRow(rec) {
+        const shiftStr = rec.shift || calculateShift(rec.readingTime);
+        const tr = document.createElement("tr");
+        
+        const tk08_summary = [rec.tk105_08_ph, rec.tk105_08_orp, rec.tk105_08_den].map(v => v??'-').join(' / ');
+        const s2_summary = [rec.scrub2_ph, rec.scrub2_orp].map(v => v??'-').join(' / ');
+
+        tr.innerHTML = `
+          <td><div class="time-cell"><span class="t-main">${escapeHtml(formatDateShort(rec.readingTime))}</span><span class="t-sub">${escapeHtml(formatTimeShort(rec.readingTime))}</span></div></td>
+          <td><span class="badge-shift ${getShiftClass(shiftStr)}">${shiftStr}</span></td>
+          <td><b>${tk08_summary}</b></td>
+          <td><strong style="color:var(--ok); font-size:15px;">${escapeHtml(rec.ft106_1a_ntu)}</strong></td>
+          <td><strong style="color:var(--violet); font-size:15px;">${s2_summary}</strong></td>
+          <td style="text-align: center;">
+            <div class="actions" style="justify-content: center;">
+              <button class="btn-ghost" type="button" onclick="viewRecord('${rec.id}')" title="View"><i class="fa-solid fa-eye"></i></button>
+              <button class="btn-edit" type="button" onclick="openForm('${rec.id}')" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button class="btn-danger" type="button" onclick="deleteRecord('${rec.id}')" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+          </td>`;
+        return tr;
+      }
+
+      if (currentShiftFilter === "all") {
+        ["1st Shift", "2nd Shift", "3rd Shift"].forEach(shiftLabel => {
+          const group = sortedRecords.filter(r => (r.shift || calculateShift(r.readingTime)) === shiftLabel);
+          if (!group.length) return;
+          const tr = document.createElement("tr"); tr.className = "group-header-row";
+          tr.innerHTML = `<td colspan="6"><div class="group-header"><span class="badge-shift ${getShiftClass(shiftLabel)}">${shiftLabel}</span><span class="group-count">${group.length} reading${group.length !== 1 ? 's' : ''}</span></div></td>`;
+          tbody.appendChild(tr);
+          group.forEach(rec => tbody.appendChild(buildRow(rec)));
+        });
+      } else {
+        sortedRecords.forEach(rec => tbody.appendChild(buildRow(rec)));
+      }
+    }
+
+    // Helper to safely get value or null instead of NaN
+    function getNum(id) {
+      const val = parseFloat(document.getElementById(id).value);
+      return isNaN(val) ? null : val;
+    }
+
+    function openForm(id) {
+      const form = document.getElementById("recordForm"); form.reset(); 
+      photos = { a:null, b:null, c:null, d:null, e:null, f:null };
+      ['a','b','c','d','e','f'].forEach(l => document.getElementById(`prev-${l}`).hidden = true);
+      
+      document.getElementById("recordId").value = "";
+      document.getElementById("formTitle").textContent = id ? "Edit Reading" : "Add Sampling Reading";
+      switchAddTab(1);
+
+      if (id) {
+        const rec = records.find(r => r.id === id); if (!rec) return;
+        document.getElementById("recordId").value = rec.id;
+        document.getElementById("readingTime").value = rec.readingTime;
+        
+        // 105s
+        document.getElementById("tk105_02_ph").value = rec.tk105_02_ph ?? ""; document.getElementById("tk105_02_orp").value = rec.tk105_02_orp ?? "";
+        document.getElementById("tk105_03_ph").value = rec.tk105_03_ph ?? ""; document.getElementById("tk105_03_orp").value = rec.tk105_03_orp ?? "";
+        document.getElementById("tk105_05_ph").value = rec.tk105_05_ph ?? ""; document.getElementById("tk105_05_orp").value = rec.tk105_05_orp ?? "";
+        document.getElementById("tk105_08_ph").value = rec.tk105_08_ph ?? ""; document.getElementById("tk105_08_orp").value = rec.tk105_08_orp ?? ""; document.getElementById("tk105_08_den").value = rec.tk105_08_den ?? "";
+        document.getElementById("tk105_13_ph").value = rec.tk105_13_ph ?? ""; document.getElementById("tk105_13_orp").value = rec.tk105_13_orp ?? ""; document.getElementById("tk105_13_den").value = rec.tk105_13_den ?? "";
+        
+        // 106s
+        document.getElementById("tk106_14_ph").value = rec.tk106_14_ph ?? ""; document.getElementById("tk106_14_orp").value = rec.tk106_14_orp ?? "";
+        document.getElementById("tk106_18_den").value = rec.tk106_18_den ?? "";
+        document.getElementById("th106_01_ph").value = rec.th106_01_ph ?? ""; document.getElementById("th106_01_orp").value = rec.th106_01_orp ?? ""; document.getElementById("th106_01_den").value = rec.th106_01_den ?? "";
+        
+        // Filters
+        ['a','b','c','d','e','f'].forEach(l => {
+          document.getElementById(`ft106_1${l}_ntu`).value = rec[`ft106_1${l}_ntu`] ?? "";
+          if (rec[`ft106_1${l}_photo`]) {
+            photos[l] = rec[`ft106_1${l}_photo`];
+            document.getElementById(`img-${l}`).src = photos[l];
+            document.getElementById(`prev-${l}`).hidden = false;
+          }
+        });
+
+        // Scrubbers
+        document.getElementById("scrub2_ph").value = rec.scrub2_ph ?? ""; document.getElementById("scrub2_orp").value = rec.scrub2_orp ?? ""; document.getElementById("scrub2_fph").value = rec.scrub2_fph ?? ""; document.getElementById("scrub2_forp").value = rec.scrub2_forp ?? "";
+        document.getElementById("scrub3_ph").value = rec.scrub3_ph ?? ""; document.getElementById("scrub3_orp").value = rec.scrub3_orp ?? ""; document.getElementById("scrub3_fph").value = rec.scrub3_fph ?? ""; document.getElementById("scrub3_forp").value = rec.scrub3_forp ?? "";
+        document.getElementById("scrub4_ph").value = rec.scrub4_ph ?? ""; document.getElementById("scrub4_orp").value = rec.scrub4_orp ?? ""; document.getElementById("scrub4_fph").value = rec.scrub4_fph ?? ""; document.getElementById("scrub4_forp").value = rec.scrub4_forp ?? "";
+        
+        document.getElementById("notes").value = rec.notes || "";
+      } else {
+        const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById("readingTime").value = now.toISOString().slice(0, 16);
+      }
+      document.getElementById("formModal").classList.add("show");
+    }
+
+    async function saveRecord() {
+      const form = document.getElementById("recordForm");
+      if (!form.checkValidity()) { form.reportValidity(); return; }
+
+      const saveBtn = document.getElementById("saveBtn"); saveBtn.classList.add("btn-loading");
+      const readingTimeStr = document.getElementById("readingTime").value;
+      const id = document.getElementById("recordId").value || crypto.randomUUID();
+      
+      const payload = {
+        id, readingTime: readingTimeStr, shift: calculateShift(readingTimeStr),
+        
+        tk105_02_ph: getNum("tk105_02_ph"), tk105_02_orp: getNum("tk105_02_orp"),
+        tk105_03_ph: getNum("tk105_03_ph"), tk105_03_orp: getNum("tk105_03_orp"),
+        tk105_05_ph: getNum("tk105_05_ph"), tk105_05_orp: getNum("tk105_05_orp"),
+        tk105_08_ph: getNum("tk105_08_ph"), tk105_08_orp: getNum("tk105_08_orp"), tk105_08_den: getNum("tk105_08_den"),
+        tk105_13_ph: getNum("tk105_13_ph"), tk105_13_orp: getNum("tk105_13_orp"), tk105_13_den: getNum("tk105_13_den"),
+        
+        tk106_14_ph: getNum("tk106_14_ph"), tk106_14_orp: getNum("tk106_14_orp"),
+        tk106_18_den: getNum("tk106_18_den"),
+        th106_01_ph: getNum("th106_01_ph"), th106_01_orp: getNum("th106_01_orp"), th106_01_den: getNum("th106_01_den"),
+        
+        ft106_1a_ntu: getNum("ft106_1a_ntu"), ft106_1a_photo: photos.a,
+        ft106_1b_ntu: getNum("ft106_1b_ntu"), ft106_1b_photo: photos.b,
+        ft106_1c_ntu: getNum("ft106_1c_ntu"), ft106_1c_photo: photos.c,
+        ft106_1d_ntu: getNum("ft106_1d_ntu"), ft106_1d_photo: photos.d,
+        ft106_1e_ntu: getNum("ft106_1e_ntu"), ft106_1e_photo: photos.e,
+        ft106_1f_ntu: getNum("ft106_1f_ntu"), ft106_1f_photo: photos.f,
+        
+        scrub2_ph: getNum("scrub2_ph"), scrub2_orp: getNum("scrub2_orp"), scrub2_fph: getNum("scrub2_fph"), scrub2_forp: getNum("scrub2_forp"),
+        scrub3_ph: getNum("scrub3_ph"), scrub3_orp: getNum("scrub3_orp"), scrub3_fph: getNum("scrub3_fph"), scrub3_forp: getNum("scrub3_forp"),
+        scrub4_ph: getNum("scrub4_ph"), scrub4_orp: getNum("scrub4_orp"), scrub4_fph: getNum("scrub4_fph"), scrub4_forp: getNum("scrub4_forp"),
+        
+        notes: document.getElementById("notes").value
+      };
+
+      const isEdit = !!document.getElementById("recordId").value;
+      const idx = records.findIndex(r => r.id === id);
+      if (idx >= 0) records[idx] = payload; else records.push(payload);
+
+      if (currentShiftFilter !== "all" && currentShiftFilter !== payload.shift) {
+        currentShiftFilter = "all"; document.getElementById("shiftFilter").value = "all";
+      }
+
+      persistLocal(); render(); closeModals(); saveBtn.classList.remove("btn-loading");
+
+      const url = isEdit ? `${API_ENDPOINT}?id=eq.${id}` : API_ENDPOINT;
+      try {
+        const res = await fetch(url, { method: isEdit ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json', 'Prefer': 'return=representation' }, body: JSON.stringify(isEdit ? payload : [payload]) });
+        if (!res.ok) throw new Error("API Save failed");
+        showToast("Saved securely to server!", "success");
+        setStatus("online", pendingOps.length ? `Online · ${pendingOps.length} change(s) pending` : "Online · data saved to server");
+      } catch (err) {
+        queueOp({ type: 'upsert', id, payload, isEdit });
+        showToast("Saved locally — will sync when back online", "info");
+        setStatus("offline", `Offline · ${pendingOps.length} change(s) pending`);
+      }
+    }
+
+    function viewRecord(id) {
+      const rec = records.find(r => r.id === id); if (!rec) return;
+      const shiftStr = rec.shift || calculateShift(rec.readingTime);
+      
+      const imgPlaceholder = `<div style="width:100%; aspect-ratio:1; border-radius:6px; background:rgba(10,15,28,0.5); display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--muted); border:1px dashed rgba(148,163,184,0.28)"><i class="fa-regular fa-image" style="font-size:20px; margin-bottom:4px"></i>No Image</div>`;
+      
+      document.getElementById("viewBody").innerHTML = `
+        <div style="display:flex; gap:12px; margin-bottom: 16px;">
+             <div class="kv" style="flex:1; margin:0;"><label><i class="fa-regular fa-clock"></i> Time</label><b>${formatTime(rec.readingTime)}</b></div>
+             <div class="kv" style="flex:1; margin:0;"><label><i class="fa-solid fa-cloud-sun"></i> Shift</label><span class="badge-shift ${getShiftClass(shiftStr)}" style="margin-top:4px">${shiftStr}</span></div>
+        </div>
+
+        <div class="tab-bar">
+          <button type="button" class="tab-btn active" id="view-tab-btn-1" onclick="switchViewTab(1)">105 Tanks</button>
+          <button type="button" class="tab-btn" id="view-tab-btn-2" onclick="switchViewTab(2)">106 Tanks & TH01</button>
+          <button type="button" class="tab-btn" id="view-tab-btn-3" onclick="switchViewTab(3)">106FT01 Filters</button>
+          <button type="button" class="tab-btn" id="view-tab-btn-4" onclick="switchViewTab(4)">Scrubbers</button>
+        </div>
+
+        <div id="view-tab-1" style="display:block;">
+          <div class="grid">
+            <div class="full section-title">105TK02</div>
+            <div class="kv"><label>pH</label><b>${escapeHtml(rec.tk105_02_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.tk105_02_orp)}</b></div><div></div>
+            <div class="full section-title">105TK03</div>
+            <div class="kv"><label>pH</label><b>${escapeHtml(rec.tk105_03_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.tk105_03_orp)}</b></div><div></div>
+            <div class="full section-title">105TK05</div>
+            <div class="kv"><label>pH</label><b>${escapeHtml(rec.tk105_05_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.tk105_05_orp)}</b></div><div></div>
+            <div class="full section-title">105TK08</div>
+            <div class="kv"><label>pH</label><b>${escapeHtml(rec.tk105_08_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.tk105_08_orp)}</b></div><div class="kv"><label>Density</label><b>${escapeHtml(rec.tk105_08_den)}</b></div>
+            <div class="full section-title">105TK13</div>
+            <div class="kv"><label>pH</label><b>${escapeHtml(rec.tk105_13_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.tk105_13_orp)}</b></div><div class="kv"><label>Density</label><b>${escapeHtml(rec.tk105_13_den)}</b></div>
+          </div>
+        </div>
+
+        <div id="view-tab-2" style="display:none;">
+          <div class="grid">
+            <div class="full section-title">106TK14</div>
+            <div class="kv"><label>pH</label><b>${escapeHtml(rec.tk106_14_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.tk106_14_orp)}</b></div><div></div>
+            <div class="full section-title">106TK18</div>
+            <div class="kv"><label>Density</label><b>${escapeHtml(rec.tk106_18_den)}</b></div><div class="full"></div>
+            <div class="full section-title">106TH01</div>
+            <div class="kv"><label>pH</label><b>${escapeHtml(rec.th106_01_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.th106_01_orp)}</b></div><div class="kv"><label>Density</label><b>${escapeHtml(rec.th106_01_den)}</b></div>
+          </div>
+        </div>
+
+        <div id="view-tab-3" style="display:none;">
+          <div class="grid-2">
+            ${['a','b','c','d','e','f'].map(l => `
+              <div>
+                <div class="section-title">106FT01${l.toUpperCase()}</div>
+                <div class="kv" style="display:flex; gap:16px;">
+                  <div style="flex:1;">
+                    <label>NTU</label><b style="font-size:18px; color:var(--ok);">${escapeHtml(rec[`ft106_1${l}_ntu`])}</b>
+                  </div>
+                  <div style="width:72px;">
+                    ${rec[`ft106_1${l}_photo`] ? `<img src="${rec[`ft106_1${l}_photo`]}" style="width:100%; aspect-ratio:1; object-fit:cover; border-radius:6px;">` : imgPlaceholder}
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div id="view-tab-4" style="display:none;">
+          <div class="grid">
+            <div class="full section-title">Scrubber 2</div>
+            <div class="kv"><label>Lab pH</label><b>${escapeHtml(rec.scrub2_ph)}</b></div><div class="kv"><label>Lab ORP</label><b>${escapeHtml(rec.scrub2_orp)}</b></div><div class="full" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div class="kv" style="margin:0;"><label>Field pH</label><b>${escapeHtml(rec.scrub2_fph)}</b></div><div class="kv" style="margin:0;"><label>Field ORP</label><b>${escapeHtml(rec.scrub2_forp)}</b></div></div>
+            
+            <div class="full section-title" style="margin-top:8px;">Scrubber 3</div>
+            <div class="kv"><label>Lab pH</label><b>${escapeHtml(rec.scrub3_ph)}</b></div><div class="kv"><label>Lab ORP</label><b>${escapeHtml(rec.scrub3_orp)}</b></div><div class="full" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div class="kv" style="margin:0;"><label>Field pH</label><b>${escapeHtml(rec.scrub3_fph)}</b></div><div class="kv" style="margin:0;"><label>Field ORP</label><b>${escapeHtml(rec.scrub3_forp)}</b></div></div>
+            
+            <div class="full section-title" style="margin-top:8px;">Scrubber 4</div>
+            <div class="kv"><label>Lab pH</label><b>${escapeHtml(rec.scrub4_ph)}</b></div><div class="kv"><label>Lab ORP</label><b>${escapeHtml(rec.scrub4_orp)}</b></div><div class="full" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div class="kv" style="margin:0;"><label>Field pH</label><b>${escapeHtml(rec.scrub4_fph)}</b></div><div class="kv" style="margin:0;"><label>Field ORP</label><b>${escapeHtml(rec.scrub4_forp)}</b></div></div>
+          </div>
+        </div>
+
+        <div class="kv" style="margin-top:16px;"><label><i class="fa-solid fa-align-left"></i> Notes</label><b>${escapeHtml(rec.notes || "No remarks")}</b></div>
+      `;
+      document.getElementById("viewModal").classList.add("show");
+    }
+
+    async function deleteRecord(id) {
+      if (!confirm("Delete this reading? This cannot be undone.")) return;
+      records = records.filter(r => r.id !== id); persistLocal(); render();
+      try {
+        const res = await fetch(`${API_ENDPOINT}?id=eq.${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error("Delete failed");
+        showToast("Deleted securely", "success");
+      } catch (err) {
+        queueOp({ type: 'delete', id });
+        showToast("Deleted locally — will sync when back online", "info");
+        setStatus("offline", `Offline · ${pendingOps.length} change(s) pending`);
+      }
+    }
+
+    function closeModals() { document.querySelectorAll(".modal-bg").forEach(el => el.classList.remove("show")); }
+    document.querySelectorAll('.modal-bg').forEach(bg => { bg.addEventListener('click', (e) => { if (e.target === bg) closeModals(); }); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModals(); });
+
+    function exportXls() {
+      const headers = ["Time", "Shift", "TK02 pH", "TK02 ORP", "TK03 pH", "TK03 ORP", "TK05 pH", "TK05 ORP", "TK08 pH", "TK08 ORP", "TK08 Den", "TK13 pH", "TK13 ORP", "TK13 Den", "TK14 pH", "TK14 ORP", "TK18 Den", "TH01 pH", "TH01 ORP", "TH01 Den", "FT1A NTU", "FT1B NTU", "FT1C NTU", "FT1D NTU", "FT1E NTU", "FT1F NTU", "S2 Lab pH", "S2 Lab ORP", "S2 F.pH", "S2 F.ORP", "S3 Lab pH", "S3 Lab ORP", "S3 F.pH", "S3 F.ORP", "S4 Lab pH", "S4 Lab ORP", "S4 F.pH", "S4 F.ORP", "Notes"];
+      const rows = [headers];
+      const sorted = getFilteredRecords().sort((a, b) => currentSort === "desc" ? new Date(b.readingTime) - new Date(a.readingTime) : new Date(a.readingTime) - new Date(b.readingTime));
+      
+      sorted.forEach(r => rows.push([
+        formatTime(r.readingTime), r.shift || calculateShift(r.readingTime),
+        r.tk105_02_ph, r.tk105_02_orp, r.tk105_03_ph, r.tk105_03_orp, r.tk105_05_ph, r.tk105_05_orp, r.tk105_08_ph, r.tk105_08_orp, r.tk105_08_den, r.tk105_13_ph, r.tk105_13_orp, r.tk105_13_den,
+        r.tk106_14_ph, r.tk106_14_orp, r.tk106_18_den, r.th106_01_ph, r.th106_01_orp, r.th106_01_den,
+        r.ft106_1a_ntu, r.ft106_1b_ntu, r.ft106_1c_ntu, r.ft106_1d_ntu, r.ft106_1e_ntu, r.ft106_1f_ntu,
+        r.scrub2_ph, r.scrub2_orp, r.scrub2_fph, r.scrub2_forp, r.scrub3_ph, r.scrub3_orp, r.scrub3_fph, r.scrub3_forp, r.scrub4_ph, r.scrub4_orp, r.scrub4_fph, r.scrub4_forp,
+        r.notes || ""
+      ]));
+      
+      const table = rows.map(row => "<tr>" + row.map(cell => `<td>${escapeHtml(cell)}</td>`).join("") + "</tr>").join("");
+      const html = `<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body><table>${table}</table></body></html>`;
+      const blob = new Blob(["\ufeff" + html], { type: "application/vnd.ms-excel" });
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+      const shiftSuffix = currentShiftFilter === "all" ? "" : `-${currentShiftFilter.replace(/\s+/g, "")}`;
+      a.download = `Sampling1-Report${shiftSuffix}-${new Date().toISOString().slice(0, 10)}.xls`; a.click();
+    }
+  </script>
+</body>
+</html>
