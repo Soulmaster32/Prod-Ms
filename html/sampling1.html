@@ -69,6 +69,14 @@
     .chart-card-header h3 i { color: var(--accent); font-size: 14px; }
     .chart-legend-note { font-size: 12px; color: var(--muted); }
     .chart-container { padding: 8px 20px 22px; width: 100%; height: 340px; }
+
+    /* Filter Images Strip styles */
+    .filter-images-strip { display: flex; padding: 12px 24px 16px; gap: 12px; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+    .filter-images-strip::-webkit-scrollbar { display: none; }
+    .strip-img-box { display: inline-block; width: 78px; height: 78px; border-radius: 8px; border: 1px solid rgba(148,163,184,0.28); overflow: hidden; cursor: pointer; position: relative; flex-shrink: 0; background: rgba(10, 15, 28, 0.4); transition: transform 0.2s; }
+    .strip-img-box:hover { transform: scale(1.05); border-color: var(--accent); }
+    .strip-img-box img { width: 100%; height: 100%; object-fit: cover; }
+    .strip-img-label { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.75); color: white; font-size: 10.5px; font-weight: 700; text-align: center; padding: 4px 0; backdrop-filter: blur(2px); }
     
     .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
     .stat-chip { background: var(--glass); border: 1px solid rgba(148,163,184,0.14); border-radius: var(--radius-md); padding: 16px 18px; display: flex; align-items: center; gap: 12px; backdrop-filter: blur(10px); }
@@ -177,7 +185,7 @@
         <div class="title-icon"><i class="fa-solid fa-vial"></i></div>
         <div>
           <h1>Sampling 1 Division</h1>
-          <div class="sub">Track pH, Temp, Density, and NTU across all equipment.</div>
+          <div class="sub">Track pH, Temp, Density, ORP, and NTU across all equipment.</div>
         </div>
       </div>
       <div class="toolbar">
@@ -234,6 +242,8 @@
         <h3 id="chartTitle"><i class="fa-solid fa-chart-line"></i> Trend Analysis</h3>
         <span class="chart-legend-note" id="chartNote">Hover a point to see the exact reading time</span>
       </div>
+      <!-- IMAGES STRIP FOR FILTER TAB -->
+      <div id="filterImagesStrip" class="filter-images-strip" style="display: none;"></div>
       <div class="chart-container">
         <canvas id="trendChart"></canvas>
       </div>
@@ -399,7 +409,7 @@
             </div>
           </div>
 
-          <!-- TAB 4: Scrubbers (Changed ORP to TEMP) -->
+          <!-- TAB 4: Scrubbers (Temp included) -->
           <div id="add-tab-4" style="display:none;">
             <div class="grid">
               <div class="full section-title">Scrubber 2</div>
@@ -482,6 +492,19 @@
       <footer>
         <button class="btn-ghost" type="button" onclick="closeModals()">Close Window</button>
       </footer>
+    </div>
+  </div>
+
+  <!-- FULL IMAGE VIEWER MODAL -->
+  <div class="modal-bg" id="imageViewerModal" style="z-index: 1000;">
+    <div class="modal" style="width: auto; max-width: 90vw; background: transparent; border: none; box-shadow: none; align-items: center; justify-content: center;">
+      <div style="text-align: right; width: 100%; margin-bottom: 8px;">
+        <button class="btn-ghost" type="button" onclick="closeImageViewer()" style="background: rgba(15,23,42,0.9); border: 1px solid rgba(148,163,184,0.3); color: white; border-radius: 50px; padding: 10px 20px;">
+          <i class="fa-solid fa-xmark"></i> Close Image
+        </button>
+      </div>
+      <img id="fullViewerImg" src="" style="max-width: 100%; max-height: 75vh; border-radius: 12px; box-shadow: 0 25px 50px rgba(0,0,0,0.9); object-fit: contain; background: #000;">
+      <div id="fullViewerTitle" style="text-align: center; color: white; font-weight: 700; margin-top: 14px; font-size: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);"></div>
     </div>
   </div>
 
@@ -699,44 +722,101 @@
 
       let datasets = [];
 
+      // Logic for the Filter Images Strip
+      const imagesStrip = document.getElementById("filterImagesStrip");
+      if (activeMainTab === 'filters') {
+        imagesStrip.style.display = "flex";
+        // Find latest record which has at least one photo
+        let latestImgRec = chronData.slice().reverse().find(r => r.ft106_1a_photo || r.ft106_1b_photo || r.ft106_1c_photo || r.ft106_1d_photo || r.ft106_1e_photo || r.ft106_1f_photo);
+        if (!latestImgRec) latestImgRec = chronData[chronData.length - 1]; // Fallback to absolute latest
+        
+        imagesStrip.innerHTML = "";
+        const letters = ['a','b','c','d','e','f'];
+        letters.forEach(l => {
+          const photo = latestImgRec[`ft106_1${l}_photo`];
+          const timeStr = formatTimeShort(latestImgRec.readingTime);
+          if (photo) {
+            imagesStrip.innerHTML += `
+              <div class="strip-img-box" onclick="viewFullImage('${photo}', '106FT01${l.toUpperCase()} - Latest (${timeStr})')">
+                <img src="${photo}" title="View 106FT01${l.toUpperCase()}">
+                <div class="strip-img-label">FT1${l.toUpperCase()}</div>
+              </div>
+            `;
+          } else {
+            imagesStrip.innerHTML += `
+              <div class="strip-img-box" style="cursor: default;" title="No Image for FT1${l.toUpperCase()}">
+                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--muted); opacity: 0.6;">
+                  <i class="fa-regular fa-image" style="font-size: 20px; margin-bottom: 8px;"></i>
+                </div>
+                <div class="strip-img-label">FT1${l.toUpperCase()}</div>
+              </div>
+            `;
+          }
+        });
+      } else {
+        imagesStrip.style.display = "none";
+      }
+
       if (activeMainTab === '105') {
-        document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> 105 Tanks pH Trend`;
+        document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> 105 Tanks Trend (pH & ORP)`;
         datasets = [
-          { label: '105TK02 pH', data: chronData.map(r => r.tk105_02_ph), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true },
-          { label: '105TK03 pH', data: chronData.map(r => r.tk105_03_ph), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true },
-          { label: '105TK05 pH', data: chronData.map(r => r.tk105_05_ph), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true },
-          { label: '105TK08 pH', data: chronData.map(r => r.tk105_08_ph), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true },
-          { label: '105TK13 pH', data: chronData.map(r => r.tk105_13_ph), borderColor: '#f87171', backgroundColor: '#f87171', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true }
+          { label: '105TK02 pH', data: chronData.map(r => r.tk105_02_ph), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '105TK02 ORP', data: chronData.map(r => r.tk105_02_orp), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
+          
+          { label: '105TK03 pH', data: chronData.map(r => r.tk105_03_ph), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '105TK03 ORP', data: chronData.map(r => r.tk105_03_orp), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
+          
+          { label: '105TK05 pH', data: chronData.map(r => r.tk105_05_ph), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '105TK05 ORP', data: chronData.map(r => r.tk105_05_orp), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
+          
+          { label: '105TK08 pH', data: chronData.map(r => r.tk105_08_ph), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '105TK08 ORP', data: chronData.map(r => r.tk105_08_orp), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
+          
+          { label: '105TK13 pH', data: chronData.map(r => r.tk105_13_ph), borderColor: '#f87171', backgroundColor: '#f87171', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '105TK13 ORP', data: chronData.map(r => r.tk105_13_orp), borderColor: '#f87171', backgroundColor: '#f87171', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' }
         ];
       } else if (activeMainTab === '106') {
         document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> 106 Tanks Trend`;
         datasets = [
-          { label: '106TK14 pH', data: chronData.map(r => r.tk106_14_ph), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true },
-          { label: '106TH01 pH', data: chronData.map(r => r.th106_01_ph), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true },
-          { label: '106TK18 Density', data: chronData.map(r => r.tk106_18_den), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true }
+          { label: '106TK14 pH', data: chronData.map(r => r.tk106_14_ph), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '106TK14 ORP', data: chronData.map(r => r.tk106_14_orp), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
+          
+          { label: '106TH01 pH', data: chronData.map(r => r.th106_01_ph), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '106TH01 ORP', data: chronData.map(r => r.th106_01_orp), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
+          
+          { label: '106TK18 Density', data: chronData.map(r => r.tk106_18_den), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y1' }
         ];
       } else if (activeMainTab === 'filters') {
         document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> 106FT01 Filters NTU Trend`;
         datasets = [
-          { label: 'FT1A NTU', data: chronData.map(r => r.ft106_1a_ntu), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true },
-          { label: 'FT1B NTU', data: chronData.map(r => r.ft106_1b_ntu), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true },
-          { label: 'FT1C NTU', data: chronData.map(r => r.ft106_1c_ntu), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true },
-          { label: 'FT1D NTU', data: chronData.map(r => r.ft106_1d_ntu), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true }
+          { label: 'FT1A NTU', data: chronData.map(r => r.ft106_1a_ntu), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: 'FT1B NTU', data: chronData.map(r => r.ft106_1b_ntu), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: 'FT1C NTU', data: chronData.map(r => r.ft106_1c_ntu), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: 'FT1D NTU', data: chronData.map(r => r.ft106_1d_ntu), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: 'FT1E NTU', data: chronData.map(r => r.ft106_1e_ntu), borderColor: '#f87171', backgroundColor: '#f87171', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: 'FT1F NTU', data: chronData.map(r => r.ft106_1f_ntu), borderColor: '#818cf8', backgroundColor: '#818cf8', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' }
         ];
       } else if (activeMainTab === 'scrubbers') {
-        document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> Scrubbers pH Trend`;
+        document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> Scrubbers Trend (pH & Temp)`;
         datasets = [
-          { label: 'Scrubber 2 pH', data: chronData.map(r => r.scrub2_ph), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true },
-          { label: 'Scrubber 3 pH', data: chronData.map(r => r.scrub3_ph), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true },
-          { label: 'Scrubber 4 pH', data: chronData.map(r => r.scrub4_ph), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true }
+          { label: 'Scrubber 2 pH', data: chronData.map(r => r.scrub2_ph), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: 'Scrubber 2 Temp', data: chronData.map(r => r.scrub2_temp), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
+          
+          { label: 'Scrubber 3 pH', data: chronData.map(r => r.scrub3_ph), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: 'Scrubber 3 Temp', data: chronData.map(r => r.scrub3_temp), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
+          
+          { label: 'Scrubber 4 pH', data: chronData.map(r => r.scrub4_ph), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: 'Scrubber 4 Temp', data: chronData.map(r => r.scrub4_temp), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' }
         ];
       } else if (activeMainTab === 'ditches') {
         document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> Ditches pH Trend`;
         datasets = [
-          { label: '931 pH', data: chronData.map(r => r.ditch_931_ph), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true },
-          { label: '934 pH', data: chronData.map(r => r.ditch_934_ph), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true },
-          { label: 'Scandium pH', data: chronData.map(r => r.ditch_scan_ph), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true },
-          { label: 'Lab pH', data: chronData.map(r => r.ditch_lab_ph), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 4, tension: 0.35, spanGaps: true }
+          { label: '931 pH', data: chronData.map(r => r.ditch_931_ph), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '934 pH', data: chronData.map(r => r.ditch_934_ph), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: 'Scandium pH', data: chronData.map(r => r.ditch_scan_ph), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: 'Lab pH', data: chronData.map(r => r.ditch_lab_ph), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: 'Admin pH', data: chronData.map(r => r.ditch_admin_ph), borderColor: '#f87171', backgroundColor: '#f87171', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: 'Safety pH', data: chronData.map(r => r.ditch_safety_ph), borderColor: '#818cf8', backgroundColor: '#818cf8', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' }
         ];
       }
 
@@ -754,8 +834,22 @@
             tooltip: { backgroundColor: 'rgba(10,15,28,0.95)', titleColor: '#fff', bodyColor: '#cbd5e1', padding: 12, borderRadius: 10, borderColor: 'rgba(148,163,184,0.2)', borderWidth: 1, callbacks: { title: (items) => fullTimes[items[0].dataIndex] } }
           },
           scales: {
-            x: { ticks: { color: '#8b98b3', font: { size: 11 } }, grid: { color: 'rgba(148, 163, 184, 0.04)' } },
-            y: { ticks: { color: '#8b98b3', font: { size: 11 } }, grid: { color: 'rgba(148, 163, 184, 0.08)' } }
+            x: { 
+              ticks: { color: '#8b98b3', font: { size: 11 } }, 
+              grid: { color: 'rgba(148, 163, 184, 0.04)' } 
+            },
+            y: { 
+              type: 'linear', display: true, position: 'left',
+              title: { display: true, text: 'pH / NTU', color: '#8b98b3', font: {size: 11} },
+              ticks: { color: '#8b98b3', font: { size: 11 } }, 
+              grid: { color: 'rgba(148, 163, 184, 0.08)' } 
+            },
+            y1: {
+              type: 'linear', display: 'auto', position: 'right', // 'auto' shows axis only if a linked dataset exists
+              title: { display: true, text: 'ORP / Temp / Density', color: '#8b98b3', font: {size: 11} },
+              ticks: { color: '#8b98b3', font: { size: 11 } },
+              grid: { drawOnChartArea: false }
+            }
           }
         }
       });
@@ -1069,7 +1163,7 @@
                     <label>NTU</label><b style="font-size:18px; color:var(--ok);">${escapeHtml(rec[`ft106_1${l}_ntu`])}</b>
                   </div>
                   <div style="width:72px;">
-                    ${rec[`ft106_1${l}_photo`] ? `<img src="${rec[`ft106_1${l}_photo`]}" style="width:100%; aspect-ratio:1; object-fit:cover; border-radius:6px;">` : imgPlaceholder}
+                    ${rec[`ft106_1${l}_photo`] ? `<img src="${rec[`ft106_1${l}_photo`]}" onclick="viewFullImage('${rec[`ft106_1${l}_photo`]}', '106FT01${l.toUpperCase()} - ${formatTimeShort(rec.readingTime)}')" style="width:100%; aspect-ratio:1; object-fit:cover; border-radius:6px; cursor:pointer;" title="Click to view large">` : imgPlaceholder}
                   </div>
                 </div>
               </div>
@@ -1117,6 +1211,40 @@
       document.getElementById("viewModal").classList.add("show");
     }
 
+    // Modal behavior controls
+    function closeModals() { 
+      document.querySelectorAll(".modal-bg").forEach(el => el.classList.remove("show")); 
+    }
+    
+    // Allows closing only the clicked modal background
+    document.querySelectorAll('.modal-bg').forEach(bg => { 
+      bg.addEventListener('click', (e) => { 
+        if (e.target === bg) {
+          bg.classList.remove("show"); 
+        } 
+      }); 
+    });
+
+    document.addEventListener("keydown", (e) => { 
+      if (e.key === "Escape") {
+        const openModals = Array.from(document.querySelectorAll(".modal-bg.show"));
+        if (openModals.length > 0) {
+          openModals[openModals.length - 1].classList.remove("show");
+        }
+      } 
+    });
+
+    // Image Viewer specific triggers
+    function viewFullImage(src, title) {
+      if(!src || src === 'null') return;
+      document.getElementById("fullViewerImg").src = src;
+      document.getElementById("fullViewerTitle").textContent = title;
+      document.getElementById("imageViewerModal").classList.add("show");
+    }
+    function closeImageViewer() {
+      document.getElementById("imageViewerModal").classList.remove("show");
+    }
+
     async function deleteRecord(id) {
       if (!confirm("Delete this reading? This cannot be undone.")) return;
       records = records.filter(r => r.id !== id); persistLocal(); render();
@@ -1130,10 +1258,6 @@
         setStatus("offline", `Offline · ${pendingOps.length} change(s) pending`);
       }
     }
-
-    function closeModals() { document.querySelectorAll(".modal-bg").forEach(el => el.classList.remove("show")); }
-    document.querySelectorAll('.modal-bg').forEach(bg => { bg.addEventListener('click', (e) => { if (e.target === bg) closeModals(); }); });
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModals(); });
 
     function exportXls() {
       const headers = [
