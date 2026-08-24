@@ -184,7 +184,7 @@
       <div class="title-block">
         <div class="title-icon"><i class="fa-solid fa-vial"></i></div>
         <div>
-          <h1>Sampling Activity</h1>
+          <h1>Sampling 1 Division</h1>
           <div class="sub">Track pH, Temp, Density, ORP, and NTU across all equipment.</div>
         </div>
       </div>
@@ -210,7 +210,8 @@
     <!-- MAIN DASHBOARD TABS -->
     <div class="main-tabs">
       <button class="main-tab-btn active" id="dash-btn-105" onclick="switchDashboard('105')"><i class="fa-solid fa-flask"></i> 105 Tanks</button>
-      <button class="main-tab-btn" id="dash-btn-106" onclick="switchDashboard('106')"><i class="fa-solid fa-flask"></i> 106 Tanks & TH01</button>
+      <button class="main-tab-btn" id="dash-btn-106" onclick="switchDashboard('106')"><i class="fa-solid fa-flask"></i> 106 Tanks</button>
+      <button class="main-tab-btn" id="dash-btn-106ve" onclick="switchDashboard('106ve')"><i class="fa-solid fa-flask-vial"></i> 106 Vessels (VE)</button>
       <button class="main-tab-btn" id="dash-btn-filters" onclick="switchDashboard('filters')"><i class="fa-solid fa-droplet"></i> 106FT01 Filters</button>
       <button class="main-tab-btn" id="dash-btn-scrubbers" onclick="switchDashboard('scrubbers')"><i class="fa-solid fa-wind"></i> Scrubbers</button>
       <button class="main-tab-btn" id="dash-btn-ditches" onclick="switchDashboard('ditches')"><i class="fa-solid fa-water"></i> Ditches</button>
@@ -244,8 +245,17 @@
       </div>
       <!-- IMAGES STRIP FOR FILTER TAB -->
       <div id="filterImagesStrip" class="filter-images-strip" style="display: none;"></div>
+      
       <div class="chart-container">
         <canvas id="trendChart"></canvas>
+      </div>
+      
+      <!-- Secondary Chart specifically for ORP (Used in 106VE tab) -->
+      <div class="chart-card-header" id="chartTitle2Container" style="display: none; border-top: 1px solid rgba(148,163,184,0.1); margin-top: 10px;">
+        <h3 id="chartTitle2"><i class="fa-solid fa-chart-line"></i> 106 Vessels ORP Trend</h3>
+      </div>
+      <div class="chart-container" id="chartContainer2" style="display: none;">
+        <canvas id="trendChart2"></canvas>
       </div>
     </div>
 
@@ -289,8 +299,9 @@
           <!-- Tabs for Add Form -->
           <div class="tab-bar">
             <button type="button" class="tab-btn active" id="add-tab-btn-1" onclick="switchAddTab(1)">105 Tanks</button>
-            <button type="button" class="tab-btn" id="add-tab-btn-2" onclick="switchAddTab(2)">106 Tanks & TH01</button>
-            <button type="button" class="tab-btn" id="add-tab-btn-3" onclick="switchAddTab(3)">106FT01 Filters</button>
+            <button type="button" class="tab-btn" id="add-tab-btn-2" onclick="switchAddTab(2)">106 Tanks</button>
+            <button type="button" class="tab-btn" id="add-tab-btn-6" onclick="switchAddTab(6)">106 Vessels</button>
+            <button type="button" class="tab-btn" id="add-tab-btn-3" onclick="switchAddTab(3)">106FT01</button>
             <button type="button" class="tab-btn" id="add-tab-btn-4" onclick="switchAddTab(4)">Scrubbers</button>
             <button type="button" class="tab-btn" id="add-tab-btn-5" onclick="switchAddTab(5)">Ditches</button>
           </div>
@@ -341,6 +352,31 @@
               <div><label>pH</label><input type="number" step="any" id="th106_01_ph"></div>
               <div><label>ORP</label><input type="number" step="any" id="th106_01_orp"></div>
               <div><label>Density</label><input type="number" step="any" id="th106_01_den"></div>
+            </div>
+          </div>
+          
+          <!-- TAB 6: 106 Vessels -->
+          <div id="add-tab-6" style="display:none;">
+            <div class="grid">
+              <div class="full section-title">106VE01</div>
+              <div><label>pH</label><input type="number" step="any" id="ve106_01_ph"></div>
+              <div><label>ORP</label><input type="number" step="any" id="ve106_01_orp"></div>
+              <div></div>
+              
+              <div class="full section-title">106VE02</div>
+              <div><label>pH</label><input type="number" step="any" id="ve106_02_ph"></div>
+              <div><label>ORP</label><input type="number" step="any" id="ve106_02_orp"></div>
+              <div></div>
+              
+              <div class="full section-title">106VE03</div>
+              <div><label>pH</label><input type="number" step="any" id="ve106_03_ph"></div>
+              <div><label>ORP</label><input type="number" step="any" id="ve106_03_orp"></div>
+              <div></div>
+              
+              <div class="full section-title">106VE04</div>
+              <div><label>pH</label><input type="number" step="any" id="ve106_04_ph"></div>
+              <div><label>ORP</label><input type="number" step="any" id="ve106_04_orp"></div>
+              <div></div>
             </div>
           </div>
 
@@ -523,6 +559,7 @@
     let photos = { a:null, b:null, c:null, d:null, e:null, f:null };
     
     let chartInstance = null;
+    let chartInstance2 = null; // New variable for secondary charts (ORP in Vessels tab)
     let currentSort = "desc";
     let currentShiftFilter = "all";
     
@@ -539,7 +576,7 @@
 
     // Modal Add Tabs Logic
     function switchAddTab(tabId) {
-      for(let i=1; i<=5; i++) {
+      for(let i=1; i<=6; i++) {
         document.getElementById(`add-tab-${i}`).style.display = i === tabId ? 'block' : 'none';
         document.getElementById(`add-tab-btn-${i}`).className = i === tabId ? 'tab-btn active' : 'tab-btn';
       }
@@ -547,7 +584,7 @@
     
     // Modal View Tabs Logic
     window.switchViewTab = function(tabId) {
-      for(let i=1; i<=5; i++) {
+      for(let i=1; i<=6; i++) {
         document.getElementById(`view-tab-${i}`).style.display = i === tabId ? 'block' : 'none';
         document.getElementById(`view-tab-btn-${i}`).className = i === tabId ? 'tab-btn active' : 'tab-btn';
       }
@@ -721,6 +758,14 @@
       const fullTimes = chronData.map(r => formatTime(r.readingTime));
 
       let datasets = [];
+      let datasets2 = []; // Secondary chart specifically for isolated ORP/Secondary data
+
+      // Clear optional secondary chart by default
+      const chartTitle2Container = document.getElementById("chartTitle2Container");
+      const chartContainer2 = document.getElementById("chartContainer2");
+      if(chartInstance2) { chartInstance2.destroy(); chartInstance2 = null; }
+      chartTitle2Container.style.display = "none";
+      chartContainer2.style.display = "none";
 
       // Logic for the Filter Images Strip
       const imagesStrip = document.getElementById("filterImagesStrip");
@@ -786,6 +831,25 @@
           
           { label: '106TK18 Density', data: chronData.map(r => r.tk106_18_den), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y1' }
         ];
+      } else if (activeMainTab === '106ve') {
+        document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> 106 Vessels pH Trend`;
+        // Show the secondary container for completely isolated ORP Chart
+        chartTitle2Container.style.display = "flex";
+        chartContainer2.style.display = "block";
+        
+        datasets = [
+          { label: '106VE01 pH', data: chronData.map(r => r.ve106_01_ph), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '106VE02 pH', data: chronData.map(r => r.ve106_02_ph), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '106VE03 pH', data: chronData.map(r => r.ve106_03_ph), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '106VE04 pH', data: chronData.map(r => r.ve106_04_ph), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' }
+        ];
+        
+        datasets2 = [
+          { label: '106VE01 ORP', data: chronData.map(r => r.ve106_01_orp), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2.5, borderDash: [5, 5], pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '106VE02 ORP', data: chronData.map(r => r.ve106_02_orp), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, borderDash: [5, 5], pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '106VE03 ORP', data: chronData.map(r => r.ve106_03_orp), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, borderDash: [5, 5], pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '106VE04 ORP', data: chronData.map(r => r.ve106_04_orp), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2.5, borderDash: [5, 5], pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' }
+        ];
       } else if (activeMainTab === 'filters') {
         document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> 106FT01 Filters NTU Trend`;
         datasets = [
@@ -840,7 +904,7 @@
             },
             y: { 
               type: 'linear', display: true, position: 'left',
-              title: { display: true, text: 'pH / NTU', color: '#8b98b3', font: {size: 11} },
+              title: { display: true, text: activeMainTab==='106ve' ? 'pH' : 'pH / NTU', color: '#8b98b3', font: {size: 11} },
               ticks: { color: '#8b98b3', font: { size: 11 } }, 
               grid: { color: 'rgba(148, 163, 184, 0.08)' } 
             },
@@ -853,6 +917,35 @@
           }
         }
       });
+
+      // Render secondary separated chart if active tab is 106ve
+      if (activeMainTab === '106ve' && datasets2.length > 0) {
+        const ctx2 = document.getElementById('trendChart2').getContext('2d');
+        chartInstance2 = new Chart(ctx2, {
+          type: 'line',
+          data: { labels: labels, datasets: datasets2 },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: { labels: { color: '#e2e8f0', font: { family: 'Inter', size: 12, weight: '600' }, usePointStyle: true, padding: 16 } },
+              tooltip: { backgroundColor: 'rgba(10,15,28,0.95)', titleColor: '#fff', bodyColor: '#cbd5e1', padding: 12, borderRadius: 10, borderColor: 'rgba(148,163,184,0.2)', borderWidth: 1, callbacks: { title: (items) => fullTimes[items[0].dataIndex] } }
+            },
+            scales: {
+              x: { 
+                ticks: { color: '#8b98b3', font: { size: 11 } }, 
+                grid: { color: 'rgba(148, 163, 184, 0.04)' } 
+              },
+              y: { 
+                type: 'linear', display: true, position: 'left',
+                title: { display: true, text: 'ORP', color: '#8b98b3', font: {size: 11} },
+                ticks: { color: '#8b98b3', font: { size: 11 } }, 
+                grid: { color: 'rgba(148, 163, 184, 0.08)' } 
+              }
+            }
+          }
+        });
+      }
     }
 
     function render() {
@@ -866,8 +959,11 @@
         document.getElementById("tableTitle").innerHTML = `<i class="fa-solid fa-table-list"></i> 105 Tanks Log`;
         headerHTML += `<th>105TK02 (pH/ORP)</th><th>105TK03 (pH/ORP)</th><th>105TK05 (pH/ORP)</th><th>105TK08 (pH/ORP)</th><th>105TK13 (pH/ORP)</th>`;
       } else if (activeMainTab === '106') {
-        document.getElementById("tableTitle").innerHTML = `<i class="fa-solid fa-table-list"></i> 106 Tanks & TH01 Log`;
+        document.getElementById("tableTitle").innerHTML = `<i class="fa-solid fa-table-list"></i> 106 Tanks Log`;
         headerHTML += `<th>106TK14 (pH/ORP)</th><th>106TK18 (Den)</th><th>106TH01 (pH/ORP/Den)</th>`;
+      } else if (activeMainTab === '106ve') {
+        document.getElementById("tableTitle").innerHTML = `<i class="fa-solid fa-table-list"></i> 106 Vessels Log`;
+        headerHTML += `<th>106VE01 (pH/ORP)</th><th>106VE02 (pH/ORP)</th><th>106VE03 (pH/ORP)</th><th>106VE04 (pH/ORP)</th>`;
       } else if (activeMainTab === 'filters') {
         document.getElementById("tableTitle").innerHTML = `<i class="fa-solid fa-table-list"></i> 106FT01 Filters Log (NTU)`;
         headerHTML += `<th>FT1A</th><th>FT1B</th><th>FT1C</th><th>FT1D</th><th>FT1E</th><th>FT1F</th>`;
@@ -922,6 +1018,13 @@
             <td><b>${escapeHtml(rec.tk106_18_den)}</b></td>
             <td><b>${escapeHtml(rec.th106_01_ph)} / ${escapeHtml(rec.th106_01_orp)} / ${escapeHtml(rec.th106_01_den)}</b></td>
           `;
+        } else if (activeMainTab === '106ve') {
+          colsHTML += `
+            <td><b>${escapeHtml(rec.ve106_01_ph)} / ${escapeHtml(rec.ve106_01_orp)}</b></td>
+            <td><b>${escapeHtml(rec.ve106_02_ph)} / ${escapeHtml(rec.ve106_02_orp)}</b></td>
+            <td><b>${escapeHtml(rec.ve106_03_ph)} / ${escapeHtml(rec.ve106_03_orp)}</b></td>
+            <td><b>${escapeHtml(rec.ve106_04_ph)} / ${escapeHtml(rec.ve106_04_orp)}</b></td>
+          `;
         } else if (activeMainTab === 'filters') {
           colsHTML += `
             <td><b>${escapeHtml(rec.ft106_1a_ntu)}</b></td><td><b>${escapeHtml(rec.ft106_1b_ntu)}</b></td>
@@ -964,8 +1067,9 @@
           if (!group.length) return;
           const tr = document.createElement("tr"); tr.className = "group-header-row";
           
-          let colSpanCount = 7; // Default
+          let colSpanCount = 7; // Default for 105
           if(activeMainTab === '106') colSpanCount = 5;
+          if(activeMainTab === '106ve') colSpanCount = 6;
           if(activeMainTab === 'filters') colSpanCount = 8;
           if(activeMainTab === 'scrubbers') colSpanCount = 5;
           if(activeMainTab === 'ditches') colSpanCount = 8;
@@ -1011,6 +1115,12 @@
         document.getElementById("tk106_18_den").value = rec.tk106_18_den ?? "";
         document.getElementById("th106_01_ph").value = rec.th106_01_ph ?? ""; document.getElementById("th106_01_orp").value = rec.th106_01_orp ?? ""; document.getElementById("th106_01_den").value = rec.th106_01_den ?? "";
         
+        // 106ve
+        document.getElementById("ve106_01_ph").value = rec.ve106_01_ph ?? ""; document.getElementById("ve106_01_orp").value = rec.ve106_01_orp ?? "";
+        document.getElementById("ve106_02_ph").value = rec.ve106_02_ph ?? ""; document.getElementById("ve106_02_orp").value = rec.ve106_02_orp ?? "";
+        document.getElementById("ve106_03_ph").value = rec.ve106_03_ph ?? ""; document.getElementById("ve106_03_orp").value = rec.ve106_03_orp ?? "";
+        document.getElementById("ve106_04_ph").value = rec.ve106_04_ph ?? ""; document.getElementById("ve106_04_orp").value = rec.ve106_04_orp ?? "";
+
         // Filters
         ['a','b','c','d','e','f'].forEach(l => {
           document.getElementById(`ft106_1${l}_ntu`).value = rec[`ft106_1${l}_ntu`] ?? "";
@@ -1062,6 +1172,11 @@
         tk106_14_ph: getNum("tk106_14_ph"), tk106_14_orp: getNum("tk106_14_orp"),
         tk106_18_den: getNum("tk106_18_den"),
         th106_01_ph: getNum("th106_01_ph"), th106_01_orp: getNum("th106_01_orp"), th106_01_den: getNum("th106_01_den"),
+
+        ve106_01_ph: getNum("ve106_01_ph"), ve106_01_orp: getNum("ve106_01_orp"),
+        ve106_02_ph: getNum("ve106_02_ph"), ve106_02_orp: getNum("ve106_02_orp"),
+        ve106_03_ph: getNum("ve106_03_ph"), ve106_03_orp: getNum("ve106_03_orp"),
+        ve106_04_ph: getNum("ve106_04_ph"), ve106_04_orp: getNum("ve106_04_orp"),
         
         ft106_1a_ntu: getNum("ft106_1a_ntu"), ft106_1a_photo: photos.a,
         ft106_1b_ntu: getNum("ft106_1b_ntu"), ft106_1b_photo: photos.b,
@@ -1121,8 +1236,9 @@
 
         <div class="tab-bar">
           <button type="button" class="tab-btn active" id="view-tab-btn-1" onclick="switchViewTab(1)">105 Tanks</button>
-          <button type="button" class="tab-btn" id="view-tab-btn-2" onclick="switchViewTab(2)">106 Tanks & TH01</button>
-          <button type="button" class="tab-btn" id="view-tab-btn-3" onclick="switchViewTab(3)">106FT01 Filters</button>
+          <button type="button" class="tab-btn" id="view-tab-btn-2" onclick="switchViewTab(2)">106 Tanks</button>
+          <button type="button" class="tab-btn" id="view-tab-btn-6" onclick="switchViewTab(6)">106 Vessels</button>
+          <button type="button" class="tab-btn" id="view-tab-btn-3" onclick="switchViewTab(3)">106FT01</button>
           <button type="button" class="tab-btn" id="view-tab-btn-4" onclick="switchViewTab(4)">Scrubbers</button>
           <button type="button" class="tab-btn" id="view-tab-btn-5" onclick="switchViewTab(5)">Ditches</button>
         </div>
@@ -1150,6 +1266,19 @@
             <div class="kv"><label>Density</label><b>${escapeHtml(rec.tk106_18_den)}</b></div><div class="full"></div>
             <div class="full section-title">106TH01</div>
             <div class="kv"><label>pH</label><b>${escapeHtml(rec.th106_01_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.th106_01_orp)}</b></div><div class="kv"><label>Density</label><b>${escapeHtml(rec.th106_01_den)}</b></div>
+          </div>
+        </div>
+
+        <div id="view-tab-6" style="display:none;">
+          <div class="grid">
+            <div class="full section-title">106VE01</div>
+            <div class="kv"><label>pH</label><b>${escapeHtml(rec.ve106_01_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.ve106_01_orp)}</b></div><div></div>
+            <div class="full section-title">106VE02</div>
+            <div class="kv"><label>pH</label><b>${escapeHtml(rec.ve106_02_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.ve106_02_orp)}</b></div><div></div>
+            <div class="full section-title">106VE03</div>
+            <div class="kv"><label>pH</label><b>${escapeHtml(rec.ve106_03_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.ve106_03_orp)}</b></div><div></div>
+            <div class="full section-title">106VE04</div>
+            <div class="kv"><label>pH</label><b>${escapeHtml(rec.ve106_04_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.ve106_04_orp)}</b></div><div></div>
           </div>
         </div>
 
@@ -1261,8 +1390,10 @@
 
     function exportXls() {
       const headers = [
-        "Time", "Shift", "TK02 pH", "TK02 ORP", "TK03 pH", "TK03 ORP", "TK05 pH", "TK05 ORP", "TK08 pH", "TK08 ORP", "TK08 Den", "TK13 pH", "TK13 ORP", "TK13 Den", 
-        "TK14 pH", "TK14 ORP", "TK18 Den", "TH01 pH", "TH01 ORP", "TH01 Den", 
+        "Time", "Shift", 
+        "105TK02 pH", "105TK02 ORP", "105TK03 pH", "105TK03 ORP", "105TK05 pH", "105TK05 ORP", "105TK08 pH", "105TK08 ORP", "105TK08 Den", "105TK13 pH", "105TK13 ORP", "105TK13 Den", 
+        "106TK14 pH", "106TK14 ORP", "106TK18 Den", "106TH01 pH", "106TH01 ORP", "106TH01 Den", 
+        "106VE01 pH", "106VE01 ORP", "106VE02 pH", "106VE02 ORP", "106VE03 pH", "106VE03 ORP", "106VE04 pH", "106VE04 ORP",
         "FT1A NTU", "FT1B NTU", "FT1C NTU", "FT1D NTU", "FT1E NTU", "FT1F NTU", 
         "S2 Lab pH", "S2 Lab Temp", "S2 F.pH", "S2 F.Temp", "S3 Lab pH", "S3 Lab Temp", "S3 F.pH", "S3 F.Temp", "S4 Lab pH", "S4 Lab Temp", "S4 F.pH", "S4 F.Temp", 
         "931 pH", "931 F.pH", "934 pH", "934 F.pH", "Scan pH", "Lab pH", "Admin pH", "Safety pH",
@@ -1275,6 +1406,7 @@
         formatTime(r.readingTime), r.shift || calculateShift(r.readingTime),
         r.tk105_02_ph, r.tk105_02_orp, r.tk105_03_ph, r.tk105_03_orp, r.tk105_05_ph, r.tk105_05_orp, r.tk105_08_ph, r.tk105_08_orp, r.tk105_08_den, r.tk105_13_ph, r.tk105_13_orp, r.tk105_13_den,
         r.tk106_14_ph, r.tk106_14_orp, r.tk106_18_den, r.th106_01_ph, r.th106_01_orp, r.th106_01_den,
+        r.ve106_01_ph, r.ve106_01_orp, r.ve106_02_ph, r.ve106_02_orp, r.ve106_03_ph, r.ve106_03_orp, r.ve106_04_ph, r.ve106_04_orp,
         r.ft106_1a_ntu, r.ft106_1b_ntu, r.ft106_1c_ntu, r.ft106_1d_ntu, r.ft106_1e_ntu, r.ft106_1f_ntu,
         r.scrub2_ph, r.scrub2_temp, r.scrub2_fph, r.scrub2_ftemp, r.scrub3_ph, r.scrub3_temp, r.scrub3_fph, r.scrub3_ftemp, r.scrub4_ph, r.scrub4_temp, r.scrub4_fph, r.scrub4_ftemp,
         r.ditch_931_ph, r.ditch_931_fph, r.ditch_934_ph, r.ditch_934_fph, r.ditch_scan_ph, r.ditch_lab_ph, r.ditch_admin_ph, r.ditch_safety_ph,
