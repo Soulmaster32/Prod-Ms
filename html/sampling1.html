@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -121,7 +122,7 @@
     .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .full { grid-column: 1 / -1; }
-    .section-title { font-size: 13.5px; font-weight: 700; color: var(--accent); border-bottom: 1px solid rgba(34,211,238,0.2); padding-bottom: 6px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .section-title { font-size: 13.5px; font-weight: 700; color: var(--accent); border-bottom: 1px solid rgba(34,211,238,0.2); padding-bottom: 6px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: baseline; gap: 6px; }
 
     label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
     input, textarea { width: 100%; padding: 11px 14px; border-radius: 8px; border: 1px solid rgba(148,163,184,0.25); background: rgba(10, 15, 28, 0.8); color: white; font-family: inherit; font-size: 14px; outline: none; transition: all 0.2s; }
@@ -218,8 +219,8 @@
     <!-- Quick Stats -->
     <div class="stats-row" id="statsRow" style="display:none;">
       <div class="stat-chip">
-        <div class="icon-box" style="background:rgba(34,211,238,0.14); color:var(--accent)"><i class="fa-solid fa-vial"></i></div>
-        <div><div class="val" id="statTk08">–</div><div class="lbl">Latest 105TK08 pH</div></div>
+        <div class="icon-box" style="background:rgba(34,211,238,0.14); color:var(--accent)"><i class="fa-solid fa-bolt"></i></div>
+        <div><div class="val" id="statTk08">–</div><div class="lbl">Latest 105TK08 ORP</div></div>
       </div>
       <div class="stat-chip">
         <div class="icon-box" style="background:rgba(251,191,36,0.14); color:var(--amber)"><i class="fa-solid fa-droplet"></i></div>
@@ -312,39 +313,29 @@
               <div><label>ORP</label><input type="number" step="any" id="tk105_02_orp"></div>
               <div></div>
 
-              <div class="full section-title">105TK03</div>
+              <div class="full section-title">105TK03 <span style="font-size:11px; color:var(--muted); font-weight:normal; text-transform:none;">(Hourly)</span></div>
               <div><label>pH</label><input type="number" step="any" id="tk105_03_ph"></div>
               <div><label>ORP</label><input type="number" step="any" id="tk105_03_orp"></div>
               <div></div>
 
-              <div class="full section-title">105TK05</div>
+              <div class="full section-title">105TK05 <span style="font-size:11px; color:var(--muted); font-weight:normal; text-transform:none;">(Hourly)</span></div>
               <div><label>pH</label><input type="number" step="any" id="tk105_05_ph"></div>
               <div><label>ORP</label><input type="number" step="any" id="tk105_05_orp"></div>
-              <div></div>
-
-              <div class="full section-title">105TK08</div>
-              <div><label>pH</label><input type="number" step="any" id="tk105_08_ph"></div>
-              <div><label>ORP</label><input type="number" step="any" id="tk105_08_orp"></div>
-              <div></div>
-
-              <div class="full section-title">105TK13</div>
-              <div><label>pH</label><input type="number" step="any" id="tk105_13_ph"></div>
-              <div><label>ORP</label><input type="number" step="any" id="tk105_13_orp"></div>
               <div></div>
             </div>
           </div>
 
-          <!-- TAB 2: 106 Tanks & TH01 -->
+          <!-- TAB 2: 106 Tanks -->
           <div id="add-tab-2" style="display:none;">
             <div class="grid">
-              <div class="full section-title">106TK14</div>
+              <div class="full section-title">106TK14 <span style="font-size:11px; color:var(--muted); font-weight:normal; text-transform:none;">(Hourly)</span></div>
               <div><label>pH</label><input type="number" step="any" id="tk106_14_ph"></div>
               <div><label>ORP</label><input type="number" step="any" id="tk106_14_orp"></div>
               <div></div>
 
-              <div class="full section-title">106TH01</div>
-              <div><label>pH</label><input type="number" step="any" id="th106_01_ph"></div>
-              <div><label>ORP</label><input type="number" step="any" id="th106_01_orp"></div>
+              <div class="full section-title">106TK01 <span style="font-size:11px; color:var(--muted); font-weight:normal; text-transform:none;">(Hourly)</span></div>
+              <div><label>pH</label><input type="number" step="any" id="tk106_01_ph"></div>
+              <div><label>ORP</label><input type="number" step="any" id="tk106_01_orp"></div>
               <div></div>
             </div>
           </div>
@@ -362,27 +353,35 @@
               <div><label>ORP</label><input type="number" step="any" id="ve106_02_orp"></div>
               <div></div>
               
-              <div class="full section-title">106VE03</div>
+              <div class="full section-title">106VE03 <span style="font-size:11px; color:var(--muted); font-weight:normal; text-transform:none;">(Hourly)</span></div>
               <div><label>pH</label><input type="number" step="any" id="ve106_03_ph"></div>
               <div><label>ORP</label><input type="number" step="any" id="ve106_03_orp"></div>
               <div></div>
               
-              <div class="full section-title">106VE04</div>
+              <div class="full section-title">106VE04 <span style="font-size:11px; color:var(--muted); font-weight:normal; text-transform:none;">(Hourly)</span></div>
               <div><label>pH</label><input type="number" step="any" id="ve106_04_ph"></div>
               <div><label>ORP</label><input type="number" step="any" id="ve106_04_orp"></div>
               <div></div>
             </div>
           </div>
 
-          <!-- TAB 3: Density & Filters (Centers everything) -->
+          <!-- TAB 3: Density & Filters -->
           <div id="add-tab-3" style="display:none;">
             <div class="grid" style="margin-bottom: 24px;">
-              <div class="full section-title">Densities</div>
-              <div><label>105TK08 Density</label><input type="number" step="any" id="tk105_08_den"></div>
-              <div><label>105TK13 Density</label><input type="number" step="any" id="tk105_13_den"></div>
+              <div class="full section-title">105TK08</div>
+              <div><label>ORP</label><input type="number" step="any" id="tk105_08_orp"></div>
+              <div><label>Density</label><input type="number" step="any" id="tk105_08_den"></div>
+              <div class="full"></div>
+              
+              <div class="full section-title">105TK13</div>
+              <div><label>pH</label><input type="number" step="any" id="tk105_13_ph"></div>
+              <div><label>ORP</label><input type="number" step="any" id="tk105_13_orp"></div>
+              <div><label>Density</label><input type="number" step="any" id="tk105_13_den"></div>
+              
+              <div class="full section-title" style="margin-top: 8px;">106 Tanks Densities</div>
               <div><label>106TK18 Density</label><input type="number" step="any" id="tk106_18_den"></div>
-              <div><label>106TH01 Density</label><input type="number" step="any" id="th106_01_den"></div>
-              <div class="full"></div> <!-- Spacer to keep grid neat -->
+              <div><label>106TK01 Density</label><input type="number" step="any" id="tk106_01_den"></div>
+              <div class="full"></div> 
             </div>
             
             <div class="full section-title" style="margin-bottom: 12px;">105FT01 Filters</div>
@@ -473,10 +472,10 @@
             </div>
           </div>
 
-          <!-- TAB 4: Scrubbers (Temp included) -->
+          <!-- TAB 4: Scrubbers -->
           <div id="add-tab-4" style="display:none;">
             <div class="grid">
-              <div class="full section-title">Scrubber 2</div>
+              <div class="full section-title">Scrubber 2 <span style="font-size:11px; color:var(--muted); font-weight:normal; text-transform:none;">(Every 2 Hours)</span></div>
               <div><label>Lab pH</label><input type="number" step="any" id="scrub2_ph"></div>
               <div><label>Lab Temp</label><input type="number" step="any" id="scrub2_temp"></div>
               <div class="full" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
@@ -484,7 +483,7 @@
                 <div><label>Field Temp</label><input type="number" step="any" id="scrub2_ftemp"></div>
               </div>
 
-              <div class="full section-title">Scrubber 3</div>
+              <div class="full section-title">Scrubber 3 <span style="font-size:11px; color:var(--muted); font-weight:normal; text-transform:none;">(Every 2 Hours)</span></div>
               <div><label>Lab pH</label><input type="number" step="any" id="scrub3_ph"></div>
               <div><label>Lab Temp</label><input type="number" step="any" id="scrub3_temp"></div>
               <div class="full" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
@@ -492,7 +491,7 @@
                 <div><label>Field Temp</label><input type="number" step="any" id="scrub3_ftemp"></div>
               </div>
 
-              <div class="full section-title">Scrubber 4</div>
+              <div class="full section-title">Scrubber 4 <span style="font-size:11px; color:var(--muted); font-weight:normal; text-transform:none;">(Every 2 Hours)</span></div>
               <div><label>Lab pH</label><input type="number" step="any" id="scrub4_ph"></div>
               <div><label>Lab Temp</label><input type="number" step="any" id="scrub4_temp"></div>
               <div class="full" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
@@ -502,7 +501,7 @@
             </div>
           </div>
 
-          <!-- TAB 5: Ditches (5+ Points) -->
+          <!-- TAB 5: Ditches -->
           <div id="add-tab-5" style="display:none;">
             <div class="grid">
               <div class="full section-title">931 Ditch</div>
@@ -587,7 +586,7 @@
     let photos = { a:null, b:null, c:null, d:null, e:null, f:null };
     
     let chartInstance = null;
-    let chartInstance2 = null; // New variable for secondary charts (ORP in Vessels tab)
+    let chartInstance2 = null; 
     let currentSort = "desc";
     let currentShiftFilter = "all";
     
@@ -656,7 +655,21 @@
       label.textContent = text;
     }
 
-    function loadLocal() { try { const stored = localStorage.getItem(STORAGE_KEY); return stored ? JSON.parse(stored) : []; } catch { return []; } }
+    function loadLocal() { 
+      try { 
+        const stored = localStorage.getItem(STORAGE_KEY); 
+        let data = stored ? JSON.parse(stored) : [];
+        // Optional quick migration from th106_01 to tk106_01
+        data = data.map(r => {
+          if (r.th106_01_ph !== undefined) { r.tk106_01_ph = r.th106_01_ph; delete r.th106_01_ph; }
+          if (r.th106_01_orp !== undefined) { r.tk106_01_orp = r.th106_01_orp; delete r.th106_01_orp; }
+          if (r.th106_01_den !== undefined) { r.tk106_01_den = r.th106_01_den; delete r.th106_01_den; }
+          return r;
+        });
+        return data; 
+      } catch { return []; } 
+    }
+    
     function persistLocal() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); } catch (e) { console.warn("Local persist failed", e); } }
     function loadPending() { try { const stored = localStorage.getItem(PENDING_KEY); return stored ? JSON.parse(stored) : []; } catch { return []; } }
     function persistPending() { try { localStorage.setItem(PENDING_KEY, JSON.stringify(pendingOps)); } catch (e) { console.warn("Pending queue persist failed", e); } }
@@ -668,7 +681,16 @@
         await flushPendingOps();
         const res = await fetch(API_ENDPOINT);
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
-        const data = await res.json();
+        let data = await res.json();
+        
+        // Handle incoming legacy keys if any
+        data = data.map(r => {
+          if (r.th106_01_ph !== undefined) { r.tk106_01_ph = r.th106_01_ph; delete r.th106_01_ph; }
+          if (r.th106_01_orp !== undefined) { r.tk106_01_orp = r.th106_01_orp; delete r.th106_01_orp; }
+          if (r.th106_01_den !== undefined) { r.tk106_01_den = r.th106_01_den; delete r.th106_01_den; }
+          return r;
+        });
+
         if (Array.isArray(data)) {
           const merged = new Map();
           data.forEach(r => merged.set(r.id, r));
@@ -770,7 +792,7 @@
       const scrubPHs = [latest.scrub2_ph, latest.scrub3_ph, latest.scrub4_ph].filter(v => v !== null && v !== undefined && v !== "");
       const avgScrubPh = scrubPHs.length ? (scrubPHs.reduce((a,b)=>parseFloat(a)+parseFloat(b),0)/scrubPHs.length).toFixed(2) : '-';
 
-      document.getElementById("statTk08").textContent = latest.tk105_08_ph ?? '-';
+      document.getElementById("statTk08").textContent = latest.tk105_08_orp ?? '-';
       document.getElementById("statNtu").textContent = avgNtu;
       document.getElementById("statScrubpH").textContent = avgScrubPh;
       document.getElementById("statCount").textContent = sortedRecords.length;
@@ -786,7 +808,7 @@
       const fullTimes = chronData.map(r => formatTime(r.readingTime));
 
       let datasets = [];
-      let datasets2 = []; // Secondary chart specifically for isolated ORP/Secondary data
+      let datasets2 = []; 
 
       // Clear optional secondary chart by default
       const chartTitle2Container = document.getElementById("chartTitle2Container");
@@ -795,13 +817,11 @@
       chartTitle2Container.style.display = "none";
       chartContainer2.style.display = "none";
 
-      // Logic for the Filter Images Strip (Transferred to Combined tab)
       const imagesStrip = document.getElementById("filterImagesStrip");
       if (activeMainTab === 'combined') {
         imagesStrip.style.display = "flex";
-        // Find latest record which has at least one photo
         let latestImgRec = chronData.slice().reverse().find(r => r.ft106_1a_photo || r.ft106_1b_photo || r.ft106_1c_photo || r.ft106_1d_photo || r.ft106_1e_photo || r.ft106_1f_photo);
-        if (!latestImgRec) latestImgRec = chronData[chronData.length - 1]; // Fallback to absolute latest
+        if (!latestImgRec) latestImgRec = chronData[chronData.length - 1]; 
         
         imagesStrip.innerHTML = "";
         const letters = ['a','b','c','d','e','f'];
@@ -840,13 +860,7 @@
           { label: '105TK03 ORP', data: chronData.map(r => r.tk105_03_orp), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
           
           { label: '105TK05 pH', data: chronData.map(r => r.tk105_05_ph), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
-          { label: '105TK05 ORP', data: chronData.map(r => r.tk105_05_orp), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
-          
-          { label: '105TK08 pH', data: chronData.map(r => r.tk105_08_ph), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
-          { label: '105TK08 ORP', data: chronData.map(r => r.tk105_08_orp), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
-          
-          { label: '105TK13 pH', data: chronData.map(r => r.tk105_13_ph), borderColor: '#f87171', backgroundColor: '#f87171', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
-          { label: '105TK13 ORP', data: chronData.map(r => r.tk105_13_orp), borderColor: '#f87171', backgroundColor: '#f87171', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' }
+          { label: '105TK05 ORP', data: chronData.map(r => r.tk105_05_orp), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' }
         ];
       } else if (activeMainTab === '106') {
         document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> 106 Tanks Trend`;
@@ -854,12 +868,11 @@
           { label: '106TK14 pH', data: chronData.map(r => r.tk106_14_ph), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
           { label: '106TK14 ORP', data: chronData.map(r => r.tk106_14_orp), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
           
-          { label: '106TH01 pH', data: chronData.map(r => r.th106_01_ph), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
-          { label: '106TH01 ORP', data: chronData.map(r => r.th106_01_orp), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' }
+          { label: '106TK01 pH', data: chronData.map(r => r.tk106_01_ph), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '106TK01 ORP', data: chronData.map(r => r.tk106_01_orp), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' }
         ];
       } else if (activeMainTab === '106ve') {
         document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> 106 Vessels pH Trend`;
-        // Show the secondary container for completely isolated ORP Chart
         chartTitle2Container.style.display = "flex";
         chartContainer2.style.display = "block";
         
@@ -877,12 +890,20 @@
           { label: '106VE04 ORP', data: chronData.map(r => r.ve106_04_orp), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2.5, borderDash: [5, 5], pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' }
         ];
       } else if (activeMainTab === 'combined') {
-        document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> Density & 105FT01 Filters Trend`;
+        document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> Tanks (ORP/Den) & Filters Trend`;
         datasets = [
-          { label: '105TK08 Den', data: chronData.map(r => r.tk105_08_den), borderColor: '#f87171', backgroundColor: '#f87171', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
-          { label: '105TK13 Den', data: chronData.map(r => r.tk105_13_den), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
+          // ORPs & Densities (y1 axis)
+          { label: '105TK08 ORP', data: chronData.map(r => r.tk105_08_orp), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
+          { label: '105TK08 Den', data: chronData.map(r => r.tk105_08_den), borderColor: '#8b5cf6', backgroundColor: '#8b5cf6', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
+          
+          { label: '105TK13 pH', data: chronData.map(r => r.tk105_13_ph), borderColor: '#f87171', backgroundColor: '#f87171', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '105TK13 ORP', data: chronData.map(r => r.tk105_13_orp), borderColor: '#f87171', backgroundColor: '#f87171', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
+          { label: '105TK13 Den', data: chronData.map(r => r.tk105_13_den), borderColor: '#ef4444', backgroundColor: '#ef4444', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
+          
           { label: '106TK18 Den', data: chronData.map(r => r.tk106_18_den), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
-          { label: '106TH01 Den', data: chronData.map(r => r.th106_01_den), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
+          { label: '106TK01 Den', data: chronData.map(r => r.tk106_01_den), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
+          
+          // NTUs (y axis)
           { label: '105FT1A NTU', data: chronData.map(r => r.ft106_1a_ntu), borderColor: '#818cf8', backgroundColor: '#818cf8', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' },
           { label: '105FT1B NTU', data: chronData.map(r => r.ft106_1b_ntu), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' },
           { label: '105FT1C NTU', data: chronData.map(r => r.ft106_1c_ntu), borderColor: '#c084fc', backgroundColor: '#c084fc', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' },
@@ -934,12 +955,12 @@
             },
             y: { 
               type: 'linear', display: true, position: 'left',
-              title: { display: true, text: activeMainTab==='106ve' ? 'pH' : (activeMainTab==='combined' ? 'NTU' : 'pH / NTU'), color: '#8b98b3', font: {size: 11} },
+              title: { display: true, text: activeMainTab==='106ve' ? 'pH' : (activeMainTab==='combined' ? 'pH / NTU' : 'pH / NTU'), color: '#8b98b3', font: {size: 11} },
               ticks: { color: '#8b98b3', font: { size: 11 } }, 
               grid: { color: 'rgba(148, 163, 184, 0.08)' } 
             },
             y1: {
-              type: 'linear', display: 'auto', position: 'right', // 'auto' shows axis only if a linked dataset exists
+              type: 'linear', display: 'auto', position: 'right',
               title: { display: true, text: 'ORP / Temp / Density', color: '#8b98b3', font: {size: 11} },
               ticks: { color: '#8b98b3', font: { size: 11 } },
               grid: { drawOnChartArea: false }
@@ -948,7 +969,6 @@
         }
       });
 
-      // Render secondary separated chart if active tab is 106ve
       if (activeMainTab === '106ve' && datasets2.length > 0) {
         const ctx2 = document.getElementById('trendChart2').getContext('2d');
         chartInstance2 = new Chart(ctx2, {
@@ -987,16 +1007,16 @@
       
       if (activeMainTab === '105') {
         document.getElementById("tableTitle").innerHTML = `<i class="fa-solid fa-table-list"></i> 105 Tanks Log`;
-        headerHTML += `<th>105TK02 (pH/ORP)</th><th>105TK03 (pH/ORP)</th><th>105TK05 (pH/ORP)</th><th>105TK08 (pH/ORP)</th><th>105TK13 (pH/ORP)</th>`;
+        headerHTML += `<th>105TK02 (pH/ORP)</th><th>105TK03 (pH/ORP)</th><th>105TK05 (pH/ORP)</th>`;
       } else if (activeMainTab === '106') {
         document.getElementById("tableTitle").innerHTML = `<i class="fa-solid fa-table-list"></i> 106 Tanks Log`;
-        headerHTML += `<th>106TK14 (pH/ORP)</th><th>106TH01 (pH/ORP)</th>`;
+        headerHTML += `<th>106TK14 (pH/ORP)</th><th>106TK01 (pH/ORP)</th>`;
       } else if (activeMainTab === '106ve') {
         document.getElementById("tableTitle").innerHTML = `<i class="fa-solid fa-table-list"></i> 106 Vessels Log`;
         headerHTML += `<th>106VE01 (pH/ORP)</th><th>106VE02 (pH/ORP)</th><th>106VE03 (pH/ORP)</th><th>106VE04 (pH/ORP)</th>`;
       } else if (activeMainTab === 'combined') {
         document.getElementById("tableTitle").innerHTML = `<i class="fa-solid fa-table-list"></i> Density & 105FT01 Log`;
-        headerHTML += `<th>105TK08 (Den)</th><th>105TK13 (Den)</th><th>106TK18 (Den)</th><th>106TH01 (Den)</th><th>105FT01 A-F NTU (Avg)</th>`;
+        headerHTML += `<th>105TK08 (ORP/Den)</th><th>105TK13 (pH/ORP/Den)</th><th>106TK18 (Den)</th><th>106TK01 (Den)</th><th>105FT01 A-F NTU (Avg)</th>`;
       } else if (activeMainTab === 'scrubbers') {
         document.getElementById("tableTitle").innerHTML = `<i class="fa-solid fa-table-list"></i> Scrubbers Log (pH/Temp)`;
         headerHTML += `<th>Scrubber 2</th><th>Scrubber 3</th><th>Scrubber 4</th>`;
@@ -1039,13 +1059,11 @@
             <td><b>${escapeHtml(rec.tk105_02_ph)} / ${escapeHtml(rec.tk105_02_orp)}</b></td>
             <td><b>${escapeHtml(rec.tk105_03_ph)} / ${escapeHtml(rec.tk105_03_orp)}</b></td>
             <td><b>${escapeHtml(rec.tk105_05_ph)} / ${escapeHtml(rec.tk105_05_orp)}</b></td>
-            <td><b>${escapeHtml(rec.tk105_08_ph)} / ${escapeHtml(rec.tk105_08_orp)}</b></td>
-            <td><b>${escapeHtml(rec.tk105_13_ph)} / ${escapeHtml(rec.tk105_13_orp)}</b></td>
           `;
         } else if (activeMainTab === '106') {
           colsHTML += `
             <td><b>${escapeHtml(rec.tk106_14_ph)} / ${escapeHtml(rec.tk106_14_orp)}</b></td>
-            <td><b>${escapeHtml(rec.th106_01_ph)} / ${escapeHtml(rec.th106_01_orp)}</b></td>
+            <td><b>${escapeHtml(rec.tk106_01_ph)} / ${escapeHtml(rec.tk106_01_orp)}</b></td>
           `;
         } else if (activeMainTab === '106ve') {
           colsHTML += `
@@ -1058,10 +1076,10 @@
           const ntus = [rec.ft106_1a_ntu, rec.ft106_1b_ntu, rec.ft106_1c_ntu, rec.ft106_1d_ntu, rec.ft106_1e_ntu, rec.ft106_1f_ntu].filter(v => v !== null && v !== undefined && v !== "");
           const avgNtu = ntus.length ? (ntus.reduce((a,b)=>parseFloat(a)+parseFloat(b),0)/ntus.length).toFixed(2) : '-';
           colsHTML += `
-            <td><b>${escapeHtml(rec.tk105_08_den)}</b></td>
-            <td><b>${escapeHtml(rec.tk105_13_den)}</b></td>
+            <td><b>${escapeHtml(rec.tk105_08_orp)} / ${escapeHtml(rec.tk105_08_den)}</b></td>
+            <td><b>${escapeHtml(rec.tk105_13_ph)} / ${escapeHtml(rec.tk105_13_orp)} / ${escapeHtml(rec.tk105_13_den)}</b></td>
             <td><b>${escapeHtml(rec.tk106_18_den)}</b></td>
-            <td><b>${escapeHtml(rec.th106_01_den)}</b></td>
+            <td><b>${escapeHtml(rec.tk106_01_den)}</b></td>
             <td><b>${avgNtu}</b></td>
           `;
         } else if (activeMainTab === 'scrubbers') {
@@ -1100,12 +1118,12 @@
           if (!group.length) return;
           const tr = document.createElement("tr"); tr.className = "group-header-row";
           
-          let colSpanCount = 7; // Default for 105
-          if(activeMainTab === '106') colSpanCount = 4;
-          if(activeMainTab === '106ve') colSpanCount = 6;
+          let colSpanCount = 6; // Default for 105
+          if(activeMainTab === '106') colSpanCount = 5;
+          if(activeMainTab === '106ve') colSpanCount = 7;
           if(activeMainTab === 'combined') colSpanCount = 8;
-          if(activeMainTab === 'scrubbers') colSpanCount = 5;
-          if(activeMainTab === 'ditches') colSpanCount = 8;
+          if(activeMainTab === 'scrubbers') colSpanCount = 6;
+          if(activeMainTab === 'ditches') colSpanCount = 9;
           
           tr.innerHTML = `<td colspan="${colSpanCount}"><div class="group-header"><span class="badge-shift ${getShiftClass(shiftLabel)}">${shiftLabel}</span><span class="group-count">${group.length} reading${group.length !== 1 ? 's' : ''}</span></div></td>`;
           tbody.appendChild(tr);
@@ -1116,7 +1134,6 @@
       }
     }
 
-    // Helper to safely get value or null
     function getNum(id) {
       const val = parseFloat(document.getElementById(id).value);
       return isNaN(val) ? null : val;
@@ -1136,22 +1153,23 @@
         document.getElementById("recordId").value = rec.id;
         document.getElementById("readingTime").value = rec.readingTime;
         
-        // 105s (Removed Density fields)
+        // 105s
         document.getElementById("tk105_02_ph").value = rec.tk105_02_ph ?? ""; document.getElementById("tk105_02_orp").value = rec.tk105_02_orp ?? "";
         document.getElementById("tk105_03_ph").value = rec.tk105_03_ph ?? ""; document.getElementById("tk105_03_orp").value = rec.tk105_03_orp ?? "";
         document.getElementById("tk105_05_ph").value = rec.tk105_05_ph ?? ""; document.getElementById("tk105_05_orp").value = rec.tk105_05_orp ?? "";
-        document.getElementById("tk105_08_ph").value = rec.tk105_08_ph ?? ""; document.getElementById("tk105_08_orp").value = rec.tk105_08_orp ?? ""; 
-        document.getElementById("tk105_13_ph").value = rec.tk105_13_ph ?? ""; document.getElementById("tk105_13_orp").value = rec.tk105_13_orp ?? ""; 
         
-        // 106s (Removed Density fields)
+        // 106s
         document.getElementById("tk106_14_ph").value = rec.tk106_14_ph ?? ""; document.getElementById("tk106_14_orp").value = rec.tk106_14_orp ?? "";
-        document.getElementById("th106_01_ph").value = rec.th106_01_ph ?? ""; document.getElementById("th106_01_orp").value = rec.th106_01_orp ?? ""; 
+        document.getElementById("tk106_01_ph").value = rec.tk106_01_ph ?? ""; document.getElementById("tk106_01_orp").value = rec.tk106_01_orp ?? ""; 
         
-        // Density & Filters (Tab 3)
+        // Density & Filters
+        document.getElementById("tk105_08_orp").value = rec.tk105_08_orp ?? "";
         document.getElementById("tk105_08_den").value = rec.tk105_08_den ?? "";
+        document.getElementById("tk105_13_ph").value = rec.tk105_13_ph ?? "";
+        document.getElementById("tk105_13_orp").value = rec.tk105_13_orp ?? "";
         document.getElementById("tk105_13_den").value = rec.tk105_13_den ?? "";
         document.getElementById("tk106_18_den").value = rec.tk106_18_den ?? "";
-        document.getElementById("th106_01_den").value = rec.th106_01_den ?? "";
+        document.getElementById("tk106_01_den").value = rec.tk106_01_den ?? "";
         
         // 106ve
         document.getElementById("ve106_01_ph").value = rec.ve106_01_ph ?? ""; document.getElementById("ve106_01_orp").value = rec.ve106_01_orp ?? "";
@@ -1204,12 +1222,12 @@
         tk105_02_ph: getNum("tk105_02_ph"), tk105_02_orp: getNum("tk105_02_orp"),
         tk105_03_ph: getNum("tk105_03_ph"), tk105_03_orp: getNum("tk105_03_orp"),
         tk105_05_ph: getNum("tk105_05_ph"), tk105_05_orp: getNum("tk105_05_orp"),
-        tk105_08_ph: getNum("tk105_08_ph"), tk105_08_orp: getNum("tk105_08_orp"), tk105_08_den: getNum("tk105_08_den"),
+        tk105_08_orp: getNum("tk105_08_orp"), tk105_08_den: getNum("tk105_08_den"),
         tk105_13_ph: getNum("tk105_13_ph"), tk105_13_orp: getNum("tk105_13_orp"), tk105_13_den: getNum("tk105_13_den"),
         
         tk106_14_ph: getNum("tk106_14_ph"), tk106_14_orp: getNum("tk106_14_orp"),
         tk106_18_den: getNum("tk106_18_den"),
-        th106_01_ph: getNum("th106_01_ph"), th106_01_orp: getNum("th106_01_orp"), th106_01_den: getNum("th106_01_den"),
+        tk106_01_ph: getNum("tk106_01_ph"), tk106_01_orp: getNum("tk106_01_orp"), tk106_01_den: getNum("tk106_01_den"),
 
         ve106_01_ph: getNum("ve106_01_ph"), ve106_01_orp: getNum("ve106_01_orp"),
         ve106_02_ph: getNum("ve106_02_ph"), ve106_02_orp: getNum("ve106_02_orp"),
@@ -1287,10 +1305,6 @@
             <div class="kv"><label>pH</label><b>${escapeHtml(rec.tk105_03_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.tk105_03_orp)}</b></div><div></div>
             <div class="full section-title">105TK05</div>
             <div class="kv"><label>pH</label><b>${escapeHtml(rec.tk105_05_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.tk105_05_orp)}</b></div><div></div>
-            <div class="full section-title">105TK08</div>
-            <div class="kv"><label>pH</label><b>${escapeHtml(rec.tk105_08_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.tk105_08_orp)}</b></div><div></div>
-            <div class="full section-title">105TK13</div>
-            <div class="kv"><label>pH</label><b>${escapeHtml(rec.tk105_13_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.tk105_13_orp)}</b></div><div></div>
           </div>
         </div>
 
@@ -1299,8 +1313,8 @@
             <div class="full section-title">106TK14</div>
             <div class="kv"><label>pH</label><b>${escapeHtml(rec.tk106_14_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.tk106_14_orp)}</b></div><div></div>
             
-            <div class="full section-title">106TH01</div>
-            <div class="kv"><label>pH</label><b>${escapeHtml(rec.th106_01_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.th106_01_orp)}</b></div><div></div>
+            <div class="full section-title">106TK01</div>
+            <div class="kv"><label>pH</label><b>${escapeHtml(rec.tk106_01_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.tk106_01_orp)}</b></div><div></div>
           </div>
         </div>
 
@@ -1319,11 +1333,18 @@
 
         <div id="view-tab-3" style="display:none;">
           <div class="grid" style="margin-bottom: 24px;">
-            <div class="full section-title">Densities</div>
-            <div class="kv"><label>105TK08 Density</label><b style="text-align:center; font-size:17px;">${escapeHtml(rec.tk105_08_den)}</b></div>
-            <div class="kv"><label>105TK13 Density</label><b style="text-align:center; font-size:17px;">${escapeHtml(rec.tk105_13_den)}</b></div>
+            <div class="full section-title">105TK08</div>
+            <div class="kv"><label>ORP</label><b style="text-align:center; font-size:17px;">${escapeHtml(rec.tk105_08_orp)}</b></div>
+            <div class="kv"><label>Density</label><b style="text-align:center; font-size:17px;">${escapeHtml(rec.tk105_08_den)}</b></div><div class="full"></div>
+
+            <div class="full section-title">105TK13</div>
+            <div class="kv"><label>pH</label><b style="text-align:center; font-size:17px;">${escapeHtml(rec.tk105_13_ph)}</b></div>
+            <div class="kv"><label>ORP</label><b style="text-align:center; font-size:17px;">${escapeHtml(rec.tk105_13_orp)}</b></div>
+            <div class="kv"><label>Density</label><b style="text-align:center; font-size:17px;">${escapeHtml(rec.tk105_13_den)}</b></div>
+
+            <div class="full section-title">106 Tanks Densities</div>
             <div class="kv"><label>106TK18 Density</label><b style="text-align:center; font-size:17px;">${escapeHtml(rec.tk106_18_den)}</b></div>
-            <div class="kv"><label>106TH01 Density</label><b style="text-align:center; font-size:17px;">${escapeHtml(rec.th106_01_den)}</b></div>
+            <div class="kv"><label>106TK01 Density</label><b style="text-align:center; font-size:17px;">${escapeHtml(rec.tk106_01_den)}</b></div>
           </div>
           
           <div class="full section-title" style="margin-bottom:12px;">105FT01 Filters</div>
@@ -1381,12 +1402,10 @@
       document.getElementById("viewModal").classList.add("show");
     }
 
-    // Modal behavior controls
     function closeModals() { 
       document.querySelectorAll(".modal-bg").forEach(el => el.classList.remove("show")); 
     }
     
-    // Allows closing only the clicked modal background
     document.querySelectorAll('.modal-bg').forEach(bg => { 
       bg.addEventListener('click', (e) => { 
         if (e.target === bg) {
@@ -1404,7 +1423,6 @@
       } 
     });
 
-    // Image Viewer specific triggers
     function viewFullImage(src, title) {
       if(!src || src === 'null') return;
       document.getElementById("fullViewerImg").src = src;
@@ -1432,8 +1450,9 @@
     function exportXls() {
       const headers = [
         "Time", "Shift", 
-        "105TK02 pH", "105TK02 ORP", "105TK03 pH", "105TK03 ORP", "105TK05 pH", "105TK05 ORP", "105TK08 pH", "105TK08 ORP", "105TK08 Den", "105TK13 pH", "105TK13 ORP", "105TK13 Den", 
-        "106TK14 pH", "106TK14 ORP", "106TK18 Den", "106TH01 pH", "106TH01 ORP", "106TH01 Den", 
+        "105TK02 pH", "105TK02 ORP", "105TK03 pH", "105TK03 ORP", "105TK05 pH", "105TK05 ORP", 
+        "105TK08 ORP", "105TK08 Den", "105TK13 pH", "105TK13 ORP", "105TK13 Den", 
+        "106TK14 pH", "106TK14 ORP", "106TK18 Den", "106TK01 pH", "106TK01 ORP", "106TK01 Den", 
         "106VE01 pH", "106VE01 ORP", "106VE02 pH", "106VE02 ORP", "106VE03 pH", "106VE03 ORP", "106VE04 pH", "106VE04 ORP",
         "105FT1A NTU", "105FT1B NTU", "105FT1C NTU", "105FT1D NTU", "105FT1E NTU", "105FT1F NTU", 
         "S2 Lab pH", "S2 Lab Temp", "S2 F.pH", "S2 F.Temp", "S3 Lab pH", "S3 Lab Temp", "S3 F.pH", "S3 F.Temp", "S4 Lab pH", "S4 Lab Temp", "S4 F.pH", "S4 F.Temp", 
@@ -1445,8 +1464,9 @@
       
       sorted.forEach(r => rows.push([
         formatTime(r.readingTime), r.shift || calculateShift(r.readingTime),
-        r.tk105_02_ph, r.tk105_02_orp, r.tk105_03_ph, r.tk105_03_orp, r.tk105_05_ph, r.tk105_05_orp, r.tk105_08_ph, r.tk105_08_orp, r.tk105_08_den, r.tk105_13_ph, r.tk105_13_orp, r.tk105_13_den,
-        r.tk106_14_ph, r.tk106_14_orp, r.tk106_18_den, r.th106_01_ph, r.th106_01_orp, r.th106_01_den,
+        r.tk105_02_ph, r.tk105_02_orp, r.tk105_03_ph, r.tk105_03_orp, r.tk105_05_ph, r.tk105_05_orp, 
+        r.tk105_08_orp, r.tk105_08_den, r.tk105_13_ph, r.tk105_13_orp, r.tk105_13_den,
+        r.tk106_14_ph, r.tk106_14_orp, r.tk106_18_den, r.tk106_01_ph, r.tk106_01_orp, r.tk106_01_den,
         r.ve106_01_ph, r.ve106_01_orp, r.ve106_02_ph, r.ve106_02_orp, r.ve106_03_ph, r.ve106_03_orp, r.ve106_04_ph, r.ve106_04_orp,
         r.ft106_1a_ntu, r.ft106_1b_ntu, r.ft106_1c_ntu, r.ft106_1d_ntu, r.ft106_1e_ntu, r.ft106_1f_ntu,
         r.scrub2_ph, r.scrub2_temp, r.scrub2_fph, r.scrub2_ftemp, r.scrub3_ph, r.scrub3_temp, r.scrub3_fph, r.scrub3_ftemp, r.scrub4_ph, r.scrub4_temp, r.scrub4_fph, r.scrub4_ftemp,
