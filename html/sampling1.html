@@ -132,8 +132,6 @@
     .file-upload-wrapper input[type="file"] { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
     .file-upload-ui { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: 2px dashed rgba(148,163,184,0.28); border-radius: 8px; background: rgba(10, 15, 28, 0.5); color: var(--muted); font-weight: 500; font-size: 13px; transition: all 0.2s; }
     .file-upload-wrapper:hover .file-upload-ui { border-color: var(--accent); color: var(--accent); background: rgba(34, 211, 238, 0.05); }
-    .preview { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
-    .preview img { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(148,163,184,0.28); cursor: pointer; }
     
     .kv { margin-bottom: 12px; background: rgba(10, 15, 28, 0.45); padding: 12px 15px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.09); }
     .kv label { margin-bottom: 4px; font-size: 11px; }
@@ -212,7 +210,6 @@
       <button class="main-tab-btn active" id="dash-btn-105" onclick="switchDashboard('105')"><i class="fa-solid fa-flask"></i> 105 Tanks</button>
       <button class="main-tab-btn" id="dash-btn-106" onclick="switchDashboard('106')"><i class="fa-solid fa-flask"></i> 106 Tanks</button>
       <button class="main-tab-btn" id="dash-btn-106ve" onclick="switchDashboard('106ve')"><i class="fa-solid fa-flask-vial"></i> 106 Vessels (VE)</button>
-      <button class="main-tab-btn" id="dash-btn-filters" onclick="switchDashboard('filters')"><i class="fa-solid fa-droplet"></i> 106FT01 Filters</button>
       <button class="main-tab-btn" id="dash-btn-combined" onclick="switchDashboard('combined')"><i class="fa-solid fa-layer-group"></i> Density & Filters</button>
       <button class="main-tab-btn" id="dash-btn-scrubbers" onclick="switchDashboard('scrubbers')"><i class="fa-solid fa-wind"></i> Scrubbers</button>
       <button class="main-tab-btn" id="dash-btn-ditches" onclick="switchDashboard('ditches')"><i class="fa-solid fa-water"></i> Ditches</button>
@@ -226,7 +223,7 @@
       </div>
       <div class="stat-chip">
         <div class="icon-box" style="background:rgba(251,191,36,0.14); color:var(--amber)"><i class="fa-solid fa-droplet"></i></div>
-        <div><div class="val" id="statNtu">–</div><div class="lbl">Avg NTU (1A-1F)</div></div>
+        <div><div class="val" id="statNtu">–</div><div class="lbl">105FT01 Avg NTU</div></div>
       </div>
       <div class="stat-chip">
         <div class="icon-box" style="background:rgba(167,139,250,0.14); color:var(--violet)"><i class="fa-solid fa-flask"></i></div>
@@ -302,7 +299,7 @@
             <button type="button" class="tab-btn active" id="add-tab-btn-1" onclick="switchAddTab(1)">105 Tanks</button>
             <button type="button" class="tab-btn" id="add-tab-btn-2" onclick="switchAddTab(2)">106 Tanks</button>
             <button type="button" class="tab-btn" id="add-tab-btn-6" onclick="switchAddTab(6)">106 Vessels</button>
-            <button type="button" class="tab-btn" id="add-tab-btn-3" onclick="switchAddTab(3)">106FT01</button>
+            <button type="button" class="tab-btn" id="add-tab-btn-3" onclick="switchAddTab(3)">Density & Filters</button>
             <button type="button" class="tab-btn" id="add-tab-btn-4" onclick="switchAddTab(4)">Scrubbers</button>
             <button type="button" class="tab-btn" id="add-tab-btn-5" onclick="switchAddTab(5)">Ditches</button>
           </div>
@@ -328,12 +325,12 @@
               <div class="full section-title">105TK08</div>
               <div><label>pH</label><input type="number" step="any" id="tk105_08_ph"></div>
               <div><label>ORP</label><input type="number" step="any" id="tk105_08_orp"></div>
-              <div><label>Density</label><input type="number" step="any" id="tk105_08_den"></div>
+              <div></div>
 
               <div class="full section-title">105TK13</div>
               <div><label>pH</label><input type="number" step="any" id="tk105_13_ph"></div>
               <div><label>ORP</label><input type="number" step="any" id="tk105_13_orp"></div>
-              <div><label>Density</label><input type="number" step="any" id="tk105_13_den"></div>
+              <div></div>
             </div>
           </div>
 
@@ -345,14 +342,10 @@
               <div><label>ORP</label><input type="number" step="any" id="tk106_14_orp"></div>
               <div></div>
 
-              <div class="full section-title">106TK18</div>
-              <div><label>Density</label><input type="number" step="any" id="tk106_18_den"></div>
-              <div class="full"></div>
-
               <div class="full section-title">106TH01</div>
               <div><label>pH</label><input type="number" step="any" id="th106_01_ph"></div>
               <div><label>ORP</label><input type="number" step="any" id="th106_01_orp"></div>
-              <div><label>Density</label><input type="number" step="any" id="th106_01_den"></div>
+              <div></div>
             </div>
           </div>
           
@@ -381,67 +374,101 @@
             </div>
           </div>
 
-          <!-- TAB 3: Filters A-F -->
+          <!-- TAB 3: Density & Filters (Centers everything) -->
           <div id="add-tab-3" style="display:none;">
-            <div class="grid-2">
-              <div>
-                <div class="section-title">106FT01A</div>
-                <label>NTU Reading</label><input type="number" step="any" id="ft106_1a_ntu">
-                <div class="file-upload-wrapper" style="margin-top:8px;">
-                  <input type="file" accept="image/*" onchange="handlePhoto(event, 'a')" />
-                  <div class="file-upload-ui"><i class="fa-solid fa-camera"></i> Attach Photo</div>
+            <div class="grid" style="margin-bottom: 24px;">
+              <div class="full section-title">Densities</div>
+              <div><label>105TK08 Density</label><input type="number" step="any" id="tk105_08_den"></div>
+              <div><label>105TK13 Density</label><input type="number" step="any" id="tk105_13_den"></div>
+              <div><label>106TK18 Density</label><input type="number" step="any" id="tk106_18_den"></div>
+              <div><label>106TH01 Density</label><input type="number" step="any" id="th106_01_den"></div>
+              <div class="full"></div> <!-- Spacer to keep grid neat -->
+            </div>
+            
+            <div class="full section-title" style="margin-bottom: 12px;">105FT01 Filters</div>
+            <div class="grid">
+              <div style="display:flex; flex-direction:column; align-items:center; background:rgba(10,15,28,0.4); padding:16px; border-radius:12px; border:1px solid rgba(148,163,184,0.1);">
+                <div class="section-title" style="text-align:center; width:100%;">105FT01A</div>
+                <label style="text-align:center;">NTU Reading</label>
+                <input type="number" step="any" id="ft106_1a_ntu" style="text-align:center; width:80%; margin-bottom:12px;">
+                <div class="file-upload-wrapper" style="width:100%; display:flex; justify-content:center;">
+                  <input type="file" accept="image/*" onchange="handlePhoto(event, 'a')" style="width:80%; height:100%; position:absolute; top:0; left:10%; opacity:0; cursor:pointer;" />
+                  <div class="file-upload-ui" style="width:80%;"><i class="fa-solid fa-camera"></i> Attach Photo</div>
                 </div>
-                <div class="preview" id="prev-a" hidden><img id="img-a"><button type="button" class="btn-ghost" style="padding:4px 8px;" onclick="removePhoto('a')"><i class="fa-solid fa-xmark"></i></button></div>
-              </div>
-              
-              <div>
-                <div class="section-title">106FT01B</div>
-                <label>NTU Reading</label><input type="number" step="any" id="ft106_1b_ntu">
-                <div class="file-upload-wrapper" style="margin-top:8px;">
-                  <input type="file" accept="image/*" onchange="handlePhoto(event, 'b')" />
-                  <div class="file-upload-ui"><i class="fa-solid fa-camera"></i> Attach Photo</div>
+                <div class="preview" id="prev-a" hidden style="margin-top:12px; display:flex; flex-direction:column; align-items:center;">
+                  <img id="img-a" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border: 1px solid rgba(148,163,184,0.28);">
+                  <button type="button" class="btn-ghost" style="padding:6px 12px; margin-top:8px; font-size:11.5px;" onclick="removePhoto('a')"><i class="fa-solid fa-xmark"></i> Remove</button>
                 </div>
-                <div class="preview" id="prev-b" hidden><img id="img-b"><button type="button" class="btn-ghost" style="padding:4px 8px;" onclick="removePhoto('b')"><i class="fa-solid fa-xmark"></i></button></div>
-              </div>
-
-              <div>
-                <div class="section-title">106FT01C</div>
-                <label>NTU Reading</label><input type="number" step="any" id="ft106_1c_ntu">
-                <div class="file-upload-wrapper" style="margin-top:8px;">
-                  <input type="file" accept="image/*" onchange="handlePhoto(event, 'c')" />
-                  <div class="file-upload-ui"><i class="fa-solid fa-camera"></i> Attach Photo</div>
-                </div>
-                <div class="preview" id="prev-c" hidden><img id="img-c"><button type="button" class="btn-ghost" style="padding:4px 8px;" onclick="removePhoto('c')"><i class="fa-solid fa-xmark"></i></button></div>
               </div>
 
-              <div>
-                <div class="section-title">106FT01D</div>
-                <label>NTU Reading</label><input type="number" step="any" id="ft106_1d_ntu">
-                <div class="file-upload-wrapper" style="margin-top:8px;">
-                  <input type="file" accept="image/*" onchange="handlePhoto(event, 'd')" />
-                  <div class="file-upload-ui"><i class="fa-solid fa-camera"></i> Attach Photo</div>
+              <div style="display:flex; flex-direction:column; align-items:center; background:rgba(10,15,28,0.4); padding:16px; border-radius:12px; border:1px solid rgba(148,163,184,0.1);">
+                <div class="section-title" style="text-align:center; width:100%;">105FT01B</div>
+                <label style="text-align:center;">NTU Reading</label>
+                <input type="number" step="any" id="ft106_1b_ntu" style="text-align:center; width:80%; margin-bottom:12px;">
+                <div class="file-upload-wrapper" style="width:100%; display:flex; justify-content:center;">
+                  <input type="file" accept="image/*" onchange="handlePhoto(event, 'b')" style="width:80%; height:100%; position:absolute; top:0; left:10%; opacity:0; cursor:pointer;" />
+                  <div class="file-upload-ui" style="width:80%;"><i class="fa-solid fa-camera"></i> Attach Photo</div>
                 </div>
-                <div class="preview" id="prev-d" hidden><img id="img-d"><button type="button" class="btn-ghost" style="padding:4px 8px;" onclick="removePhoto('d')"><i class="fa-solid fa-xmark"></i></button></div>
+                <div class="preview" id="prev-b" hidden style="margin-top:12px; display:flex; flex-direction:column; align-items:center;">
+                  <img id="img-b" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border: 1px solid rgba(148,163,184,0.28);">
+                  <button type="button" class="btn-ghost" style="padding:6px 12px; margin-top:8px; font-size:11.5px;" onclick="removePhoto('b')"><i class="fa-solid fa-xmark"></i> Remove</button>
+                </div>
               </div>
 
-              <div>
-                <div class="section-title">106FT01E</div>
-                <label>NTU Reading</label><input type="number" step="any" id="ft106_1e_ntu">
-                <div class="file-upload-wrapper" style="margin-top:8px;">
-                  <input type="file" accept="image/*" onchange="handlePhoto(event, 'e')" />
-                  <div class="file-upload-ui"><i class="fa-solid fa-camera"></i> Attach Photo</div>
+              <div style="display:flex; flex-direction:column; align-items:center; background:rgba(10,15,28,0.4); padding:16px; border-radius:12px; border:1px solid rgba(148,163,184,0.1);">
+                <div class="section-title" style="text-align:center; width:100%;">105FT01C</div>
+                <label style="text-align:center;">NTU Reading</label>
+                <input type="number" step="any" id="ft106_1c_ntu" style="text-align:center; width:80%; margin-bottom:12px;">
+                <div class="file-upload-wrapper" style="width:100%; display:flex; justify-content:center;">
+                  <input type="file" accept="image/*" onchange="handlePhoto(event, 'c')" style="width:80%; height:100%; position:absolute; top:0; left:10%; opacity:0; cursor:pointer;" />
+                  <div class="file-upload-ui" style="width:80%;"><i class="fa-solid fa-camera"></i> Attach Photo</div>
                 </div>
-                <div class="preview" id="prev-e" hidden><img id="img-e"><button type="button" class="btn-ghost" style="padding:4px 8px;" onclick="removePhoto('e')"><i class="fa-solid fa-xmark"></i></button></div>
+                <div class="preview" id="prev-c" hidden style="margin-top:12px; display:flex; flex-direction:column; align-items:center;">
+                  <img id="img-c" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border: 1px solid rgba(148,163,184,0.28);">
+                  <button type="button" class="btn-ghost" style="padding:6px 12px; margin-top:8px; font-size:11.5px;" onclick="removePhoto('c')"><i class="fa-solid fa-xmark"></i> Remove</button>
+                </div>
               </div>
 
-              <div>
-                <div class="section-title">106FT01F</div>
-                <label>NTU Reading</label><input type="number" step="any" id="ft106_1f_ntu">
-                <div class="file-upload-wrapper" style="margin-top:8px;">
-                  <input type="file" accept="image/*" onchange="handlePhoto(event, 'f')" />
-                  <div class="file-upload-ui"><i class="fa-solid fa-camera"></i> Attach Photo</div>
+              <div style="display:flex; flex-direction:column; align-items:center; background:rgba(10,15,28,0.4); padding:16px; border-radius:12px; border:1px solid rgba(148,163,184,0.1);">
+                <div class="section-title" style="text-align:center; width:100%;">105FT01D</div>
+                <label style="text-align:center;">NTU Reading</label>
+                <input type="number" step="any" id="ft106_1d_ntu" style="text-align:center; width:80%; margin-bottom:12px;">
+                <div class="file-upload-wrapper" style="width:100%; display:flex; justify-content:center;">
+                  <input type="file" accept="image/*" onchange="handlePhoto(event, 'd')" style="width:80%; height:100%; position:absolute; top:0; left:10%; opacity:0; cursor:pointer;" />
+                  <div class="file-upload-ui" style="width:80%;"><i class="fa-solid fa-camera"></i> Attach Photo</div>
                 </div>
-                <div class="preview" id="prev-f" hidden><img id="img-f"><button type="button" class="btn-ghost" style="padding:4px 8px;" onclick="removePhoto('f')"><i class="fa-solid fa-xmark"></i></button></div>
+                <div class="preview" id="prev-d" hidden style="margin-top:12px; display:flex; flex-direction:column; align-items:center;">
+                  <img id="img-d" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border: 1px solid rgba(148,163,184,0.28);">
+                  <button type="button" class="btn-ghost" style="padding:6px 12px; margin-top:8px; font-size:11.5px;" onclick="removePhoto('d')"><i class="fa-solid fa-xmark"></i> Remove</button>
+                </div>
+              </div>
+
+              <div style="display:flex; flex-direction:column; align-items:center; background:rgba(10,15,28,0.4); padding:16px; border-radius:12px; border:1px solid rgba(148,163,184,0.1);">
+                <div class="section-title" style="text-align:center; width:100%;">105FT01E</div>
+                <label style="text-align:center;">NTU Reading</label>
+                <input type="number" step="any" id="ft106_1e_ntu" style="text-align:center; width:80%; margin-bottom:12px;">
+                <div class="file-upload-wrapper" style="width:100%; display:flex; justify-content:center;">
+                  <input type="file" accept="image/*" onchange="handlePhoto(event, 'e')" style="width:80%; height:100%; position:absolute; top:0; left:10%; opacity:0; cursor:pointer;" />
+                  <div class="file-upload-ui" style="width:80%;"><i class="fa-solid fa-camera"></i> Attach Photo</div>
+                </div>
+                <div class="preview" id="prev-e" hidden style="margin-top:12px; display:flex; flex-direction:column; align-items:center;">
+                  <img id="img-e" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border: 1px solid rgba(148,163,184,0.28);">
+                  <button type="button" class="btn-ghost" style="padding:6px 12px; margin-top:8px; font-size:11.5px;" onclick="removePhoto('e')"><i class="fa-solid fa-xmark"></i> Remove</button>
+                </div>
+              </div>
+
+              <div style="display:flex; flex-direction:column; align-items:center; background:rgba(10,15,28,0.4); padding:16px; border-radius:12px; border:1px solid rgba(148,163,184,0.1);">
+                <div class="section-title" style="text-align:center; width:100%;">105FT01F</div>
+                <label style="text-align:center;">NTU Reading</label>
+                <input type="number" step="any" id="ft106_1f_ntu" style="text-align:center; width:80%; margin-bottom:12px;">
+                <div class="file-upload-wrapper" style="width:100%; display:flex; justify-content:center;">
+                  <input type="file" accept="image/*" onchange="handlePhoto(event, 'f')" style="width:80%; height:100%; position:absolute; top:0; left:10%; opacity:0; cursor:pointer;" />
+                  <div class="file-upload-ui" style="width:80%;"><i class="fa-solid fa-camera"></i> Attach Photo</div>
+                </div>
+                <div class="preview" id="prev-f" hidden style="margin-top:12px; display:flex; flex-direction:column; align-items:center;">
+                  <img id="img-f" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border: 1px solid rgba(148,163,184,0.28);">
+                  <button type="button" class="btn-ghost" style="padding:6px 12px; margin-top:8px; font-size:11.5px;" onclick="removePhoto('f')"><i class="fa-solid fa-xmark"></i> Remove</button>
+                </div>
               </div>
             </div>
           </div>
@@ -737,11 +764,11 @@
       
       const latest = sortedRecords.slice().sort((a, b) => new Date(b.readingTime) - new Date(a.readingTime))[0];
       
-      const ntus = [latest.ft106_1a_ntu, latest.ft106_1b_ntu, latest.ft106_1c_ntu, latest.ft106_1d_ntu, latest.ft106_1e_ntu, latest.ft106_1f_ntu].filter(v => v !== null && v !== undefined);
-      const avgNtu = ntus.length ? (ntus.reduce((a,b)=>a+b,0)/ntus.length).toFixed(2) : '-';
+      const ntus = [latest.ft106_1a_ntu, latest.ft106_1b_ntu, latest.ft106_1c_ntu, latest.ft106_1d_ntu, latest.ft106_1e_ntu, latest.ft106_1f_ntu].filter(v => v !== null && v !== undefined && v !== "");
+      const avgNtu = ntus.length ? (ntus.reduce((a,b)=>parseFloat(a)+parseFloat(b),0)/ntus.length).toFixed(2) : '-';
       
-      const scrubPHs = [latest.scrub2_ph, latest.scrub3_ph, latest.scrub4_ph].filter(v => v !== null && v !== undefined);
-      const avgScrubPh = scrubPHs.length ? (scrubPHs.reduce((a,b)=>a+b,0)/scrubPHs.length).toFixed(2) : '-';
+      const scrubPHs = [latest.scrub2_ph, latest.scrub3_ph, latest.scrub4_ph].filter(v => v !== null && v !== undefined && v !== "");
+      const avgScrubPh = scrubPHs.length ? (scrubPHs.reduce((a,b)=>parseFloat(a)+parseFloat(b),0)/scrubPHs.length).toFixed(2) : '-';
 
       document.getElementById("statTk08").textContent = latest.tk105_08_ph ?? '-';
       document.getElementById("statNtu").textContent = avgNtu;
@@ -768,9 +795,9 @@
       chartTitle2Container.style.display = "none";
       chartContainer2.style.display = "none";
 
-      // Logic for the Filter Images Strip
+      // Logic for the Filter Images Strip (Transferred to Combined tab)
       const imagesStrip = document.getElementById("filterImagesStrip");
-      if (activeMainTab === 'filters') {
+      if (activeMainTab === 'combined') {
         imagesStrip.style.display = "flex";
         // Find latest record which has at least one photo
         let latestImgRec = chronData.slice().reverse().find(r => r.ft106_1a_photo || r.ft106_1b_photo || r.ft106_1c_photo || r.ft106_1d_photo || r.ft106_1e_photo || r.ft106_1f_photo);
@@ -783,18 +810,18 @@
           const timeStr = formatTimeShort(latestImgRec.readingTime);
           if (photo) {
             imagesStrip.innerHTML += `
-              <div class="strip-img-box" onclick="viewFullImage('${photo}', '106FT01${l.toUpperCase()} - Latest (${timeStr})')">
-                <img src="${photo}" title="View 106FT01${l.toUpperCase()}">
-                <div class="strip-img-label">FT1${l.toUpperCase()}</div>
+              <div class="strip-img-box" onclick="viewFullImage('${photo}', '105FT01${l.toUpperCase()} - Latest (${timeStr})')">
+                <img src="${photo}" title="View 105FT01${l.toUpperCase()}">
+                <div class="strip-img-label">105FT1${l.toUpperCase()}</div>
               </div>
             `;
           } else {
             imagesStrip.innerHTML += `
-              <div class="strip-img-box" style="cursor: default;" title="No Image for FT1${l.toUpperCase()}">
+              <div class="strip-img-box" style="cursor: default;" title="No Image for 105FT01${l.toUpperCase()}">
                 <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--muted); opacity: 0.6;">
                   <i class="fa-regular fa-image" style="font-size: 20px; margin-bottom: 8px;"></i>
                 </div>
-                <div class="strip-img-label">FT1${l.toUpperCase()}</div>
+                <div class="strip-img-label">105FT1${l.toUpperCase()}</div>
               </div>
             `;
           }
@@ -828,9 +855,7 @@
           { label: '106TK14 ORP', data: chronData.map(r => r.tk106_14_orp), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
           
           { label: '106TH01 pH', data: chronData.map(r => r.th106_01_ph), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
-          { label: '106TH01 ORP', data: chronData.map(r => r.th106_01_orp), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
-          
-          { label: '106TK18 Density', data: chronData.map(r => r.tk106_18_den), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y1' }
+          { label: '106TH01 ORP', data: chronData.map(r => r.th106_01_orp), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2, borderDash: [5, 5], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y1' }
         ];
       } else if (activeMainTab === '106ve') {
         document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> 106 Vessels pH Trend`;
@@ -851,29 +876,19 @@
           { label: '106VE03 ORP', data: chronData.map(r => r.ve106_03_orp), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, borderDash: [5, 5], pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
           { label: '106VE04 ORP', data: chronData.map(r => r.ve106_04_orp), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2.5, borderDash: [5, 5], pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' }
         ];
-      } else if (activeMainTab === 'filters') {
-        document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> 106FT01 Filters NTU Trend`;
-        datasets = [
-          { label: 'FT1A NTU', data: chronData.map(r => r.ft106_1a_ntu), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
-          { label: 'FT1B NTU', data: chronData.map(r => r.ft106_1b_ntu), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
-          { label: 'FT1C NTU', data: chronData.map(r => r.ft106_1c_ntu), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
-          { label: 'FT1D NTU', data: chronData.map(r => r.ft106_1d_ntu), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
-          { label: 'FT1E NTU', data: chronData.map(r => r.ft106_1e_ntu), borderColor: '#f87171', backgroundColor: '#f87171', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
-          { label: 'FT1F NTU', data: chronData.map(r => r.ft106_1f_ntu), borderColor: '#818cf8', backgroundColor: '#818cf8', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' }
-        ];
       } else if (activeMainTab === 'combined') {
-        document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> Combined Trend (Filters NTU & Densities)`;
+        document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> Density & 105FT01 Filters Trend`;
         datasets = [
           { label: '105TK08 Den', data: chronData.map(r => r.tk105_08_den), borderColor: '#f87171', backgroundColor: '#f87171', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
           { label: '105TK13 Den', data: chronData.map(r => r.tk105_13_den), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
           { label: '106TK18 Den', data: chronData.map(r => r.tk106_18_den), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
           { label: '106TH01 Den', data: chronData.map(r => r.th106_01_den), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
-          { label: 'FT1A NTU', data: chronData.map(r => r.ft106_1a_ntu), borderColor: '#818cf8', backgroundColor: '#818cf8', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' },
-          { label: 'FT1B NTU', data: chronData.map(r => r.ft106_1b_ntu), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' },
-          { label: 'FT1C NTU', data: chronData.map(r => r.ft106_1c_ntu), borderColor: '#c084fc', backgroundColor: '#c084fc', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' },
-          { label: 'FT1D NTU', data: chronData.map(r => r.ft106_1d_ntu), borderColor: '#e879f9', backgroundColor: '#e879f9', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' },
-          { label: 'FT1E NTU', data: chronData.map(r => r.ft106_1e_ntu), borderColor: '#f472b6', backgroundColor: '#f472b6', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' },
-          { label: 'FT1F NTU', data: chronData.map(r => r.ft106_1f_ntu), borderColor: '#fb7185', backgroundColor: '#fb7185', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' }
+          { label: '105FT1A NTU', data: chronData.map(r => r.ft106_1a_ntu), borderColor: '#818cf8', backgroundColor: '#818cf8', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '105FT1B NTU', data: chronData.map(r => r.ft106_1b_ntu), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '105FT1C NTU', data: chronData.map(r => r.ft106_1c_ntu), borderColor: '#c084fc', backgroundColor: '#c084fc', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '105FT1D NTU', data: chronData.map(r => r.ft106_1d_ntu), borderColor: '#e879f9', backgroundColor: '#e879f9', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '105FT1E NTU', data: chronData.map(r => r.ft106_1e_ntu), borderColor: '#f472b6', backgroundColor: '#f472b6', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: '105FT1F NTU', data: chronData.map(r => r.ft106_1f_ntu), borderColor: '#fb7185', backgroundColor: '#fb7185', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' }
         ];
       } else if (activeMainTab === 'scrubbers') {
         document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> Scrubbers Trend (pH & Temp)`;
@@ -975,16 +990,13 @@
         headerHTML += `<th>105TK02 (pH/ORP)</th><th>105TK03 (pH/ORP)</th><th>105TK05 (pH/ORP)</th><th>105TK08 (pH/ORP)</th><th>105TK13 (pH/ORP)</th>`;
       } else if (activeMainTab === '106') {
         document.getElementById("tableTitle").innerHTML = `<i class="fa-solid fa-table-list"></i> 106 Tanks Log`;
-        headerHTML += `<th>106TK14 (pH/ORP)</th><th>106TK18 (Den)</th><th>106TH01 (pH/ORP/Den)</th>`;
+        headerHTML += `<th>106TK14 (pH/ORP)</th><th>106TH01 (pH/ORP)</th>`;
       } else if (activeMainTab === '106ve') {
         document.getElementById("tableTitle").innerHTML = `<i class="fa-solid fa-table-list"></i> 106 Vessels Log`;
         headerHTML += `<th>106VE01 (pH/ORP)</th><th>106VE02 (pH/ORP)</th><th>106VE03 (pH/ORP)</th><th>106VE04 (pH/ORP)</th>`;
-      } else if (activeMainTab === 'filters') {
-        document.getElementById("tableTitle").innerHTML = `<i class="fa-solid fa-table-list"></i> 106FT01 Filters Log (NTU)`;
-        headerHTML += `<th>FT1A</th><th>FT1B</th><th>FT1C</th><th>FT1D</th><th>FT1E</th><th>FT1F</th>`;
       } else if (activeMainTab === 'combined') {
-        document.getElementById("tableTitle").innerHTML = `<i class="fa-solid fa-table-list"></i> Density & NTU Log`;
-        headerHTML += `<th>105TK08 (Den)</th><th>105TK13 (Den)</th><th>106TK18 (Den)</th><th>106TH01 (Den)</th><th>FT1A-1F NTU (Avg)</th>`;
+        document.getElementById("tableTitle").innerHTML = `<i class="fa-solid fa-table-list"></i> Density & 105FT01 Log`;
+        headerHTML += `<th>105TK08 (Den)</th><th>105TK13 (Den)</th><th>106TK18 (Den)</th><th>106TH01 (Den)</th><th>105FT01 A-F NTU (Avg)</th>`;
       } else if (activeMainTab === 'scrubbers') {
         document.getElementById("tableTitle").innerHTML = `<i class="fa-solid fa-table-list"></i> Scrubbers Log (pH/Temp)`;
         headerHTML += `<th>Scrubber 2</th><th>Scrubber 3</th><th>Scrubber 4</th>`;
@@ -1033,8 +1045,7 @@
         } else if (activeMainTab === '106') {
           colsHTML += `
             <td><b>${escapeHtml(rec.tk106_14_ph)} / ${escapeHtml(rec.tk106_14_orp)}</b></td>
-            <td><b>${escapeHtml(rec.tk106_18_den)}</b></td>
-            <td><b>${escapeHtml(rec.th106_01_ph)} / ${escapeHtml(rec.th106_01_orp)} / ${escapeHtml(rec.th106_01_den)}</b></td>
+            <td><b>${escapeHtml(rec.th106_01_ph)} / ${escapeHtml(rec.th106_01_orp)}</b></td>
           `;
         } else if (activeMainTab === '106ve') {
           colsHTML += `
@@ -1042,12 +1053,6 @@
             <td><b>${escapeHtml(rec.ve106_02_ph)} / ${escapeHtml(rec.ve106_02_orp)}</b></td>
             <td><b>${escapeHtml(rec.ve106_03_ph)} / ${escapeHtml(rec.ve106_03_orp)}</b></td>
             <td><b>${escapeHtml(rec.ve106_04_ph)} / ${escapeHtml(rec.ve106_04_orp)}</b></td>
-          `;
-        } else if (activeMainTab === 'filters') {
-          colsHTML += `
-            <td><b>${escapeHtml(rec.ft106_1a_ntu)}</b></td><td><b>${escapeHtml(rec.ft106_1b_ntu)}</b></td>
-            <td><b>${escapeHtml(rec.ft106_1c_ntu)}</b></td><td><b>${escapeHtml(rec.ft106_1d_ntu)}</b></td>
-            <td><b>${escapeHtml(rec.ft106_1e_ntu)}</b></td><td><b>${escapeHtml(rec.ft106_1f_ntu)}</b></td>
           `;
         } else if (activeMainTab === 'combined') {
           const ntus = [rec.ft106_1a_ntu, rec.ft106_1b_ntu, rec.ft106_1c_ntu, rec.ft106_1d_ntu, rec.ft106_1e_ntu, rec.ft106_1f_ntu].filter(v => v !== null && v !== undefined && v !== "");
@@ -1096,9 +1101,8 @@
           const tr = document.createElement("tr"); tr.className = "group-header-row";
           
           let colSpanCount = 7; // Default for 105
-          if(activeMainTab === '106') colSpanCount = 5;
+          if(activeMainTab === '106') colSpanCount = 4;
           if(activeMainTab === '106ve') colSpanCount = 6;
-          if(activeMainTab === 'filters') colSpanCount = 8;
           if(activeMainTab === 'combined') colSpanCount = 8;
           if(activeMainTab === 'scrubbers') colSpanCount = 5;
           if(activeMainTab === 'ditches') colSpanCount = 8;
@@ -1132,17 +1136,22 @@
         document.getElementById("recordId").value = rec.id;
         document.getElementById("readingTime").value = rec.readingTime;
         
-        // 105s
+        // 105s (Removed Density fields)
         document.getElementById("tk105_02_ph").value = rec.tk105_02_ph ?? ""; document.getElementById("tk105_02_orp").value = rec.tk105_02_orp ?? "";
         document.getElementById("tk105_03_ph").value = rec.tk105_03_ph ?? ""; document.getElementById("tk105_03_orp").value = rec.tk105_03_orp ?? "";
         document.getElementById("tk105_05_ph").value = rec.tk105_05_ph ?? ""; document.getElementById("tk105_05_orp").value = rec.tk105_05_orp ?? "";
-        document.getElementById("tk105_08_ph").value = rec.tk105_08_ph ?? ""; document.getElementById("tk105_08_orp").value = rec.tk105_08_orp ?? ""; document.getElementById("tk105_08_den").value = rec.tk105_08_den ?? "";
-        document.getElementById("tk105_13_ph").value = rec.tk105_13_ph ?? ""; document.getElementById("tk105_13_orp").value = rec.tk105_13_orp ?? ""; document.getElementById("tk105_13_den").value = rec.tk105_13_den ?? "";
+        document.getElementById("tk105_08_ph").value = rec.tk105_08_ph ?? ""; document.getElementById("tk105_08_orp").value = rec.tk105_08_orp ?? ""; 
+        document.getElementById("tk105_13_ph").value = rec.tk105_13_ph ?? ""; document.getElementById("tk105_13_orp").value = rec.tk105_13_orp ?? ""; 
         
-        // 106s
+        // 106s (Removed Density fields)
         document.getElementById("tk106_14_ph").value = rec.tk106_14_ph ?? ""; document.getElementById("tk106_14_orp").value = rec.tk106_14_orp ?? "";
+        document.getElementById("th106_01_ph").value = rec.th106_01_ph ?? ""; document.getElementById("th106_01_orp").value = rec.th106_01_orp ?? ""; 
+        
+        // Density & Filters (Tab 3)
+        document.getElementById("tk105_08_den").value = rec.tk105_08_den ?? "";
+        document.getElementById("tk105_13_den").value = rec.tk105_13_den ?? "";
         document.getElementById("tk106_18_den").value = rec.tk106_18_den ?? "";
-        document.getElementById("th106_01_ph").value = rec.th106_01_ph ?? ""; document.getElementById("th106_01_orp").value = rec.th106_01_orp ?? ""; document.getElementById("th106_01_den").value = rec.th106_01_den ?? "";
+        document.getElementById("th106_01_den").value = rec.th106_01_den ?? "";
         
         // 106ve
         document.getElementById("ve106_01_ph").value = rec.ve106_01_ph ?? ""; document.getElementById("ve106_01_orp").value = rec.ve106_01_orp ?? "";
@@ -1150,7 +1159,7 @@
         document.getElementById("ve106_03_ph").value = rec.ve106_03_ph ?? ""; document.getElementById("ve106_03_orp").value = rec.ve106_03_orp ?? "";
         document.getElementById("ve106_04_ph").value = rec.ve106_04_ph ?? ""; document.getElementById("ve106_04_orp").value = rec.ve106_04_orp ?? "";
 
-        // Filters
+        // Filters inside Tab 3
         ['a','b','c','d','e','f'].forEach(l => {
           document.getElementById(`ft106_1${l}_ntu`).value = rec[`ft106_1${l}_ntu`] ?? "";
           if (rec[`ft106_1${l}_photo`]) {
@@ -1265,7 +1274,7 @@
           <button type="button" class="tab-btn active" id="view-tab-btn-1" onclick="switchViewTab(1)">105 Tanks</button>
           <button type="button" class="tab-btn" id="view-tab-btn-2" onclick="switchViewTab(2)">106 Tanks</button>
           <button type="button" class="tab-btn" id="view-tab-btn-6" onclick="switchViewTab(6)">106 Vessels</button>
-          <button type="button" class="tab-btn" id="view-tab-btn-3" onclick="switchViewTab(3)">106FT01</button>
+          <button type="button" class="tab-btn" id="view-tab-btn-3" onclick="switchViewTab(3)">Density & Filters</button>
           <button type="button" class="tab-btn" id="view-tab-btn-4" onclick="switchViewTab(4)">Scrubbers</button>
           <button type="button" class="tab-btn" id="view-tab-btn-5" onclick="switchViewTab(5)">Ditches</button>
         </div>
@@ -1279,9 +1288,9 @@
             <div class="full section-title">105TK05</div>
             <div class="kv"><label>pH</label><b>${escapeHtml(rec.tk105_05_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.tk105_05_orp)}</b></div><div></div>
             <div class="full section-title">105TK08</div>
-            <div class="kv"><label>pH</label><b>${escapeHtml(rec.tk105_08_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.tk105_08_orp)}</b></div><div class="kv"><label>Density</label><b>${escapeHtml(rec.tk105_08_den)}</b></div>
+            <div class="kv"><label>pH</label><b>${escapeHtml(rec.tk105_08_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.tk105_08_orp)}</b></div><div></div>
             <div class="full section-title">105TK13</div>
-            <div class="kv"><label>pH</label><b>${escapeHtml(rec.tk105_13_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.tk105_13_orp)}</b></div><div class="kv"><label>Density</label><b>${escapeHtml(rec.tk105_13_den)}</b></div>
+            <div class="kv"><label>pH</label><b>${escapeHtml(rec.tk105_13_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.tk105_13_orp)}</b></div><div></div>
           </div>
         </div>
 
@@ -1289,10 +1298,9 @@
           <div class="grid">
             <div class="full section-title">106TK14</div>
             <div class="kv"><label>pH</label><b>${escapeHtml(rec.tk106_14_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.tk106_14_orp)}</b></div><div></div>
-            <div class="full section-title">106TK18</div>
-            <div class="kv"><label>Density</label><b>${escapeHtml(rec.tk106_18_den)}</b></div><div class="full"></div>
+            
             <div class="full section-title">106TH01</div>
-            <div class="kv"><label>pH</label><b>${escapeHtml(rec.th106_01_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.th106_01_orp)}</b></div><div class="kv"><label>Density</label><b>${escapeHtml(rec.th106_01_den)}</b></div>
+            <div class="kv"><label>pH</label><b>${escapeHtml(rec.th106_01_ph)}</b></div><div class="kv"><label>ORP</label><b>${escapeHtml(rec.th106_01_orp)}</b></div><div></div>
           </div>
         </div>
 
@@ -1310,14 +1318,23 @@
         </div>
 
         <div id="view-tab-3" style="display:none;">
-          <div class="grid-2">
+          <div class="grid" style="margin-bottom: 24px;">
+            <div class="full section-title">Densities</div>
+            <div class="kv"><label>105TK08 Density</label><b style="text-align:center; font-size:17px;">${escapeHtml(rec.tk105_08_den)}</b></div>
+            <div class="kv"><label>105TK13 Density</label><b style="text-align:center; font-size:17px;">${escapeHtml(rec.tk105_13_den)}</b></div>
+            <div class="kv"><label>106TK18 Density</label><b style="text-align:center; font-size:17px;">${escapeHtml(rec.tk106_18_den)}</b></div>
+            <div class="kv"><label>106TH01 Density</label><b style="text-align:center; font-size:17px;">${escapeHtml(rec.th106_01_den)}</b></div>
+          </div>
+          
+          <div class="full section-title" style="margin-bottom:12px;">105FT01 Filters</div>
+          <div class="grid">
             ${['a','b','c','d','e','f'].map(l => `
               <div style="background: rgba(10, 15, 28, 0.45); padding: 16px; border-radius: 12px; border: 1px solid rgba(148,163,184,0.09); display: flex; flex-direction: column; align-items: center;">
-                <div class="section-title" style="margin-bottom: 12px; text-align: center; width: 100%; border-bottom: 1px solid rgba(34,211,238,0.1); padding-bottom: 8px;">106FT01${l.toUpperCase()}</div>
+                <div class="section-title" style="margin-bottom: 12px; text-align: center; width: 100%; border-bottom: 1px solid rgba(34,211,238,0.1); padding-bottom: 8px;">105FT01${l.toUpperCase()}</div>
                 <label style="font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px;">NTU Reading</label>
                 <b style="font-size: 22px; color: var(--ok); margin-bottom: 16px;">${escapeHtml(rec[`ft106_1${l}_ntu`])}</b>
                 <div style="width: 140px; height: 140px; border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.3); border: 1px dashed rgba(148,163,184,0.3); display: flex; align-items: center; justify-content: center;">
-                  ${rec[`ft106_1${l}_photo`] ? `<img src="${rec[`ft106_1${l}_photo`]}" onclick="viewFullImage('${rec[`ft106_1${l}_photo`]}', '106FT01${l.toUpperCase()} - ${formatTimeShort(rec.readingTime)}')" style="width:100%; height:100%; object-fit:cover; cursor:pointer;" title="Click to view large">` : `<div style="color:var(--muted); display:flex; flex-direction:column; align-items:center;"><i class="fa-regular fa-image" style="font-size:24px; margin-bottom:8px"></i><span style="font-size:11px">No Image</span></div>`}
+                  ${rec[`ft106_1${l}_photo`] ? `<img src="${rec[`ft106_1${l}_photo`]}" onclick="viewFullImage('${rec[`ft106_1${l}_photo`]}', '105FT01${l.toUpperCase()} - ${formatTimeShort(rec.readingTime)}')" style="width:100%; height:100%; object-fit:cover; cursor:pointer;" title="Click to view large">` : `<div style="color:var(--muted); display:flex; flex-direction:column; align-items:center;"><i class="fa-regular fa-image" style="font-size:24px; margin-bottom:8px"></i><span style="font-size:11px">No Image</span></div>`}
                 </div>
               </div>
             `).join('')}
@@ -1418,7 +1435,7 @@
         "105TK02 pH", "105TK02 ORP", "105TK03 pH", "105TK03 ORP", "105TK05 pH", "105TK05 ORP", "105TK08 pH", "105TK08 ORP", "105TK08 Den", "105TK13 pH", "105TK13 ORP", "105TK13 Den", 
         "106TK14 pH", "106TK14 ORP", "106TK18 Den", "106TH01 pH", "106TH01 ORP", "106TH01 Den", 
         "106VE01 pH", "106VE01 ORP", "106VE02 pH", "106VE02 ORP", "106VE03 pH", "106VE03 ORP", "106VE04 pH", "106VE04 ORP",
-        "FT1A NTU", "FT1B NTU", "FT1C NTU", "FT1D NTU", "FT1E NTU", "FT1F NTU", 
+        "105FT1A NTU", "105FT1B NTU", "105FT1C NTU", "105FT1D NTU", "105FT1E NTU", "105FT1F NTU", 
         "S2 Lab pH", "S2 Lab Temp", "S2 F.pH", "S2 F.Temp", "S3 Lab pH", "S3 Lab Temp", "S3 F.pH", "S3 F.Temp", "S4 Lab pH", "S4 Lab Temp", "S4 F.pH", "S4 F.Temp", 
         "931 pH", "931 F.pH", "934 pH", "934 F.pH", "Scan pH", "Lab pH", "Admin pH", "Safety pH",
         "Notes"
