@@ -213,6 +213,7 @@
       <button class="main-tab-btn" id="dash-btn-106" onclick="switchDashboard('106')"><i class="fa-solid fa-flask"></i> 106 Tanks</button>
       <button class="main-tab-btn" id="dash-btn-106ve" onclick="switchDashboard('106ve')"><i class="fa-solid fa-flask-vial"></i> 106 Vessels (VE)</button>
       <button class="main-tab-btn" id="dash-btn-filters" onclick="switchDashboard('filters')"><i class="fa-solid fa-droplet"></i> 106FT01 Filters</button>
+      <button class="main-tab-btn" id="dash-btn-combined" onclick="switchDashboard('combined')"><i class="fa-solid fa-layer-group"></i> Density & Filters</button>
       <button class="main-tab-btn" id="dash-btn-scrubbers" onclick="switchDashboard('scrubbers')"><i class="fa-solid fa-wind"></i> Scrubbers</button>
       <button class="main-tab-btn" id="dash-btn-ditches" onclick="switchDashboard('ditches')"><i class="fa-solid fa-water"></i> Ditches</button>
     </div>
@@ -860,6 +861,20 @@
           { label: 'FT1E NTU', data: chronData.map(r => r.ft106_1e_ntu), borderColor: '#f87171', backgroundColor: '#f87171', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' },
           { label: 'FT1F NTU', data: chronData.map(r => r.ft106_1f_ntu), borderColor: '#818cf8', backgroundColor: '#818cf8', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y' }
         ];
+      } else if (activeMainTab === 'combined') {
+        document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> Combined Trend (Filters NTU & Densities)`;
+        datasets = [
+          { label: '105TK08 Den', data: chronData.map(r => r.tk105_08_den), borderColor: '#f87171', backgroundColor: '#f87171', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
+          { label: '105TK13 Den', data: chronData.map(r => r.tk105_13_den), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
+          { label: '106TK18 Den', data: chronData.map(r => r.tk106_18_den), borderColor: '#34d399', backgroundColor: '#34d399', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
+          { label: '106TH01 Den', data: chronData.map(r => r.th106_01_den), borderColor: '#22d3ee', backgroundColor: '#22d3ee', borderWidth: 2.5, pointRadius: 4, tension: 0.35, spanGaps: true, yAxisID: 'y1' },
+          { label: 'FT1A NTU', data: chronData.map(r => r.ft106_1a_ntu), borderColor: '#818cf8', backgroundColor: '#818cf8', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: 'FT1B NTU', data: chronData.map(r => r.ft106_1b_ntu), borderColor: '#a78bfa', backgroundColor: '#a78bfa', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: 'FT1C NTU', data: chronData.map(r => r.ft106_1c_ntu), borderColor: '#c084fc', backgroundColor: '#c084fc', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: 'FT1D NTU', data: chronData.map(r => r.ft106_1d_ntu), borderColor: '#e879f9', backgroundColor: '#e879f9', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: 'FT1E NTU', data: chronData.map(r => r.ft106_1e_ntu), borderColor: '#f472b6', backgroundColor: '#f472b6', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' },
+          { label: 'FT1F NTU', data: chronData.map(r => r.ft106_1f_ntu), borderColor: '#fb7185', backgroundColor: '#fb7185', borderWidth: 2, borderDash: [4, 4], pointRadius: 3, tension: 0.35, spanGaps: true, yAxisID: 'y' }
+        ];
       } else if (activeMainTab === 'scrubbers') {
         document.getElementById("chartTitle").innerHTML = `<i class="fa-solid fa-chart-line"></i> Scrubbers Trend (pH & Temp)`;
         datasets = [
@@ -904,7 +919,7 @@
             },
             y: { 
               type: 'linear', display: true, position: 'left',
-              title: { display: true, text: activeMainTab==='106ve' ? 'pH' : 'pH / NTU', color: '#8b98b3', font: {size: 11} },
+              title: { display: true, text: activeMainTab==='106ve' ? 'pH' : (activeMainTab==='combined' ? 'NTU' : 'pH / NTU'), color: '#8b98b3', font: {size: 11} },
               ticks: { color: '#8b98b3', font: { size: 11 } }, 
               grid: { color: 'rgba(148, 163, 184, 0.08)' } 
             },
@@ -967,6 +982,9 @@
       } else if (activeMainTab === 'filters') {
         document.getElementById("tableTitle").innerHTML = `<i class="fa-solid fa-table-list"></i> 106FT01 Filters Log (NTU)`;
         headerHTML += `<th>FT1A</th><th>FT1B</th><th>FT1C</th><th>FT1D</th><th>FT1E</th><th>FT1F</th>`;
+      } else if (activeMainTab === 'combined') {
+        document.getElementById("tableTitle").innerHTML = `<i class="fa-solid fa-table-list"></i> Density & NTU Log`;
+        headerHTML += `<th>105TK08 (Den)</th><th>105TK13 (Den)</th><th>106TK18 (Den)</th><th>106TH01 (Den)</th><th>FT1A-1F NTU (Avg)</th>`;
       } else if (activeMainTab === 'scrubbers') {
         document.getElementById("tableTitle").innerHTML = `<i class="fa-solid fa-table-list"></i> Scrubbers Log (pH/Temp)`;
         headerHTML += `<th>Scrubber 2</th><th>Scrubber 3</th><th>Scrubber 4</th>`;
@@ -1031,6 +1049,16 @@
             <td><b>${escapeHtml(rec.ft106_1c_ntu)}</b></td><td><b>${escapeHtml(rec.ft106_1d_ntu)}</b></td>
             <td><b>${escapeHtml(rec.ft106_1e_ntu)}</b></td><td><b>${escapeHtml(rec.ft106_1f_ntu)}</b></td>
           `;
+        } else if (activeMainTab === 'combined') {
+          const ntus = [rec.ft106_1a_ntu, rec.ft106_1b_ntu, rec.ft106_1c_ntu, rec.ft106_1d_ntu, rec.ft106_1e_ntu, rec.ft106_1f_ntu].filter(v => v !== null && v !== undefined && v !== "");
+          const avgNtu = ntus.length ? (ntus.reduce((a,b)=>parseFloat(a)+parseFloat(b),0)/ntus.length).toFixed(2) : '-';
+          colsHTML += `
+            <td><b>${escapeHtml(rec.tk105_08_den)}</b></td>
+            <td><b>${escapeHtml(rec.tk105_13_den)}</b></td>
+            <td><b>${escapeHtml(rec.tk106_18_den)}</b></td>
+            <td><b>${escapeHtml(rec.th106_01_den)}</b></td>
+            <td><b>${avgNtu}</b></td>
+          `;
         } else if (activeMainTab === 'scrubbers') {
           colsHTML += `
             <td><b>${escapeHtml(rec.scrub2_ph)} / ${escapeHtml(rec.scrub2_temp)}</b></td>
@@ -1071,6 +1099,7 @@
           if(activeMainTab === '106') colSpanCount = 5;
           if(activeMainTab === '106ve') colSpanCount = 6;
           if(activeMainTab === 'filters') colSpanCount = 8;
+          if(activeMainTab === 'combined') colSpanCount = 8;
           if(activeMainTab === 'scrubbers') colSpanCount = 5;
           if(activeMainTab === 'ditches') colSpanCount = 8;
           
@@ -1226,8 +1255,6 @@
       const rec = records.find(r => r.id === id); if (!rec) return;
       const shiftStr = rec.shift || calculateShift(rec.readingTime);
       
-      const imgPlaceholder = `<div style="width:100%; aspect-ratio:1; border-radius:6px; background:rgba(10,15,28,0.5); display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--muted); border:1px dashed rgba(148,163,184,0.28)"><i class="fa-regular fa-image" style="font-size:20px; margin-bottom:4px"></i>No Image</div>`;
-      
       document.getElementById("viewBody").innerHTML = `
         <div style="display:flex; gap:12px; margin-bottom: 16px;">
              <div class="kv" style="flex:1; margin:0;"><label><i class="fa-regular fa-clock"></i> Time</label><b>${formatTime(rec.readingTime)}</b></div>
@@ -1285,15 +1312,12 @@
         <div id="view-tab-3" style="display:none;">
           <div class="grid-2">
             ${['a','b','c','d','e','f'].map(l => `
-              <div>
-                <div class="section-title">106FT01${l.toUpperCase()}</div>
-                <div class="kv" style="display:flex; gap:16px;">
-                  <div style="flex:1;">
-                    <label>NTU</label><b style="font-size:18px; color:var(--ok);">${escapeHtml(rec[`ft106_1${l}_ntu`])}</b>
-                  </div>
-                  <div style="width:72px;">
-                    ${rec[`ft106_1${l}_photo`] ? `<img src="${rec[`ft106_1${l}_photo`]}" onclick="viewFullImage('${rec[`ft106_1${l}_photo`]}', '106FT01${l.toUpperCase()} - ${formatTimeShort(rec.readingTime)}')" style="width:100%; aspect-ratio:1; object-fit:cover; border-radius:6px; cursor:pointer;" title="Click to view large">` : imgPlaceholder}
-                  </div>
+              <div style="background: rgba(10, 15, 28, 0.45); padding: 16px; border-radius: 12px; border: 1px solid rgba(148,163,184,0.09); display: flex; flex-direction: column; align-items: center;">
+                <div class="section-title" style="margin-bottom: 12px; text-align: center; width: 100%; border-bottom: 1px solid rgba(34,211,238,0.1); padding-bottom: 8px;">106FT01${l.toUpperCase()}</div>
+                <label style="font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px;">NTU Reading</label>
+                <b style="font-size: 22px; color: var(--ok); margin-bottom: 16px;">${escapeHtml(rec[`ft106_1${l}_ntu`])}</b>
+                <div style="width: 140px; height: 140px; border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.3); border: 1px dashed rgba(148,163,184,0.3); display: flex; align-items: center; justify-content: center;">
+                  ${rec[`ft106_1${l}_photo`] ? `<img src="${rec[`ft106_1${l}_photo`]}" onclick="viewFullImage('${rec[`ft106_1${l}_photo`]}', '106FT01${l.toUpperCase()} - ${formatTimeShort(rec.readingTime)}')" style="width:100%; height:100%; object-fit:cover; cursor:pointer;" title="Click to view large">` : `<div style="color:var(--muted); display:flex; flex-direction:column; align-items:center;"><i class="fa-regular fa-image" style="font-size:24px; margin-bottom:8px"></i><span style="font-size:11px">No Image</span></div>`}
                 </div>
               </div>
             `).join('')}
