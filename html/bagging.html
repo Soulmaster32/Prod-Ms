@@ -63,7 +63,7 @@
     .chart-container { padding: 8px 20px 22px; width: 100%; height: 340px; }
 
     .table-wrap { width: 100%; overflow-x: auto; max-height: 700px; overflow-y: auto; }
-    table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+    table { width: 100%; border-collapse: collapse; min-width: 1100px; }
     th, td { padding: 15px 20px; border-bottom: 1px solid rgba(148,163,184,0.08); text-align: left; vertical-align: middle; }
     th { background: rgba(10, 15, 28, 0.96); color: #8b98b3; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.08em; position: sticky; top: 0; z-index: 10; }
     td { font-size: 13.5px; }
@@ -85,35 +85,51 @@
     .modal { width: min(850px, 100%); background: var(--panel); border: 1px solid rgba(148,163,184,0.16); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); max-height: 92vh; display: flex; flex-direction: column; }
     .modal header { padding: 24px; border-bottom: 1px solid rgba(148,163,184,0.1); display: flex; align-items: center; gap: 12px; }
     .modal header h2 { margin: 0; font-size: 21px; font-weight: 700; }
-    .modal .body { padding: 24px; overflow-y: auto; flex: 1; }
+    .modal .body { padding: 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 24px; }
     .modal footer { padding: 20px 24px; border-top: 1px solid rgba(148,163,184,0.1); display: flex; justify-content: flex-end; gap: 12px; background: rgba(10, 15, 28, 0.4); }
 
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-    .full { grid-column: 1 / -1; }
-    
-    .top-log { background: rgba(167,139,250,0.05); padding: 16px; border-radius: 12px; border: 1px dashed rgba(167,139,250,0.3); margin-bottom: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;}
-    .top-log label { color: var(--violet); }
+    /* Distinct Form Divisions */
+    .form-section { 
+      background: rgba(10, 15, 28, 0.4); border: 1px dashed rgba(148,163,184,0.2); 
+      border-radius: 14px; padding: 20px; 
+    }
+    .form-section-title { 
+      font-size: 13.5px; font-weight: 700; color: var(--violet); 
+      margin-bottom: 16px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
 
-    label { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
-    input, select { width: 100%; padding: 13px 15px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.25); background: rgba(10, 15, 28, 0.8); color: white; outline: none; font-size: 14px;}
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .full { grid-column: 1 / -1; }
+
+    label { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
+    input, select { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.25); background: rgba(10, 15, 28, 0.8); color: white; outline: none; font-size: 14px;}
     input:focus { border-color: var(--violet); }
 
     .checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;}
-    .check-item { display: flex; align-items: center; gap: 10px; background: rgba(10, 15, 28, 0.5); padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.15); cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s;}
+    .check-item { display: flex; align-items: center; gap: 10px; background: rgba(15, 23, 42, 0.6); padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.15); cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s;}
     .check-item:hover { border-color: var(--violet); }
     .check-item input { width: 18px; height: 18px; margin: 0; cursor: pointer; accent-color: var(--violet); }
 
-    .multi-thumb-container { display: flex; gap: 8px; }
-    .thumb { width: 45px; height: 45px; object-fit: cover; border-radius: 9px; border: 1px solid rgba(148,163,184,0.25); cursor: pointer; position: relative;}
-    .no-img { width: 45px; height: 45px; border-radius: 9px; display: grid; place-items: center; background: rgba(15, 23, 42, 0.5); color: var(--muted); border: 1px dashed rgba(148,163,184,0.3); font-size: 18px;}
+    .thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 9px; border: 1px solid rgba(148,163,184,0.25); cursor: pointer; }
+    .no-img { width: 50px; height: 50px; border-radius: 9px; display: grid; place-items: center; background: rgba(15, 23, 42, 0.5); color: var(--muted); border: 1px dashed rgba(148,163,184,0.3); font-size: 20px;}
 
-    .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 10px;}
+    /* Photo Upload UIs */
     .file-upload-wrapper { position: relative; height: 80px;}
     .file-upload-wrapper input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; z-index: 2;}
-    .file-upload-ui { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; height: 100%; border: 2px dashed rgba(148,163,184,0.28); border-radius: 10px; background: rgba(10, 15, 28, 0.5); color: var(--muted); font-weight: 500; font-size: 12px; text-align: center; padding: 10px;}
+    .file-upload-ui { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; height: 100%; border: 2px dashed rgba(148,163,184,0.28); border-radius: 10px; background: rgba(15, 23, 42, 0.6); color: var(--muted); font-weight: 500; font-size: 12px; text-align: center; padding: 10px; transition: 0.2s;}
+    .file-upload-wrapper:hover .file-upload-ui { border-color: var(--violet); background: rgba(167, 139, 250, 0.05);}
+
+    /* Personnel View Modal Styling */
+    .personnel-view-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .personnel-card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(148,163,184,0.2); border-radius: 12px; padding: 20px; text-align: center; display:flex; flex-direction: column; align-items: center; gap: 12px;}
+    .personnel-card img { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 3px solid var(--violet); }
+    .personnel-card .no-photo { width: 120px; height: 120px; border-radius: 50%; background: rgba(10,15,28,0.8); display: grid; place-items: center; border: 2px dashed rgba(148,163,184,0.3); font-size: 32px; color: var(--muted); }
+    .personnel-card h4 { margin: 0; font-size: 18px; color: white; }
+    .personnel-card p { margin: 0; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
 
     @media (max-width: 768px) {
-      .grid, .top-log, .checklist, .photo-grid { grid-template-columns: 1fr; }
+      .grid, .grid-3, .checklist, .personnel-view-grid { grid-template-columns: 1fr; }
       .modal { border-radius: 24px 24px 0 0; max-height: 90vh; transform: translateY(100%); }
       .modal-bg.show .modal { transform: translateY(0); }
     }
@@ -126,7 +142,7 @@
         <div class="title-icon"><i class="fa-solid fa-box-open"></i></div>
         <div>
           <h1>MS Product Bagging</h1>
-          <div class="sub">Log Weights, Conditions, and Track End-of-Shift Totals.</div>
+          <div class="sub">Log Weights, Multiple Products, Conditions, and Personnel Details.</div>
         </div>
       </div>
       <div class="toolbar">
@@ -152,17 +168,17 @@
     <!-- Data Table -->
     <div class="card">
       <div class="chart-card-header">
-        <h3 style="color:var(--text)"><i class="fa-solid fa-list"></i> Detailed Records</h3>
+        <h3 style="color:var(--text)"><i class="fa-solid fa-list"></i> Bagging Records</h3>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th><i class="fa-solid fa-camera"></i> Photos (Bag/QA/Bagger)</th>
-              <th><i class="fa-solid fa-cube"></i> Product & Shift</th>
-              <th><i class="fa-solid fa-users"></i> Personnel</th>
-              <th><i class="fa-solid fa-scale-balanced"></i> Weights Logging</th>
+              <th><i class="fa-solid fa-camera"></i> Bag Image</th>
+              <th><i class="fa-solid fa-cube"></i> Product & Time</th>
+              <th><i class="fa-solid fa-scale-balanced"></i> Weights</th>
               <th><i class="fa-solid fa-clipboard-check"></i> Conditions</th>
+              <th><i class="fa-solid fa-users"></i> Personnel</th>
               <th style="text-align: center;"><i class="fa-solid fa-wrench"></i> Actions</th>
             </tr>
           </thead>
@@ -185,91 +201,101 @@
         <form id="recordForm">
           <input type="hidden" id="recordId" />
           
-          <div class="top-log">
-            <div>
-              <label for="weighingScale"><i class="fa-solid fa-scale-balanced"></i> Weighing Scale (kg)</label>
-              <input id="weighingScale" type="number" step="0.01" required placeholder="0.00" />
-            </div>
-            <div>
-              <label for="tareWeight"><i class="fa-solid fa-minus"></i> Tare Weight (kg)</label>
-              <input id="tareWeight" type="number" step="0.01" required placeholder="0.00" />
-            </div>
-            <div>
-              <label for="bagWeight" style="color:var(--accent);"><i class="fa-solid fa-weight-hanging"></i> Weight of the Bag (kg)</label>
-              <input id="bagWeight" type="number" step="0.01" required placeholder="0.00" />
+          <!-- DIVISION 1: Weighing Scale & Tare -->
+          <div class="form-section">
+            <div class="form-section-title"><i class="fa-solid fa-scale-balanced"></i> Weighing Data</div>
+            <div class="grid-3">
+              <div>
+                <label for="weighingScale">Weighing Scale (kg)</label>
+                <input id="weighingScale" type="number" step="0.01" required placeholder="0.00" />
+              </div>
+              <div>
+                <label for="tareWeight">Tare Weight (kg)</label>
+                <input id="tareWeight" type="number" step="0.01" required placeholder="0.00" />
+              </div>
+              <div>
+                <label for="bagWeight" style="color:var(--accent);">Weight of the Bag (kg)</label>
+                <input id="bagWeight" type="number" step="0.01" required placeholder="0.00" />
+              </div>
             </div>
           </div>
 
-          <div class="grid">
-            <div>
-              <label for="productName"><i class="fa-solid fa-cube"></i> Product Name</label>
-              <input id="productName" type="text" required placeholder="Enter Product Name" />
-            </div>
-            <div style="display: flex; gap:10px;">
-              <div style="flex:1;">
-                <label for="bagDate"><i class="fa-regular fa-calendar"></i> Date</label>
-                <input id="bagDate" type="date" required />
+          <!-- DIVISION 2: MS Product Details -->
+          <div class="form-section">
+            <div class="form-section-title"><i class="fa-solid fa-cube"></i> MS Product Details</div>
+            <div class="grid">
+              <div>
+                <label for="productName">Product Name</label>
+                <input id="productName" type="text" required placeholder="Enter Multiple MS Product Name" />
               </div>
-              <div style="flex:1;">
-                <label for="bagTime"><i class="fa-regular fa-clock"></i> Time</label>
-                <input id="bagTime" type="time" required />
-              </div>
-            </div>
-
-            <div>
-              <label for="qaPerson"><i class="fa-solid fa-clipboard-user"></i> Q.A Person</label>
-              <input id="qaPerson" type="text" required placeholder="Name of QA" />
-            </div>
-            <div>
-              <label for="assignPerson"><i class="fa-solid fa-user-gear"></i> Bagger Assign</label>
-              <input id="assignPerson" type="text" required placeholder="Name of Bagger" />
-            </div>
-            
-            <div class="full">
-              <label><i class="fa-solid fa-clipboard-check"></i> Check Conditions</label>
-              <div class="checklist">
-                <label class="check-item"><input type="checkbox" id="chkTie"> Tie</label>
-                <label class="check-item"><input type="checkbox" id="chkSling"> Sling</label>
-                <label class="check-item"><input type="checkbox" id="chkWriting"> Writing Back and Front</label>
-                <label class="check-item"><input type="checkbox" id="chkN2"> N2 Purging</label>
-                <label class="check-item"><input type="checkbox" id="chkRedTag"> Before removing red tag sling install</label>
-                <label class="check-item"><input type="checkbox" id="chkWarehouse"> Deliver to Warehouse</label>
-              </div>
-            </div>
-
-            <div class="full">
-              <label><i class="fa-solid fa-camera"></i> Attached Evidence Photos</label>
-              <div class="photo-grid">
-                <div>
-                  <div class="file-upload-wrapper">
-                    <input type="file" id="photoBag" accept="image/*" />
-                    <div class="file-upload-ui" id="uiPhotoBag">
-                      <i class="fa-solid fa-box-open" style="font-size: 20px;"></i>
-                      <span>Image of Bag</span>
-                    </div>
-                  </div>
+              <div style="display: flex; gap:10px;">
+                <div style="flex:1;">
+                  <label for="bagDate">Date</label>
+                  <input id="bagDate" type="date" required />
                 </div>
-                <div>
-                  <div class="file-upload-wrapper">
-                    <input type="file" id="photoQA" accept="image/*" />
-                    <div class="file-upload-ui" id="uiPhotoQA">
-                      <i class="fa-solid fa-clipboard-user" style="font-size: 20px;"></i>
-                      <span>Image of QA</span>
-                    </div>
-                  </div>
+                <div style="flex:1;">
+                  <label for="bagTime">Military Time</label>
+                  <!-- type="time" defaults to 24h format on most systems -->
+                  <input id="bagTime" type="time" required />
                 </div>
-                <div>
-                  <div class="file-upload-wrapper">
-                    <input type="file" id="photoBagger" accept="image/*" />
-                    <div class="file-upload-ui" id="uiPhotoBagger">
-                      <i class="fa-solid fa-user-gear" style="font-size: 20px;"></i>
-                      <span>Image of Bagger</span>
-                    </div>
+              </div>
+
+              <div class="full">
+                <label>Check Conditions</label>
+                <div class="checklist">
+                  <label class="check-item"><input type="checkbox" id="chkTie"> Tie</label>
+                  <label class="check-item"><input type="checkbox" id="chkSling"> Sling</label>
+                  <label class="check-item"><input type="checkbox" id="chkWriting"> Writing Back and Front</label>
+                  <label class="check-item"><input type="checkbox" id="chkN2"> N2 Purging</label>
+                  <label class="check-item"><input type="checkbox" id="chkRedTag"> Before removing red tag sling install</label>
+                  <label class="check-item"><input type="checkbox" id="chkWarehouse"> Deliver to Warehouse</label>
+                </div>
+              </div>
+
+              <div class="full">
+                <label>Image of the Bag</label>
+                <div class="file-upload-wrapper">
+                  <input type="file" id="photoBag" accept="image/*" />
+                  <div class="file-upload-ui" id="uiPhotoBag">
+                    <i class="fa-solid fa-box-open" style="font-size: 20px;"></i>
+                    <span>Tap to upload Bag Image</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+
+          <!-- DIVISION 3: Personnel Info -->
+          <div class="form-section">
+            <div class="form-section-title"><i class="fa-solid fa-users"></i> Personnel Information</div>
+            <div class="grid">
+              <!-- QA Details -->
+              <div>
+                <label for="qaPerson">Q.A Person Name</label>
+                <input id="qaPerson" type="text" required placeholder="Name of QA" style="margin-bottom:12px;" />
+                <div class="file-upload-wrapper">
+                  <input type="file" id="photoQA" accept="image/*" />
+                  <div class="file-upload-ui" id="uiPhotoQA">
+                    <i class="fa-solid fa-clipboard-user" style="font-size: 20px;"></i>
+                    <span>Tap to upload QA Image</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Bagger Details -->
+              <div>
+                <label for="assignPerson">Bagger Assign Name</label>
+                <input id="assignPerson" type="text" required placeholder="Name of Bagger" style="margin-bottom:12px;" />
+                <div class="file-upload-wrapper">
+                  <input type="file" id="photoBagger" accept="image/*" />
+                  <div class="file-upload-ui" id="uiPhotoBagger">
+                    <i class="fa-solid fa-user-gear" style="font-size: 20px;"></i>
+                    <span>Tap to upload Bagger Image</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </form>
       </div>
       <footer>
@@ -279,8 +305,24 @@
     </div>
   </div>
 
+  <!-- Personnel View Modal -->
+  <div class="modal-bg" id="personnelModal">
+    <div class="modal" style="width: min(600px, 100%);">
+      <header>
+        <i class="fa-solid fa-id-card-clip" style="color:var(--violet)"></i>
+        <h2>Personnel Details</h2>
+      </header>
+      <div class="body" id="personnelModalBody">
+        <!-- Injected via JS -->
+      </div>
+      <footer>
+        <button class="btn-ghost" type="button" onclick="document.getElementById('personnelModal').classList.remove('show')">Close</button>
+      </footer>
+    </div>
+  </div>
+
   <script>
-    const STORAGE_KEY = "ms_product_bagging_v2";
+    const STORAGE_KEY = "ms_product_bagging_v3";
     let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
     let chartInstance = null;
 
@@ -314,6 +356,7 @@
             pendingImages[key] = canvas.toDataURL("image/jpeg", 0.7);
             document.getElementById(uiId).innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--ok); font-size:24px;"></i><span style="color:var(--ok)">Attached</span>`;
             document.getElementById(uiId).style.borderColor = "var(--ok)";
+            document.getElementById(uiId).style.background = "rgba(52,211,153,0.05)";
           };
           img.src = ev.target.result;
         };
@@ -345,16 +388,10 @@
         
         const cond = (c, label) => c ? `<span class="badge-status status-ok"><i class="fa-solid fa-check"></i> ${label}</span>` : `<span class="badge-status status-no"><i class="fa-solid fa-xmark"></i> ${label}</span>`;
         
-        const renderThumb = (imgSrc, title) => imgSrc ? `<img class="thumb" src="${imgSrc}" title="${title}">` : `<div class="no-img" title="No ${title}"><i class="fa-solid fa-user-slash" style="font-size:14px"></i></div>`;
-
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>
-            <div class="multi-thumb-container">
-               ${r.photoBag ? `<img class="thumb" src="${r.photoBag}" title="Bag Image">` : `<div class="no-img" title="No Bag Photo"><i class="fa-regular fa-image"></i></div>`}
-               ${renderThumb(r.photoQA, 'QA Image')}
-               ${renderThumb(r.photoBagger, 'Bagger Image')}
-            </div>
+            ${r.photoBag ? `<img class="thumb" src="${r.photoBag}" title="Bag Image">` : `<div class="no-img" title="No Bag Photo"><i class="fa-regular fa-image"></i></div>`}
           </td>
           <td>
             <div class="data-stack">
@@ -365,16 +402,10 @@
           </td>
           <td>
              <div class="data-stack">
-               <div><span class="data-label">QA:</span> <span class="data-val">${r.qaPerson || 'N/A'}</span></div>
-               <div><span class="data-label">Bagger:</span> <span class="data-val">${r.person}</span></div>
-             </div>
-          </td>
-          <td>
-             <div class="data-stack">
                <div><span class="data-label">Scale:</span> <span class="data-val">${r.scale} kg</span></div>
                <div><span class="data-label">Tare:</span> <span class="data-val">${r.tare} kg</span></div>
-               <div><span class="data-label">Bag Wt:</span> <span class="data-val" style="color:var(--accent); font-weight:bold">${bagWt} kg</span></div>
-               <div style="margin-top:2px"><span class="data-label">Net:</span> <span class="data-val">${netWeight} kg</span></div>
+               <div><span class="data-label">Bag:</span> <span class="data-val" style="color:var(--accent);">${bagWt} kg</span></div>
+               <div style="margin-top:2px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:2px;"><span class="data-label">Net:</span> <span class="data-val" style="font-weight:bold">${netWeight} kg</span></div>
              </div>
           </td>
           <td>
@@ -387,6 +418,9 @@
               ${cond(r.condWarehouse, 'Whse')}
             </div>
           </td>
+          <td>
+            <button class="btn-ghost" style="padding:6px 12px; font-size:12px;" onclick="viewPersonnel('${r.id}')"><i class="fa-solid fa-id-badge"></i> View Personnel</button>
+          </td>
           <td style="text-align: center;">
             <button class="btn-danger" style="padding:8px 12px;" onclick="deleteRecord('${r.id}')"><i class="fa-solid fa-trash"></i></button>
           </td>
@@ -397,14 +431,39 @@
       renderShiftChart(sorted);
     }
 
+    function viewPersonnel(id) {
+      const rec = records.find(r => r.id === id);
+      if (!rec) return;
+
+      const body = document.getElementById("personnelModalBody");
+      
+      const drawImg = (src, fallbackIcon) => src 
+        ? `<img src="${src}" />` 
+        : `<div class="no-photo"><i class="fa-solid ${fallbackIcon}"></i></div>`;
+
+      body.innerHTML = `
+        <div class="personnel-view-grid">
+          <div class="personnel-card">
+            <p>Quality Assurance</p>
+            ${drawImg(rec.photoQA, 'fa-user-tie')}
+            <h4>${rec.qaPerson || 'Not Assigned'}</h4>
+          </div>
+          <div class="personnel-card">
+            <p>Bagger Assign</p>
+            ${drawImg(rec.photoBagger, 'fa-user-gear')}
+            <h4>${rec.person || 'Not Assigned'}</h4>
+          </div>
+        </div>
+      `;
+
+      document.getElementById("personnelModal").classList.add("show");
+    }
+
     function renderShiftChart(data) {
       const ctx = document.getElementById('shiftChart').getContext('2d');
       if (chartInstance) chartInstance.destroy();
 
-      // Aggregate data by Date + Shift
       const grouped = {};
-      
-      // Sort oldest to newest for timeline tracking
       const chronological = [...data].sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
 
       chronological.forEach(r => {
@@ -414,7 +473,6 @@
           grouped[key] = { bagCount: 0, totalWeight: 0 };
         }
         grouped[key].bagCount += 1;
-        // Total weight logic: Will sum the inputted 'Weight of the Bag' or fallback to Net Weight
         const w = parseFloat(r.bagWeight) || (parseFloat(r.scale) - parseFloat(r.tare)) || 0;
         grouped[key].totalWeight += w;
       });
@@ -483,17 +541,19 @@
 
     function resetUploadUI(id, icon, text) {
       document.getElementById(id).value = "";
-      document.getElementById("ui" + id.charAt(0).toUpperCase() + id.slice(1)).innerHTML = `<i class="fa-solid ${icon}" style="font-size: 20px;"></i><span>${text}</span>`;
-      document.getElementById("ui" + id.charAt(0).toUpperCase() + id.slice(1)).style.borderColor = "rgba(148,163,184,0.28)";
+      const ui = document.getElementById("ui" + id.charAt(0).toUpperCase() + id.slice(1));
+      ui.innerHTML = `<i class="fa-solid ${icon}" style="font-size: 20px;"></i><span>${text}</span>`;
+      ui.style.borderColor = "rgba(148,163,184,0.28)";
+      ui.style.background = "rgba(15, 23, 42, 0.6)";
     }
 
     function openForm() {
       document.getElementById("recordForm").reset();
       
       pendingImages = { bag: null, qa: null, bagger: null };
-      resetUploadUI("photoBag", "fa-box-open", "Image of Bag");
-      resetUploadUI("photoQA", "fa-clipboard-user", "Image of QA");
-      resetUploadUI("photoBagger", "fa-user-gear", "Image of Bagger");
+      resetUploadUI("photoBag", "fa-box-open", "Tap to upload Bag Image");
+      resetUploadUI("photoQA", "fa-clipboard-user", "Tap to upload QA Image");
+      resetUploadUI("photoBagger", "fa-user-gear", "Tap to upload Bagger Image");
       
       const now = new Date();
       document.getElementById("bagDate").value = now.toISOString().slice(0, 10);
@@ -543,6 +603,13 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
       renderTable();
     }
+
+    // Modal Background Close handling
+    document.querySelectorAll('.modal-bg').forEach(bg => { 
+      bg.addEventListener('click', (e) => { 
+        if (e.target === bg) bg.classList.remove('show'); 
+      }); 
+    });
 
     // Initialize
     renderTable();
