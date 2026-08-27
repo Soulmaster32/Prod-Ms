@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MS Product Bagging</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* Inherited CSS Variables & Base Styles */
+    :root {
+      --bg: #0a0f1c; --panel: #131b2e; --panel-2: #1c2740; --line: #2a3752;
+      --text: #f1f5f9; --muted: #8b98b3; --accent: #22d3ee; --accent-2: #0891b2;
+      --violet: #a78bfa; --amber: #fbbf24; --ok: #34d399; --danger: #f87171;
+      --shadow: 0 24px 48px -18px rgba(0, 0, 0, 0.6); --glass: rgba(19, 27, 46, 0.72);
+      --radius-lg: 18px; --radius-md: 12px; --radius-sm: 8px;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0; font-family: 'Inter', sans-serif;
+      background: radial-gradient(ellipse 900px 500px at 10% -5%, rgba(34,211,238,0.14), transparent 55%),
+                  radial-gradient(ellipse 700px 500px at 95% 15%, rgba(167,139,250,0.08), transparent 55%),
+                  var(--bg);
+      background-attachment: fixed; color: var(--text);
+      min-height: 100vh; padding-bottom: 96px; -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap { max-width: 1300px; margin: 0 auto; padding: 32px 20px; }
+
+    header.page-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+    .title-block { display: flex; align-items: center; gap: 14px; }
+    .title-icon {
+      width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+      background: linear-gradient(135deg, rgba(167,139,250,0.18), rgba(124,58,237,0.1));
+      border: 1px solid rgba(167,139,250,0.25); display: grid; place-items: center;
+      box-shadow: 0 8px 20px -6px rgba(167,139,250,0.3);
+    }
+    .title-icon i { font-size: 22px; color: var(--violet); }
+    h1 { margin: 0 0 4px; font-size: 27px; font-weight: 800; letter-spacing: -0.6px; }
+    .sub { color: var(--muted); font-size: 14px; }
+
+    .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    button {
+      border: 0; border-radius: 10px; padding: 10px 16px; font-size: 13.5px; font-weight: 600; cursor: pointer;
+      color: white; background: var(--panel-2); transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--violet), #7c3aed); box-shadow: 0 6px 16px -4px rgba(167,139,250,0.4); }
+    .btn-ghost { background: rgba(255,255,255,0.04); border: 1px solid rgba(148,163,184,0.25); color: var(--text); }
+    .btn-danger { background: rgba(248, 113, 113, 0.12); color: #fca5a5; border: 1px solid rgba(248, 113, 113, 0.28); }
+    button:hover { transform: translateY(-1px); filter: brightness(1.1); }
+
+    .card {
+      background: var(--glass); backdrop-filter: blur(14px); border: 1px solid rgba(148,163,184,0.14);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 22px;
+    }
+    .chart-card-header { display: flex; justify-content: space-between; padding: 20px 24px 4px; }
+    .chart-card-header h3 { margin: 0; font-size: 15px; font-weight: 700; color: var(--violet); }
+    .chart-container { padding: 8px 20px 22px; width: 100%; height: 340px; }
+
+    .table-wrap { width: 100%; overflow-x: auto; max-height: 700px; overflow-y: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 1400px; }
+    th, td { padding: 15px 20px; border-bottom: 1px solid rgba(148,163,184,0.08); text-align: left; white-space: nowrap; }
+    th { background: rgba(10, 15, 28, 0.96); color: #8b98b3; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.08em; position: sticky; top: 0; z-index: 10; }
+    td { font-size: 14px; }
+    tbody tr:hover td { background: rgba(167,139,250, 0.06); }
+
+    .badge-status { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;}
+    .status-ok { background: rgba(52,211,153,0.15); color: var(--ok); }
+    .status-no { background: rgba(248,113,113,0.15); color: var(--danger); }
+    .cond-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+
+    .modal-bg { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.72); display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; pointer-events: none; transition: 0.3s; padding:16px;}
+    .modal-bg.show { opacity: 1; pointer-events: auto; }
+    .modal { width: min(800px, 100%); background: var(--panel); border: 1px solid rgba(148,163,184,0.16); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); max-height: 92vh; display: flex; flex-direction: column; }
+    .modal header { padding: 24px; border-bottom: 1px solid rgba(148,163,184,0.1); display: flex; align-items: center; gap: 12px; }
+    .modal header h2 { margin: 0; font-size: 21px; font-weight: 700; }
+    .modal .body { padding: 24px; overflow-y: auto; flex: 1; }
+    .modal footer { padding: 20px 24px; border-top: 1px solid rgba(148,163,184,0.1); display: flex; justify-content: flex-end; gap: 12px; background: rgba(10, 15, 28, 0.4); }
+
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .full { grid-column: 1 / -1; }
+    
+    .top-log { background: rgba(167,139,250,0.05); padding: 16px; border-radius: 12px; border: 1px dashed rgba(167,139,250,0.3); margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;}
+    .top-log label { color: var(--violet); }
+
+    label { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
+    input, select { width: 100%; padding: 13px 15px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.25); background: rgba(10, 15, 28, 0.8); color: white; outline: none; font-size: 14px;}
+    input:focus { border-color: var(--violet); }
+
+    /* Custom Checkboxes */
+    .checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;}
+    .check-item {
+      display: flex; align-items: center; gap: 10px; background: rgba(10, 15, 28, 0.5);
+      padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.15);
+      cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s;
+    }
+    .check-item:hover { border-color: var(--violet); }
+    .check-item input { width: 18px; height: 18px; margin: 0; cursor: pointer; accent-color: var(--violet); }
+
+    .thumb { width: 42px; height: 42px; object-fit: cover; border-radius: 9px; border: 1px solid rgba(148,163,184,0.25); cursor: pointer; }
+    .no-img { width: 42px; height: 42px; border-radius: 9px; display: grid; place-items: center; background: rgba(15, 23, 42, 0.5); color: var(--muted); border: 1px dashed rgba(148,163,184,0.3); }
+
+    .file-upload-wrapper { position: relative; }
+    .file-upload-wrapper input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .file-upload-ui { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 16px; border: 2px dashed rgba(148,163,184,0.28); border-radius: 10px; background: rgba(10, 15, 28, 0.5); color: var(--muted); font-weight: 500; font-size: 14px;}
+
+    @media (max-width: 768px) {
+      .grid, .top-log, .checklist { grid-template-columns: 1fr; }
+      .modal { border-radius: 24px 24px 0 0; max-height: 90vh; transform: translateY(100%); }
+      .modal-bg.show .modal { transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="page-header">
+      <div class="title-block">
+        <div class="title-icon"><i class="fa-solid fa-box-open"></i></div>
+        <div>
+          <h1>MS Product Bagging</h1>
+          <div class="sub">Log Weighing Scale, Conditions, and Net Weights.</div>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button class="btn-ghost" type="button" onclick="window.history.back()">
+          <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+        <button class="btn-primary" type="button" onclick="openForm()">
+          <i class="fa-solid fa-plus"></i> Add Bagging Record
+        </button>
+      </div>
+    </header>
+
+    <!-- Bar Chart Card -->
+    <div class="card" id="chartCard">
+      <div class="chart-card-header">
+        <h3><i class="fa-solid fa-chart-column"></i> Net Weight Bar Chart (kg)</h3>
+      </div>
+      <div class="chart-container">
+        <canvas id="barChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="card">
+      <div class="chart-card-header">
+        <h3 style="color:var(--text)"><i class="fa-solid fa-list"></i> Product List</h3>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th><i class="fa-regular fa-image"></i> Photo</th>
+              <th><i class="fa-solid fa-cube"></i> Product Name</th>
+              <th><i class="fa-regular fa-calendar"></i> Date & Time</th>
+              <th><i class="fa-solid fa-user"></i> Assign Person</th>
+              <th><i class="fa-solid fa-scale-balanced"></i> Weighing Scale</th>
+              <th><i class="fa-solid fa-minus"></i> Tare Weight</th>
+              <th><i class="fa-solid fa-weight-hanging"></i> Net Weight</th>
+              <th><i class="fa-solid fa-clipboard-check"></i> Conditions</th>
+              <th style="text-align: center;"><i class="fa-solid fa-wrench"></i> Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <!-- Populated via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Modal -->
+  <div class="modal-bg" id="formModal">
+    <div class="modal">
+      <header>
+        <i class="fa-solid fa-pen-to-square" style="color:var(--violet)"></i>
+        <h2 id="formTitle">Add Bagging Record</h2>
+      </header>
+      <div class="body">
+        <form id="recordForm">
+          <input type="hidden" id="recordId" />
+          
+          <!-- Top Log per user instructions -->
+          <div class="top-log">
+            <div>
+              <label for="weighingScale"><i class="fa-solid fa-scale-balanced"></i> Weighing Scale (kg)</label>
+              <input id="weighingScale" type="number" step="0.01" required placeholder="0.00" />
+            </div>
+            <div>
+              <label for="tareWeight"><i class="fa-solid fa-minus"></i> Tare / Tear Weight (kg)</label>
+              <input id="tareWeight" type="number" step="0.01" required placeholder="0.00" />
+            </div>
+          </div>
+
+          <div class="grid">
+            <div>
+              <label for="productName"><i class="fa-solid fa-cube"></i> Product Name</label>
+              <input id="productName" type="text" required placeholder="Enter Product Name" />
+            </div>
+            <div>
+              <label for="assignPerson"><i class="fa-solid fa-user"></i> Assign Person</label>
+              <input id="assignPerson" type="text" required placeholder="Name of personnel" />
+            </div>
+            <div>
+              <label for="bagDate"><i class="fa-regular fa-calendar"></i> Date</label>
+              <input id="bagDate" type="date" required />
+            </div>
+            <div>
+              <label for="bagTime"><i class="fa-regular fa-clock"></i> Time</label>
+              <input id="bagTime" type="time" required />
+            </div>
+            
+            <div class="full">
+              <label><i class="fa-solid fa-clipboard-check"></i> Check Conditions</label>
+              <div class="checklist">
+                <label class="check-item"><input type="checkbox" id="chkTie"> Tie</label>
+                <label class="check-item"><input type="checkbox" id="chkSling"> Sling</label>
+                <label class="check-item"><input type="checkbox" id="chkWriting"> Writing Back and Front</label>
+                <label class="check-item"><input type="checkbox" id="chkN2"> N2 Purging</label>
+                <label class="check-item"><input type="checkbox" id="chkRedTag"> Before removing red tag sling install</label>
+                <label class="check-item"><input type="checkbox" id="chkWarehouse"> Deliver to Warehouse</label>
+              </div>
+            </div>
+
+            <div class="full">
+              <label><i class="fa-solid fa-camera"></i> Image of the Bag</label>
+              <div class="file-upload-wrapper">
+                <input id="photo" type="file" accept="image/*" />
+                <div class="file-upload-ui">
+                  <i class="fa-solid fa-upload" style="font-size: 18px;"></i>
+                  <span id="photoStatus">Tap to upload image</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <footer>
+        <button class="btn-ghost" type="button" onclick="closeForm()">Cancel</button>
+        <button class="btn-primary" type="button" onclick="saveRecord()"><i class="fa-solid fa-floppy-disk"></i> Save Record</button>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // --- bagging.js logic embedded ---
+    const STORAGE_KEY = "ms_product_bagging_v1";
+    let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    let pendingPhoto = null;
+    let chartInstance = null;
+
+    function renderTable() {
+      const tbody = document.getElementById("tbody");
+      tbody.innerHTML = "";
+
+      if(records.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:40px; color:var(--muted);">No bagging records found.</td></tr>`;
+        document.getElementById("chartCard").style.display = "none";
+        return;
+      }
+      document.getElementById("chartCard").style.display = "block";
+
+      const sorted = records.sort((a, b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time));
+
+      sorted.forEach(r => {
+        const netWeight = (parseFloat(r.scale) - parseFloat(r.tare)).toFixed(2);
+        
+        // Helper to draw condition badges
+        const cond = (c, label) => c ? `<span class="badge-status status-ok"><i class="fa-solid fa-check"></i> ${label}</span>` : `<span class="badge-status status-no"><i class="fa-solid fa-xmark"></i> ${label}</span>`;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${r.photo ? `<img class="thumb" src="${r.photo}">` : `<div class="no-img"><i class="fa-regular fa-image"></i></div>`}</td>
+          <td><strong>${r.productName}</strong></td>
+          <td>${r.date} <span style="color:var(--muted); font-size:12px;">${r.time}</span></td>
+          <td>${r.person}</td>
+          <td>${r.scale} kg</td>
+          <td>${r.tare} kg</td>
+          <td style="color:var(--violet); font-weight:bold; font-size:16px;">${netWeight} kg</td>
+          <td>
+            <div class="cond-grid">
+              ${cond(r.condTie, 'Tie')}
+              ${cond(r.condSling, 'Sling')}
+              ${cond(r.condWriting, 'Writing')}
+              ${cond(r.condN2, 'N2')}
+              ${cond(r.condRedTag, 'Tag')}
+              ${cond(r.condWarehouse, 'Whse')}
+            </div>
+          </td>
+          <td style="text-align: center;">
+            <button class="btn-danger" style="padding:6px 10px;" onclick="deleteRecord('${r.id}')"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      renderChart(sorted);
+    }
+
+    function renderChart(data) {
+      const ctx = document.getElementById('barChart').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      const reversed = [...data].reverse(); // Oldest to newest for the chart timeline
+
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: reversed.map(r => `${r.productName} (${r.date})`),
+          datasets: [{
+            label: 'Net Weight (kg)',
+            data: reversed.map(r => (parseFloat(r.scale) - parseFloat(r.tare)).toFixed(2)),
+            backgroundColor: '#a78bfa',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#e2e8f0' } }
+          },
+          scales: {
+            x: { ticks: { color: '#8b98b3' }, grid: { color: 'rgba(148,163,184,0.05)' } },
+            y: { ticks: { color: '#8b98b3' }, grid: { color: 'rgba(148,163,184,0.1)' }, beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    function openForm() {
+      document.getElementById("recordForm").reset();
+      pendingPhoto = null;
+      document.getElementById("photoStatus").textContent = "Tap to upload image";
+      
+      const now = new Date();
+      document.getElementById("bagDate").value = now.toISOString().slice(0, 10);
+      document.getElementById("bagTime").value = now.toTimeString().slice(0, 5);
+      
+      document.getElementById("formModal").classList.add("show");
+    }
+
+    function closeForm() {
+      document.getElementById("formModal").classList.remove("show");
+    }
+
+    // Image Compressor
+    document.getElementById("photo").addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const MAX = 600;
+          let w = img.width, h = img.height;
+          if(w > h && w > MAX) { h *= MAX/w; w = MAX; }
+          else if (h > MAX) { w *= MAX/h; h = MAX; }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+          pendingPhoto = canvas.toDataURL("image/jpeg", 0.7);
+          document.getElementById("photoStatus").innerHTML = `<i class="fa-solid fa-check" style="color:var(--ok)"></i> Image Ready`;
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function saveRecord() {
+      const form = document.getElementById("recordForm");
+      if (!form.reportValidity()) return;
+
+      const record = {
+        id: crypto.randomUUID(),
+        scale: document.getElementById("weighingScale").value,
+        tare: document.getElementById("tareWeight").value,
+        productName: document.getElementById("productName").value,
+        person: document.getElementById("assignPerson").value,
+        date: document.getElementById("bagDate").value,
+        time: document.getElementById("bagTime").value,
+        condTie: document.getElementById("chkTie").checked,
+        condSling: document.getElementById("chkSling").checked,
+        condWriting: document.getElementById("chkWriting").checked,
+        condN2: document.getElementById("chkN2").checked,
+        condRedTag: document.getElementById("chkRedTag").checked,
+        condWarehouse: document.getElementById("chkWarehouse").checked,
+        photo: pendingPhoto
+      };
+
+      records.push(record);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+      renderTable();
+      closeForm();
+    }
+
+    function deleteRecord(id) {
+      if(!confirm("Delete this bagging log?")) return;
+      records = records.filter(r => r.id !== id);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+      renderTable();
+    }
+
+    // Initialize
+    renderTable();
+  </script>
+</body>
+</html>
