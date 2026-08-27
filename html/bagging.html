@@ -100,8 +100,9 @@
     .full { grid-column: 1 / -1; }
 
     label { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
-    input, select { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.25); background: rgba(10, 15, 28, 0.8); color: white; outline: none; font-size: 14px;}
-    input:focus { border-color: var(--violet); }
+    input, select, textarea { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.25); background: rgba(10, 15, 28, 0.8); color: white; outline: none; font-size: 14px; font-family: inherit;}
+    textarea { resize: vertical; min-height: 80px; }
+    input:focus, select:focus, textarea:focus { border-color: var(--violet); }
 
     .checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;}
     .check-item { display: flex; align-items: center; gap: 10px; background: rgba(15, 23, 42, 0.6); padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.15); cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s;}
@@ -127,6 +128,9 @@
     .kv { margin-bottom: 12px; display: flex; justify-content: space-between; font-size: 14px;}
     .kv .k { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase;}
     .kv .v { color: white; font-weight: 600; text-align: right;}
+    .kv-block { margin-bottom: 14px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+    .kv-block .k { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase;}
+    .kv-block .v { color: white; font-weight: 400; line-height: 1.5; font-size: 13.5px; background: rgba(10,15,28,0.5); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(148,163,184,0.1);}
     
     .personnel-view-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 10px;}
     .personnel-card { text-align: center; display:flex; flex-direction: column; align-items: center; gap: 8px;}
@@ -312,11 +316,29 @@
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
 
-          <!-- DIVISION 3: Personnel Info -->
+          <!-- DIVISION 3: Remarks & SOP -->
+          <div class="form-section">
+            <div class="form-section-title"><i class="fa-solid fa-list-check"></i> Remarks, Claims & Procedures</div>
+            <div class="grid">
+              <div class="full">
+                <label for="remarks">Remarks</label>
+                <textarea id="remarks" placeholder="Enter any additional remarks..."></textarea>
+              </div>
+              <div class="full">
+                <label for="claims">Claims</label>
+                <textarea id="claims" placeholder="Enter claims details..."></textarea>
+              </div>
+              <div class="full">
+                <label for="procedureSop">Procedure and SOP</label>
+                <textarea id="procedureSop" placeholder="Enter Procedure and SOP details..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- DIVISION 4: Personnel Info -->
           <div class="form-section">
             <div class="form-section-title"><i class="fa-solid fa-users"></i> Personnel Information</div>
             <div class="grid-3">
@@ -382,7 +404,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "ms_product_bagging_v5";
+    const STORAGE_KEY = "ms_product_bagging_v6";
     let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
     let chartInstance = null;
 
@@ -395,13 +417,26 @@
     let carouselImages = [];
     let carouselIndex = 0;
 
-    // Standard Shifting Schedule
+    // UPDATED Shifting Schedule
     function calculateShift(timeStr) {
       if (!timeStr) return 'Unknown Shift';
       const h = parseInt(timeStr.split(':')[0]);
-      if (h >= 7 && h < 15) return '1st Shift (07:00 - 15:00)';
-      if (h >= 15 && h < 23) return '2nd Shift (15:00 - 23:00)';
-      return '3rd Shift (23:00 - 07:00)';
+      
+      // 2nd Shift: 07:00 to 14:59
+      if (h >= 7 && h < 15) return '2nd Shift (07:00 - 15:00)';
+      // 3rd Shift: 15:00 to 22:59
+      if (h >= 15 && h < 23) return '3rd Shift (15:00 - 23:00)';
+      // 1st Shift: 23:00 to 06:59
+      return '1st Shift (23:00 - 07:00)';
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
     }
 
     // Image Compressor Helper
@@ -505,8 +540,8 @@
             <td>${thumbHtml}</td>
             <td>
               <div class="data-stack">
-                <span class="data-val" style="color:var(--violet); font-weight:700;">${r.productName}</span>
-                <span class="data-label"><i class="fa-regular fa-clock"></i> ${r.time}</span>
+                <span class="data-val" style="color:var(--violet); font-weight:700;">${escapeHtml(r.productName)}</span>
+                <span class="data-label"><i class="fa-regular fa-clock"></i> ${escapeHtml(r.time)}</span>
               </div>
             </td>
             <td>
@@ -596,16 +631,34 @@
           <div>
             <div class="view-card" style="margin-bottom: 20px;">
                <h4><i class="fa-solid fa-cube"></i> Product Information</h4>
-               <div class="kv"><span class="k">Product</span> <span class="v" style="color:var(--violet)">${r.productName}</span></div>
-               <div class="kv"><span class="k">Date & Time</span> <span class="v">${r.date} · ${r.time}</span></div>
+               <div class="kv"><span class="k">Product</span> <span class="v" style="color:var(--violet)">${escapeHtml(r.productName)}</span></div>
+               <div class="kv"><span class="k">Date</span> <span class="v">${escapeHtml(r.date)}</span></div>
+               <div class="kv"><span class="k">Time</span> <span class="v">${escapeHtml(r.time)}</span></div>
                <div class="kv"><span class="k">Shift</span> <span class="v badge-shift">${shiftStr}</span></div>
             </div>
-            <div class="view-card">
+            
+            <div class="view-card" style="margin-bottom: 20px;">
                <h4><i class="fa-solid fa-scale-balanced"></i> Weighing Data</h4>
                <div class="kv"><span class="k">Scale</span> <span class="v">${r.scale} kg</span></div>
                <div class="kv"><span class="k">Tare</span> <span class="v">${r.tare} kg</span></div>
                <div class="kv"><span class="k">Bag Weight</span> <span class="v" style="color:var(--accent)">${r.bagWeight || '0'} kg</span></div>
                <div class="kv" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;"><span class="k">Net Weight</span> <span class="v" style="font-size:16px;">${netWeight} kg</span></div>
+            </div>
+            
+            <div class="view-card">
+               <h4><i class="fa-solid fa-note-sticky"></i> Remarks & Procedures</h4>
+               <div class="kv-block">
+                 <span class="k">Remarks</span> 
+                 <span class="v">${escapeHtml(r.remarks) || '<i style="color:var(--muted)">None</i>'}</span>
+               </div>
+               <div class="kv-block">
+                 <span class="k">Claims</span> 
+                 <span class="v">${escapeHtml(r.claims) || '<i style="color:var(--muted)">None</i>'}</span>
+               </div>
+               <div class="kv-block" style="margin-bottom:0;">
+                 <span class="k">Procedure and SOP</span> 
+                 <span class="v">${escapeHtml(r.procedureSop) || '<i style="color:var(--muted)">None</i>'}</span>
+               </div>
             </div>
           </div>
 
@@ -633,17 +686,17 @@
             <div class="personnel-card">
               <span style="font-size:11px; color:var(--muted); text-transform:uppercase; font-weight:600; margin-bottom:2px;">QA</span>
               ${drawImg(r.photoQA, 'fa-user-tie')}
-              <h3 style="margin:8px 0 0 0; font-size:14px;">${r.qaPerson || 'N/A'}</h3>
+              <h3 style="margin:8px 0 0 0; font-size:14px;">${escapeHtml(r.qaPerson) || 'N/A'}</h3>
             </div>
             <div class="personnel-card">
               <span style="font-size:11px; color:var(--muted); text-transform:uppercase; font-weight:600; margin-bottom:2px;">Bagger</span>
               ${drawImg(r.photoBagger, 'fa-user-gear')}
-              <h3 style="margin:8px 0 0 0; font-size:14px;">${r.person || 'N/A'}</h3>
+              <h3 style="margin:8px 0 0 0; font-size:14px;">${escapeHtml(r.person) || 'N/A'}</h3>
             </div>
             <div class="personnel-card">
               <span style="font-size:11px; color:var(--muted); text-transform:uppercase; font-weight:600; margin-bottom:2px;">H2S Personnel</span>
               ${drawImg(r.photoH2S, 'fa-mask-ventilator')}
-              <h3 style="margin:8px 0 0 0; font-size:14px;">${r.h2sPerson || 'N/A'}</h3>
+              <h3 style="margin:8px 0 0 0; font-size:14px;">${escapeHtml(r.h2sPerson) || 'N/A'}</h3>
             </div>
           </div>
         </div>
@@ -763,6 +816,10 @@
           document.getElementById("bagDate").value = r.date;
           document.getElementById("bagTime").value = r.time;
           
+          document.getElementById("remarks").value = r.remarks || "";
+          document.getElementById("claims").value = r.claims || "";
+          document.getElementById("procedureSop").value = r.procedureSop || "";
+
           document.getElementById("qaPerson").value = r.qaPerson;
           document.getElementById("assignPerson").value = r.person;
           document.getElementById("h2sPerson").value = r.h2sPerson || "";
@@ -794,7 +851,11 @@
           setUploadUI("photoH2S", "fa-mask-ventilator", "H2S Image", !!r.photoH2S);
         }
       } else {
-        // Add Mode: Reset Bag Photos
+        // Add Mode: Reset Bag Photos & text areas
+        document.getElementById("remarks").value = "";
+        document.getElementById("claims").value = "";
+        document.getElementById("procedureSop").value = "";
+
         setUploadUI("photoBagTop", "fa-arrow-up", "Top Image", false);
         setUploadUI("photoBagFront", "fa-square", "Front Image", false);
         setUploadUI("photoBagBack", "fa-square", "Back Image", false);
@@ -821,6 +882,8 @@
           document.getElementById("assignPerson").value = lastRec.person;
           document.getElementById("h2sPerson").value = lastRec.h2sPerson || "";
 
+          // We intentionally don't pre-fill remarks/claims as those are usually unique to a single bag
+          // but we will copy personnel photos so they don't have to upload on every new entry
           if (lastRec.photoQA) {
             pendingImages.qa = lastRec.photoQA;
             setUploadUI("photoQA", "fa-clipboard-user", "Copied", true);
@@ -856,6 +919,10 @@
         bagWeight: document.getElementById("bagWeight").value,
         productName: document.getElementById("productName").value,
         
+        remarks: document.getElementById("remarks").value,
+        claims: document.getElementById("claims").value,
+        procedureSop: document.getElementById("procedureSop").value,
+
         qaPerson: document.getElementById("qaPerson").value,
         person: document.getElementById("assignPerson").value,
         h2sPerson: document.getElementById("h2sPerson").value,
