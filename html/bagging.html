@@ -70,7 +70,7 @@
     td { font-size: 13.5px; }
     tbody tr:hover td { background: rgba(167,139,250, 0.06); }
 
-    .group-header-row td { padding: 10px 20px; background: rgba(15, 23, 42, 0.8) !important; border-bottom: 1px solid rgba(148,163,184,0.15); border-top: 2px solid rgba(167,139,250,0.3); }
+    .group-header-row td { padding: 10px 20px; border-bottom: 1px solid rgba(148,163,184,0.15); border-top: 1px solid rgba(167,139,250,0.1); }
     .group-header { display: flex; align-items: center; gap: 12px; }
     .group-count { font-size: 12px; color: var(--muted); font-weight: 600; }
     .badge-shift { padding: 4px 10px; border-radius: 99px; font-size: 11.5px; font-weight: 700; background: rgba(167,139,250,0.15); color: #c4b5fd; border: 1px solid rgba(167,139,250,0.3); }
@@ -112,7 +112,6 @@
     .thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 9px; border: 1px solid rgba(148,163,184,0.25); cursor: pointer; }
     .no-img { width: 50px; height: 50px; border-radius: 9px; display: grid; place-items: center; background: rgba(15, 23, 42, 0.5); color: var(--muted); border: 1px dashed rgba(148,163,184,0.3); font-size: 20px;}
 
-    /* 5-Image Horizontal Scroll Layout */
     .images-scroll-container { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; }
     .images-scroll-container::-webkit-scrollbar { height: 6px; }
     .images-scroll-container::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.3); border-radius: 4px; }
@@ -139,7 +138,6 @@
 
     .actions { display: flex; gap: 8px; justify-content: center; }
 
-    /* Carousel for Bag Images */
     .carousel-container { position: relative; width: 100%; aspect-ratio: 4/3; background: #0a0f1c; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; display: flex; align-items: center; justify-content: center; }
     .carousel-container img { width: 100%; height: 100%; object-fit: cover; display: none;}
     .carousel-container img.active { display: block; }
@@ -177,13 +175,35 @@
       </div>
     </header>
 
-    <!-- End of Shift Chart Card -->
-    <div class="card" id="chartCard">
+    <!-- Annual Target Progress Card -->
+    <div class="card" id="targetCard" style="display: none;">
+      <div style="padding: 24px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px;">
+          <div>
+            <h3 style="margin:0 0 4px 0; color:var(--ok); font-size:16px;"><i class="fa-solid fa-bullseye"></i> YTD Production Progress</h3>
+            <div class="sub">Accumulated Dry Nickel Tons against <b style="color:white;">33,000 Tons</b> Annual Target</div>
+          </div>
+          <div style="text-align:right;">
+            <div id="targetPercent" style="font-size:26px; font-weight:800; color:var(--ok);">0%</div>
+          </div>
+        </div>
+        <div style="width:100%; background:rgba(10,15,28,0.8); border: 1px solid rgba(148,163,184,0.2); border-radius:12px; height:20px; overflow:hidden; position:relative;">
+          <div id="targetProgressBar" style="width:0%; background:linear-gradient(90deg, var(--violet), var(--ok)); height:100%; transition:width 1.5s ease-in-out;"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:14px; font-weight:600;">
+          <span id="yearlyAccumulated" style="color:white;">0 Tons</span>
+          <span style="color:var(--muted);"><i class="fa-solid fa-flag-checkered"></i> 33,000 Tons Target</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly Accumulation Chart Card -->
+    <div class="card" id="chartCard" style="display: none;">
       <div class="chart-card-header">
-        <h3><i class="fa-solid fa-chart-line"></i> End of Shift Totals</h3>
+        <h3><i class="fa-solid fa-chart-line"></i> Monthly Production & Accumulation Chart</h3>
       </div>
       <div class="chart-container">
-        <canvas id="shiftChart"></canvas>
+        <canvas id="monthlyChart"></canvas>
       </div>
     </div>
 
@@ -222,7 +242,6 @@
         <form id="recordForm">
           <input type="hidden" id="recordId" />
           
-          <!-- DIVISION 1: Weighing Scale & Tare -->
           <div class="form-section">
             <div class="form-section-title"><i class="fa-solid fa-scale-balanced"></i> Weighing Data</div>
             <div class="grid-3">
@@ -241,7 +260,6 @@
             </div>
           </div>
 
-          <!-- DIVISION 2: MS Product Details -->
           <div class="form-section">
             <div class="form-section-title"><i class="fa-solid fa-cube"></i> MS Product Details</div>
             <div class="grid">
@@ -270,11 +288,9 @@
                 </div>
               </div>
 
-              <!-- 5-SIDE BAG IMAGES -->
               <div class="full">
                 <label><i class="fa-solid fa-camera"></i> 5-Side Bag Images</label>
                 <div class="images-scroll-container">
-                  <!-- Top -->
                   <div class="file-upload-wrapper">
                     <input type="file" id="photoBagTop" accept="image/*" />
                     <div class="file-upload-ui" id="uiPhotoBagTop">
@@ -282,7 +298,6 @@
                       <span>Top Image</span>
                     </div>
                   </div>
-                  <!-- Front -->
                   <div class="file-upload-wrapper">
                     <input type="file" id="photoBagFront" accept="image/*" />
                     <div class="file-upload-ui" id="uiPhotoBagFront">
@@ -290,7 +305,6 @@
                       <span>Front Image</span>
                     </div>
                   </div>
-                  <!-- Back -->
                   <div class="file-upload-wrapper">
                     <input type="file" id="photoBagBack" accept="image/*" />
                     <div class="file-upload-ui" id="uiPhotoBagBack">
@@ -298,7 +312,6 @@
                       <span>Back Image</span>
                     </div>
                   </div>
-                  <!-- Left -->
                   <div class="file-upload-wrapper">
                     <input type="file" id="photoBagLeft" accept="image/*" />
                     <div class="file-upload-ui" id="uiPhotoBagLeft">
@@ -306,7 +319,6 @@
                       <span>Left Side Image</span>
                     </div>
                   </div>
-                  <!-- Right -->
                   <div class="file-upload-wrapper">
                     <input type="file" id="photoBagRight" accept="image/*" />
                     <div class="file-upload-ui" id="uiPhotoBagRight">
@@ -319,7 +331,6 @@
             </div>
           </div>
 
-          <!-- DIVISION 3: Remarks & SOP -->
           <div class="form-section">
             <div class="form-section-title"><i class="fa-solid fa-list-check"></i> Remarks, Claims & Procedures</div>
             <div class="grid">
@@ -338,7 +349,6 @@
             </div>
           </div>
 
-          <!-- DIVISION 4: Personnel Info -->
           <div class="form-section">
             <div class="form-section-title"><i class="fa-solid fa-users"></i> Personnel Information</div>
             <div class="grid-3">
@@ -394,9 +404,7 @@
         <i class="fa-regular fa-file-lines" style="color:var(--accent)"></i>
         <h2>Bagging Details</h2>
       </header>
-      <div class="body" id="viewModalBody">
-        <!-- Injected via JS -->
-      </div>
+      <div class="body" id="viewModalBody"></div>
       <footer>
         <button class="btn-ghost" type="button" onclick="document.getElementById('viewModal').classList.remove('show')">Close Window</button>
       </footer>
@@ -404,42 +412,32 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "ms_product_bagging_v6";
+    const STORAGE_KEY = "ms_product_bagging_v7";
     let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
     let chartInstance = null;
+    const TARGET_TONS = 33000;
 
     let pendingImages = { 
       bagTop: null, bagFront: null, bagBack: null, bagLeft: null, bagRight: null, 
       qa: null, bagger: null, h2s: null 
     };
 
-    // Carousel variables for the View Modal
     let carouselImages = [];
     let carouselIndex = 0;
 
-    // UPDATED Shifting Schedule
     function calculateShift(timeStr) {
       if (!timeStr) return 'Unknown Shift';
       const h = parseInt(timeStr.split(':')[0]);
-      
-      // 2nd Shift: 07:00 to 14:59
       if (h >= 7 && h < 15) return '2nd Shift (07:00 - 15:00)';
-      // 3rd Shift: 15:00 to 22:59
       if (h >= 15 && h < 23) return '3rd Shift (15:00 - 23:00)';
-      // 1st Shift: 23:00 to 06:59
       return '1st Shift (23:00 - 07:00)';
     }
 
     function escapeHtml(str) {
       if (!str) return '';
-      return str.replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
-    // Image Compressor Helper
     function setupImageUpload(inputId, uiId, key) {
       document.getElementById(inputId).addEventListener("change", function(e) {
         const file = e.target.files[0];
@@ -468,13 +466,11 @@
       });
     }
 
-    // Attach uploads for all 5 bag sides and 3 personnel
     setupImageUpload("photoBagTop", "uiPhotoBagTop", "bagTop");
     setupImageUpload("photoBagFront", "uiPhotoBagFront", "bagFront");
     setupImageUpload("photoBagBack", "uiPhotoBagBack", "bagBack");
     setupImageUpload("photoBagLeft", "uiPhotoBagLeft", "bagLeft");
     setupImageUpload("photoBagRight", "uiPhotoBagRight", "bagRight");
-    
     setupImageUpload("photoQA", "uiPhotoQA", "qa");
     setupImageUpload("photoBagger", "uiPhotoBagger", "bagger");
     setupImageUpload("photoH2S", "uiPhotoH2S", "h2s");
@@ -486,94 +482,241 @@
       if(records.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:60px; color:var(--muted);"><i class="fa-solid fa-box-open" style="font-size: 30px; margin-bottom: 10px; display:block; opacity:0.5;"></i>No bagging records found.</td></tr>`;
         document.getElementById("chartCard").style.display = "none";
+        document.getElementById("targetCard").style.display = "none";
         return;
       }
       document.getElementById("chartCard").style.display = "block";
+      document.getElementById("targetCard").style.display = "block";
 
-      // Group by Date and Shift
       const sorted = [...records].sort((a, b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time));
-      const grouped = {};
-
+      
+      // Group logically by Day -> Shift
+      const groupedByDate = {};
       sorted.forEach(r => {
+        if(!groupedByDate[r.date]) {
+          groupedByDate[r.date] = { totalKg: 0, bagCount: 0, shifts: {} };
+        }
+        
+        const netWeight = Math.max(0, parseFloat(r.scale) - parseFloat(r.tare)) || 0;
+        groupedByDate[r.date].totalKg += netWeight;
+        groupedByDate[r.date].bagCount += 1;
+
         const shiftStr = calculateShift(r.time);
-        const groupKey = `${r.date} | ${shiftStr}`;
-        if (!grouped[groupKey]) grouped[groupKey] = [];
-        grouped[groupKey].push(r);
+        if(!groupedByDate[r.date].shifts[shiftStr]) {
+          groupedByDate[r.date].shifts[shiftStr] = [];
+        }
+        groupedByDate[r.date].shifts[shiftStr].push({...r, netWeight});
       });
 
-      Object.keys(grouped).forEach(key => {
-        const group = grouped[key];
-        const [datePart, shiftPart] = key.split(' | ');
+      // Render the Date (Total in 1 Day) -> then Shifts -> then Rows
+      Object.keys(groupedByDate).forEach(date => {
+        const dayData = groupedByDate[date];
+        const dayTons = (dayData.totalKg / 1000).toFixed(3);
 
-        // Group Header
-        const headerTr = document.createElement("tr");
-        headerTr.className = "group-header-row";
-        headerTr.innerHTML = `
+        // Daily Summary Header
+        const dateTr = document.createElement("tr");
+        dateTr.className = "group-header-row";
+        dateTr.style.background = "rgba(34, 211, 238, 0.08) !important";
+        dateTr.innerHTML = `
           <td colspan="5">
             <div class="group-header">
-              <span class="badge-shift">${shiftPart}</span>
-              <span style="color: white; font-weight: 600; font-size: 13px;">${datePart}</span>
-              <span class="group-count">· ${group.length} Bag${group.length > 1 ? 's' : ''} Produced</span>
+              <i class="fa-regular fa-calendar-check" style="color:var(--accent); font-size:16px;"></i>
+              <span style="color: white; font-weight: 700; font-size: 14px;">${date}</span>
+              <span class="badge-shift" style="background:var(--accent-2); color:white; border:none; padding:4px 12px;"><i class="fa-solid fa-cubes-stacked"></i> Daily Total: ${dayTons} Tons (${dayData.totalKg.toLocaleString()} kg)</span>
+              <span class="group-count">· ${dayData.bagCount} Total Bags</span>
             </div>
           </td>`;
-        tbody.appendChild(headerTr);
+        tbody.appendChild(dateTr);
 
-        // Group Rows
-        group.forEach(r => {
-          const netWeight = (parseFloat(r.scale) - parseFloat(r.tare)).toFixed(2);
-          const bagWt = r.bagWeight ? parseFloat(r.bagWeight).toFixed(2) : '-';
-          
-          const cond = (c, label) => c ? `<span class="badge-status status-ok"><i class="fa-solid fa-check"></i> ${label}</span>` : `<span class="badge-status status-no"><i class="fa-solid fa-xmark"></i> ${label}</span>`;
-          
-          // Get the first available image to show as a thumbnail, count total attachments
-          const availableImages = [r.photoBagTop, r.photoBagFront, r.photoBagBack, r.photoBagLeft, r.photoBagRight].filter(Boolean);
-          const mainImg = availableImages[0];
-          const thumbHtml = mainImg 
-            ? `<div style="position:relative; width:50px; height:50px;">
-                 <img class="thumb" src="${mainImg}">
-                 <span style="position:absolute; bottom:-5px; right:-5px; background:var(--violet); color:white; font-size:10px; padding:2px 5px; border-radius:4px; font-weight:bold;">+${availableImages.length}</span>
-               </div>` 
-            : `<div class="no-img" title="No Bag Photos"><i class="fa-regular fa-images"></i></div>`;
-
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${thumbHtml}</td>
-            <td>
-              <div class="data-stack">
-                <span class="data-val" style="color:var(--violet); font-weight:700;">${escapeHtml(r.productName)}</span>
-                <span class="data-label"><i class="fa-regular fa-clock"></i> ${escapeHtml(r.time)}</span>
-              </div>
-            </td>
-            <td>
-               <div class="data-stack">
-                 <div><span class="data-label">Scale:</span> <span class="data-val">${r.scale} kg</span></div>
-                 <div><span class="data-label">Tare:</span> <span class="data-val">${r.tare} kg</span></div>
-                 <div style="margin-top:2px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:2px;"><span class="data-label">Net:</span> <span class="data-val" style="font-weight:bold; color:var(--accent);">${netWeight} kg</span></div>
+        // Shifts within this day
+        Object.keys(dayData.shifts).forEach(shiftKey => {
+           const shiftBags = dayData.shifts[shiftKey];
+           
+           // Shift Sub-Header
+           const shiftTr = document.createElement("tr");
+           shiftTr.className = "group-header-row";
+           shiftTr.innerHTML = `
+             <td colspan="5" style="padding: 8px 20px; background:rgba(15,23,42,0.6) !important; border-top:none;">
+               <div class="group-header" style="padding-left: 15px;">
+                 <span class="badge-shift">${shiftKey}</span>
+                 <span class="group-count">· ${shiftBags.length} Bag(s)</span>
                </div>
-            </td>
-            <td>
-              <div class="cond-grid">
-                ${cond(r.condTie, 'Tie')}
-                ${cond(r.condSling, 'Sling')}
-                ${cond(r.condWriting, 'Writing')}
-                ${cond(r.condN2, 'N2')}
-                ${cond(r.condRedTag, 'Tag')}
-                ${cond(r.condWarehouse, 'Whse')}
-              </div>
-            </td>
-            <td>
-              <div class="actions">
-                <button class="btn-ghost" title="View Details" onclick="viewDetails('${r.id}')"><i class="fa-solid fa-eye"></i></button>
-                <button class="btn-edit" title="Edit Bag" onclick="openForm('${r.id}')"><i class="fa-solid fa-pen"></i></button>
-                <button class="btn-danger" title="Delete Bag" onclick="deleteRecord('${r.id}')"><i class="fa-solid fa-trash"></i></button>
-              </div>
-            </td>
-          `;
-          tbody.appendChild(tr);
+             </td>`;
+           tbody.appendChild(shiftTr);
+
+           // Bag Logs
+           shiftBags.forEach(r => {
+             const netWeight = r.netWeight.toFixed(2);
+             const cond = (c, label) => c ? `<span class="badge-status status-ok"><i class="fa-solid fa-check"></i> ${label}</span>` : `<span class="badge-status status-no"><i class="fa-solid fa-xmark"></i> ${label}</span>`;
+             
+             const availableImages = [r.photoBagTop, r.photoBagFront, r.photoBagBack, r.photoBagLeft, r.photoBagRight].filter(Boolean);
+             const mainImg = availableImages[0];
+             const thumbHtml = mainImg 
+               ? `<div style="position:relative; width:50px; height:50px;">
+                    <img class="thumb" src="${mainImg}">
+                    <span style="position:absolute; bottom:-5px; right:-5px; background:var(--violet); color:white; font-size:10px; padding:2px 5px; border-radius:4px; font-weight:bold;">+${availableImages.length}</span>
+                  </div>` 
+               : `<div class="no-img" title="No Bag Photos"><i class="fa-regular fa-images"></i></div>`;
+
+             const tr = document.createElement("tr");
+             tr.innerHTML = `
+               <td>${thumbHtml}</td>
+               <td>
+                 <div class="data-stack">
+                   <span class="data-val" style="color:var(--violet); font-weight:700;">${escapeHtml(r.productName)}</span>
+                   <span class="data-label"><i class="fa-regular fa-clock"></i> ${escapeHtml(r.time)}</span>
+                 </div>
+               </td>
+               <td>
+                  <div class="data-stack">
+                    <div><span class="data-label">Scale:</span> <span class="data-val">${r.scale} kg</span></div>
+                    <div><span class="data-label">Tare:</span> <span class="data-val">${r.tare} kg</span></div>
+                    <div style="margin-top:2px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:2px;"><span class="data-label">Net:</span> <span class="data-val" style="font-weight:bold; color:var(--accent);">${netWeight} kg</span></div>
+                  </div>
+               </td>
+               <td>
+                 <div class="cond-grid">
+                   ${cond(r.condTie, 'Tie')}
+                   ${cond(r.condSling, 'Sling')}
+                   ${cond(r.condWriting, 'Writing')}
+                   ${cond(r.condN2, 'N2')}
+                   ${cond(r.condRedTag, 'Tag')}
+                   ${cond(r.condWarehouse, 'Whse')}
+                 </div>
+               </td>
+               <td>
+                 <div class="actions">
+                   <button class="btn-ghost" title="View Details" onclick="viewDetails('${r.id}')"><i class="fa-solid fa-eye"></i></button>
+                   <button class="btn-edit" title="Edit Bag" onclick="openForm('${r.id}')"><i class="fa-solid fa-pen"></i></button>
+                   <button class="btn-danger" title="Delete Bag" onclick="deleteRecord('${r.id}')"><i class="fa-solid fa-trash"></i></button>
+                 </div>
+               </td>
+             `;
+             tbody.appendChild(tr);
+           });
         });
       });
 
-      renderShiftChart(sorted);
+      renderDashboard(sorted);
+    }
+
+    function renderDashboard(data) {
+      const currentYear = new Date().getFullYear();
+      const monthlyTons = new Array(12).fill(0);
+      
+      // Calculate Monthly Dry Nickel Tons for YTD accumulation
+      data.forEach(r => {
+        const d = new Date(r.date);
+        if (d.getFullYear() === currentYear) {
+           const month = d.getMonth(); // 0 to 11
+           const netWeight = Math.max(0, parseFloat(r.scale) - parseFloat(r.tare)) || 0;
+           monthlyTons[month] += (netWeight / 1000); // converting kg to Tons
+        }
+      });
+
+      let accumulatedTotal = 0;
+      const barData = [];
+      const cumulativeData = [];
+      
+      // We only want the cumulative line to plot up to the current month to avoid flat lines in the future
+      const currentMonthIndex = new Date().getMonth();
+
+      for (let i = 0; i < 12; i++) {
+        barData.push(monthlyTons[i].toFixed(2));
+        
+        if (i <= currentMonthIndex) {
+          accumulatedTotal += monthlyTons[i];
+          cumulativeData.push(accumulatedTotal.toFixed(2));
+        } else {
+          cumulativeData.push(null);
+        }
+      }
+
+      // 1. Update Annual Target UI
+      const percent = Math.min((accumulatedTotal / TARGET_TONS) * 100, 100).toFixed(2);
+      document.getElementById('yearlyAccumulated').innerHTML = `<strong style="color:var(--accent); font-size:16px;">${accumulatedTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</strong> <span style="color:var(--muted)">/ ${TARGET_TONS.toLocaleString()} Tons Accumulated</span>`;
+      document.getElementById('targetProgressBar').style.width = percent + '%';
+      document.getElementById('targetPercent').textContent = percent + '%';
+
+      // 2. Render YTD Accumulation Chart
+      const ctx = document.getElementById('monthlyChart').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      const labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const targetLine = new Array(12).fill(TARGET_TONS);
+
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Monthly Production (Tons)',
+              data: barData,
+              backgroundColor: 'rgba(167, 139, 250, 0.7)',
+              borderColor: '#a78bfa',
+              borderWidth: 1,
+              borderRadius: 6,
+              yAxisID: 'y',
+              order: 3
+            },
+            {
+              label: 'Accumulated Year-to-Date (Tons)',
+              data: cumulativeData,
+              type: 'line',
+              backgroundColor: '#22d3ee',
+              borderColor: '#22d3ee',
+              borderWidth: 3,
+              pointRadius: 5,
+              pointBackgroundColor: '#131b2e',
+              tension: 0.3,
+              yAxisID: 'y',
+              order: 2,
+              spanGaps: true
+            },
+            {
+              label: 'Annual Target (33,000 Tons)',
+              data: targetLine,
+              type: 'line',
+              borderColor: 'rgba(248, 113, 113, 0.8)',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              pointRadius: 0,
+              fill: false,
+              yAxisID: 'y',
+              order: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { labels: { color: '#e2e8f0', usePointStyle: true, padding: 15 } },
+            tooltip: {
+               callbacks: {
+                 label: function(context) {
+                    let label = context.dataset.label || '';
+                    if (label) label += ': ';
+                    if (context.parsed.y !== null) {
+                       label += context.parsed.y.toLocaleString() + ' Tons';
+                    }
+                    return label;
+                 }
+               }
+            }
+          },
+          scales: {
+            x: { ticks: { color: '#8b98b3', font: {size: 11} }, grid: { color: 'rgba(148,163,184,0.05)' } },
+            y: { 
+              type: 'linear', position: 'left',
+              title: { display: true, text: 'Dry Nickel Tons', color: '#a78bfa', font: {weight: 'bold'} },
+              ticks: { color: '#8b98b3' }, 
+              grid: { color: 'rgba(148,163,184,0.1)' }, beginAtZero: true 
+            }
+          }
+        }
+      });
     }
 
     // Carousel Functions
@@ -596,7 +739,6 @@
       const drawImg = (src, fallbackIcon) => src ? `<img src="${src}" />` : `<div class="no-photo"><i class="fa-solid ${fallbackIcon}"></i></div>`;
       const cond = (c, label) => c ? `<span style="color:var(--ok)"><i class="fa-solid fa-check"></i> Yes</span>` : `<span style="color:var(--danger)"><i class="fa-solid fa-xmark"></i> No</span>`;
 
-      // Build Carousel Array
       carouselImages = [
         { src: r.photoBagTop, label: "Top Image" },
         { src: r.photoBagFront, label: "Front Image" },
@@ -606,7 +748,6 @@
       ].filter(img => img.src);
       
       carouselIndex = 0;
-
       let carouselHtml = `<div class="no-carousel-images"><i class="fa-regular fa-images" style="font-size:30px; display:block; margin-bottom:10px;"></i>No Bag Images Attached</div>`;
       
       if (carouselImages.length > 0) {
@@ -627,7 +768,6 @@
       const body = document.getElementById("viewModalBody");
       body.innerHTML = `
         <div class="details-grid">
-          <!-- Left Column -->
           <div>
             <div class="view-card" style="margin-bottom: 20px;">
                <h4><i class="fa-solid fa-cube"></i> Product Information</h4>
@@ -662,7 +802,6 @@
             </div>
           </div>
 
-          <!-- Right Column -->
           <div>
             <div class="view-card" style="margin-bottom: 20px;">
                <h4><i class="fa-solid fa-clipboard-check"></i> Conditions Checklist</h4>
@@ -705,80 +844,6 @@
       document.getElementById("viewModal").classList.add("show");
     }
 
-    function renderShiftChart(data) {
-      const ctx = document.getElementById('shiftChart').getContext('2d');
-      if (chartInstance) chartInstance.destroy();
-
-      const grouped = {};
-      const chronological = [...data].sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
-
-      chronological.forEach(r => {
-        const shiftStr = calculateShift(r.time);
-        const key = `${r.date} | ${shiftStr}`;
-        if (!grouped[key]) {
-          grouped[key] = { bagCount: 0, totalWeight: 0 };
-        }
-        grouped[key].bagCount += 1;
-        const w = parseFloat(r.bagWeight) || (parseFloat(r.scale) - parseFloat(r.tare)) || 0;
-        grouped[key].totalWeight += w;
-      });
-
-      const labels = Object.keys(grouped);
-      const counts = labels.map(l => grouped[l].bagCount);
-      const weights = labels.map(l => grouped[l].totalWeight.toFixed(2));
-
-      chartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: 'Total Bags Produced',
-              data: counts,
-              backgroundColor: 'rgba(167, 139, 250, 0.8)',
-              borderColor: '#a78bfa',
-              borderWidth: 1,
-              borderRadius: 6,
-              yAxisID: 'y'
-            },
-            {
-              label: 'Total Weight (kg)',
-              data: weights,
-              type: 'line',
-              backgroundColor: '#22d3ee',
-              borderColor: '#22d3ee',
-              borderWidth: 3,
-              pointRadius: 4,
-              pointBackgroundColor: '#131b2e',
-              tension: 0.3,
-              yAxisID: 'y1'
-            }
-          ]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
-          plugins: {
-            legend: { labels: { color: '#e2e8f0', usePointStyle: true, padding: 15 } }
-          },
-          scales: {
-            x: { ticks: { color: '#8b98b3', font: {size: 11} }, grid: { color: 'rgba(148,163,184,0.05)' } },
-            y: { 
-              type: 'linear', position: 'left',
-              title: { display: true, text: 'Total Bags', color: '#a78bfa', font: {weight: 'bold'} },
-              ticks: { color: '#8b98b3', stepSize: 5 }, 
-              grid: { color: 'rgba(148,163,184,0.1)' }, beginAtZero: true 
-            },
-            y1: {
-              type: 'linear', position: 'right',
-              title: { display: true, text: 'Total Weight (kg)', color: '#22d3ee', font: {weight: 'bold'} },
-              ticks: { color: '#8b98b3' }, grid: { drawOnChartArea: false }, beginAtZero: true
-            }
-          }
-        }
-      });
-    }
-
     function setUploadUI(id, icon, text, hasImage = false) {
       const ui = document.getElementById("ui" + id.charAt(0).toUpperCase() + id.slice(1));
       if (hasImage) {
@@ -805,7 +870,6 @@
       };
 
       if (id) {
-        // Edit Mode: Load everything
         const r = records.find(rec => rec.id === id);
         if (r) {
           document.getElementById("weighingScale").value = r.scale;
@@ -851,7 +915,6 @@
           setUploadUI("photoH2S", "fa-mask-ventilator", "H2S Image", !!r.photoH2S);
         }
       } else {
-        // Add Mode: Reset Bag Photos & text areas
         document.getElementById("remarks").value = "";
         document.getElementById("claims").value = "";
         document.getElementById("procedureSop").value = "";
@@ -871,7 +934,6 @@
         document.getElementById("bagTime").value = now.toTimeString().slice(0, 5);
 
         if (records.length > 0) {
-          // Pre-fill sticky fields from previous log in the shift
           const chronological = [...records].sort((a, b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time));
           const lastRec = chronological[0];
           
@@ -882,8 +944,6 @@
           document.getElementById("assignPerson").value = lastRec.person;
           document.getElementById("h2sPerson").value = lastRec.h2sPerson || "";
 
-          // We intentionally don't pre-fill remarks/claims as those are usually unique to a single bag
-          // but we will copy personnel photos so they don't have to upload on every new entry
           if (lastRec.photoQA) {
             pendingImages.qa = lastRec.photoQA;
             setUploadUI("photoQA", "fa-clipboard-user", "Copied", true);
@@ -966,14 +1026,12 @@
       renderTable();
     }
 
-    // Modal Background Close handling
     document.querySelectorAll('.modal-bg').forEach(bg => { 
       bg.addEventListener('click', (e) => { 
         if (e.target === bg) bg.classList.remove('show'); 
       }); 
     });
 
-    // Initialize
     renderTable();
   </script>
 </body>
