@@ -107,7 +107,7 @@
     .checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;}
     .check-item { display: flex; align-items: center; gap: 10px; background: rgba(15, 23, 42, 0.6); padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.15); cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s;}
     .check-item:hover { border-color: var(--violet); }
-    .check-item input { width: 18px; height: 18px; margin: 0; cursor: pointer; accent-color: var(--violet); }
+    .check-item input[type="checkbox"] { width: 18px; height: 18px; margin: 0; cursor: pointer; accent-color: var(--violet); }
 
     .thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 9px; border: 1px solid rgba(148,163,184,0.25); cursor: pointer; }
     .no-img { width: 50px; height: 50px; border-radius: 9px; display: grid; place-items: center; background: rgba(15, 23, 42, 0.5); color: var(--muted); border: 1px dashed rgba(148,163,184,0.3); font-size: 20px;}
@@ -219,7 +219,7 @@
               <th><i class="fa-solid fa-camera"></i> Bag</th>
               <th><i class="fa-solid fa-cube"></i> Product & Time</th>
               <th><i class="fa-solid fa-scale-balanced"></i> Weights</th>
-              <th><i class="fa-solid fa-clipboard-check"></i> Conditions</th>
+              <th><i class="fa-solid fa-clipboard-check"></i> Conditions Summary</th>
               <th style="text-align: center;"><i class="fa-solid fa-wrench"></i> Actions</th>
             </tr>
           </thead>
@@ -276,15 +276,61 @@
                 <input id="bagTime" type="time" required />
               </div>
 
+              <!-- Refined Conditions Checklist with Categories -->
               <div class="full">
-                <label>Check Conditions</label>
-                <div class="checklist">
-                  <label class="check-item"><input type="checkbox" id="chkTie"> Tie</label>
-                  <label class="check-item"><input type="checkbox" id="chkSling"> Sling</label>
-                  <label class="check-item"><input type="checkbox" id="chkWriting"> Writing Back and Front</label>
-                  <label class="check-item"><input type="checkbox" id="chkN2"> N2 Purging</label>
-                  <label class="check-item"><input type="checkbox" id="chkRedTag"> Before removing red tag sling install</label>
-                  <label class="check-item"><input type="checkbox" id="chkWarehouse"> Deliver to Warehouse</label>
+                <label><i class="fa-solid fa-clipboard-list"></i> Conditions Checklist</label>
+                
+                <div style="margin-bottom: 16px;">
+                  <div style="font-size: 11px; color: var(--accent); margin-bottom: 8px; font-weight: 700; letter-spacing: 0.5px;">GENERAL CONDITIONS</div>
+                  <div class="checklist">
+                    <label class="check-item"><input type="checkbox" id="chkTie"> Tie</label>
+                    <label class="check-item"><input type="checkbox" id="chkSling"> Sling</label>
+                    <label class="check-item"><input type="checkbox" id="chkWriting"> Writing Back and Front</label>
+                    <label class="check-item"><input type="checkbox" id="chkN2"> N2 Purging</label>
+                    <label class="check-item"><input type="checkbox" id="chkRedTag"> Before removing red tag sling install</label>
+                    <label class="check-item"><input type="checkbox" id="chkWarehouse"> Deliver to Warehouse</label>
+                  </div>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                  <div style="font-size: 11px; color: var(--accent); margin-bottom: 8px; font-weight: 700; letter-spacing: 0.5px;">AFTER BALLOONING</div>
+                  <div class="checklist">
+                    <label class="check-item"><input type="checkbox" id="chkLiner"> Check Liner</label>
+                    <label class="check-item"><input type="checkbox" id="chkTopBottom"> Top/Bottom</label>
+                    <label class="check-item"><input type="checkbox" id="chkSides"> Sides</label>
+                    <label class="check-item"><input type="checkbox" id="chkLongSling"> Long Sling</label>
+                    <label class="check-item"><input type="checkbox" id="chkShortSling"> Short Sling</label>
+                  </div>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                  <div style="font-size: 11px; color: var(--accent); margin-bottom: 8px; font-weight: 700; letter-spacing: 0.5px;">BEFORE TYING</div>
+                  <div class="checklist">
+                    <label class="check-item"><input type="checkbox" id="chkForeignMaterials"> No foreign materials</label>
+                    <label class="check-item"><input type="checkbox" id="chkHardenedScale"> No hardened scale</label>
+                  </div>
+                </div>
+
+                <div style="margin-bottom: 8px;">
+                  <div style="font-size: 11px; color: var(--accent); margin-bottom: 8px; font-weight: 700; letter-spacing: 0.5px;">AFTER TYING</div>
+                  <div class="checklist">
+                    <label class="check-item"><input type="checkbox" id="chkLinerTall"> Liner tall</label>
+                    <label class="check-item"><input type="checkbox" id="chkLinerRope"> Liner rope</label>
+                    <label class="check-item"><input type="checkbox" id="chkLinerLoop"> Liner loop</label>
+                    <label class="check-item"><input type="checkbox" id="chkLotSide1"> Lot# (side 1)</label>
+                    <label class="check-item"><input type="checkbox" id="chkLotSide2"> Lot# (side 2)</label>
+                    <label class="check-item"><input type="checkbox" id="chkSliderNotClose"> Slider not close</label>
+                    <label class="check-item"><input type="checkbox" id="chkFinalWeight"> Final weight</label>
+                    <label class="check-item"><input type="checkbox" id="chkRedTagRemove"> Red tag remove</label>
+                    
+                    <label class="check-item" style="cursor: default; padding: 6px 14px;">
+                      <span style="flex:1;">Sample Condition</span>
+                      <select id="selSampleCondition" style="width: auto; padding: 6px 12px; margin: 0; min-width: 90px; border-radius: 6px;">
+                        <option value="Wet">Wet</option>
+                        <option value="Dry">Dry</option>
+                      </select>
+                    </label>
+                  </div>
                 </div>
               </div>
 
@@ -412,7 +458,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "ms_product_bagging_v7";
+    const STORAGE_KEY = "ms_product_bagging_v8";
     let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
     let chartInstance = null;
     const TARGET_TONS = 33000;
@@ -490,7 +536,6 @@
 
       const sorted = [...records].sort((a, b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time));
       
-      // Group logically by Day -> Shift
       const groupedByDate = {};
       sorted.forEach(r => {
         if(!groupedByDate[r.date]) {
@@ -508,12 +553,10 @@
         groupedByDate[r.date].shifts[shiftStr].push({...r, netWeight});
       });
 
-      // Render the Date (Total in 1 Day) -> then Shifts -> then Rows
       Object.keys(groupedByDate).forEach(date => {
         const dayData = groupedByDate[date];
         const dayTons = (dayData.totalKg / 1000).toFixed(3);
 
-        // Daily Summary Header
         const dateTr = document.createElement("tr");
         dateTr.className = "group-header-row";
         dateTr.style.background = "rgba(34, 211, 238, 0.08) !important";
@@ -528,11 +571,9 @@
           </td>`;
         tbody.appendChild(dateTr);
 
-        // Shifts within this day
         Object.keys(dayData.shifts).forEach(shiftKey => {
            const shiftBags = dayData.shifts[shiftKey];
            
-           // Shift Sub-Header
            const shiftTr = document.createElement("tr");
            shiftTr.className = "group-header-row";
            shiftTr.innerHTML = `
@@ -544,7 +585,6 @@
              </td>`;
            tbody.appendChild(shiftTr);
 
-           // Bag Logs
            shiftBags.forEach(r => {
              const netWeight = r.netWeight.toFixed(2);
              const cond = (c, label) => c ? `<span class="badge-status status-ok"><i class="fa-solid fa-check"></i> ${label}</span>` : `<span class="badge-status status-no"><i class="fa-solid fa-xmark"></i> ${label}</span>`;
@@ -580,9 +620,8 @@
                    ${cond(r.condSling, 'Sling')}
                    ${cond(r.condWriting, 'Writing')}
                    ${cond(r.condN2, 'N2')}
-                   ${cond(r.condRedTag, 'Tag')}
-                   ${cond(r.condWarehouse, 'Whse')}
                  </div>
+                 <div style="font-size: 11px; margin-top: 8px; color: var(--muted); font-weight: 500;"><i class="fa-solid fa-list-check"></i> View details for full checklist</div>
                </td>
                <td>
                  <div class="actions">
@@ -604,21 +643,18 @@
       const currentYear = new Date().getFullYear();
       const monthlyTons = new Array(12).fill(0);
       
-      // Calculate Monthly Dry Nickel Tons for YTD accumulation
       data.forEach(r => {
         const d = new Date(r.date);
         if (d.getFullYear() === currentYear) {
-           const month = d.getMonth(); // 0 to 11
+           const month = d.getMonth();
            const netWeight = Math.max(0, parseFloat(r.scale) - parseFloat(r.tare)) || 0;
-           monthlyTons[month] += (netWeight / 1000); // converting kg to Tons
+           monthlyTons[month] += (netWeight / 1000);
         }
       });
 
       let accumulatedTotal = 0;
       const barData = [];
       const cumulativeData = [];
-      
-      // We only want the cumulative line to plot up to the current month to avoid flat lines in the future
       const currentMonthIndex = new Date().getMonth();
 
       for (let i = 0; i < 12; i++) {
@@ -632,13 +668,11 @@
         }
       }
 
-      // 1. Update Annual Target UI
       const percent = Math.min((accumulatedTotal / TARGET_TONS) * 100, 100).toFixed(2);
       document.getElementById('yearlyAccumulated').innerHTML = `<strong style="color:var(--accent); font-size:16px;">${accumulatedTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</strong> <span style="color:var(--muted)">/ ${TARGET_TONS.toLocaleString()} Tons Accumulated</span>`;
       document.getElementById('targetProgressBar').style.width = percent + '%';
       document.getElementById('targetPercent').textContent = percent + '%';
 
-      // 2. Render YTD Accumulation Chart
       const ctx = document.getElementById('monthlyChart').getContext('2d');
       if (chartInstance) chartInstance.destroy();
 
@@ -719,7 +753,6 @@
       });
     }
 
-    // Carousel Functions
     function changeCarousel(direction) {
       if (carouselImages.length === 0) return;
       carouselIndex = (carouselIndex + direction + carouselImages.length) % carouselImages.length;
@@ -737,7 +770,7 @@
       const shiftStr = calculateShift(r.time);
       
       const drawImg = (src, fallbackIcon) => src ? `<img src="${src}" />` : `<div class="no-photo"><i class="fa-solid ${fallbackIcon}"></i></div>`;
-      const cond = (c, label) => c ? `<span style="color:var(--ok)"><i class="fa-solid fa-check"></i> Yes</span>` : `<span style="color:var(--danger)"><i class="fa-solid fa-xmark"></i> No</span>`;
+      const cond = (c) => c ? `<span style="color:var(--ok)"><i class="fa-solid fa-check"></i> Yes</span>` : `<span style="color:var(--danger)"><i class="fa-solid fa-xmark"></i> No</span>`;
 
       carouselImages = [
         { src: r.photoBagTop, label: "Top Image" },
@@ -785,7 +818,7 @@
                <div class="kv" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;"><span class="k">Net Weight</span> <span class="v" style="font-size:16px;">${netWeight} kg</span></div>
             </div>
             
-            <div class="view-card">
+            <div class="view-card" style="margin-bottom: 20px;">
                <h4><i class="fa-solid fa-note-sticky"></i> Remarks & Procedures</h4>
                <div class="kv-block">
                  <span class="k">Remarks</span> 
@@ -800,21 +833,49 @@
                  <span class="v">${escapeHtml(r.procedureSop) || '<i style="color:var(--muted)">None</i>'}</span>
                </div>
             </div>
+            
+            <div class="view-card" style="padding:10px;">
+              ${carouselHtml}
+            </div>
           </div>
 
           <div>
             <div class="view-card" style="margin-bottom: 20px;">
-               <h4><i class="fa-solid fa-clipboard-check"></i> Conditions Checklist</h4>
+               <h4><i class="fa-solid fa-clipboard-check"></i> General Conditions</h4>
                <div class="kv"><span class="k">Tie</span> <span class="v">${cond(r.condTie)}</span></div>
                <div class="kv"><span class="k">Sling</span> <span class="v">${cond(r.condSling)}</span></div>
                <div class="kv"><span class="k">Writing Back & Front</span> <span class="v">${cond(r.condWriting)}</span></div>
                <div class="kv"><span class="k">N2 Purging</span> <span class="v">${cond(r.condN2)}</span></div>
-               <div class="kv"><span class="k">Red Tag Removed</span> <span class="v">${cond(r.condRedTag)}</span></div>
+               <div class="kv"><span class="k">Red Tag sling installed</span> <span class="v">${cond(r.condRedTag)}</span></div>
                <div class="kv"><span class="k">Delivered to Whse</span> <span class="v">${cond(r.condWarehouse)}</span></div>
             </div>
             
-            <div class="view-card" style="padding:10px;">
-              ${carouselHtml}
+            <div class="view-card" style="margin-bottom: 20px;">
+               <h4><i class="fa-solid fa-clipboard-check"></i> After Ballooning</h4>
+               <div class="kv"><span class="k">Check Liner</span> <span class="v">${cond(r.condLiner)}</span></div>
+               <div class="kv"><span class="k">Top/Bottom</span> <span class="v">${cond(r.condTopBottom)}</span></div>
+               <div class="kv"><span class="k">Sides</span> <span class="v">${cond(r.condSides)}</span></div>
+               <div class="kv"><span class="k">Long Sling</span> <span class="v">${cond(r.condLongSling)}</span></div>
+               <div class="kv"><span class="k">Short Sling</span> <span class="v">${cond(r.condShortSling)}</span></div>
+            </div>
+
+            <div class="view-card" style="margin-bottom: 20px;">
+               <h4><i class="fa-solid fa-clipboard-check"></i> Before Tying</h4>
+               <div class="kv"><span class="k">No foreign materials</span> <span class="v">${cond(r.condForeignMaterials)}</span></div>
+               <div class="kv"><span class="k">No hardened scale</span> <span class="v">${cond(r.condHardenedScale)}</span></div>
+            </div>
+
+            <div class="view-card" style="margin-bottom: 20px;">
+               <h4><i class="fa-solid fa-clipboard-check"></i> After Tying</h4>
+               <div class="kv"><span class="k">Liner tall</span> <span class="v">${cond(r.condLinerTall)}</span></div>
+               <div class="kv"><span class="k">Liner rope</span> <span class="v">${cond(r.condLinerRope)}</span></div>
+               <div class="kv"><span class="k">Liner loop</span> <span class="v">${cond(r.condLinerLoop)}</span></div>
+               <div class="kv"><span class="k">Lot# (side 1)</span> <span class="v">${cond(r.condLotSide1)}</span></div>
+               <div class="kv"><span class="k">Lot# (side 2)</span> <span class="v">${cond(r.condLotSide2)}</span></div>
+               <div class="kv"><span class="k">Slider not close</span> <span class="v">${cond(r.condSliderNotClose)}</span></div>
+               <div class="kv"><span class="k">Final weight</span> <span class="v">${cond(r.condFinalWeight)}</span></div>
+               <div class="kv"><span class="k">Red tag remove</span> <span class="v">${cond(r.condRedTagRemove)}</span></div>
+               <div class="kv" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;"><span class="k">Sample condition</span> <span class="v"><span class="badge-status" style="background: rgba(167,139,250,0.15); color: #c4b5fd;">${r.sampleCondition || 'N/A'}</span></span></div>
             </div>
           </div>
         </div>
@@ -888,12 +949,32 @@
           document.getElementById("assignPerson").value = r.person;
           document.getElementById("h2sPerson").value = r.h2sPerson || "";
 
-          document.getElementById("chkTie").checked = r.condTie;
-          document.getElementById("chkSling").checked = r.condSling;
-          document.getElementById("chkWriting").checked = r.condWriting;
-          document.getElementById("chkN2").checked = r.condN2;
-          document.getElementById("chkRedTag").checked = r.condRedTag;
-          document.getElementById("chkWarehouse").checked = r.condWarehouse;
+          // Populate Checklists
+          document.getElementById("chkTie").checked = r.condTie || false;
+          document.getElementById("chkSling").checked = r.condSling || false;
+          document.getElementById("chkWriting").checked = r.condWriting || false;
+          document.getElementById("chkN2").checked = r.condN2 || false;
+          document.getElementById("chkRedTag").checked = r.condRedTag || false;
+          document.getElementById("chkWarehouse").checked = r.condWarehouse || false;
+          
+          document.getElementById("chkLiner").checked = r.condLiner || false;
+          document.getElementById("chkTopBottom").checked = r.condTopBottom || false;
+          document.getElementById("chkSides").checked = r.condSides || false;
+          document.getElementById("chkLongSling").checked = r.condLongSling || false;
+          document.getElementById("chkShortSling").checked = r.condShortSling || false;
+          
+          document.getElementById("chkForeignMaterials").checked = r.condForeignMaterials || false;
+          document.getElementById("chkHardenedScale").checked = r.condHardenedScale || false;
+          
+          document.getElementById("chkLinerTall").checked = r.condLinerTall || false;
+          document.getElementById("chkLinerRope").checked = r.condLinerRope || false;
+          document.getElementById("chkLinerLoop").checked = r.condLinerLoop || false;
+          document.getElementById("chkLotSide1").checked = r.condLotSide1 || false;
+          document.getElementById("chkLotSide2").checked = r.condLotSide2 || false;
+          document.getElementById("chkSliderNotClose").checked = r.condSliderNotClose || false;
+          document.getElementById("chkFinalWeight").checked = r.condFinalWeight || false;
+          document.getElementById("chkRedTagRemove").checked = r.condRedTagRemove || false;
+          document.getElementById("selSampleCondition").value = r.sampleCondition || "Wet";
 
           pendingImages.bagTop = r.photoBagTop;
           pendingImages.bagFront = r.photoBagFront;
@@ -915,10 +996,6 @@
           setUploadUI("photoH2S", "fa-mask-ventilator", "H2S Image", !!r.photoH2S);
         }
       } else {
-        document.getElementById("remarks").value = "";
-        document.getElementById("claims").value = "";
-        document.getElementById("procedureSop").value = "";
-
         setUploadUI("photoBagTop", "fa-arrow-up", "Top Image", false);
         setUploadUI("photoBagFront", "fa-square", "Front Image", false);
         setUploadUI("photoBagBack", "fa-square", "Back Image", false);
@@ -989,12 +1066,32 @@
 
         date: document.getElementById("bagDate").value,
         time: document.getElementById("bagTime").value,
+        
         condTie: document.getElementById("chkTie").checked,
         condSling: document.getElementById("chkSling").checked,
         condWriting: document.getElementById("chkWriting").checked,
         condN2: document.getElementById("chkN2").checked,
         condRedTag: document.getElementById("chkRedTag").checked,
         condWarehouse: document.getElementById("chkWarehouse").checked,
+        
+        condLiner: document.getElementById("chkLiner").checked,
+        condTopBottom: document.getElementById("chkTopBottom").checked,
+        condSides: document.getElementById("chkSides").checked,
+        condLongSling: document.getElementById("chkLongSling").checked,
+        condShortSling: document.getElementById("chkShortSling").checked,
+        
+        condForeignMaterials: document.getElementById("chkForeignMaterials").checked,
+        condHardenedScale: document.getElementById("chkHardenedScale").checked,
+        
+        condLinerTall: document.getElementById("chkLinerTall").checked,
+        condLinerRope: document.getElementById("chkLinerRope").checked,
+        condLinerLoop: document.getElementById("chkLinerLoop").checked,
+        condLotSide1: document.getElementById("chkLotSide1").checked,
+        condLotSide2: document.getElementById("chkLotSide2").checked,
+        condSliderNotClose: document.getElementById("chkSliderNotClose").checked,
+        condFinalWeight: document.getElementById("chkFinalWeight").checked,
+        condRedTagRemove: document.getElementById("chkRedTagRemove").checked,
+        sampleCondition: document.getElementById("selSampleCondition").value,
         
         photoBagTop: pendingImages.bagTop,
         photoBagFront: pendingImages.bagFront,
