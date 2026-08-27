@@ -47,10 +47,11 @@
     .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
     button {
       border: 0; border-radius: 10px; padding: 10px 16px; font-size: 13.5px; font-weight: 600; cursor: pointer;
-      color: white; background: var(--panel-2); transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+      color: white; background: var(--panel-2); transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     }
     .btn-primary { background: linear-gradient(135deg, var(--violet), #7c3aed); box-shadow: 0 6px 16px -4px rgba(167,139,250,0.4); }
     .btn-ghost { background: rgba(255,255,255,0.04); border: 1px solid rgba(148,163,184,0.25); color: var(--text); }
+    .btn-edit { background: rgba(34, 211, 238, 0.12); color: #67e8f9; border: 1px solid rgba(34, 211, 238, 0.28); }
     .btn-danger { background: rgba(248, 113, 113, 0.12); color: #fca5a5; border: 1px solid rgba(248, 113, 113, 0.28); }
     button:hover { transform: translateY(-1px); filter: brightness(1.1); }
 
@@ -63,11 +64,17 @@
     .chart-container { padding: 8px 20px 22px; width: 100%; height: 340px; }
 
     .table-wrap { width: 100%; overflow-x: auto; max-height: 700px; overflow-y: auto; }
-    table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+    table { width: 100%; border-collapse: collapse; min-width: 1000px; }
     th, td { padding: 15px 20px; border-bottom: 1px solid rgba(148,163,184,0.08); text-align: left; vertical-align: middle; }
     th { background: rgba(10, 15, 28, 0.96); color: #8b98b3; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.08em; position: sticky; top: 0; z-index: 10; }
     td { font-size: 13.5px; }
     tbody tr:hover td { background: rgba(167,139,250, 0.06); }
+
+    /* Grouping Headers */
+    .group-header-row td { padding: 10px 20px; background: rgba(15, 23, 42, 0.8) !important; border-bottom: 1px solid rgba(148,163,184,0.15); border-top: 2px solid rgba(167,139,250,0.3); }
+    .group-header { display: flex; align-items: center; gap: 12px; }
+    .group-count { font-size: 12px; color: var(--muted); font-weight: 600; }
+    .badge-shift { padding: 4px 10px; border-radius: 99px; font-size: 11.5px; font-weight: 700; background: rgba(167,139,250,0.15); color: #c4b5fd; border: 1px solid rgba(167,139,250,0.3); }
 
     .data-stack { display: flex; flex-direction: column; gap: 4px; }
     .data-label { font-size: 11px; color: var(--muted); text-transform: uppercase; font-weight: 600; }
@@ -78,8 +85,6 @@
     .status-no { background: rgba(248,113,113,0.15); color: var(--danger); }
     .cond-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 
-    .badge-shift { padding: 3px 8px; border-radius: 99px; font-size: 11px; font-weight: 700; background: rgba(34,211,238,0.15); color: var(--accent); display: inline-block; margin-top:4px;}
-
     .modal-bg { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.72); display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; pointer-events: none; transition: 0.3s; padding:16px;}
     .modal-bg.show { opacity: 1; pointer-events: auto; }
     .modal { width: min(850px, 100%); background: var(--panel); border: 1px solid rgba(148,163,184,0.16); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); max-height: 92vh; display: flex; flex-direction: column; }
@@ -89,14 +94,8 @@
     .modal footer { padding: 20px 24px; border-top: 1px solid rgba(148,163,184,0.1); display: flex; justify-content: flex-end; gap: 12px; background: rgba(10, 15, 28, 0.4); }
 
     /* Distinct Form Divisions */
-    .form-section { 
-      background: rgba(10, 15, 28, 0.4); border: 1px dashed rgba(148,163,184,0.2); 
-      border-radius: 14px; padding: 20px; 
-    }
-    .form-section-title { 
-      font-size: 13.5px; font-weight: 700; color: var(--violet); 
-      margin-bottom: 16px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px;
-    }
+    .form-section { background: rgba(10, 15, 28, 0.4); border: 1px dashed rgba(148,163,184,0.2); border-radius: 14px; padding: 20px; }
+    .form-section-title { font-size: 13.5px; font-weight: 700; color: var(--violet); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
 
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
@@ -120,16 +119,23 @@
     .file-upload-ui { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; height: 100%; border: 2px dashed rgba(148,163,184,0.28); border-radius: 10px; background: rgba(15, 23, 42, 0.6); color: var(--muted); font-weight: 500; font-size: 12px; text-align: center; padding: 10px; transition: 0.2s;}
     .file-upload-wrapper:hover .file-upload-ui { border-color: var(--violet); background: rgba(167, 139, 250, 0.05);}
 
-    /* Personnel View Modal Styling */
-    .personnel-view-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .personnel-card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(148,163,184,0.2); border-radius: 12px; padding: 20px; text-align: center; display:flex; flex-direction: column; align-items: center; gap: 12px;}
-    .personnel-card img { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 3px solid var(--violet); }
-    .personnel-card .no-photo { width: 120px; height: 120px; border-radius: 50%; background: rgba(10,15,28,0.8); display: grid; place-items: center; border: 2px dashed rgba(148,163,184,0.3); font-size: 32px; color: var(--muted); }
-    .personnel-card h4 { margin: 0; font-size: 18px; color: white; }
-    .personnel-card p { margin: 0; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+    /* View Details Modal Styling */
+    .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .view-card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(148,163,184,0.2); border-radius: 12px; padding: 20px; }
+    .view-card h4 { margin: 0 0 16px 0; font-size: 14px; color: var(--violet); text-transform: uppercase; border-bottom: 1px solid rgba(148,163,184,0.1); padding-bottom: 10px;}
+    .kv { margin-bottom: 12px; display: flex; justify-content: space-between; font-size: 14px;}
+    .kv .k { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase;}
+    .kv .v { color: white; font-weight: 600; text-align: right;}
+    
+    .personnel-view-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 10px;}
+    .personnel-card { text-align: center; display:flex; flex-direction: column; align-items: center; gap: 8px;}
+    .personnel-card img { width: 90px; height: 90px; object-fit: cover; border-radius: 50%; border: 2px solid var(--violet); }
+    .personnel-card .no-photo { width: 90px; height: 90px; border-radius: 50%; background: rgba(10,15,28,0.8); display: grid; place-items: center; border: 2px dashed rgba(148,163,184,0.3); font-size: 28px; color: var(--muted); }
+
+    .actions { display: flex; gap: 8px; justify-content: center; }
 
     @media (max-width: 768px) {
-      .grid, .grid-3, .checklist, .personnel-view-grid { grid-template-columns: 1fr; }
+      .grid, .grid-3, .checklist, .details-grid, .personnel-view-grid { grid-template-columns: 1fr; }
       .modal { border-radius: 24px 24px 0 0; max-height: 90vh; transform: translateY(100%); }
       .modal-bg.show .modal { transform: translateY(0); }
     }
@@ -142,7 +148,7 @@
         <div class="title-icon"><i class="fa-solid fa-box-open"></i></div>
         <div>
           <h1>MS Product Bagging</h1>
-          <div class="sub">Log Weights, Multiple Products, Conditions, and Personnel Details.</div>
+          <div class="sub">Log Weights, Conditions, and Group Production by Shift.</div>
         </div>
       </div>
       <div class="toolbar">
@@ -168,17 +174,16 @@
     <!-- Data Table -->
     <div class="card">
       <div class="chart-card-header">
-        <h3 style="color:var(--text)"><i class="fa-solid fa-list"></i> Bagging Records</h3>
+        <h3 style="color:var(--text)"><i class="fa-solid fa-list-check"></i> Shift Production Logs</h3>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th><i class="fa-solid fa-camera"></i> Bag Image</th>
+              <th><i class="fa-solid fa-camera"></i> Bag</th>
               <th><i class="fa-solid fa-cube"></i> Product & Time</th>
               <th><i class="fa-solid fa-scale-balanced"></i> Weights</th>
               <th><i class="fa-solid fa-clipboard-check"></i> Conditions</th>
-              <th><i class="fa-solid fa-users"></i> Personnel</th>
               <th style="text-align: center;"><i class="fa-solid fa-wrench"></i> Actions</th>
             </tr>
           </thead>
@@ -190,7 +195,7 @@
     </div>
   </div>
 
-  <!-- Form Modal -->
+  <!-- Form Modal (Add / Edit) -->
   <div class="modal-bg" id="formModal">
     <div class="modal">
       <header>
@@ -235,7 +240,6 @@
                 </div>
                 <div style="flex:1;">
                   <label for="bagTime">Military Time</label>
-                  <!-- type="time" defaults to 24h format on most systems -->
                   <input id="bagTime" type="time" required />
                 </div>
               </div>
@@ -269,7 +273,6 @@
           <div class="form-section">
             <div class="form-section-title"><i class="fa-solid fa-users"></i> Personnel Information</div>
             <div class="grid">
-              <!-- QA Details -->
               <div>
                 <label for="qaPerson">Q.A Person Name</label>
                 <input id="qaPerson" type="text" required placeholder="Name of QA" style="margin-bottom:12px;" />
@@ -281,7 +284,6 @@
                   </div>
                 </div>
               </div>
-              <!-- Bagger Details -->
               <div>
                 <label for="assignPerson">Bagger Assign Name</label>
                 <input id="assignPerson" type="text" required placeholder="Name of Bagger" style="margin-bottom:12px;" />
@@ -305,24 +307,24 @@
     </div>
   </div>
 
-  <!-- Personnel View Modal -->
-  <div class="modal-bg" id="personnelModal">
-    <div class="modal" style="width: min(600px, 100%);">
+  <!-- View Details Modal -->
+  <div class="modal-bg" id="viewModal">
+    <div class="modal">
       <header>
-        <i class="fa-solid fa-id-card-clip" style="color:var(--violet)"></i>
-        <h2>Personnel Details</h2>
+        <i class="fa-regular fa-file-lines" style="color:var(--accent)"></i>
+        <h2>Bagging Details</h2>
       </header>
-      <div class="body" id="personnelModalBody">
+      <div class="body" id="viewModalBody">
         <!-- Injected via JS -->
       </div>
       <footer>
-        <button class="btn-ghost" type="button" onclick="document.getElementById('personnelModal').classList.remove('show')">Close</button>
+        <button class="btn-ghost" type="button" onclick="document.getElementById('viewModal').classList.remove('show')">Close Window</button>
       </footer>
     </div>
   </div>
 
   <script>
-    const STORAGE_KEY = "ms_product_bagging_v3";
+    const STORAGE_KEY = "ms_product_bagging_v4";
     let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
     let chartInstance = null;
 
@@ -354,9 +356,11 @@
             canvas.width = w; canvas.height = h;
             canvas.getContext("2d").drawImage(img, 0, 0, w, h);
             pendingImages[key] = canvas.toDataURL("image/jpeg", 0.7);
-            document.getElementById(uiId).innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--ok); font-size:24px;"></i><span style="color:var(--ok)">Attached</span>`;
-            document.getElementById(uiId).style.borderColor = "var(--ok)";
-            document.getElementById(uiId).style.background = "rgba(52,211,153,0.05)";
+            
+            const ui = document.getElementById(uiId);
+            ui.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--ok); font-size:24px;"></i><span style="color:var(--ok)">Attached</span>`;
+            ui.style.borderColor = "var(--ok)";
+            ui.style.background = "rgba(52,211,153,0.05)";
           };
           img.src = ev.target.result;
         };
@@ -373,90 +377,159 @@
       tbody.innerHTML = "";
 
       if(records.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:40px; color:var(--muted);">No bagging records found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:60px; color:var(--muted);"><i class="fa-solid fa-box-open" style="font-size: 30px; margin-bottom: 10px; display:block; opacity:0.5;"></i>No bagging records found.</td></tr>`;
         document.getElementById("chartCard").style.display = "none";
         return;
       }
       document.getElementById("chartCard").style.display = "block";
 
+      // Group by Date and Shift
       const sorted = [...records].sort((a, b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time));
+      const grouped = {};
 
       sorted.forEach(r => {
-        const netWeight = (parseFloat(r.scale) - parseFloat(r.tare)).toFixed(2);
-        const bagWt = r.bagWeight ? parseFloat(r.bagWeight).toFixed(2) : '-';
         const shiftStr = calculateShift(r.time);
-        
-        const cond = (c, label) => c ? `<span class="badge-status status-ok"><i class="fa-solid fa-check"></i> ${label}</span>` : `<span class="badge-status status-no"><i class="fa-solid fa-xmark"></i> ${label}</span>`;
-        
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>
-            ${r.photoBag ? `<img class="thumb" src="${r.photoBag}" title="Bag Image">` : `<div class="no-img" title="No Bag Photo"><i class="fa-regular fa-image"></i></div>`}
-          </td>
-          <td>
-            <div class="data-stack">
-              <span class="data-val" style="color:var(--violet); font-weight:700;">${r.productName}</span>
-              <span class="data-label">${r.date} · ${r.time}</span>
-              <span class="badge-shift">${shiftStr}</span>
+        const groupKey = `${r.date} | ${shiftStr}`;
+        if (!grouped[groupKey]) grouped[groupKey] = [];
+        grouped[groupKey].push(r);
+      });
+
+      // Render Groups
+      Object.keys(grouped).forEach(key => {
+        const group = grouped[key];
+        const [datePart, shiftPart] = key.split(' | ');
+
+        // Group Header
+        const headerTr = document.createElement("tr");
+        headerTr.className = "group-header-row";
+        headerTr.innerHTML = `
+          <td colspan="5">
+            <div class="group-header">
+              <span class="badge-shift">${shiftPart}</span>
+              <span style="color: white; font-weight: 600; font-size: 13px;">${datePart}</span>
+              <span class="group-count">· ${group.length} Bag${group.length > 1 ? 's' : ''} Produced</span>
             </div>
-          </td>
-          <td>
-             <div class="data-stack">
-               <div><span class="data-label">Scale:</span> <span class="data-val">${r.scale} kg</span></div>
-               <div><span class="data-label">Tare:</span> <span class="data-val">${r.tare} kg</span></div>
-               <div><span class="data-label">Bag:</span> <span class="data-val" style="color:var(--accent);">${bagWt} kg</span></div>
-               <div style="margin-top:2px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:2px;"><span class="data-label">Net:</span> <span class="data-val" style="font-weight:bold">${netWeight} kg</span></div>
-             </div>
-          </td>
-          <td>
-            <div class="cond-grid">
-              ${cond(r.condTie, 'Tie')}
-              ${cond(r.condSling, 'Sling')}
-              ${cond(r.condWriting, 'Writing')}
-              ${cond(r.condN2, 'N2')}
-              ${cond(r.condRedTag, 'Tag')}
-              ${cond(r.condWarehouse, 'Whse')}
-            </div>
-          </td>
-          <td>
-            <button class="btn-ghost" style="padding:6px 12px; font-size:12px;" onclick="viewPersonnel('${r.id}')"><i class="fa-solid fa-id-badge"></i> View Personnel</button>
-          </td>
-          <td style="text-align: center;">
-            <button class="btn-danger" style="padding:8px 12px;" onclick="deleteRecord('${r.id}')"><i class="fa-solid fa-trash"></i></button>
-          </td>
-        `;
-        tbody.appendChild(tr);
+          </td>`;
+        tbody.appendChild(headerTr);
+
+        // Group Rows
+        group.forEach(r => {
+          const netWeight = (parseFloat(r.scale) - parseFloat(r.tare)).toFixed(2);
+          const bagWt = r.bagWeight ? parseFloat(r.bagWeight).toFixed(2) : '-';
+          
+          const cond = (c, label) => c ? `<span class="badge-status status-ok"><i class="fa-solid fa-check"></i> ${label}</span>` : `<span class="badge-status status-no"><i class="fa-solid fa-xmark"></i> ${label}</span>`;
+          
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>
+              ${r.photoBag ? `<img class="thumb" src="${r.photoBag}" title="Bag Image">` : `<div class="no-img" title="No Bag Photo"><i class="fa-regular fa-image"></i></div>`}
+            </td>
+            <td>
+              <div class="data-stack">
+                <span class="data-val" style="color:var(--violet); font-weight:700;">${r.productName}</span>
+                <span class="data-label"><i class="fa-regular fa-clock"></i> ${r.time}</span>
+              </div>
+            </td>
+            <td>
+               <div class="data-stack">
+                 <div><span class="data-label">Scale:</span> <span class="data-val">${r.scale} kg</span></div>
+                 <div><span class="data-label">Tare:</span> <span class="data-val">${r.tare} kg</span></div>
+                 <div><span class="data-label">Bag:</span> <span class="data-val" style="color:var(--accent);">${bagWt} kg</span></div>
+                 <div style="margin-top:2px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:2px;"><span class="data-label">Net:</span> <span class="data-val" style="font-weight:bold">${netWeight} kg</span></div>
+               </div>
+            </td>
+            <td>
+              <div class="cond-grid">
+                ${cond(r.condTie, 'Tie')}
+                ${cond(r.condSling, 'Sling')}
+                ${cond(r.condWriting, 'Writing')}
+                ${cond(r.condN2, 'N2')}
+                ${cond(r.condRedTag, 'Tag')}
+                ${cond(r.condWarehouse, 'Whse')}
+              </div>
+            </td>
+            <td>
+              <div class="actions">
+                <button class="btn-ghost" title="View Details" onclick="viewDetails('${r.id}')"><i class="fa-solid fa-eye"></i></button>
+                <button class="btn-edit" title="Edit Bag" onclick="openForm('${r.id}')"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn-danger" title="Delete Bag" onclick="deleteRecord('${r.id}')"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
       });
 
       renderShiftChart(sorted);
     }
 
-    function viewPersonnel(id) {
-      const rec = records.find(r => r.id === id);
-      if (!rec) return;
+    function viewDetails(id) {
+      const r = records.find(rec => rec.id === id);
+      if (!r) return;
 
-      const body = document.getElementById("personnelModalBody");
+      const netWeight = (parseFloat(r.scale) - parseFloat(r.tare)).toFixed(2);
+      const shiftStr = calculateShift(r.time);
       
-      const drawImg = (src, fallbackIcon) => src 
-        ? `<img src="${src}" />` 
-        : `<div class="no-photo"><i class="fa-solid ${fallbackIcon}"></i></div>`;
+      const drawImg = (src, fallbackIcon) => src ? `<img src="${src}" />` : `<div class="no-photo"><i class="fa-solid ${fallbackIcon}"></i></div>`;
+      const cond = (c, label) => c ? `<span style="color:var(--ok)"><i class="fa-solid fa-check"></i> Yes</span>` : `<span style="color:var(--danger)"><i class="fa-solid fa-xmark"></i> No</span>`;
 
+      const body = document.getElementById("viewModalBody");
       body.innerHTML = `
-        <div class="personnel-view-grid">
-          <div class="personnel-card">
-            <p>Quality Assurance</p>
-            ${drawImg(rec.photoQA, 'fa-user-tie')}
-            <h4>${rec.qaPerson || 'Not Assigned'}</h4>
+        <div class="details-grid">
+          <!-- Left Column -->
+          <div>
+            <div class="view-card" style="margin-bottom: 20px;">
+               <h4><i class="fa-solid fa-cube"></i> Product Information</h4>
+               <div class="kv"><span class="k">Product</span> <span class="v" style="color:var(--violet)">${r.productName}</span></div>
+               <div class="kv"><span class="k">Date & Time</span> <span class="v">${r.date} · ${r.time}</span></div>
+               <div class="kv"><span class="k">Shift</span> <span class="v badge-shift">${shiftStr}</span></div>
+            </div>
+            <div class="view-card">
+               <h4><i class="fa-solid fa-scale-balanced"></i> Weighing Data</h4>
+               <div class="kv"><span class="k">Scale</span> <span class="v">${r.scale} kg</span></div>
+               <div class="kv"><span class="k">Tare</span> <span class="v">${r.tare} kg</span></div>
+               <div class="kv"><span class="k">Bag Weight</span> <span class="v" style="color:var(--accent)">${r.bagWeight || '0'} kg</span></div>
+               <div class="kv" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;"><span class="k">Net Weight</span> <span class="v" style="font-size:16px;">${netWeight} kg</span></div>
+            </div>
           </div>
-          <div class="personnel-card">
-            <p>Bagger Assign</p>
-            ${drawImg(rec.photoBagger, 'fa-user-gear')}
-            <h4>${rec.person || 'Not Assigned'}</h4>
+
+          <!-- Right Column -->
+          <div>
+            <div class="view-card" style="margin-bottom: 20px;">
+               <h4><i class="fa-solid fa-clipboard-check"></i> Conditions Checklist</h4>
+               <div class="kv"><span class="k">Tie</span> <span class="v">${cond(r.condTie)}</span></div>
+               <div class="kv"><span class="k">Sling</span> <span class="v">${cond(r.condSling)}</span></div>
+               <div class="kv"><span class="k">Writing Back & Front</span> <span class="v">${cond(r.condWriting)}</span></div>
+               <div class="kv"><span class="k">N2 Purging</span> <span class="v">${cond(r.condN2)}</span></div>
+               <div class="kv"><span class="k">Red Tag Removed</span> <span class="v">${cond(r.condRedTag)}</span></div>
+               <div class="kv"><span class="k">Delivered to Whse</span> <span class="v">${cond(r.condWarehouse)}</span></div>
+            </div>
+            
+            <div class="view-card">
+              <h4><i class="fa-solid fa-camera"></i> Bag Image</h4>
+              ${r.photoBag ? `<img src="${r.photoBag}" style="width:100%; border-radius:8px; border:1px solid rgba(255,255,255,0.1);">` : `<div style="text-align:center; padding:20px; color:var(--muted); border:1px dashed rgba(148,163,184,0.3); border-radius:8px;">No Bag Image Available</div>`}
+            </div>
+          </div>
+        </div>
+
+        <div class="view-card" style="margin-top: 20px;">
+          <h4><i class="fa-solid fa-users"></i> Personnel Details</h4>
+          <div class="personnel-view-grid">
+            <div class="personnel-card">
+              <span style="font-size:12px; color:var(--muted); text-transform:uppercase; font-weight:600; margin-bottom:4px;">Quality Assurance</span>
+              ${drawImg(r.photoQA, 'fa-user-tie')}
+              <h3 style="margin:10px 0 0 0; font-size:16px;">${r.qaPerson || 'Not Assigned'}</h3>
+            </div>
+            <div class="personnel-card">
+              <span style="font-size:12px; color:var(--muted); text-transform:uppercase; font-weight:600; margin-bottom:4px;">Bagger Assign</span>
+              ${drawImg(r.photoBagger, 'fa-user-gear')}
+              <h3 style="margin:10px 0 0 0; font-size:16px;">${r.person || 'Not Assigned'}</h3>
+            </div>
           </div>
         </div>
       `;
 
-      document.getElementById("personnelModal").classList.add("show");
+      document.getElementById("viewModal").classList.add("show");
     }
 
     function renderShiftChart(data) {
@@ -468,7 +541,7 @@
 
       chronological.forEach(r => {
         const shiftStr = calculateShift(r.time);
-        const key = `${r.date} - ${shiftStr}`;
+        const key = `${r.date} | ${shiftStr}`;
         if (!grouped[key]) {
           grouped[key] = { bagCount: 0, totalWeight: 0 };
         }
@@ -487,7 +560,7 @@
           labels: labels,
           datasets: [
             {
-              label: 'Total Bags (Count)',
+              label: 'Total Bags Produced',
               data: counts,
               backgroundColor: 'rgba(167, 139, 250, 0.8)',
               borderColor: '#a78bfa',
@@ -516,48 +589,108 @@
             legend: { labels: { color: '#e2e8f0', usePointStyle: true, padding: 15 } }
           },
           scales: {
-            x: { 
-              ticks: { color: '#8b98b3', font: {size: 11} }, 
-              grid: { color: 'rgba(148,163,184,0.05)' } 
-            },
+            x: { ticks: { color: '#8b98b3', font: {size: 11} }, grid: { color: 'rgba(148,163,184,0.05)' } },
             y: { 
               type: 'linear', position: 'left',
-              title: { display: true, text: 'Total Bags (Count)', color: '#a78bfa', font: {weight: 'bold'} },
-              ticks: { color: '#8b98b3', stepSize: 1 }, 
-              grid: { color: 'rgba(148,163,184,0.1)' }, 
-              beginAtZero: true 
+              title: { display: true, text: 'Total Bags', color: '#a78bfa', font: {weight: 'bold'} },
+              ticks: { color: '#8b98b3', stepSize: 5 }, 
+              grid: { color: 'rgba(148,163,184,0.1)' }, beginAtZero: true 
             },
             y1: {
               type: 'linear', position: 'right',
               title: { display: true, text: 'Total Weight (kg)', color: '#22d3ee', font: {weight: 'bold'} },
-              ticks: { color: '#8b98b3' },
-              grid: { drawOnChartArea: false },
-              beginAtZero: true
+              ticks: { color: '#8b98b3' }, grid: { drawOnChartArea: false }, beginAtZero: true
             }
           }
         }
       });
     }
 
-    function resetUploadUI(id, icon, text) {
-      document.getElementById(id).value = "";
+    function setUploadUI(id, icon, text, hasImage = false) {
       const ui = document.getElementById("ui" + id.charAt(0).toUpperCase() + id.slice(1));
-      ui.innerHTML = `<i class="fa-solid ${icon}" style="font-size: 20px;"></i><span>${text}</span>`;
-      ui.style.borderColor = "rgba(148,163,184,0.28)";
-      ui.style.background = "rgba(15, 23, 42, 0.6)";
+      if (hasImage) {
+        ui.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--ok); font-size:24px;"></i><span style="color:var(--ok)">Attached</span>`;
+        ui.style.borderColor = "var(--ok)";
+        ui.style.background = "rgba(52,211,153,0.05)";
+      } else {
+        document.getElementById(id).value = "";
+        ui.innerHTML = `<i class="fa-solid ${icon}" style="font-size: 20px;"></i><span>${text}</span>`;
+        ui.style.borderColor = "rgba(148,163,184,0.28)";
+        ui.style.background = "rgba(15, 23, 42, 0.6)";
+      }
     }
 
-    function openForm() {
-      document.getElementById("recordForm").reset();
-      
+    function openForm(id = null) {
+      const form = document.getElementById("recordForm");
+      form.reset();
+      document.getElementById("recordId").value = id || "";
+      document.getElementById("formTitle").textContent = id ? "Edit Bagging Record" : "Add Bagging Record";
+
       pendingImages = { bag: null, qa: null, bagger: null };
-      resetUploadUI("photoBag", "fa-box-open", "Tap to upload Bag Image");
-      resetUploadUI("photoQA", "fa-clipboard-user", "Tap to upload QA Image");
-      resetUploadUI("photoBagger", "fa-user-gear", "Tap to upload Bagger Image");
-      
-      const now = new Date();
-      document.getElementById("bagDate").value = now.toISOString().slice(0, 10);
-      document.getElementById("bagTime").value = now.toTimeString().slice(0, 5);
+
+      if (id) {
+        // Edit Mode: Load everything from the record
+        const r = records.find(rec => rec.id === id);
+        if (r) {
+          document.getElementById("weighingScale").value = r.scale;
+          document.getElementById("tareWeight").value = r.tare;
+          document.getElementById("bagWeight").value = r.bagWeight || "";
+          
+          document.getElementById("productName").value = r.productName;
+          document.getElementById("bagDate").value = r.date;
+          document.getElementById("bagTime").value = r.time;
+          
+          document.getElementById("qaPerson").value = r.qaPerson;
+          document.getElementById("assignPerson").value = r.person;
+
+          document.getElementById("chkTie").checked = r.condTie;
+          document.getElementById("chkSling").checked = r.condSling;
+          document.getElementById("chkWriting").checked = r.condWriting;
+          document.getElementById("chkN2").checked = r.condN2;
+          document.getElementById("chkRedTag").checked = r.condRedTag;
+          document.getElementById("chkWarehouse").checked = r.condWarehouse;
+
+          pendingImages.bag = r.photoBag;
+          pendingImages.qa = r.photoQA;
+          pendingImages.bagger = r.photoBagger;
+
+          setUploadUI("photoBag", "fa-box-open", "Tap to upload Bag Image", !!r.photoBag);
+          setUploadUI("photoQA", "fa-clipboard-user", "Tap to upload QA Image", !!r.photoQA);
+          setUploadUI("photoBagger", "fa-user-gear", "Tap to upload Bagger Image", !!r.photoBagger);
+        }
+      } else {
+        // Add Mode: Pre-fill from the last record for continuous shift entry
+        setUploadUI("photoBag", "fa-box-open", "Tap to upload Bag Image", false);
+        setUploadUI("photoQA", "fa-clipboard-user", "Tap to upload QA Image", false);
+        setUploadUI("photoBagger", "fa-user-gear", "Tap to upload Bagger Image", false);
+        
+        const now = new Date();
+        document.getElementById("bagDate").value = now.toISOString().slice(0, 10);
+        document.getElementById("bagTime").value = now.toTimeString().slice(0, 5);
+
+        if (records.length > 0) {
+          // Sort chronologically and take the most recent to pre-fill repeated data
+          const chronological = [...records].sort((a, b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time));
+          const lastRec = chronological[0];
+          
+          // Pre-fill sticky fields
+          document.getElementById("weighingScale").value = lastRec.scale;
+          document.getElementById("tareWeight").value = lastRec.tare;
+          document.getElementById("productName").value = lastRec.productName;
+          document.getElementById("qaPerson").value = lastRec.qaPerson;
+          document.getElementById("assignPerson").value = lastRec.person;
+
+          // Pre-fill personnel photos (so they don't have to re-upload on every bag)
+          if (lastRec.photoQA) {
+            pendingImages.qa = lastRec.photoQA;
+            setUploadUI("photoQA", "fa-clipboard-user", "QA Image Copied", true);
+          }
+          if (lastRec.photoBagger) {
+            pendingImages.bagger = lastRec.photoBagger;
+            setUploadUI("photoBagger", "fa-user-gear", "Bagger Image Copied", true);
+          }
+        }
+      }
       
       document.getElementById("formModal").classList.add("show");
     }
@@ -570,8 +703,10 @@
       const form = document.getElementById("recordForm");
       if (!form.reportValidity()) return;
 
-      const record = {
-        id: crypto.randomUUID(),
+      const recordId = document.getElementById("recordId").value;
+      
+      const payload = {
+        id: recordId || crypto.randomUUID(),
         scale: document.getElementById("weighingScale").value,
         tare: document.getElementById("tareWeight").value,
         bagWeight: document.getElementById("bagWeight").value,
@@ -591,14 +726,22 @@
         photoBagger: pendingImages.bagger
       };
 
-      records.push(record);
+      if (recordId) {
+        // Update existing
+        const index = records.findIndex(r => r.id === recordId);
+        if (index !== -1) records[index] = payload;
+      } else {
+        // Add new
+        records.push(payload);
+      }
+
       localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
       renderTable();
       closeForm();
     }
 
     function deleteRecord(id) {
-      if(!confirm("Delete this bagging log?")) return;
+      if(!confirm("Are you sure you want to delete this bag's log? This cannot be undone.")) return;
       records = records.filter(r => r.id !== id);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
       renderTable();
