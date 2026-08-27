@@ -30,7 +30,7 @@
       min-height: 100vh; padding-bottom: 96px; -webkit-font-smoothing: antialiased;
     }
 
-    .wrap { max-width: 1300px; margin: 0 auto; padding: 32px 20px; }
+    .wrap { max-width: 1400px; margin: 0 auto; padding: 32px 20px; }
 
     header.page-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
     .title-block { display: flex; align-items: center; gap: 14px; }
@@ -63,20 +63,26 @@
     .chart-container { padding: 8px 20px 22px; width: 100%; height: 340px; }
 
     .table-wrap { width: 100%; overflow-x: auto; max-height: 700px; overflow-y: auto; }
-    table { width: 100%; border-collapse: collapse; min-width: 1400px; }
-    th, td { padding: 15px 20px; border-bottom: 1px solid rgba(148,163,184,0.08); text-align: left; white-space: nowrap; }
+    table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+    th, td { padding: 15px 20px; border-bottom: 1px solid rgba(148,163,184,0.08); text-align: left; vertical-align: middle; }
     th { background: rgba(10, 15, 28, 0.96); color: #8b98b3; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.08em; position: sticky; top: 0; z-index: 10; }
-    td { font-size: 14px; }
+    td { font-size: 13.5px; }
     tbody tr:hover td { background: rgba(167,139,250, 0.06); }
+
+    .data-stack { display: flex; flex-direction: column; gap: 4px; }
+    .data-label { font-size: 11px; color: var(--muted); text-transform: uppercase; font-weight: 600; }
+    .data-val { font-size: 14px; font-weight: 500; color: white; }
 
     .badge-status { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;}
     .status-ok { background: rgba(52,211,153,0.15); color: var(--ok); }
     .status-no { background: rgba(248,113,113,0.15); color: var(--danger); }
-    .cond-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+    .cond-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+    .badge-shift { padding: 3px 8px; border-radius: 99px; font-size: 11px; font-weight: 700; background: rgba(34,211,238,0.15); color: var(--accent); display: inline-block; margin-top:4px;}
 
     .modal-bg { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.72); display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; pointer-events: none; transition: 0.3s; padding:16px;}
     .modal-bg.show { opacity: 1; pointer-events: auto; }
-    .modal { width: min(800px, 100%); background: var(--panel); border: 1px solid rgba(148,163,184,0.16); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); max-height: 92vh; display: flex; flex-direction: column; }
+    .modal { width: min(850px, 100%); background: var(--panel); border: 1px solid rgba(148,163,184,0.16); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); max-height: 92vh; display: flex; flex-direction: column; }
     .modal header { padding: 24px; border-bottom: 1px solid rgba(148,163,184,0.1); display: flex; align-items: center; gap: 12px; }
     .modal header h2 { margin: 0; font-size: 21px; font-weight: 700; }
     .modal .body { padding: 24px; overflow-y: auto; flex: 1; }
@@ -85,32 +91,29 @@
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
     .full { grid-column: 1 / -1; }
     
-    .top-log { background: rgba(167,139,250,0.05); padding: 16px; border-radius: 12px; border: 1px dashed rgba(167,139,250,0.3); margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;}
+    .top-log { background: rgba(167,139,250,0.05); padding: 16px; border-radius: 12px; border: 1px dashed rgba(167,139,250,0.3); margin-bottom: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;}
     .top-log label { color: var(--violet); }
 
     label { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; }
     input, select { width: 100%; padding: 13px 15px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.25); background: rgba(10, 15, 28, 0.8); color: white; outline: none; font-size: 14px;}
     input:focus { border-color: var(--violet); }
 
-    /* Custom Checkboxes */
     .checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;}
-    .check-item {
-      display: flex; align-items: center; gap: 10px; background: rgba(10, 15, 28, 0.5);
-      padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.15);
-      cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s;
-    }
+    .check-item { display: flex; align-items: center; gap: 10px; background: rgba(10, 15, 28, 0.5); padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(148,163,184,0.15); cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s;}
     .check-item:hover { border-color: var(--violet); }
     .check-item input { width: 18px; height: 18px; margin: 0; cursor: pointer; accent-color: var(--violet); }
 
-    .thumb { width: 42px; height: 42px; object-fit: cover; border-radius: 9px; border: 1px solid rgba(148,163,184,0.25); cursor: pointer; }
-    .no-img { width: 42px; height: 42px; border-radius: 9px; display: grid; place-items: center; background: rgba(15, 23, 42, 0.5); color: var(--muted); border: 1px dashed rgba(148,163,184,0.3); }
+    .multi-thumb-container { display: flex; gap: 8px; }
+    .thumb { width: 45px; height: 45px; object-fit: cover; border-radius: 9px; border: 1px solid rgba(148,163,184,0.25); cursor: pointer; position: relative;}
+    .no-img { width: 45px; height: 45px; border-radius: 9px; display: grid; place-items: center; background: rgba(15, 23, 42, 0.5); color: var(--muted); border: 1px dashed rgba(148,163,184,0.3); font-size: 18px;}
 
-    .file-upload-wrapper { position: relative; }
-    .file-upload-wrapper input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-    .file-upload-ui { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 16px; border: 2px dashed rgba(148,163,184,0.28); border-radius: 10px; background: rgba(10, 15, 28, 0.5); color: var(--muted); font-weight: 500; font-size: 14px;}
+    .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 10px;}
+    .file-upload-wrapper { position: relative; height: 80px;}
+    .file-upload-wrapper input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; z-index: 2;}
+    .file-upload-ui { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; height: 100%; border: 2px dashed rgba(148,163,184,0.28); border-radius: 10px; background: rgba(10, 15, 28, 0.5); color: var(--muted); font-weight: 500; font-size: 12px; text-align: center; padding: 10px;}
 
     @media (max-width: 768px) {
-      .grid, .top-log, .checklist { grid-template-columns: 1fr; }
+      .grid, .top-log, .checklist, .photo-grid { grid-template-columns: 1fr; }
       .modal { border-radius: 24px 24px 0 0; max-height: 90vh; transform: translateY(100%); }
       .modal-bg.show .modal { transform: translateY(0); }
     }
@@ -123,7 +126,7 @@
         <div class="title-icon"><i class="fa-solid fa-box-open"></i></div>
         <div>
           <h1>MS Product Bagging</h1>
-          <div class="sub">Log Weighing Scale, Conditions, and Net Weights.</div>
+          <div class="sub">Log Weights, Conditions, and Track End-of-Shift Totals.</div>
         </div>
       </div>
       <div class="toolbar">
@@ -136,32 +139,29 @@
       </div>
     </header>
 
-    <!-- Bar Chart Card -->
+    <!-- End of Shift Chart Card -->
     <div class="card" id="chartCard">
       <div class="chart-card-header">
-        <h3><i class="fa-solid fa-chart-column"></i> Net Weight Bar Chart (kg)</h3>
+        <h3><i class="fa-solid fa-chart-line"></i> End of Shift Totals</h3>
       </div>
       <div class="chart-container">
-        <canvas id="barChart"></canvas>
+        <canvas id="shiftChart"></canvas>
       </div>
     </div>
 
     <!-- Data Table -->
     <div class="card">
       <div class="chart-card-header">
-        <h3 style="color:var(--text)"><i class="fa-solid fa-list"></i> Product List</h3>
+        <h3 style="color:var(--text)"><i class="fa-solid fa-list"></i> Detailed Records</h3>
       </div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th><i class="fa-regular fa-image"></i> Photo</th>
-              <th><i class="fa-solid fa-cube"></i> Product Name</th>
-              <th><i class="fa-regular fa-calendar"></i> Date & Time</th>
-              <th><i class="fa-solid fa-user"></i> Assign Person</th>
-              <th><i class="fa-solid fa-scale-balanced"></i> Weighing Scale</th>
-              <th><i class="fa-solid fa-minus"></i> Tare Weight</th>
-              <th><i class="fa-solid fa-weight-hanging"></i> Net Weight</th>
+              <th><i class="fa-solid fa-camera"></i> Photos (Bag/QA/Bagger)</th>
+              <th><i class="fa-solid fa-cube"></i> Product & Shift</th>
+              <th><i class="fa-solid fa-users"></i> Personnel</th>
+              <th><i class="fa-solid fa-scale-balanced"></i> Weights Logging</th>
               <th><i class="fa-solid fa-clipboard-check"></i> Conditions</th>
               <th style="text-align: center;"><i class="fa-solid fa-wrench"></i> Actions</th>
             </tr>
@@ -185,15 +185,18 @@
         <form id="recordForm">
           <input type="hidden" id="recordId" />
           
-          <!-- Top Log per user instructions -->
           <div class="top-log">
             <div>
               <label for="weighingScale"><i class="fa-solid fa-scale-balanced"></i> Weighing Scale (kg)</label>
               <input id="weighingScale" type="number" step="0.01" required placeholder="0.00" />
             </div>
             <div>
-              <label for="tareWeight"><i class="fa-solid fa-minus"></i> Tare / Tear Weight (kg)</label>
+              <label for="tareWeight"><i class="fa-solid fa-minus"></i> Tare Weight (kg)</label>
               <input id="tareWeight" type="number" step="0.01" required placeholder="0.00" />
+            </div>
+            <div>
+              <label for="bagWeight" style="color:var(--accent);"><i class="fa-solid fa-weight-hanging"></i> Weight of the Bag (kg)</label>
+              <input id="bagWeight" type="number" step="0.01" required placeholder="0.00" />
             </div>
           </div>
 
@@ -202,17 +205,24 @@
               <label for="productName"><i class="fa-solid fa-cube"></i> Product Name</label>
               <input id="productName" type="text" required placeholder="Enter Product Name" />
             </div>
+            <div style="display: flex; gap:10px;">
+              <div style="flex:1;">
+                <label for="bagDate"><i class="fa-regular fa-calendar"></i> Date</label>
+                <input id="bagDate" type="date" required />
+              </div>
+              <div style="flex:1;">
+                <label for="bagTime"><i class="fa-regular fa-clock"></i> Time</label>
+                <input id="bagTime" type="time" required />
+              </div>
+            </div>
+
             <div>
-              <label for="assignPerson"><i class="fa-solid fa-user"></i> Assign Person</label>
-              <input id="assignPerson" type="text" required placeholder="Name of personnel" />
+              <label for="qaPerson"><i class="fa-solid fa-clipboard-user"></i> Q.A Person</label>
+              <input id="qaPerson" type="text" required placeholder="Name of QA" />
             </div>
             <div>
-              <label for="bagDate"><i class="fa-regular fa-calendar"></i> Date</label>
-              <input id="bagDate" type="date" required />
-            </div>
-            <div>
-              <label for="bagTime"><i class="fa-regular fa-clock"></i> Time</label>
-              <input id="bagTime" type="time" required />
+              <label for="assignPerson"><i class="fa-solid fa-user-gear"></i> Bagger Assign</label>
+              <input id="assignPerson" type="text" required placeholder="Name of Bagger" />
             </div>
             
             <div class="full">
@@ -228,12 +238,34 @@
             </div>
 
             <div class="full">
-              <label><i class="fa-solid fa-camera"></i> Image of the Bag</label>
-              <div class="file-upload-wrapper">
-                <input id="photo" type="file" accept="image/*" />
-                <div class="file-upload-ui">
-                  <i class="fa-solid fa-upload" style="font-size: 18px;"></i>
-                  <span id="photoStatus">Tap to upload image</span>
+              <label><i class="fa-solid fa-camera"></i> Attached Evidence Photos</label>
+              <div class="photo-grid">
+                <div>
+                  <div class="file-upload-wrapper">
+                    <input type="file" id="photoBag" accept="image/*" />
+                    <div class="file-upload-ui" id="uiPhotoBag">
+                      <i class="fa-solid fa-box-open" style="font-size: 20px;"></i>
+                      <span>Image of Bag</span>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div class="file-upload-wrapper">
+                    <input type="file" id="photoQA" accept="image/*" />
+                    <div class="file-upload-ui" id="uiPhotoQA">
+                      <i class="fa-solid fa-clipboard-user" style="font-size: 20px;"></i>
+                      <span>Image of QA</span>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div class="file-upload-wrapper">
+                    <input type="file" id="photoBagger" accept="image/*" />
+                    <div class="file-upload-ui" id="uiPhotoBagger">
+                      <i class="fa-solid fa-user-gear" style="font-size: 20px;"></i>
+                      <span>Image of Bagger</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -248,40 +280,103 @@
   </div>
 
   <script>
-    // --- bagging.js logic embedded ---
-    const STORAGE_KEY = "ms_product_bagging_v1";
+    const STORAGE_KEY = "ms_product_bagging_v2";
     let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    let pendingPhoto = null;
     let chartInstance = null;
+
+    let pendingImages = { bag: null, qa: null, bagger: null };
+
+    // Function to calculate Shift from time
+    function calculateShift(timeStr) {
+      if (!timeStr) return 'Unknown Shift';
+      const h = parseInt(timeStr.split(':')[0]);
+      if (h >= 7 && h < 15) return '1st Shift';
+      if (h >= 15 && h < 23) return '2nd Shift';
+      return '3rd Shift';
+    }
+
+    // Image Compressor Helper
+    function setupImageUpload(inputId, uiId, key) {
+      document.getElementById(inputId).addEventListener("change", function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            const MAX = 500;
+            let w = img.width, h = img.height;
+            if(w > h && w > MAX) { h *= MAX/w; w = MAX; }
+            else if (h > MAX) { w *= MAX/h; h = MAX; }
+            canvas.width = w; canvas.height = h;
+            canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+            pendingImages[key] = canvas.toDataURL("image/jpeg", 0.7);
+            document.getElementById(uiId).innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--ok); font-size:24px;"></i><span style="color:var(--ok)">Attached</span>`;
+            document.getElementById(uiId).style.borderColor = "var(--ok)";
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    setupImageUpload("photoBag", "uiPhotoBag", "bag");
+    setupImageUpload("photoQA", "uiPhotoQA", "qa");
+    setupImageUpload("photoBagger", "uiPhotoBagger", "bagger");
 
     function renderTable() {
       const tbody = document.getElementById("tbody");
       tbody.innerHTML = "";
 
       if(records.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:40px; color:var(--muted);">No bagging records found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:40px; color:var(--muted);">No bagging records found.</td></tr>`;
         document.getElementById("chartCard").style.display = "none";
         return;
       }
       document.getElementById("chartCard").style.display = "block";
 
-      const sorted = records.sort((a, b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time));
+      const sorted = [...records].sort((a, b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time));
 
       sorted.forEach(r => {
         const netWeight = (parseFloat(r.scale) - parseFloat(r.tare)).toFixed(2);
+        const bagWt = r.bagWeight ? parseFloat(r.bagWeight).toFixed(2) : '-';
+        const shiftStr = calculateShift(r.time);
         
-        // Helper to draw condition badges
         const cond = (c, label) => c ? `<span class="badge-status status-ok"><i class="fa-solid fa-check"></i> ${label}</span>` : `<span class="badge-status status-no"><i class="fa-solid fa-xmark"></i> ${label}</span>`;
+        
+        const renderThumb = (imgSrc, title) => imgSrc ? `<img class="thumb" src="${imgSrc}" title="${title}">` : `<div class="no-img" title="No ${title}"><i class="fa-solid fa-user-slash" style="font-size:14px"></i></div>`;
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${r.photo ? `<img class="thumb" src="${r.photo}">` : `<div class="no-img"><i class="fa-regular fa-image"></i></div>`}</td>
-          <td><strong>${r.productName}</strong></td>
-          <td>${r.date} <span style="color:var(--muted); font-size:12px;">${r.time}</span></td>
-          <td>${r.person}</td>
-          <td>${r.scale} kg</td>
-          <td>${r.tare} kg</td>
-          <td style="color:var(--violet); font-weight:bold; font-size:16px;">${netWeight} kg</td>
+          <td>
+            <div class="multi-thumb-container">
+               ${r.photoBag ? `<img class="thumb" src="${r.photoBag}" title="Bag Image">` : `<div class="no-img" title="No Bag Photo"><i class="fa-regular fa-image"></i></div>`}
+               ${renderThumb(r.photoQA, 'QA Image')}
+               ${renderThumb(r.photoBagger, 'Bagger Image')}
+            </div>
+          </td>
+          <td>
+            <div class="data-stack">
+              <span class="data-val" style="color:var(--violet); font-weight:700;">${r.productName}</span>
+              <span class="data-label">${r.date} · ${r.time}</span>
+              <span class="badge-shift">${shiftStr}</span>
+            </div>
+          </td>
+          <td>
+             <div class="data-stack">
+               <div><span class="data-label">QA:</span> <span class="data-val">${r.qaPerson || 'N/A'}</span></div>
+               <div><span class="data-label">Bagger:</span> <span class="data-val">${r.person}</span></div>
+             </div>
+          </td>
+          <td>
+             <div class="data-stack">
+               <div><span class="data-label">Scale:</span> <span class="data-val">${r.scale} kg</span></div>
+               <div><span class="data-label">Tare:</span> <span class="data-val">${r.tare} kg</span></div>
+               <div><span class="data-label">Bag Wt:</span> <span class="data-val" style="color:var(--accent); font-weight:bold">${bagWt} kg</span></div>
+               <div style="margin-top:2px"><span class="data-label">Net:</span> <span class="data-val">${netWeight} kg</span></div>
+             </div>
+          </td>
           <td>
             <div class="cond-grid">
               ${cond(r.condTie, 'Tie')}
@@ -293,49 +388,112 @@
             </div>
           </td>
           <td style="text-align: center;">
-            <button class="btn-danger" style="padding:6px 10px;" onclick="deleteRecord('${r.id}')"><i class="fa-solid fa-trash"></i></button>
+            <button class="btn-danger" style="padding:8px 12px;" onclick="deleteRecord('${r.id}')"><i class="fa-solid fa-trash"></i></button>
           </td>
         `;
         tbody.appendChild(tr);
       });
 
-      renderChart(sorted);
+      renderShiftChart(sorted);
     }
 
-    function renderChart(data) {
-      const ctx = document.getElementById('barChart').getContext('2d');
+    function renderShiftChart(data) {
+      const ctx = document.getElementById('shiftChart').getContext('2d');
       if (chartInstance) chartInstance.destroy();
 
-      const reversed = [...data].reverse(); // Oldest to newest for the chart timeline
+      // Aggregate data by Date + Shift
+      const grouped = {};
+      
+      // Sort oldest to newest for timeline tracking
+      const chronological = [...data].sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
+
+      chronological.forEach(r => {
+        const shiftStr = calculateShift(r.time);
+        const key = `${r.date} - ${shiftStr}`;
+        if (!grouped[key]) {
+          grouped[key] = { bagCount: 0, totalWeight: 0 };
+        }
+        grouped[key].bagCount += 1;
+        // Total weight logic: Will sum the inputted 'Weight of the Bag' or fallback to Net Weight
+        const w = parseFloat(r.bagWeight) || (parseFloat(r.scale) - parseFloat(r.tare)) || 0;
+        grouped[key].totalWeight += w;
+      });
+
+      const labels = Object.keys(grouped);
+      const counts = labels.map(l => grouped[l].bagCount);
+      const weights = labels.map(l => grouped[l].totalWeight.toFixed(2));
 
       chartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: reversed.map(r => `${r.productName} (${r.date})`),
-          datasets: [{
-            label: 'Net Weight (kg)',
-            data: reversed.map(r => (parseFloat(r.scale) - parseFloat(r.tare)).toFixed(2)),
-            backgroundColor: '#a78bfa',
-            borderRadius: 6
-          }]
+          labels: labels,
+          datasets: [
+            {
+              label: 'Total Bags (Count)',
+              data: counts,
+              backgroundColor: 'rgba(167, 139, 250, 0.8)',
+              borderColor: '#a78bfa',
+              borderWidth: 1,
+              borderRadius: 6,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Total Weight (kg)',
+              data: weights,
+              type: 'line',
+              backgroundColor: '#22d3ee',
+              borderColor: '#22d3ee',
+              borderWidth: 3,
+              pointRadius: 4,
+              pointBackgroundColor: '#131b2e',
+              tension: 0.3,
+              yAxisID: 'y1'
+            }
+          ]
         },
         options: {
           responsive: true, maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
           plugins: {
-            legend: { labels: { color: '#e2e8f0' } }
+            legend: { labels: { color: '#e2e8f0', usePointStyle: true, padding: 15 } }
           },
           scales: {
-            x: { ticks: { color: '#8b98b3' }, grid: { color: 'rgba(148,163,184,0.05)' } },
-            y: { ticks: { color: '#8b98b3' }, grid: { color: 'rgba(148,163,184,0.1)' }, beginAtZero: true }
+            x: { 
+              ticks: { color: '#8b98b3', font: {size: 11} }, 
+              grid: { color: 'rgba(148,163,184,0.05)' } 
+            },
+            y: { 
+              type: 'linear', position: 'left',
+              title: { display: true, text: 'Total Bags (Count)', color: '#a78bfa', font: {weight: 'bold'} },
+              ticks: { color: '#8b98b3', stepSize: 1 }, 
+              grid: { color: 'rgba(148,163,184,0.1)' }, 
+              beginAtZero: true 
+            },
+            y1: {
+              type: 'linear', position: 'right',
+              title: { display: true, text: 'Total Weight (kg)', color: '#22d3ee', font: {weight: 'bold'} },
+              ticks: { color: '#8b98b3' },
+              grid: { drawOnChartArea: false },
+              beginAtZero: true
+            }
           }
         }
       });
     }
 
+    function resetUploadUI(id, icon, text) {
+      document.getElementById(id).value = "";
+      document.getElementById("ui" + id.charAt(0).toUpperCase() + id.slice(1)).innerHTML = `<i class="fa-solid ${icon}" style="font-size: 20px;"></i><span>${text}</span>`;
+      document.getElementById("ui" + id.charAt(0).toUpperCase() + id.slice(1)).style.borderColor = "rgba(148,163,184,0.28)";
+    }
+
     function openForm() {
       document.getElementById("recordForm").reset();
-      pendingPhoto = null;
-      document.getElementById("photoStatus").textContent = "Tap to upload image";
+      
+      pendingImages = { bag: null, qa: null, bagger: null };
+      resetUploadUI("photoBag", "fa-box-open", "Image of Bag");
+      resetUploadUI("photoQA", "fa-clipboard-user", "Image of QA");
+      resetUploadUI("photoBagger", "fa-user-gear", "Image of Bagger");
       
       const now = new Date();
       document.getElementById("bagDate").value = now.toISOString().slice(0, 10);
@@ -348,29 +506,6 @@
       document.getElementById("formModal").classList.remove("show");
     }
 
-    // Image Compressor
-    document.getElementById("photo").addEventListener("change", function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const MAX = 600;
-          let w = img.width, h = img.height;
-          if(w > h && w > MAX) { h *= MAX/w; w = MAX; }
-          else if (h > MAX) { w *= MAX/h; h = MAX; }
-          canvas.width = w; canvas.height = h;
-          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-          pendingPhoto = canvas.toDataURL("image/jpeg", 0.7);
-          document.getElementById("photoStatus").innerHTML = `<i class="fa-solid fa-check" style="color:var(--ok)"></i> Image Ready`;
-        };
-        img.src = ev.target.result;
-      };
-      reader.readAsDataURL(file);
-    });
-
     function saveRecord() {
       const form = document.getElementById("recordForm");
       if (!form.reportValidity()) return;
@@ -379,7 +514,9 @@
         id: crypto.randomUUID(),
         scale: document.getElementById("weighingScale").value,
         tare: document.getElementById("tareWeight").value,
+        bagWeight: document.getElementById("bagWeight").value,
         productName: document.getElementById("productName").value,
+        qaPerson: document.getElementById("qaPerson").value,
         person: document.getElementById("assignPerson").value,
         date: document.getElementById("bagDate").value,
         time: document.getElementById("bagTime").value,
@@ -389,7 +526,9 @@
         condN2: document.getElementById("chkN2").checked,
         condRedTag: document.getElementById("chkRedTag").checked,
         condWarehouse: document.getElementById("chkWarehouse").checked,
-        photo: pendingPhoto
+        photoBag: pendingImages.bag,
+        photoQA: pendingImages.qa,
+        photoBagger: pendingImages.bagger
       };
 
       records.push(record);
