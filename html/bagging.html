@@ -770,7 +770,9 @@
       const shiftStr = calculateShift(r.time);
       
       const drawImg = (src, fallbackIcon) => src ? `<img src="${src}" />` : `<div class="no-photo"><i class="fa-solid ${fallbackIcon}"></i></div>`;
-      const cond = (c) => c ? `<span style="color:var(--ok)"><i class="fa-solid fa-check"></i> Yes</span>` : `<span style="color:var(--danger)"><i class="fa-solid fa-xmark"></i> No</span>`;
+      
+      // Changed 'Yes' to 'Ok' as requested
+      const cond = (c) => c ? `<span style="color:var(--ok)"><i class="fa-solid fa-check"></i> Ok</span>` : `<span style="color:var(--danger)"><i class="fa-solid fa-xmark"></i> No</span>`;
 
       carouselImages = [
         { src: r.photoBagTop, label: "Top Image" },
@@ -875,7 +877,12 @@
                <div class="kv"><span class="k">Slider not close</span> <span class="v">${cond(r.condSliderNotClose)}</span></div>
                <div class="kv"><span class="k">Final weight</span> <span class="v">${cond(r.condFinalWeight)}</span></div>
                <div class="kv"><span class="k">Red tag remove</span> <span class="v">${cond(r.condRedTagRemove)}</span></div>
-               <div class="kv" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;"><span class="k">Sample condition</span> <span class="v"><span class="badge-status" style="background: rgba(167,139,250,0.15); color: #c4b5fd;">${r.sampleCondition || 'N/A'}</span></span></div>
+               
+               <!-- Made Sample condition show up with a checkmark icon to look checked -->
+               <div class="kv" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
+                 <span class="k">Sample condition</span> 
+                 <span class="v" style="color:var(--ok)"><i class="fa-solid fa-check"></i> ${r.sampleCondition || 'N/A'}</span>
+               </div>
             </div>
           </div>
         </div>
