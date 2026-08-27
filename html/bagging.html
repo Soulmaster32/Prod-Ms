@@ -70,7 +70,6 @@
     td { font-size: 13.5px; }
     tbody tr:hover td { background: rgba(167,139,250, 0.06); }
 
-    /* Grouping Headers */
     .group-header-row td { padding: 10px 20px; background: rgba(15, 23, 42, 0.8) !important; border-bottom: 1px solid rgba(148,163,184,0.15); border-top: 2px solid rgba(167,139,250,0.3); }
     .group-header { display: flex; align-items: center; gap: 12px; }
     .group-count { font-size: 12px; color: var(--muted); font-weight: 600; }
@@ -93,7 +92,6 @@
     .modal .body { padding: 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 24px; }
     .modal footer { padding: 20px 24px; border-top: 1px solid rgba(148,163,184,0.1); display: flex; justify-content: flex-end; gap: 12px; background: rgba(10, 15, 28, 0.4); }
 
-    /* Distinct Form Divisions */
     .form-section { background: rgba(10, 15, 28, 0.4); border: 1px dashed rgba(148,163,184,0.2); border-radius: 14px; padding: 20px; }
     .form-section-title { font-size: 13.5px; font-weight: 700; color: var(--violet); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
 
@@ -113,10 +111,13 @@
     .thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 9px; border: 1px solid rgba(148,163,184,0.25); cursor: pointer; }
     .no-img { width: 50px; height: 50px; border-radius: 9px; display: grid; place-items: center; background: rgba(15, 23, 42, 0.5); color: var(--muted); border: 1px dashed rgba(148,163,184,0.3); font-size: 20px;}
 
-    /* Photo Upload UIs */
-    .file-upload-wrapper { position: relative; height: 80px;}
+    /* 5-Image Horizontal Scroll Layout */
+    .images-scroll-container { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; }
+    .images-scroll-container::-webkit-scrollbar { height: 6px; }
+    .images-scroll-container::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.3); border-radius: 4px; }
+    .file-upload-wrapper { position: relative; height: 80px; min-width: 140px; flex: 1;}
     .file-upload-wrapper input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; z-index: 2;}
-    .file-upload-ui { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; height: 100%; border: 2px dashed rgba(148,163,184,0.28); border-radius: 10px; background: rgba(15, 23, 42, 0.6); color: var(--muted); font-weight: 500; font-size: 12px; text-align: center; padding: 10px; transition: 0.2s;}
+    .file-upload-ui { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; height: 100%; border: 2px dashed rgba(148,163,184,0.28); border-radius: 10px; background: rgba(15, 23, 42, 0.6); color: var(--muted); font-weight: 500; font-size: 12px; text-align: center; padding: 10px; transition: 0.2s;}
     .file-upload-wrapper:hover .file-upload-ui { border-color: var(--violet); background: rgba(167, 139, 250, 0.05);}
 
     /* View Details Modal Styling */
@@ -127,12 +128,23 @@
     .kv .k { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase;}
     .kv .v { color: white; font-weight: 600; text-align: right;}
     
-    .personnel-view-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 10px;}
+    .personnel-view-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 10px;}
     .personnel-card { text-align: center; display:flex; flex-direction: column; align-items: center; gap: 8px;}
-    .personnel-card img { width: 90px; height: 90px; object-fit: cover; border-radius: 50%; border: 2px solid var(--violet); }
-    .personnel-card .no-photo { width: 90px; height: 90px; border-radius: 50%; background: rgba(10,15,28,0.8); display: grid; place-items: center; border: 2px dashed rgba(148,163,184,0.3); font-size: 28px; color: var(--muted); }
+    .personnel-card img { width: 80px; height: 80px; object-fit: cover; border-radius: 50%; border: 2px solid var(--violet); }
+    .personnel-card .no-photo { width: 80px; height: 80px; border-radius: 50%; background: rgba(10,15,28,0.8); display: grid; place-items: center; border: 2px dashed rgba(148,163,184,0.3); font-size: 24px; color: var(--muted); }
 
     .actions { display: flex; gap: 8px; justify-content: center; }
+
+    /* Carousel for Bag Images */
+    .carousel-container { position: relative; width: 100%; aspect-ratio: 4/3; background: #0a0f1c; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .carousel-container img { width: 100%; height: 100%; object-fit: cover; display: none;}
+    .carousel-container img.active { display: block; }
+    .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: none; padding: 10px 14px; cursor: pointer; border-radius: 50%; font-size: 18px; z-index: 10;}
+    .carousel-btn:hover { background: var(--violet); }
+    .carousel-btn.left { left: 10px; }
+    .carousel-btn.right { right: 10px; }
+    .carousel-caption { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.7); color: white; padding: 8px; text-align: center; font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;}
+    .no-carousel-images { color: var(--muted); padding: 40px; text-align: center; width: 100%; font-size: 14px; }
 
     @media (max-width: 768px) {
       .grid, .grid-3, .checklist, .details-grid, .personnel-view-grid { grid-template-columns: 1fr; }
@@ -148,7 +160,7 @@
         <div class="title-icon"><i class="fa-solid fa-box-open"></i></div>
         <div>
           <h1>MS Product Bagging</h1>
-          <div class="sub">Log Weights, Conditions, and Group Production by Shift.</div>
+          <div class="sub">Log Weights, Shifting Conditions, 5-Side Bag Photos & Personnel.</div>
         </div>
       </div>
       <div class="toolbar">
@@ -229,19 +241,17 @@
           <div class="form-section">
             <div class="form-section-title"><i class="fa-solid fa-cube"></i> MS Product Details</div>
             <div class="grid">
-              <div>
+              <div class="full">
                 <label for="productName">Product Name</label>
                 <input id="productName" type="text" required placeholder="Enter Multiple MS Product Name" />
               </div>
-              <div style="display: flex; gap:10px;">
-                <div style="flex:1;">
-                  <label for="bagDate">Date</label>
-                  <input id="bagDate" type="date" required />
-                </div>
-                <div style="flex:1;">
-                  <label for="bagTime">Military Time</label>
-                  <input id="bagTime" type="time" required />
-                </div>
+              <div>
+                <label for="bagDate">Date</label>
+                <input id="bagDate" type="date" required />
+              </div>
+              <div>
+                <label for="bagTime">Military Time</label>
+                <input id="bagTime" type="time" required />
               </div>
 
               <div class="full">
@@ -256,42 +266,90 @@
                 </div>
               </div>
 
+              <!-- 5-SIDE BAG IMAGES -->
               <div class="full">
-                <label>Image of the Bag</label>
-                <div class="file-upload-wrapper">
-                  <input type="file" id="photoBag" accept="image/*" />
-                  <div class="file-upload-ui" id="uiPhotoBag">
-                    <i class="fa-solid fa-box-open" style="font-size: 20px;"></i>
-                    <span>Tap to upload Bag Image</span>
+                <label><i class="fa-solid fa-camera"></i> 5-Side Bag Images</label>
+                <div class="images-scroll-container">
+                  <!-- Top -->
+                  <div class="file-upload-wrapper">
+                    <input type="file" id="photoBagTop" accept="image/*" />
+                    <div class="file-upload-ui" id="uiPhotoBagTop">
+                      <i class="fa-solid fa-arrow-up" style="font-size: 20px;"></i>
+                      <span>Top Image</span>
+                    </div>
+                  </div>
+                  <!-- Front -->
+                  <div class="file-upload-wrapper">
+                    <input type="file" id="photoBagFront" accept="image/*" />
+                    <div class="file-upload-ui" id="uiPhotoBagFront">
+                      <i class="fa-regular fa-square" style="font-size: 20px;"></i>
+                      <span>Front Image</span>
+                    </div>
+                  </div>
+                  <!-- Back -->
+                  <div class="file-upload-wrapper">
+                    <input type="file" id="photoBagBack" accept="image/*" />
+                    <div class="file-upload-ui" id="uiPhotoBagBack">
+                      <i class="fa-regular fa-square" style="font-size: 20px;"></i>
+                      <span>Back Image</span>
+                    </div>
+                  </div>
+                  <!-- Left -->
+                  <div class="file-upload-wrapper">
+                    <input type="file" id="photoBagLeft" accept="image/*" />
+                    <div class="file-upload-ui" id="uiPhotoBagLeft">
+                      <i class="fa-solid fa-arrow-left" style="font-size: 20px;"></i>
+                      <span>Left Side Image</span>
+                    </div>
+                  </div>
+                  <!-- Right -->
+                  <div class="file-upload-wrapper">
+                    <input type="file" id="photoBagRight" accept="image/*" />
+                    <div class="file-upload-ui" id="uiPhotoBagRight">
+                      <i class="fa-solid fa-arrow-right" style="font-size: 20px;"></i>
+                      <span>Right Side Image</span>
+                    </div>
                   </div>
                 </div>
               </div>
+
             </div>
           </div>
 
           <!-- DIVISION 3: Personnel Info -->
           <div class="form-section">
             <div class="form-section-title"><i class="fa-solid fa-users"></i> Personnel Information</div>
-            <div class="grid">
+            <div class="grid-3">
               <div>
-                <label for="qaPerson">Q.A Person Name</label>
-                <input id="qaPerson" type="text" required placeholder="Name of QA" style="margin-bottom:12px;" />
+                <label for="qaPerson">Q.A Person</label>
+                <input id="qaPerson" type="text" required placeholder="Name" style="margin-bottom:12px;" />
                 <div class="file-upload-wrapper">
                   <input type="file" id="photoQA" accept="image/*" />
                   <div class="file-upload-ui" id="uiPhotoQA">
                     <i class="fa-solid fa-clipboard-user" style="font-size: 20px;"></i>
-                    <span>Tap to upload QA Image</span>
+                    <span>QA Image</span>
                   </div>
                 </div>
               </div>
               <div>
-                <label for="assignPerson">Bagger Assign Name</label>
-                <input id="assignPerson" type="text" required placeholder="Name of Bagger" style="margin-bottom:12px;" />
+                <label for="assignPerson">Bagger Assign</label>
+                <input id="assignPerson" type="text" required placeholder="Name" style="margin-bottom:12px;" />
                 <div class="file-upload-wrapper">
                   <input type="file" id="photoBagger" accept="image/*" />
                   <div class="file-upload-ui" id="uiPhotoBagger">
                     <i class="fa-solid fa-user-gear" style="font-size: 20px;"></i>
-                    <span>Tap to upload Bagger Image</span>
+                    <span>Bagger Image</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label for="h2sPerson">H2S Personnel</label>
+                <input id="h2sPerson" type="text" required placeholder="Name" style="margin-bottom:12px;" />
+                <div class="file-upload-wrapper">
+                  <input type="file" id="photoH2S" accept="image/*" />
+                  <div class="file-upload-ui" id="uiPhotoH2S">
+                    <i class="fa-solid fa-mask-ventilator" style="font-size: 20px;"></i>
+                    <span>H2S Image</span>
                   </div>
                 </div>
               </div>
@@ -324,19 +382,26 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "ms_product_bagging_v4";
+    const STORAGE_KEY = "ms_product_bagging_v5";
     let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
     let chartInstance = null;
 
-    let pendingImages = { bag: null, qa: null, bagger: null };
+    let pendingImages = { 
+      bagTop: null, bagFront: null, bagBack: null, bagLeft: null, bagRight: null, 
+      qa: null, bagger: null, h2s: null 
+    };
 
-    // Function to calculate Shift from time
+    // Carousel variables for the View Modal
+    let carouselImages = [];
+    let carouselIndex = 0;
+
+    // Standard Shifting Schedule
     function calculateShift(timeStr) {
       if (!timeStr) return 'Unknown Shift';
       const h = parseInt(timeStr.split(':')[0]);
-      if (h >= 7 && h < 15) return '1st Shift';
-      if (h >= 15 && h < 23) return '2nd Shift';
-      return '3rd Shift';
+      if (h >= 7 && h < 15) return '1st Shift (07:00 - 15:00)';
+      if (h >= 15 && h < 23) return '2nd Shift (15:00 - 23:00)';
+      return '3rd Shift (23:00 - 07:00)';
     }
 
     // Image Compressor Helper
@@ -349,7 +414,7 @@
           const img = new Image();
           img.onload = () => {
             const canvas = document.createElement("canvas");
-            const MAX = 500;
+            const MAX = 600;
             let w = img.width, h = img.height;
             if(w > h && w > MAX) { h *= MAX/w; w = MAX; }
             else if (h > MAX) { w *= MAX/h; h = MAX; }
@@ -368,9 +433,16 @@
       });
     }
 
-    setupImageUpload("photoBag", "uiPhotoBag", "bag");
+    // Attach uploads for all 5 bag sides and 3 personnel
+    setupImageUpload("photoBagTop", "uiPhotoBagTop", "bagTop");
+    setupImageUpload("photoBagFront", "uiPhotoBagFront", "bagFront");
+    setupImageUpload("photoBagBack", "uiPhotoBagBack", "bagBack");
+    setupImageUpload("photoBagLeft", "uiPhotoBagLeft", "bagLeft");
+    setupImageUpload("photoBagRight", "uiPhotoBagRight", "bagRight");
+    
     setupImageUpload("photoQA", "uiPhotoQA", "qa");
     setupImageUpload("photoBagger", "uiPhotoBagger", "bagger");
+    setupImageUpload("photoH2S", "uiPhotoH2S", "h2s");
 
     function renderTable() {
       const tbody = document.getElementById("tbody");
@@ -394,7 +466,6 @@
         grouped[groupKey].push(r);
       });
 
-      // Render Groups
       Object.keys(grouped).forEach(key => {
         const group = grouped[key];
         const [datePart, shiftPart] = key.split(' | ');
@@ -419,11 +490,19 @@
           
           const cond = (c, label) => c ? `<span class="badge-status status-ok"><i class="fa-solid fa-check"></i> ${label}</span>` : `<span class="badge-status status-no"><i class="fa-solid fa-xmark"></i> ${label}</span>`;
           
+          // Get the first available image to show as a thumbnail, count total attachments
+          const availableImages = [r.photoBagTop, r.photoBagFront, r.photoBagBack, r.photoBagLeft, r.photoBagRight].filter(Boolean);
+          const mainImg = availableImages[0];
+          const thumbHtml = mainImg 
+            ? `<div style="position:relative; width:50px; height:50px;">
+                 <img class="thumb" src="${mainImg}">
+                 <span style="position:absolute; bottom:-5px; right:-5px; background:var(--violet); color:white; font-size:10px; padding:2px 5px; border-radius:4px; font-weight:bold;">+${availableImages.length}</span>
+               </div>` 
+            : `<div class="no-img" title="No Bag Photos"><i class="fa-regular fa-images"></i></div>`;
+
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td>
-              ${r.photoBag ? `<img class="thumb" src="${r.photoBag}" title="Bag Image">` : `<div class="no-img" title="No Bag Photo"><i class="fa-regular fa-image"></i></div>`}
-            </td>
+            <td>${thumbHtml}</td>
             <td>
               <div class="data-stack">
                 <span class="data-val" style="color:var(--violet); font-weight:700;">${r.productName}</span>
@@ -434,8 +513,7 @@
                <div class="data-stack">
                  <div><span class="data-label">Scale:</span> <span class="data-val">${r.scale} kg</span></div>
                  <div><span class="data-label">Tare:</span> <span class="data-val">${r.tare} kg</span></div>
-                 <div><span class="data-label">Bag:</span> <span class="data-val" style="color:var(--accent);">${bagWt} kg</span></div>
-                 <div style="margin-top:2px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:2px;"><span class="data-label">Net:</span> <span class="data-val" style="font-weight:bold">${netWeight} kg</span></div>
+                 <div style="margin-top:2px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:2px;"><span class="data-label">Net:</span> <span class="data-val" style="font-weight:bold; color:var(--accent);">${netWeight} kg</span></div>
                </div>
             </td>
             <td>
@@ -463,6 +541,16 @@
       renderShiftChart(sorted);
     }
 
+    // Carousel Functions
+    function changeCarousel(direction) {
+      if (carouselImages.length === 0) return;
+      carouselIndex = (carouselIndex + direction + carouselImages.length) % carouselImages.length;
+      document.querySelectorAll('.carousel-img').forEach((img, idx) => {
+        img.classList.toggle('active', idx === carouselIndex);
+      });
+      document.getElementById('carouselCaption').textContent = carouselImages[carouselIndex].label;
+    }
+
     function viewDetails(id) {
       const r = records.find(rec => rec.id === id);
       if (!r) return;
@@ -472,6 +560,34 @@
       
       const drawImg = (src, fallbackIcon) => src ? `<img src="${src}" />` : `<div class="no-photo"><i class="fa-solid ${fallbackIcon}"></i></div>`;
       const cond = (c, label) => c ? `<span style="color:var(--ok)"><i class="fa-solid fa-check"></i> Yes</span>` : `<span style="color:var(--danger)"><i class="fa-solid fa-xmark"></i> No</span>`;
+
+      // Build Carousel Array
+      carouselImages = [
+        { src: r.photoBagTop, label: "Top Image" },
+        { src: r.photoBagFront, label: "Front Image" },
+        { src: r.photoBagBack, label: "Back Image" },
+        { src: r.photoBagLeft, label: "Left Side Image" },
+        { src: r.photoBagRight, label: "Right Side Image" }
+      ].filter(img => img.src);
+      
+      carouselIndex = 0;
+
+      let carouselHtml = `<div class="no-carousel-images"><i class="fa-regular fa-images" style="font-size:30px; display:block; margin-bottom:10px;"></i>No Bag Images Attached</div>`;
+      
+      if (carouselImages.length > 0) {
+        let imgsHtml = carouselImages.map((img, idx) => `<img src="${img.src}" class="carousel-img ${idx === 0 ? 'active' : ''}">`).join('');
+        let btnsHtml = carouselImages.length > 1 ? `
+          <button class="carousel-btn left" onclick="changeCarousel(-1)">&#10094;</button>
+          <button class="carousel-btn right" onclick="changeCarousel(1)">&#10095;</button>
+        ` : '';
+        carouselHtml = `
+          <div class="carousel-container">
+            ${btnsHtml}
+            ${imgsHtml}
+            <div class="carousel-caption" id="carouselCaption">${carouselImages[0].label}</div>
+          </div>
+        `;
+      }
 
       const body = document.getElementById("viewModalBody");
       body.innerHTML = `
@@ -505,9 +621,8 @@
                <div class="kv"><span class="k">Delivered to Whse</span> <span class="v">${cond(r.condWarehouse)}</span></div>
             </div>
             
-            <div class="view-card">
-              <h4><i class="fa-solid fa-camera"></i> Bag Image</h4>
-              ${r.photoBag ? `<img src="${r.photoBag}" style="width:100%; border-radius:8px; border:1px solid rgba(255,255,255,0.1);">` : `<div style="text-align:center; padding:20px; color:var(--muted); border:1px dashed rgba(148,163,184,0.3); border-radius:8px;">No Bag Image Available</div>`}
+            <div class="view-card" style="padding:10px;">
+              ${carouselHtml}
             </div>
           </div>
         </div>
@@ -516,14 +631,19 @@
           <h4><i class="fa-solid fa-users"></i> Personnel Details</h4>
           <div class="personnel-view-grid">
             <div class="personnel-card">
-              <span style="font-size:12px; color:var(--muted); text-transform:uppercase; font-weight:600; margin-bottom:4px;">Quality Assurance</span>
+              <span style="font-size:11px; color:var(--muted); text-transform:uppercase; font-weight:600; margin-bottom:2px;">QA</span>
               ${drawImg(r.photoQA, 'fa-user-tie')}
-              <h3 style="margin:10px 0 0 0; font-size:16px;">${r.qaPerson || 'Not Assigned'}</h3>
+              <h3 style="margin:8px 0 0 0; font-size:14px;">${r.qaPerson || 'N/A'}</h3>
             </div>
             <div class="personnel-card">
-              <span style="font-size:12px; color:var(--muted); text-transform:uppercase; font-weight:600; margin-bottom:4px;">Bagger Assign</span>
+              <span style="font-size:11px; color:var(--muted); text-transform:uppercase; font-weight:600; margin-bottom:2px;">Bagger</span>
               ${drawImg(r.photoBagger, 'fa-user-gear')}
-              <h3 style="margin:10px 0 0 0; font-size:16px;">${r.person || 'Not Assigned'}</h3>
+              <h3 style="margin:8px 0 0 0; font-size:14px;">${r.person || 'N/A'}</h3>
+            </div>
+            <div class="personnel-card">
+              <span style="font-size:11px; color:var(--muted); text-transform:uppercase; font-weight:600; margin-bottom:2px;">H2S Personnel</span>
+              ${drawImg(r.photoH2S, 'fa-mask-ventilator')}
+              <h3 style="margin:8px 0 0 0; font-size:14px;">${r.h2sPerson || 'N/A'}</h3>
             </div>
           </div>
         </div>
@@ -626,10 +746,13 @@
       document.getElementById("recordId").value = id || "";
       document.getElementById("formTitle").textContent = id ? "Edit Bagging Record" : "Add Bagging Record";
 
-      pendingImages = { bag: null, qa: null, bagger: null };
+      pendingImages = { 
+        bagTop: null, bagFront: null, bagBack: null, bagLeft: null, bagRight: null, 
+        qa: null, bagger: null, h2s: null 
+      };
 
       if (id) {
-        // Edit Mode: Load everything from the record
+        // Edit Mode: Load everything
         const r = records.find(rec => rec.id === id);
         if (r) {
           document.getElementById("weighingScale").value = r.scale;
@@ -642,6 +765,7 @@
           
           document.getElementById("qaPerson").value = r.qaPerson;
           document.getElementById("assignPerson").value = r.person;
+          document.getElementById("h2sPerson").value = r.h2sPerson || "";
 
           document.getElementById("chkTie").checked = r.condTie;
           document.getElementById("chkSling").checked = r.condSling;
@@ -650,44 +774,64 @@
           document.getElementById("chkRedTag").checked = r.condRedTag;
           document.getElementById("chkWarehouse").checked = r.condWarehouse;
 
-          pendingImages.bag = r.photoBag;
+          pendingImages.bagTop = r.photoBagTop;
+          pendingImages.bagFront = r.photoBagFront;
+          pendingImages.bagBack = r.photoBagBack;
+          pendingImages.bagLeft = r.photoBagLeft;
+          pendingImages.bagRight = r.photoBagRight;
           pendingImages.qa = r.photoQA;
           pendingImages.bagger = r.photoBagger;
+          pendingImages.h2s = r.photoH2S;
 
-          setUploadUI("photoBag", "fa-box-open", "Tap to upload Bag Image", !!r.photoBag);
-          setUploadUI("photoQA", "fa-clipboard-user", "Tap to upload QA Image", !!r.photoQA);
-          setUploadUI("photoBagger", "fa-user-gear", "Tap to upload Bagger Image", !!r.photoBagger);
+          setUploadUI("photoBagTop", "fa-arrow-up", "Top Image", !!r.photoBagTop);
+          setUploadUI("photoBagFront", "fa-square", "Front Image", !!r.photoBagFront);
+          setUploadUI("photoBagBack", "fa-square", "Back Image", !!r.photoBagBack);
+          setUploadUI("photoBagLeft", "fa-arrow-left", "Left Side Image", !!r.photoBagLeft);
+          setUploadUI("photoBagRight", "fa-arrow-right", "Right Side Image", !!r.photoBagRight);
+          
+          setUploadUI("photoQA", "fa-clipboard-user", "QA Image", !!r.photoQA);
+          setUploadUI("photoBagger", "fa-user-gear", "Bagger Image", !!r.photoBagger);
+          setUploadUI("photoH2S", "fa-mask-ventilator", "H2S Image", !!r.photoH2S);
         }
       } else {
-        // Add Mode: Pre-fill from the last record for continuous shift entry
-        setUploadUI("photoBag", "fa-box-open", "Tap to upload Bag Image", false);
-        setUploadUI("photoQA", "fa-clipboard-user", "Tap to upload QA Image", false);
-        setUploadUI("photoBagger", "fa-user-gear", "Tap to upload Bagger Image", false);
+        // Add Mode: Reset Bag Photos
+        setUploadUI("photoBagTop", "fa-arrow-up", "Top Image", false);
+        setUploadUI("photoBagFront", "fa-square", "Front Image", false);
+        setUploadUI("photoBagBack", "fa-square", "Back Image", false);
+        setUploadUI("photoBagLeft", "fa-arrow-left", "Left Side Image", false);
+        setUploadUI("photoBagRight", "fa-arrow-right", "Right Side Image", false);
+        
+        setUploadUI("photoQA", "fa-clipboard-user", "QA Image", false);
+        setUploadUI("photoBagger", "fa-user-gear", "Bagger Image", false);
+        setUploadUI("photoH2S", "fa-mask-ventilator", "H2S Image", false);
         
         const now = new Date();
         document.getElementById("bagDate").value = now.toISOString().slice(0, 10);
         document.getElementById("bagTime").value = now.toTimeString().slice(0, 5);
 
         if (records.length > 0) {
-          // Sort chronologically and take the most recent to pre-fill repeated data
+          // Pre-fill sticky fields from previous log in the shift
           const chronological = [...records].sort((a, b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time));
           const lastRec = chronological[0];
           
-          // Pre-fill sticky fields
           document.getElementById("weighingScale").value = lastRec.scale;
           document.getElementById("tareWeight").value = lastRec.tare;
           document.getElementById("productName").value = lastRec.productName;
           document.getElementById("qaPerson").value = lastRec.qaPerson;
           document.getElementById("assignPerson").value = lastRec.person;
+          document.getElementById("h2sPerson").value = lastRec.h2sPerson || "";
 
-          // Pre-fill personnel photos (so they don't have to re-upload on every bag)
           if (lastRec.photoQA) {
             pendingImages.qa = lastRec.photoQA;
-            setUploadUI("photoQA", "fa-clipboard-user", "QA Image Copied", true);
+            setUploadUI("photoQA", "fa-clipboard-user", "Copied", true);
           }
           if (lastRec.photoBagger) {
             pendingImages.bagger = lastRec.photoBagger;
-            setUploadUI("photoBagger", "fa-user-gear", "Bagger Image Copied", true);
+            setUploadUI("photoBagger", "fa-user-gear", "Copied", true);
+          }
+          if (lastRec.photoH2S) {
+            pendingImages.h2s = lastRec.photoH2S;
+            setUploadUI("photoH2S", "fa-mask-ventilator", "Copied", true);
           }
         }
       }
@@ -711,8 +855,11 @@
         tare: document.getElementById("tareWeight").value,
         bagWeight: document.getElementById("bagWeight").value,
         productName: document.getElementById("productName").value,
+        
         qaPerson: document.getElementById("qaPerson").value,
         person: document.getElementById("assignPerson").value,
+        h2sPerson: document.getElementById("h2sPerson").value,
+
         date: document.getElementById("bagDate").value,
         time: document.getElementById("bagTime").value,
         condTie: document.getElementById("chkTie").checked,
@@ -721,17 +868,22 @@
         condN2: document.getElementById("chkN2").checked,
         condRedTag: document.getElementById("chkRedTag").checked,
         condWarehouse: document.getElementById("chkWarehouse").checked,
-        photoBag: pendingImages.bag,
+        
+        photoBagTop: pendingImages.bagTop,
+        photoBagFront: pendingImages.bagFront,
+        photoBagBack: pendingImages.bagBack,
+        photoBagLeft: pendingImages.bagLeft,
+        photoBagRight: pendingImages.bagRight,
+        
         photoQA: pendingImages.qa,
-        photoBagger: pendingImages.bagger
+        photoBagger: pendingImages.bagger,
+        photoH2S: pendingImages.h2s
       };
 
       if (recordId) {
-        // Update existing
         const index = records.findIndex(r => r.id === recordId);
         if (index !== -1) records[index] = payload;
       } else {
-        // Add new
         records.push(payload);
       }
 
